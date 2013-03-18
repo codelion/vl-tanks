@@ -1,0 +1,7 @@
+improve timing f-tions
+multiplayer:
+	skills
+		active skills, dont send command on prepare skill
+	sync deaths
+	send message only if host ???
+	several rooms separate sockets

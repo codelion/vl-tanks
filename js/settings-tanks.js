@@ -1,0 +1,186 @@
+//Heavy
+TYPES.push({
+	name: 'Heavy',					//name
+	type: 'tank',					//tank type
+	description: "Heavy armor and low damage",	//tank description
+	life: [230, 0],					//[tank life in level 0, life increase in each level]
+	damage: [10, 0],				//[tank damage in level 0, damage increase in each level]
+	range: 80,					//tank shooting range
+	scout: 100,					//tank scout range
+	armor: [60, 0, 0],				//[tank armor in level 0, armor increase in each level, max armor]
+	speed: 26,					//tank moving speed
+	attack_delay: 1,				//attack delay in seconds
+	turn_speed: 2,					//tank turn speed
+	//no_repawn: 1,					//tank will not respan after death
+	//no_collisions: 1,				//tank will be able to move ower walls, and other tanks
+	//bonus: 1,					//tank will be able only in single mode,  random and mirror
+	//ignore_armor: 1,				//tank will ignore armor
+	size: ['M', 36],				//[tank size: S/M/L, icon width and height(same)]
+	icon_top: ['top1.png', 'top2.png'],		//tank base images for all teams
+	icon_base: ['base1.png', 'base2.png'],		//tank top images for all teams
+	preview: 'preview.png',				//tank preview image
+	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
+		{name: 'Shield',	passive: false,		broadcast: 1},
+		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		],
+	bullet: 'bullet.png',				//bullet_image
+	fire_sound: 'shoot.ogg',			//shooting sound
+	});
+
+//Tiger
+TYPES.push({
+	name: 'Heavy',
+	type: 'tank',
+	description: "Medium armor and huge damage",
+	life: [200, 0],
+	damage: [30, 0],
+	range: 85,
+	scout: 100,
+	armor: [40, 0, 0],
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 2,
+	size: ['M', 36],
+	preview: 'preview.png',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//Cruiser
+TYPES.push({
+	name: 'Cruiser',
+	type: 'tank',
+	description: "Light armor, fast, average damage",
+	life: [150, 0],
+	damage: [15, 0],
+	range: 90,
+	scout: 110,
+	armor: [20, 0, 0],
+	speed: 35,
+	attack_delay: 1,
+	turn_speed: 1,
+	size: ['M', 36],
+	preview: 'preview.png',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//Launcher
+TYPES.push({
+	name: 'Launcher',
+	type: 'tank',
+	description: "Missles, long range, but slow",
+	life: [100, 0],
+	damage: [50, 0],
+	range: 100,
+	scout: 110,
+	armor: [10, 0, 0],
+	speed: 23,
+	attack_delay: 1.5,
+	turn_speed: 5,
+	size: ['M', 36],
+	preview: 'preview.png',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//Sniper
+TYPES.push({
+	name: 'Sniper',
+	type: 'tank',
+	description: "Long range, huge damage, penetrates armor, but slow and inacurate",
+	life: [100, 0],
+	damage: [60, 0],
+	range: 100,
+	scout: 110,
+	armor: [10, 0, 0],
+	speed: 23,
+	attack_delay: 2,
+	turn_speed: 6,
+	size: ['M', 36],
+	ignore_armor: 1,
+	preview: 'preview.png',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//Soldier
+TYPES.push({
+	name: 'Soldier',
+	type: 'human',
+	description: "Infantry without armor and low damage",
+	life: [50, 0],
+	damage: [10, 0],
+	range: 50,
+	scout: 60,
+	armor: [0, 0, 0],
+	speed: 25,
+	attack_delay: 1,
+	turn_speed: 6,
+	no_repawn: 1,
+	size: ['S', 15],
+	preview: 'preview.png',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: [],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//TOWER
+TYPES.push({
+	name: 'Tower',
+	type: 'tower',
+	description: "Tower for defence",
+	life: [700,0],
+	damage: [30, 0],
+	range: 110,
+	scout: 120,
+	armor: [0,0,0],
+	speed: 0,
+	attack_delay: 1,
+	turn_speed: 3,
+	no_repawn: 1,
+	size: ['L', 50],
+	preview: '',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
+
+//BASE
+TYPES.push({
+	name: 'Base',
+	type: 'tower',
+	description: "Main base",
+	life: [2000,0],
+	damage: [30, 0],
+	range: 110,
+	scout: 120,
+	armor: [50,0,0],
+	speed: 0,
+	attack_delay: 1,
+	turn_speed: 3,
+	no_repawn: 1,
+	size: ['L', 53],
+	preview: '',
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	abilities: [],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	});
