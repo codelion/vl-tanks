@@ -1,1 +1,1 @@
-HTML5 tanks.
+HTML5 tanks
