@@ -470,9 +470,9 @@ function draw_final_score(live, lost_team){
 		img.src = 'img/background.jpg';
 		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
-		canvas_backround.strokeStyle = "#000000";
+		canvas_backround.strokeStyle = "#000000";	
 		canvas_backround.fillStyle = "rgba(255, 255, 255, 0.7)";
-		roundRect(canvas_backround, 10, 10, WIDTH_APP-20, HEIGHT_APP-20-25, 0, true);
+		roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20-25, 0, true);
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#382da3";
@@ -545,7 +545,7 @@ function draw_final_score(live, lost_team){
 				canvas.fillStyle = "#ffaaaa";
 			else
 				canvas.fillStyle = "#b9b9ff";
-			roundRect(canvas, Math.round((WIDTH_APP-button_width)/2), top_margin+(button_height+buttons_gap)*j, button_width, button_height, 0, true);
+			roundRect(canvas, Math.round((WIDTH_SCROLL-button_width)/2), top_margin+(button_height+buttons_gap)*j, button_width, button_height, 0, true);
 			
 			var text_y = top_margin+(button_height+buttons_gap)*j+Math.round((button_height+letter_height)/2);
 			if(TANKS[i].name == name)
