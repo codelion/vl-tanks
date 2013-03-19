@@ -74,7 +74,6 @@ MAPS.push(tmp);
 
 var tmp = new Array();
 tmp['name'] = "Mini";
-tmp['map_grass'] = "big";
 tmp['map'] =
 	[
 		['111111111111'],

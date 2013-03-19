@@ -77,7 +77,7 @@ function draw_tank(tank){
 				if(radius>35)
 					radius=35;
 				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
-				tmp_object.lineWidth = 5;
+				tmp_object.lineWidth = 3;
 				tmp_object.strokeStyle = "#e0da25";
 				tmp_object.stroke();
 				}
