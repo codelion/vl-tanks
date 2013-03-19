@@ -1,7 +1,6 @@
 /*
 Name: VL Tanks
 Author: VL
-Version: 1.0
 */
 
 //start
@@ -10,7 +9,6 @@ init_game(true);
 //init hello screen
 function init_game(first_time){
 	PLACE = 'init';
-	document.getElementById("name").innerHTML = name;
 	
 	//check if muted
 	if(getCookie("muted") != '')
@@ -43,7 +41,6 @@ function init_game(first_time){
 	}
 //checks and resizes all canvas layers
 function check_canvas_sizes(){
-	var status_bar_height = 171;
 	if(FS==false){
 		WIDTH_MAP = MAPS[level-1]['map'][0].length*block_width;
 		HEIGHT_MAP = MAPS[level-1]['map'].length*block_height;
@@ -71,13 +68,13 @@ function check_canvas_sizes(){
 			HEIGHT_APP = APP_SIZE_CACHE[1];	
 		//scroll
 		WIDTH_SCROLL = dimensions[0];
-		HEIGHT_SCROLL = dimensions[1]-status_bar_height;
+		HEIGHT_SCROLL = dimensions[1]-HEIGHT_STATUS_AREA;
 		if(WIDTH_SCROLL > WIDTH_MAP)
 			WIDTH_SCROLL = WIDTH_MAP;
 		if(WIDTH_SCROLL < block_width*11)
 			WIDTH_SCROLL = block_width*11;	
-		if(HEIGHT_SCROLL+status_bar_height > HEIGHT_MAP)
-			HEIGHT_SCROLL = HEIGHT_MAP-status_bar_height;
+		if(HEIGHT_SCROLL+HEIGHT_STATUS_AREA > HEIGHT_MAP)
+			HEIGHT_SCROLL = HEIGHT_MAP-HEIGHT_STATUS_AREA;
 		if(HEIGHT_SCROLL < block_height*6)
 			HEIGHT_SCROLL = block_height*6;	
 		}
@@ -93,9 +90,9 @@ function check_canvas_sizes(){
 	//objects
 	canvas_base.width  = WIDTH_SCROLL;
 	canvas_base.height = HEIGHT_SCROLL;
-	//container
-	document.getElementById("container").style.height = HEIGHT_APP+"px";
-	document.getElementById("container").style.width = WIDTH_APP+"px";
+	//canvas_area
+	//document.getElementById("canvas_area").style.height = HEIGHT_APP+"px";
+	//document.getElementById("canvas_area").style.width = WIDTH_APP+"px";
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 	}
@@ -105,9 +102,7 @@ function add_first_screen_elements(){
 	name_tmp = getCookie("player_name");
 	if(name_tmp != ''){
 		name = name_tmp+Math.floor(Math.random()*99);
-		document.getElementById("name").innerHTML = name;
 		}
-		
 	if(muted==false){
 		if(audio_main != undefined)
 			audio_main.pause();

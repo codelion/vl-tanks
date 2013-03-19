@@ -7,64 +7,55 @@
 <link rel="shortcut icon" href="img/favicon.png" />
 </head>
 <body>
-<div style="float:left;" id="container">
-	<canvas style="position:absolute;" id="canvas_map"></canvas>
-	<canvas style="position:absolute;" id="canvas_map_sight"></canvas>
-	<canvas style="position:absolute;" id="canvas_backround"></canvas>
-	<canvas style="position:absolute;" id="canvas_main"></canvas>
-	<div id="chat_write">
-		<input type="text" style="width:250px;" id="chat_text" />
-		<input type="submit" value="Say" onclick="chat();" />
+<div id="wrapper">
+	<div id="content">
+		<iframe id="main_iframe" src="iframe.html" width="700" height="525" frameborder="0" marginheight="0px" marginwidth="0" scrolling="no" allowfullscreen mozallowfullscreen webkitallowfullscreen></iframe>
+		<!--
+		<div style="border:1px solid red;width:400px;height:400px;overflow:hidden;" id="canvas_area">
+			<canvas style="position:absolute;" id="canvas_map"></canvas>
+			<canvas style="position:absolute;" id="canvas_map_sight"></canvas>
+			<canvas style="position:absolute;" id="canvas_backround"></canvas>
+			<canvas style="position:absolute;" id="canvas_main"></canvas>
+			<div id="chat_write">
+				<input type="text" style="width:250px;" id="chat_text" />
+				<input type="submit" value="Say" onclick="chat();" />
+			</div>
+		</div>
+		<div style="position:absolute;left:0px;top:0px;width:100%;height:8px;background-color:white;"></div>
+		<div style="position:absolute;left:0px;top:533px;width:100%;height:1000px;background-color:white"></div>
+		<div style="position:absolute; left:0px;top:0px;width:8px;height:100%;background-color:white;"></div>
+		<div style="position:absolute; left:708px;top:0px;width:1000px;height:100%;background-color:white;"></div>
+		-->
+		<div style="margin-top:20px;">
+			<table>
+			<tr>
+				<td>FPS:</td>
+				<td style="font-weight:bold;" id="fps"></td>
+			</tr>
+			<tr>
+				<td>Connected</td>
+				<td style="font-weight:bold;" id="connected">no</td>
+			</tr>
+			<tr>
+				<td style="padding-right:5px;">Messages out:</td>
+				<td style="font-weight:bold;" id="messages_out">0</td>
+			</tr>
+			<tr>
+				<td>Messages in:</td>
+				<td style="font-weight:bold;" id="messages_in">0</td>
+			</tr>
+			</table>
+		</div>
+	</div>
+	<div id="header-wide"></div>
+	<div id="header">
+		<div id="menu">
+			<div id="menu_links">
+				<a href="index.html">Home</a>
+			</div>
+			<div style="clear:both;"></div>
+		</div>
 	</div>
 </div>
-<div style="position:absolute;left:0px;top:0px;width:100%;height:8px;background-color:white;"></div>
-<div style="position:absolute;left:0px;top:533px;width:100%;height:1000px;background-color:white"></div>
-<div style="position:absolute; left:0px;top:0px;width:8px;height:100%;background-color:white;"></div>
-<div style="position:absolute; left:708px;top:0px;width:1000px;height:100%;background-color:white;"></div>
-
-<div style="position:absolute;margin-left:710px;">
-	<table>
-	<tr>
-		<td>FPS:</td>
-		<td style="font-weight:bold;" id="fps"></td>
-	</tr>
-	<tr>
-		<td>Connected</td>
-		<td style="font-weight:bold;" id="connected">no</td>
-	</tr>
-	<tr>
-		<td style="padding-right:5px;">Messages out:</td>
-		<td style="font-weight:bold;" id="messages_out">0</td>
-	</tr>
-	<tr>
-		<td>Messages in:</td>
-		<td style="font-weight:bold;" id="messages_in">0</td>
-	</tr>
-	</table>
-</div>
-<div style="clear:both;"></div>
-<br />
-<b>Network messages:</b> <span id="network_messages">0</span><br />
-<form action="" method="post" onsubmit="chat();return false;">
-<b>Chat:</b><div style="width:410px;height:80px;font-size:11px;overflow-y: scroll;border:1px solid #777777;margin-bottom:5px;" id="chat"></div>
-<b><span id="name">You</span>: </b><input type="text" style="width:200px;" id="say" /> <input type="submit" value="OK" /><br />
-</form>
-<script src="js/controlls.js"></script>
-<script src="js/multiplayer.js"></script>
-<script src="js/draw.js"></script>
-<script src="js/maps.js"></script>
-<script src="js/rooms.js"></script>
-<script src="js/tanks.js"></script>
-<script src="js/tanks-functions.js"></script>
-<script src="js/statusbar.js"></script>
-<script src="js/helpers.js"></script>
-<script src="js/settings.js"></script>
-<script src="js/settings-maps.js"></script>
-<script src="js/settings-tanks.js"></script>
-<script src="js/settings-bullets.js"></script>
-<script src="js/tanks-functions.js"></script>
-<script src="js/main.js"></script>
-<script src="libs/web_sockets_local.js"></script>
-<script src="libs/webpush.js"></script>
 </body>
 </html>

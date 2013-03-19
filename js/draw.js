@@ -476,7 +476,7 @@ function draw_final_score(live, lost_team){
 		roundRect(canvas_backround, Math.round((WIDTH_APP-button_width)/2), 25, 70, 30, 3, true);
 		register_button(Math.round((WIDTH_APP-button_width)/2), 25, 70, 30, PLACE, function(){
 			if(FS==true)
-				fullscreen('container');
+				fullscreen('canvas_area');
 			quit_game();
 			});
 		

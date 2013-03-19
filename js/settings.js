@@ -15,7 +15,8 @@ var START_GAME_COUNT_SINGLE=5;		//second how much to count in singleplayer
 var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
 var WIDTH_APP = 700;			//application width
 var HEIGHT_APP = 525;			//application height
-var VERSION = 1.6;			//app version
+var HEIGHT_STATUS_AREA = 171;		//status are height
+var VERSION = "1.0";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array

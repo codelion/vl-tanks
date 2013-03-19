@@ -89,7 +89,7 @@ function draw_fs_button(){
 	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+5, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
-		fullscreen('container');
+		fullscreen('canvas_area');
 		});
 	}
 //quit button in statusbar
