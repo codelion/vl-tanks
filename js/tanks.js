@@ -130,7 +130,7 @@ function draw_tank(tank){
 			else{
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
-				tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
+				tmp_object.drawImage(img_me, -1*round(tank_size/2), -1*round(tank_size/2), tank_size, tank_size);
 				}
 			tmp_object.restore();
 			
@@ -1084,7 +1084,7 @@ function add_towers(){
 		tmp['sublevel'] = 0;
 		tmp['type'] = type;
 		tmp['team'] = MAPS[level-1]['towers'][i][0];
-		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
+		tmp['sight'] = TYPES[tmp['type']].scout+round(TYPES[tmp['type']].size[1]/2);
 		tmp['speed'] = TYPES[tmp['type']].speed;
 		tmp['armor'] = TYPES[tmp['type']].armor[0];	
 		tmp['damage'] = TYPES[tmp['type']].damage[0];

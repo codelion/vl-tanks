@@ -24,12 +24,15 @@ function init_game(first_time){
 		}
 	
 	//logo
+	canvas_backround.fillStyle = "#676767";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	var img = new Image();
-	img.src = 'img/logo.jpg';
+	img.src = 'img/logo.png';
 	img.onload = function(){	//wait till background is loaded
 		var img = new Image();	
-		img.src = 'img/logo.jpg';	
-		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		img.src = 'img/logo.png';
+		var left = (WIDTH_APP-598)/2;	
+		canvas_backround.drawImage(img, left, 50);
 		if(first_time==true){
 			preload_all_files();
 			if(chat_interval_id==undefined)
@@ -46,7 +49,7 @@ function check_canvas_sizes(){
 		HEIGHT_MAP = MAPS[level-1]['map'].length*block_height;
 		WIDTH_APP = APP_SIZE_CACHE[0];
 		HEIGHT_APP = APP_SIZE_CACHE[1];
-		WIDTH_SCROLL = block_width*11;
+		WIDTH_SCROLL = block_width*12;
 		HEIGHT_SCROLL = HEIGHT_APP-150-25;
 		}
 	else{
@@ -91,8 +94,12 @@ function check_canvas_sizes(){
 	canvas_base.width  = WIDTH_SCROLL;
 	canvas_base.height = HEIGHT_SCROLL;
 	//canvas_area
-	//document.getElementById("canvas_area").style.height = HEIGHT_APP+"px";
-	//document.getElementById("canvas_area").style.width = WIDTH_APP+"px";
+	document.getElementById("canvas_area").style.height = HEIGHT_APP+"px";
+	document.getElementById("canvas_area").style.width = WIDTH_APP+"px";
+	try{
+		parent.document.getElementById("main_iframe").style.height = HEIGHT_APP+"px";
+		parent.document.getElementById("main_iframe").style.width = WIDTH_APP+"px";
+		}catch(error){}
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 	}
@@ -156,7 +163,7 @@ function preload_all_files(){
 		'img/background.jpg',
 		'img/favicon.png',
 		'img/lock.png',
-		'img/logo.jpg',
+		'img/logo.png',
 		'img/mute.png',
 		'img/repair.png',
 		'img/statusbar.png',

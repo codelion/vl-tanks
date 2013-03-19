@@ -6,12 +6,16 @@ function connect_server(){
 	socket.bind('message', function(data){ get_packet(data);  } );
 	socket.bind('open', function() {  
 		socket_live=true;  
-		document.getElementById("connected").innerHTML = 'yes';
+		try{
+			parent.document.getElementById("connected").innerHTML = 'yes';
+			}catch(error){}
 		register_tank_action('ask_rooms', false, name);
 		});
 	socket.bind('close', function() {  
 		socket_live=false;  
-		document.getElementById("connected").innerHTML = 'no';
+		try{
+			parent.document.getElementById("connected").innerHTML = 'no';
+			}catch(error){}
 		});
 	add_player_to_stats(name);
 	}
@@ -23,7 +27,9 @@ function disconnect_server(){
 	}
 //get packets from server
 function get_packet(event){
-	document.getElementById("messages_in").innerHTML = parseInt(document.getElementById("messages_in").innerHTML)+1;
+	try{
+		parent.document.getElementById("messages_in").innerHTML = parseInt(document.getElementById("messages_in").innerHTML)+1;
+		}catch(error){}
 	DATA = JSON.parse(event);
 	var type = DATA.type;
 	DATA = DATA.message;
@@ -311,7 +317,9 @@ function send_packet(type, message){
 		return false;
 		}
 	console.log("send message: "+type);
-	document.getElementById("messages_out").innerHTML = parseInt(document.getElementById("messages_out").innerHTML)+1;
+	try{
+		parent.document.getElementById("messages_out").innerHTML = parseInt(document.getElementById("messages_out").innerHTML)+1;
+		}catch(error){}
 	message = {
 		type: type,
 		message: message,

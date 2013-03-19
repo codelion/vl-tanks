@@ -205,27 +205,16 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	var gap = 10;
 	var letter_height = 8;
 	var letter_width = 9;
-	var selected_block_padding=2;
+	var selected_block_padding=0;
 	
 	maps_positions = [];
 	
 	//clear name ara
 	img = new Image();
-	img.src = 'img/cc2.jpg';
-	canvas_backround.drawImage(img, 0, top_height+button_height, WIDTH_APP, 30, 0, top_height+button_height, WIDTH_APP, 30);
+	img.src = 'img/background.jpg';
+	canvas_backround.drawImage(img, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){
-		if(level - 1==i){
-			//selected - show border
-			canvas_this.fillStyle = "#ca0000";
-			canvas_this.fillRect(15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2);
-			}
-		else{
-			//nto selected
-			canvas_this.fillStyle = "#cccccc";
-			canvas_this.fillRect(15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2);
-			}
-	
 		//background
 		canvas_this.fillStyle = "#cccccc";
 		canvas_this.fillRect(15+i*(81+gap)+1, top_height+1, 79, 79);
@@ -271,11 +260,6 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			canvas_this.fillRect(pos1+1+Math.ceil(MAPS[i].towers[ii][1]*(button_width-2-msize)/100), pos2+1+Math.ceil(MAPS[i].towers[ii][2]*(button_height-2-msize)/100), msize, msize);
 			}
 			
-		//corners
-		/*var img_tmp = new Image();
-		img_tmp.src = 'img/general.png';
-		canvas_this.drawImage(img_tmp, 15+i*(81+gap), top_height);*/
-		
 		//name
 		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
 		canvas_this.fillStyle = "#000000";
@@ -307,6 +291,11 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 					}
 				});
 			}
+		if(level - 1==i)	//selected - show border
+			canvas_this.strokeStyle = "#c10000";
+		else			//not selected
+			canvas_this.strokeStyle = "#6d6c6d";
+		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
 	}
 function prepare_maps(){

@@ -392,17 +392,20 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	settings_positions = [];
 	
 	//logo
+	canvas_backround.fillStyle = "#676767";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	var img = new Image();
-	img.src = 'img/logo.jpg';
-	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	img.src = 'img/logo.png';
+	var left = (WIDTH_APP-598)/2;	
+	canvas_backround.drawImage(img, left, 50);
 	
 	for (i in text_array){
 		//background
 		canvas_this.strokeStyle = "#000000";
 		if(i != active_i)
-			canvas_this.fillStyle = "rgba(12, 105, 52, 0.7)";
+			canvas_this.fillStyle = "rgba(32, 123, 32, 0.7)";
 		else
-			canvas_this.fillStyle = "rgba(12, 105, 52, 1)";
+			canvas_this.fillStyle = "rgba(25, 97, 25, 1)";
 		roundRect(canvas_this, Math.round((WIDTH_APP-button_width)/2), top_margin+(button_height+buttons_gap)*button_i, button_width, button_height, 5, true);
 	
 		//text
@@ -624,7 +627,9 @@ function draw_message(this_convas, message){
 	}
 //show FPS
 function update_fps(){
-	document.getElementById("fps").innerHTML = Math.round(FPS_real*10)/10;	
+	try{
+		parent.document.getElementById("fps").innerHTML = Math.round(FPS_real*10)/10;	
+		}catch(error){}
 	}
 var red_line_y=0;
 //selecting tank window
@@ -634,7 +639,7 @@ function draw_tank_select_screen(selected_tank){
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 	
 	var y = 10;
-	var gap = 3;
+	var gap = 5;
 	if(selected_tank == undefined){
 		if(game_mode == 1)
 			selected_tank = 0; 
@@ -658,27 +663,27 @@ function draw_tank_select_screen(selected_tank){
 	
 	//show all possible tanks
 	j = 0;
+	preview_xy = 90;
 	for(var i in TYPES){
 		if(TYPES[i].preview == '') continue;
-		if(15+j*(81+gap)+ 81 > WIDTH_APP){
-			y = y + 81+gap;
+		if(15+j*(preview_xy+gap)+ preview_xy > WIDTH_APP){
+			y = y + preview_xy+gap;
 			j = 0;
 			}
 		if(selected_tank != undefined && selected_tank == i)
-			canvas_backround.fillStyle = "#aee100";	//selected
+			canvas_backround.fillStyle = "#8fc74c";	//selected
 		else
-			canvas_backround.fillStyle = "#cccccc";
-		canvas_backround.fillRect(15+j*(81+gap)+1, y+1, 79, 79);
+			canvas_backround.fillStyle = "#dbd9da";
+		canvas_backround.fillRect(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy);
 			
-		/*var img_tmp = new Image();
-		img_tmp.src = 'img/general.png';
-		canvas_backround.drawImage(img_tmp, 15+j*(81+gap), y);*/
+		canvas_backround.strokeStyle = "#000000";
+		roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
 		
 		var img_tmp2 = new Image();
 		img_tmp2.src = 'img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
-		var pos1 = 15+j*(81+gap)+Math.floor((81-70)/2)-5;
-		var pos2 = y+Math.floor((81-70)/2)-5;
-		canvas_backround.drawImage(img_tmp2, pos1, pos2, 81, 81);
+		var pos1 = 15+j*(preview_xy+gap);
+		var pos2 = y;
+		canvas_backround.drawImage(img_tmp2, pos1, pos2, preview_xy, preview_xy);
 		
 		ROOM = get_room_by_id(opened_room_id);
 		if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
@@ -687,7 +692,7 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.drawImage(img_lock, pos1+50, pos2+45);
 			}
 		
-		register_button(15+j*(81+gap)+1, y+1, 79, 79, PLACE, function(mouseX, mouseY, index){
+		register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
 			if(game_mode == 2){
 				ROOM = get_room_by_id(opened_room_id);
 				if(ROOM.settings[0]=='normal'){
@@ -708,55 +713,42 @@ function draw_tank_select_screen(selected_tank){
 			}, i);
 		j++;
 		}
-	y = y + 81+10;
-	
-	//time left line
-	red_line_y = y;
-	if(starting_timer==-1){
-		if(game_mode == 1)	
-			starting_timer = START_GAME_COUNT_SINGLE;
-		else	
-			starting_timer = START_GAME_COUNT_MULTI;
-		}
-	draw_timer_graph();
+	y = y + preview_xy+10;
 	
 	//tank info block
-	var info_left = 15+70+10;
+	var info_left = 15;
 	canvas_backround.fillStyle = "#ffffff";
-	canvas_backround.fillRect(info_left, y, 585, 160);
+	canvas_backround.strokeStyle = "#000000";
+	roundRect(canvas_backround, info_left, y, 585, 140, 5, true);
 
 	//tank stats
 	if(selected_tank != undefined){
-		//show tank stats 15x44
-		canvas_backround.fillStyle = "#ffffff";
-		canvas_backround.fillRect(info_left+10+Math.floor((102-72)/2), y+50, 85, 85);
-		
 		var img_tmp3 = new Image();
 		img_tmp3.src = 'img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
-		var pos1 = info_left+10+Math.floor((102-72)/2);
-		var pos2 = y+50;
-		canvas_backround.drawImage(img_tmp3, pos1, pos2, 81, 81);
-		
-		canvas_backround.fillStyle = "#ffffff";
-		canvas_backround.fillRect(info_left+Math.floor((102-72)/2), y+15, 100, 20);
+		var pos1 = info_left+10;
+		var pos2 = y+((140-preview_xy)/2);
+		canvas_backround.drawImage(img_tmp3, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#000000";
-		canvas_backround.fillText(TYPES[selected_tank].name, info_left+Math.floor((102-72)/2)+15, y+15+15);
+		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+15+15);
 		
-		//abilities
-		canvas_backround.clearRect(info_left+230, y+138-15, 170, 17);
-		canvas_backround.font = "bold 14px Verdana";
-		canvas_backround.fillStyle = "#000000";
-		canvas_backround.fillText(TYPES[selected_tank].description, info_left+230, y+136);
+		//description
+		var height_space = 15;
+		for(var d in TYPES[selected_tank].description){
+			canvas_backround.font = "bold 13px Verdana";
+			canvas_backround.fillStyle = "#808080";
+			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+60+d*height_space);
+			}
 		}
-	y = y + 157+10;
+	y = y + 140+15;
 	
 	//mini maps
 	if(game_mode == 1){	
 		show_maps_selection(canvas_backround, y, true);
 		y = y + 81+30;
 		}
+		
 	//teams
 	if(game_mode == 2){
 		ROOM = get_room_by_id(opened_room_id);
@@ -774,7 +766,7 @@ function draw_tank_select_screen(selected_tank){
 			j = 0;
 			canvas_backround.strokeStyle = "#000000";
 			if(teams[t]==my_team)
-				canvas_backround.fillStyle = "#aee100";
+				canvas_backround.fillStyle = "#8fc74c";
 			else
 				canvas_backround.fillStyle = "#ffffff";
 			roundRect(canvas_backround, 15+1, y+1, 120, ICON_WIDTH, 2, true);
@@ -793,7 +785,7 @@ function draw_tank_select_screen(selected_tank){
 					//background
 					canvas_backround.strokeStyle = "#000000";
 					if(ROOM.players[p].name==name)
-						canvas_backround.fillStyle = "#aee100";	//me
+						canvas_backround.fillStyle = "#8fc74c";	//me
 					else
 						canvas_backround.fillStyle = "#bebebe";
 					roundRect(canvas_backround, 122+gap+15+j*(ICON_WIDTH+2+gap)+1, y+1, ICON_WIDTH, ICON_WIDTH, 2, true);
@@ -818,38 +810,44 @@ function draw_tank_select_screen(selected_tank){
 			y = y + ICON_WIDTH+2+5;
 			}
 		}
+		
+	//time left line
+	red_line_y = y+10;
+	if(starting_timer==-1){
+		if(game_mode == 1)	
+			starting_timer = START_GAME_COUNT_SINGLE;
+		else	
+			starting_timer = START_GAME_COUNT_MULTI;
+		}
+	draw_timer_graph();
 	}
 function draw_timer_graph(){
-	graph_width=70;
-	graph_height=157;
-	
-	//border
-	canvas_backround.strokeStyle = "#000000";
-	roundRect(canvas_backround, 15, red_line_y, graph_width, graph_height, 0, true);
+	graph_width=WIDTH_APP-30;
+	graph_height=40;
 	
 	//background
 	img = new Image();
 	img.src = 'img/background.jpg';
-	canvas_backround.drawImage(img, 15, red_line_y, graph_width, graph_height, 15, red_line_y, graph_width, graph_height);
+	canvas_backround.drawImage(img, 15-2, red_line_y-2, graph_width+4, graph_height+4, 15-2, red_line_y-2, graph_width+4, graph_height+4);
 	
 	//red block
-	canvas_backround.strokeStyle = "#cf0000";
-	canvas_backround.fillStyle = "#cf0000";
+	canvas_backround.strokeStyle = "#c10000";
+	canvas_backround.fillStyle = "#c10000";
 	var max_s = START_GAME_COUNT_MULTI;
 	if(game_mode == 1)	
 		max_s = START_GAME_COUNT_SINGLE;
-	top_x = red_line_y+graph_height*(max_s-starting_timer)/max_s;
-	height = graph_height-graph_height*(max_s-starting_timer)/max_s;
-	roundRect(canvas_backround, 15, top_x, graph_width, height, 0, true);
+	top_x = 15+graph_width*(max_s-starting_timer)/max_s;
+	width = graph_width-graph_width*(max_s-starting_timer)/max_s;
+	roundRect(canvas_backround, 15, red_line_y, width, graph_height, 0, true);
 	
 	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 40px Arial";
 	text = starting_timer;
 	if(text>9)
-		canvas_backround.fillText(text, 30, red_line_y+graph_height-10);
+		canvas_backround.fillText(text, 25, red_line_y+graph_height-5);
 	else
-		canvas_backround.fillText(text, 40, red_line_y+graph_height-10);
+		canvas_backround.fillText(text, 25, red_line_y+graph_height-5);
 	}
 //shwo preload progress line
 function update_preload(images_loaded){

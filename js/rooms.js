@@ -279,7 +279,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Game Type:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = [/*'normal', */'quick'];
+	values = ['Default'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";
@@ -335,7 +335,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	offset_top = offset_top + 20;
 	//create button block
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#07cf06";
+	canvas_backround.fillStyle = "#69a126";
 	roundRect(canvas_backround, 10+offset_left, 60+offset_top, 105, 30, 2, true);
 	
 	//create button text
@@ -433,7 +433,7 @@ function draw_room(room_id){
 	y = 20;
 	
 	//team 1 text
-	text = "Team 1";
+	/*text = "Team 1";
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 14px Helvetica";
 	canvas_backround.fillText(text, x1, y+15);
@@ -472,7 +472,8 @@ function draw_room(room_id){
 	canvas_backround.font = "Bold 12px Helvetica";
 	canvas_backround.fillText(text, x2+70+5, y+15);
 	
-	y = y + 20+gap;
+	y = y + 20+gap;*/
+	
 	y_begin = y;
 	icon_width = height;
 	
