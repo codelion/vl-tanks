@@ -293,14 +293,15 @@ function init_action(map_nr, my_team){
 
 	//add enemy if single player
 	if(game_mode==1){
-		//get random type
-		var enemy_tank_type = 0;	//default splodge
-		for(var i in TYPES){
-			if(TYPES[i].size[0]=='M' && randomToN(10)==5){
-				enemy_tank_type = i;
-				}
+		//get possible types
+		var possible_types = [];
+		for(var t in TYPES){
+			if(TYPES[t].type=="tank")
+				possible_types.push(t);
 			}
-		
+		//get random type
+		var enemy_tank_type = possible_types[randomToN(possible_types.length-1)];//randomize
+				
 		var tmp = new Array();
 		tmp['id'] = get_unique_id();
 		tmp['name'] = "Bot";

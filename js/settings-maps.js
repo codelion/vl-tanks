@@ -85,12 +85,12 @@ tmp['map'] =
 	];
 tmp['towers'] =
 	[
-		['B',	50,	3,	'Base'],
+	/*	['B',	50,	3,	'Base'],
 		['B',	30,	21,	'Tower'],
 		['B',	70,	21,	'Tower'],
 		['R',	30,	79,	'Tower'],
 		['R',	70,	79,	'Tower'],
-		['R',	50,	100,	'Base'],
+		['R',	50,	100,	'Base'],*/
 	];
 tmp['bots'] =	[];
 MAPS.push(tmp);

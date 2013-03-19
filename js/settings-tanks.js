@@ -7,7 +7,7 @@ TYPES.push({
 	damage: [10, 0],				//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [60, 0, 0],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [60, 0, 60],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 26,					//tank moving speed
 	attack_delay: 1,				//attack delay in seconds
 	turn_speed: 2,					//tank turn speed
@@ -36,7 +36,7 @@ TYPES.push({
 	damage: [30, 0],
 	range: 85,
 	scout: 100,
-	armor: [40, 0, 0],
+	armor: [40, 0, 40],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 2,
@@ -58,7 +58,7 @@ TYPES.push({
 	damage: [15, 0],
 	range: 90,
 	scout: 110,
-	armor: [20, 0, 0],
+	armor: [20, 0, 20],
 	speed: 35,
 	attack_delay: 1,
 	turn_speed: 1,
@@ -78,9 +78,9 @@ TYPES.push({
 	description: ["Missiles", "Long range", "Slow"],
 	life: [100, 0],
 	damage: [100, 0],
-	range: 200,
+	range: 150,
 	scout: 110,
-	armor: [10, 0, 0],
+	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 5,
 	turn_speed: 5,
@@ -99,10 +99,10 @@ TYPES.push({
 	type: 'tank',
 	description: ["Long range", "Huge damage", "Penetrates armor", "Slow", "Inacurate"],
 	life: [100, 0],
-	damage: [60, 0],
-	range: 100,
+	damage: [40, 0],
+	range: 150,
 	scout: 110,
-	armor: [10, 0, 0],
+	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 2,
 	turn_speed: 6,
@@ -171,7 +171,7 @@ TYPES.push({
 	damage: [30, 0],
 	range: 110,
 	scout: 120,
-	armor: [50,0,0],
+	armor: [50,0,50],
 	speed: 0,
 	attack_delay: 1,
 	turn_speed: 3,

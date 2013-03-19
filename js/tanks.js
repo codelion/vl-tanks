@@ -659,7 +659,7 @@ function tank_level_handler(){
 	canvas_backround.fillRect(status_x+326, status_y+46, red_bar_length, 7);
 	}
 //checks tanks hp regen
-function level_hp_regen_handler(){		//4 times per second
+function level_hp_regen_handler(){	return false;	//4 times per second
 	for (i in TANKS){
 		if(TANKS[i].dead == 1 || TANKS[i].respan_time != undefined) continue;
 		if(TYPES[TANKS[i].type].no_repawn == undefined){
@@ -936,8 +936,9 @@ function do_damage(TANK, TANK_TO, i, force_damage, armor_piercing_force, silent)
 			armor = 0;
 		}
 	
-	armor = Math.floor(armor/(armor+20)*100);
-	damage = damage*(100-armor)/100;
+	if(TYPES[TANK.type].ignore_armor != undefined)
+		armor = 0;	//pierce armor
+	damage = round( damage*(100-armor)/100 );		//log(damage+", target armor="+armor+", type="+TYPES[TANK_TO.type].name);
 	
 	//stats
 	if(TYPES[TANK_TO.type].name=="Tower" || TYPES[TANK_TO.type].name=="Base"){
