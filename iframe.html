@@ -6,6 +6,10 @@
 <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body style="margin:0px;padding:0px;background-color:#ffffff;">
+<div class="alert">
+	<b>ERROR:</b> You are using wrong browser.<br />
+	Please use Firefox, Chrome, Safari, Opera or other browsers that <b>supports</b> HTML5 technology.
+</div>
 <div id="canvas_area">
 	<canvas style="position:absolute;" id="canvas_map"></canvas>
 	<canvas style="position:absolute;" id="canvas_map_sight"></canvas>
@@ -17,7 +21,7 @@
 	</div>
 </div>
 <div style="position:absolute;left:0px;top:525px;width:100%;height:1000px;background-color:white"></div>
-<div style="position:absolute; left:800px;top:0px;width:1000px;height:100%;background-color:white;"></div>
+<div style="position:absolute;left:800px;top:0px;width:1000px;height:100%;background-color:white;"></div>
 <script src="js/controlls.js"></script>
 <script src="js/multiplayer.js"></script>
 <script src="js/draw.js"></script>
@@ -34,6 +38,7 @@
 <script src="js/tanks-functions.js"></script>
 <script src="js/main.js"></script>
 <script src="libs/web_sockets_local.js"></script>
+<script src="libs/css_browser_selector.js"></script>
 <script src="libs/webpush.js"></script>
 </body>
 </html>

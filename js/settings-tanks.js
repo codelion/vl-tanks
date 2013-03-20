@@ -1,10 +1,23 @@
+/*	future comparison
+
+DPS		10		30		15		20		20+aa
+VS		Heavy		Tiger		Cruiser	Launcher	Sniper	win	loss
+-------------------------------------------------------------------
+Heavy		n/a		--		++		--		--	|	1	3	but survive long
+Tiger		++		n/a		++		--		--	|	2	2
+Cruiser	--		--		n/a		0		0	|	0	2	but fast
+Launcher	++		++		0		n/a		0	|	2	0
+Sniper	++		++		0		0		n/a	|	2	0
+-------------------------------------------------------------------
+*/
+
 //Heavy
 TYPES.push({
 	name: 'Heavy',					//name
 	type: 'tank',					//tank type
 	description: ["Heavy armor", "Low damage"],	//tank description
 	life: [230, 0],					//[tank life in level 0, life increase in each level]
-	damage: [10, 0],				//[tank damage in level 0, damage increase in each level]
+	damage: [10, 0],		//10 dps	//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [60, 0, 60],				//[tank armor in level 0, armor increase in each level, max armor]
@@ -33,7 +46,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Medium armor", "Huge damage"],
 	life: [200, 0],
-	damage: [30, 0],
+	damage: [30, 0],	//30 dps
 	range: 85,
 	scout: 100,
 	armor: [40, 0, 40],
@@ -54,8 +67,8 @@ TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
 	description: ["Light armor", "Fast", "Aaverage damage"],
-	life: [150, 0],
-	damage: [15, 0],
+	life: [200, 0],
+	damage: [15, 0],	//15 dps
 	range: 90,
 	scout: 110,
 	armor: [20, 0, 20],
@@ -75,15 +88,16 @@ TYPES.push({
 TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
-	description: ["Missiles", "Long range", "Slow"],
+	description: ["Missiles", "Long range", "Slow", "Penetrates armor"],
 	life: [100, 0],
-	damage: [100, 0],
+	damage: [100, 0],	//20 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 5,
 	turn_speed: 5,
+	ignore_armor: 1,
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
@@ -97,9 +111,9 @@ TYPES.push({
 TYPES.push({
 	name: 'Sniper',
 	type: 'tank',
-	description: ["Long range", "Huge damage", "Penetrates armor", "Slow", "Inacurate"],
+	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack", "Inacurate"],
 	life: [100, 0],
-	damage: [40, 0],
+	damage: [40, 0],	//20 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
@@ -122,7 +136,7 @@ TYPES.push({
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage"],
 	life: [50, 0],
-	damage: [10, 0],
+	damage: [10, 0],	//10 dps
 	range: 50,
 	scout: 60,
 	armor: [0, 0, 0],
@@ -145,7 +159,7 @@ TYPES.push({
 	type: 'tower',
 	description: ["Tower for defence"],
 	life: [700,0],
-	damage: [30, 0],
+	damage: [30, 0],	//30 dps
 	range: 110,
 	scout: 120,
 	armor: [0,0,0],
@@ -168,7 +182,7 @@ TYPES.push({
 	type: 'tower',
 	description: ["Main base"],
 	life: [2000,0],
-	damage: [30, 0],
+	damage: [30, 0],	//30 dps
 	range: 110,
 	scout: 120,
 	armor: [50,0,50],

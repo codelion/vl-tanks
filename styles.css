@@ -1,4 +1,4 @@
-/* ========== GENERAL ======================================================= */
+/*========== GENERAL =========================================================*/
 body {
 	font-size: 75%; /* Resets to 12px */
 	font-family: Tahoma, Verdana, Arial;
@@ -82,7 +82,7 @@ hr {
 a img {
 	border: none;
 }
-/* ========== MAIN ========================================================== */
+/*========== MAIN ============================================================*/
 #wrapper {
 	margin: 0px auto;
 	width: 930px;
@@ -140,4 +140,14 @@ a img {
 	top:470px;
 	left:10px;
 	visibility:hidden;
+	}
+/*========== CLASSES =========================================================*/
+.alert{
+	padding:10px;
+	margin:5px;
+	border:1px solid red;
+	display:none;
+	}
+.ie .alert{
+	display:block;
 	}

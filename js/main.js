@@ -173,6 +173,7 @@ function preload_all_files(){
 		//map elements
 		'img/map/0.png',
 		'img/map/1.png',
+		'img/map/2.png',
 		'img/map/grass-all.jpg',
 		];
 	audio_to_preload = [
