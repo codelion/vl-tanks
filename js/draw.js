@@ -391,9 +391,14 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	last_active_tab = active_i;
 	settings_positions = [];
 	
-	//logo
+	//logo backround color
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
+	//back image
+	var img = new Image();
+	img.src = 'img/map/moon.jpg';
+	canvas_backround.drawImage(img, 0, 0, WIDTH_APP, HEIGHT_APP-27, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	//logo
 	var img = new Image();
 	img.src = 'img/logo.png';
 	var left = (WIDTH_APP-598)/2;	

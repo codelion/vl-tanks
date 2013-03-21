@@ -165,11 +165,6 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	button_active_color = '#b7e2fe';
 	button_inactive_color = '#d6d6d6';	
 	
-	//name block	
-	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#f4f7fb";
-	roundRect(canvas_backround, 10, 10, WIDTH_APP-10-10, 40, 5, true);
-	
 	//name text
 	canvas_backround.fillStyle = "#3f3b30";
 	canvas_backround.font = "Bold 13px Arial";
@@ -203,11 +198,6 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	canvas_backround.font = "Normal 12px Arial";
 	text = game_name;
 	canvas_backround.fillText(text, 80, 10+25);
-	
-	//setting block
-	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#eeeeed";
-	roundRect(canvas_backround, 10, 60, WIDTH_APP-10-10, HEIGHT_APP-95, 5, true);
 	
 	//players text - 2/4...20
 	var offset_top = 0;
@@ -249,7 +239,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Game Mode:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = ['normal', 'random', 'mirror'];
+	values = ['normal', 'random', 'mirror', 'freedom'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";
@@ -262,36 +252,6 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		//action
 		register_button(10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
 			game_mode = extra;
-			draw_create_room(game_players, game_mode, game_type, game_map);
-			}, values[i]);
-		
-		//text
-		canvas_backround.fillStyle = "#3f3b30";
-		canvas_backround.font = "Normal 12px Arial";
-		text = ucfirst(values[i]);
-		canvas_backround.fillText(text, 10+offset_left+10+i*(button_width+button_gap), 60+offset_top+25);
-		}
-	offset_top = offset_top + 40;
-	
-	//type text - normal/quick
-	canvas_backround.fillStyle = "#3f3b30";
-	canvas_backround.font = "Bold 13px Arial";
-	text = "Game Type:";
-	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
-	
-	values = ['Default'];
-	for(var i in values){
-		//block
-		canvas_backround.strokeStyle = "#000000";
-		if(values[i] == game_type)
-			canvas_backround.fillStyle = button_active_color;
-		else
-			canvas_backround.fillStyle = button_inactive_color;
-		roundRect(canvas_backround, 10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
-		
-		//action
-		register_button(10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
-			game_type = extra;
 			draw_create_room(game_players, game_mode, game_type, game_map);
 			}, values[i]);
 		
@@ -339,7 +299,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	roundRect(canvas_backround, 10+offset_left, 60+offset_top, 105, 30, 2, true);
 	
 	//create button text
-	canvas_backround.fillStyle = "#3f3b30";
+	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Arial";
 	text = "Create Game";
 	canvas_backround.fillText(text, 10+offset_left+10, 60+offset_top+20);
@@ -349,6 +309,22 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map);
 		draw_room(new_id);
 		});	
+	
+	//back button block
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#69a126";
+	roundRect(canvas_backround, 10+offset_left+120, 60+offset_top, 105, 30, 2, true);
+	
+	//back button text
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "Bold 13px Arial";
+	text = "Back";
+	canvas_backround.fillText(text, 40+offset_left+120, 60+offset_top+20);
+	
+	//register back button
+	register_button(10+offset_left+120, 60+offset_top, 105, 30, PLACE, function(){
+		draw_rooms_list();
+		});
 	}
 //room waiting for players
 function draw_room(room_id){

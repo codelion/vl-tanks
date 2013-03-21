@@ -8,7 +8,7 @@ body {
 	background-color:#e2f4cd;
 	width: 100%;
 	font-weight: normal;
-	overflow:hidden;
+	/*overflow:hidden;*/
 	}
 h1 {
 	font-weight: bold;
@@ -91,9 +91,9 @@ a img {
 	background-color:#ffffff;
 }
 #header{
-	position:fixed;
+	position:absolute;
 	padding:8px 0px 0px 0px;
-	width:100%;
+	width:900px;
 	top:0px;
 	margin-left:-1px;
 	}

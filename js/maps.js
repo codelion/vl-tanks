@@ -40,7 +40,7 @@ function draw_map(map_only){
 						continue;
 					grass_begun = true;
 					if(MAPS[level-1]['map_grass']=='big')
-						img = 'grass-all.jpg';
+						img = 'moon.jpg';
 					}
 				var img_texture = new Image();
 				img_texture.src = 'img/map/'+img;

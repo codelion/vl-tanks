@@ -23,7 +23,7 @@ function init_game(first_time){
 		check_canvas_sizes();
 		}
 	
-	//logo
+	//logo backround color
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	var img = new Image();
@@ -37,7 +37,7 @@ function init_game(first_time){
 			preload_all_files();
 			if(chat_interval_id==undefined)
 				chat_interval_id = setInterval(controll_chat, 1000);
-			}	
+			}
 		if(preloaded==true)
 			add_first_screen_elements();
 		}
@@ -174,7 +174,7 @@ function preload_all_files(){
 		'img/map/0.png',
 		'img/map/1.png',
 		'img/map/2.png',
-		'img/map/grass-all.jpg',
+		'img/map/moon.jpg',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -398,6 +398,8 @@ function quit_game(init_next_game){
 	clearInterval(start_game_timer_id);
 	
 	starting_timer = -1;
+	ROOMS = [];
+	PLAYERS = [];
 	
 	if(PLACE=='game'){
 		TANKS = [];
