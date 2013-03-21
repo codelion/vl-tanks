@@ -26,13 +26,18 @@ function init_game(first_time){
 	//logo backround color
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
+	//text
+	var text = "Moon wars".split("").join(String.fromCharCode(8201))
+	canvas_backround.font = "Bold 70px Arial";
+	canvas_backround.strokeStyle = '#ffffff';
+	canvas_backround.strokeText(text, 160, 340);
 	var img = new Image();
 	img.src = 'img/logo.png';
 	img.onload = function(){	//wait till background is loaded
 		var img = new Image();	
 		img.src = 'img/logo.png';
 		var left = (WIDTH_APP-598)/2;	
-		canvas_backround.drawImage(img, left, 50);
+		canvas_backround.drawImage(img, left, 15);
 		if(first_time==true){
 			preload_all_files();
 			if(chat_interval_id==undefined)

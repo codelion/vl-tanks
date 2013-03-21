@@ -262,7 +262,10 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			
 		//name
 		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
-		canvas_this.fillStyle = "#000000";
+		if(level - 1==i)
+			canvas_this.fillStyle = "#c10000";
+		else
+			canvas_this.fillStyle = "#196119";
 		canvas_this.font = "bold 14px Helvetica";
 		canvas_this.fillText(MAPS[i].name, 15+i*(button_width+gap)+padding_left, top_height+1+button_height+gap+10);
 		
@@ -292,9 +295,9 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 				});
 			}
 		if(level - 1==i)	//selected - show border
-			canvas_this.strokeStyle = "#c10000";
+			canvas_this.strokeStyle = "#ff0000";
 		else			//not selected
-			canvas_this.strokeStyle = "#6d6c6d";
+			canvas_this.strokeStyle = "#196119";
 		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
 	}
