@@ -748,6 +748,7 @@ function check_enemies(TANK){
 			var tmp = new Array();
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
+			tmp['bullet_to_target'] = TANKS[i]; 
 			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 			tmp['target'] = [i,TANKS[i].id];
 			tmp['angle'] = round(f_angle);
@@ -813,6 +814,7 @@ function check_enemies(TANK){
 		var tmp = new Array();
 		tmp['x'] = TANK.x+tank_size_from/2;
 		tmp['y'] = TANK.y+tank_size_from/2;
+		tmp['bullet_to_target'] = TANKS[i]; 
 		tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 		tmp['target'] = [i,TANKS[i].id];
 		tmp['angle'] = round(f_angle);
@@ -857,6 +859,7 @@ function check_enemies(TANK){
 			var tmp = new Array();
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
+			tmp['bullet_to_target'] = TANKS[i]; 
 			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 			tmp['target'] = [i,TANKS[i].id];
 			tmp['angle'] = round(f_angle);

@@ -218,8 +218,13 @@ function draw_main(){
 				if(TANKS[i].stun != undefined) continue; //stun
 				if(TANKS[i].bullets[b] == undefined) continue;
 				
-				b_dist_x = TANKS[i].bullets[b].bullet_to[0] - TANKS[i].bullets[b].x;
-				b_dist_y = TANKS[i].bullets[b].bullet_to[1] - TANKS[i].bullets[b].y;
+				//b_dist_x = TANKS[i].bullets[b].bullet_to[0] - TANKS[i].bullets[b].x;
+				//b_dist_y = TANKS[i].bullets[b].bullet_to[1] - TANKS[i].bullets[b].y;
+				//follows tank
+				var bullet_to_target_tank_size_to = TYPES[TANKS[i].bullets[b].bullet_to_target.type].size[1];
+				b_dist_x = (TANKS[i].bullets[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - TANKS[i].bullets[b].x;
+        			b_dist_y = (TANKS[i].bullets[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - TANKS[i].bullets[b].y; 
+				
 				b_distance = Math.sqrt((b_dist_x*b_dist_x)+(b_dist_y*b_dist_y));
 				b_radiance = Math.atan2(b_dist_y, b_dist_x); 
 				
