@@ -22,32 +22,20 @@ function draw_map(map_only){
 		status_y = HEIGHT_APP-150-25;
 		}
 	
-	try{
-		MAP = eval(MAPS[level-1]['map'].toSource());
+	//show background
+	var backround_height;
+	for(var b in ELEMENTS){
+		if(ELEMENTS[b].name=='background')
+			backround_height = ELEMENTS[b].size[1];
 		}
-	catch(err){
-		MAP = MAPS[level-1]['map'];
+	if(backround_height==undefined)
+		alert("ERROR: missing element 'background' config in draw_map().");
+	for(var i=0; i<Math.ceil(MAPS[level-1].y/backround_height); i++){
+		var img_texture = new Image();
+		img_texture.src = 'img/map/moon.jpg';
+		canvas_map.drawImage(img_texture, 0, 0+i*backround_height);
 		}
-	var grass_begun = false;	
-	for(var i=0; i<MAP.length; i++){
-		for(var j=0; j<MAP[i].length; j++){
-			img = '';
-			img = MAP[i][j]+'.png';
-			
-			if(img != ''){
-				if(MAP[i][j] == '0'){	//smart grass
-					if(grass_begun == true && MAPS[level-1]['map_grass']=='big')
-						continue;
-					grass_begun = true;
-					if(MAPS[level-1]['map_grass']=='big')
-						img = 'moon.jpg';
-					}
-				var img_texture = new Image();
-				img_texture.src = 'img/map/'+img;
-				canvas_map.drawImage(img_texture, j*block_width, i*block_height);
-				}
-			}
-		}
+	
 	//status bar
 	if(map_only==false){
 		//grey background
@@ -128,10 +116,6 @@ function redraw_mini_map(){
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.fillRect(status_x+20, status_y+17, 70, 116);
 	
-	//repaint mini map blocks
-	mini_w = 70/MAPS[level-1]['map'][0].length;	//Math.round(70/11);
-	mini_h = 116/MAPS[level-1]['map'].length;
-	
 	canvas_backround.fillStyle = "#8c8c8c";
 	canvas_backround.fillRect(
 		status_x+20-map_offset[0]*70/WIDTH_MAP, 
@@ -141,6 +125,14 @@ function redraw_mini_map(){
 		);
 	
 	//repaint mini map
+	/*mini_w = 70/MAPS[level-1]['map'][0].length;				//disabled for few days	
+	mini_h = 116/MAPS[level-1]['map'].length;
+	/*try{
+		MAP = eval(MAPS[level-1]['map'].toSource());				
+		}
+	catch(err){
+		MAP = MAPS[level-1]['map'];
+		}
 	for(var i=0; i<MAP.length; i++){
 		for(var j=0; j<MAP[i].length; j++){
 			img = '';
@@ -152,14 +144,9 @@ function redraw_mini_map(){
 					canvas_backround.fillStyle = "#666666";
 					canvas_backround.fillRect(status_x+20+j*mini_w, status_y+17+Math.round(i*mini_h), mini_w, mini_h);
 					}
-				//mini map - base or cannon
-				if(MAP[i][j] == 9 || MAP[i][j] == 3){
-					canvas_backround.fillStyle = "#0000aa";
-					canvas_backround.fillRect(status_x+20+j*mini_w, status_y+17+Math.round(i*mini_h), mini_w, mini_h);
-					}
 				}
 			}
-		}
+		}*/
 	}
 //darken map - using shadows
 function darken_map(){
@@ -220,7 +207,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		canvas_this.fillRect(15+i*(81+gap)+1, top_height+1, 79, 79);
 		
 		//calcuate mini-size
-		mini_w = (button_width-2)/MAPS[i]['map'][0].length;
+		/*ini_w = (button_width-2)/MAPS[i]['map'][0].length;			//disabled for few days
 		mini_h = (button_height-2)/MAPS[i]['map'].length;
 		
 		//paint mini map
@@ -258,7 +245,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			else
 				canvas_this.fillStyle = "#b12525";
 			canvas_this.fillRect(pos1+1+Math.ceil(MAPS[i].towers[ii][1]*(button_width-2-msize)/100), pos2+1+Math.ceil(MAPS[i].towers[ii][2]*(button_height-2-msize)/100), msize, msize);
-			}
+			}*/
 			
 		//name
 		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
@@ -302,13 +289,6 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		}
 	}
 function prepare_maps(){
-	for(var m in MAPS){
-		for(var j in MAPS[m].map){
-			var strings = MAPS[m].map[j].toString();
-			MAPS[m].map[j] = [];
-			for (var i=0; i<strings.length; i++){
-				MAPS[m].map[j].push(strings[i]);
-				}
-			}
-		}
+	//for(var m in MAPS){
+	//	}
 	}

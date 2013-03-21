@@ -50,19 +50,21 @@ function init_game(first_time){
 //checks and resizes all canvas layers
 function check_canvas_sizes(){
 	if(FS==false){
-		WIDTH_MAP = MAPS[level-1]['map'][0].length*block_width;
-		HEIGHT_MAP = MAPS[level-1]['map'].length*block_height;
+		WIDTH_MAP = MAPS[level-1].x;
+		HEIGHT_MAP = MAPS[level-1].y;
 		WIDTH_APP = APP_SIZE_CACHE[0];
 		HEIGHT_APP = APP_SIZE_CACHE[1];
-		WIDTH_SCROLL = block_width*12;
+		WIDTH_SCROLL = 800;
+		if(WIDTH_MAP<800)
+			WIDTH_SCROLL = WIDTH_MAP;
 		HEIGHT_SCROLL = HEIGHT_APP-150-25;
 		}
 	else{
 		//full screen
 		var dimensions = get_fimensions();
 		//map
-		WIDTH_MAP = MAPS[level-1]['map'][0].length*block_width;
-		HEIGHT_MAP = MAPS[level-1]['map'].length*block_height;
+		WIDTH_MAP = MAPS[level-1].x;
+		HEIGHT_MAP = MAPS[level-1].y
 		//app
 		WIDTH_APP = dimensions[0];
 		HEIGHT_APP = dimensions[1];
@@ -180,6 +182,7 @@ function preload_all_files(){
 		'img/map/1.png',
 		'img/map/2.png',
 		'img/map/moon.jpg',
+		'img/map/fence.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
