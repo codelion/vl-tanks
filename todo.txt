@@ -1,3 +1,8 @@
+implement accuracy ?
+bullets
+	if speed 0 - instant
+	separate from tanks - on tank death, bullet follows
+	fire animation?
 improve timing f-tions
 multiplayer:
 	skills

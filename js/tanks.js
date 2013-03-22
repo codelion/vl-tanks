@@ -203,8 +203,6 @@ function draw_tank(tank){
 
 	//draw tank in mini-map 20x17 - 70x116
 	if(tank.respan_time == undefined){
-		mini_w = Math.round(70/MAPS[level-1]['map'][0].length);
-		mini_h = Math.round(116/MAPS[level-1]['map'].length);
 		if(tank.team == 'B')
 			canvas_backround.fillStyle = "#0000aa";
 		else
@@ -216,11 +214,11 @@ function draw_tank(tank){
 		var tank_y = tank.y;	
 		if(tank_x<0)	tank_x=0;
 		if(tank_y<0)	tank_y=0;
-		if(tank_x>MAPS[level-1]['map'][0].length*block_width)	tank_x=MAPS[level-1]['map'][0].length*block_width;
-		if(tank_y>MAPS[level-1]['map'].length*block_height)	tank_y=MAPS[level-1]['map'].length*block_height;
+		if(tank_x>MAPS[level-1].x)	tank_x=MAPS[level-1].x;
+		if(tank_y>MAPS[level-1].y)	tank_y=MAPS[level-1].y;
 		
-		status_x_tmp = status_x+20+Math.round(tank_x * 70 / round(MAPS[level-1]['map'][0].length*block_width));
-		status_y = HEIGHT_APP - 150 - 25 + 17 + round(tank_y * 116 /(MAPS[level-1]['map'].length*block_height));
+		status_x_tmp = status_x+20+Math.round(tank_x * 70 / round(MAPS[level-1].x));
+		status_y = HEIGHT_APP - 150 - 25 + 17 + round(tank_y * 116 /(MAPS[level-1].y));
 		canvas_backround.fillRect(round(status_x_tmp), status_y, msize, msize);
 		}
 	}
@@ -573,8 +571,8 @@ function draw_tank_move(mouseX, mouseY){
 		}
 	}
 //check collisions
-function check_collisions(xx, yy, TANK){
-	if(TYPES[TANK.type].no_collisions != undefined) return false;
+function check_collisions(xx, yy, TANK){							//disabled for few days
+	/*if(TYPES[TANK.type].no_collisions != undefined) return false;
 	
 	xx = Math.round(xx);
 	yy = Math.round(yy);
@@ -611,7 +609,7 @@ function check_collisions(xx, yy, TANK){
 					}
 				}
 			}
-		}
+		}*/
 	
 	return false;
 	}
@@ -748,6 +746,7 @@ function check_enemies(TANK){
 			var tmp = new Array();
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
+			tmp['bullet_to_target'] = TANKS[i]; 
 			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 			tmp['target'] = [i,TANKS[i].id];
 			tmp['angle'] = round(f_angle);
@@ -813,6 +812,7 @@ function check_enemies(TANK){
 		var tmp = new Array();
 		tmp['x'] = TANK.x+tank_size_from/2;
 		tmp['y'] = TANK.y+tank_size_from/2;
+		tmp['bullet_to_target'] = TANKS[i]; 
 		tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 		tmp['target'] = [i,TANKS[i].id];
 		tmp['angle'] = round(f_angle);
@@ -857,6 +857,7 @@ function check_enemies(TANK){
 			var tmp = new Array();
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
+			tmp['bullet_to_target'] = TANKS[i]; 
 			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
 			tmp['target'] = [i,TANKS[i].id];
 			tmp['angle'] = round(f_angle);
