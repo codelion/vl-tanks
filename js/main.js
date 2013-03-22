@@ -81,12 +81,8 @@ function check_canvas_sizes(){
 		HEIGHT_SCROLL = dimensions[1]-HEIGHT_STATUS_AREA;
 		if(WIDTH_SCROLL > WIDTH_MAP)
 			WIDTH_SCROLL = WIDTH_MAP;
-		if(WIDTH_SCROLL < block_width*11)
-			WIDTH_SCROLL = block_width*11;	
 		if(HEIGHT_SCROLL+HEIGHT_STATUS_AREA > HEIGHT_MAP)
 			HEIGHT_SCROLL = HEIGHT_MAP-HEIGHT_STATUS_AREA;
-		if(HEIGHT_SCROLL < block_height*6)
-			HEIGHT_SCROLL = block_height*6;	
 		}
 	//background
 	document.getElementById("canvas_backround").width  = WIDTH_APP;
@@ -177,12 +173,6 @@ function preload_all_files(){
 		'img/target.png',
 		'img/unmute.png',
 		'img/button.png',
-		//map elements
-		'img/map/0.png',
-		'img/map/1.png',
-		'img/map/2.png',
-		'img/map/moon.jpg',
-		'img/map/fence.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -191,7 +181,7 @@ function preload_all_files(){
 		];
 		
 	//calculate files count
-	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS.length;
+	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS.length + ELEMENTS.length;
 	for(i in TYPES){
 		preload_left = preload_left + 5;	
 		}
@@ -203,6 +193,9 @@ function preload_all_files(){
 		}
 	for(var i in BULLETS){
 		preload('img/bullets/'+BULLETS[i].file);
+		}
+	for(var i in ELEMENTS){
+		preload('img/map/'+ELEMENTS[i].file);
 		}
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
@@ -272,13 +265,13 @@ function init_action(map_nr, my_team){
 	tmp['type'] = my_tank_nr;
 	if(my_team=='B'){
 		//blue top
-		tmp['x'] = WIDTH_SCROLL/2+Math.floor(block_width*0.6);
+		tmp['x'] = round(WIDTH_SCROLL*2/3);
 		tmp['y'] = 20;
 		tmp['angle'] = 180;
 		}
 	else{
 		//red bottom 
-		tmp['x'] = WIDTH_SCROLL/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+		tmp['x'] = WIDTH_SCROLL/3;
 		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 		tmp['angle'] = 0;
 		}
@@ -315,7 +308,7 @@ function init_action(map_nr, my_team){
 		tmp['id'] = get_unique_id();
 		tmp['name'] = "Bot";
 		tmp['type'] = enemy_tank_type;
-		tmp['x'] = WIDTH_MAP/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+		tmp['x'] = round(WIDTH_SCROLL/3);
 		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 		tmp['angle'] = 0;
 		tmp['angle'] = 0;

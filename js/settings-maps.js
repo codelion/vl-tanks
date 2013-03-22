@@ -1,38 +1,61 @@
 ELEMENTS.push({
-	name:	'background',
+	name: 'background',
 	file: 'moon.jpg',	
 	size: [1264, 632], 	
 	collission: false,	
 	});
 ELEMENTS.push({
-	name:	'fence',
+	name: 'fence',
 	file: 'fence.png',	
-	size: [96, 42], 	
+	size: [100, 22], 	
 	collission: true,	
 	});
-	
+ELEMENTS.push({
+	name: 'bomb',
+	file: 'bomb.png',	
+	size: [16, 16], 	
+	collission: true,	
+	});	
 
 //====== Standart ==============================================================
 
 MAPS.push({
 	name: "Standart",
 	x:	800,
-	y:	1300,
+	y:	800,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	50,	1,	'Base'],
-			['B',	30,	21,	'Tower'],
-			['B',	70,	21,	'Tower'],
-			['B',	27,	41,	'Tower'],
-			['B',	82,	41,	'Tower'],
-			['R',	19,	59,	'Tower'],
-			['R',	73,	59,	'Tower'],
-			['R',	30,	79,	'Tower'],
-			['R',	70,	79,	'Tower'],
+			['B',	30,	17,	'Tower'],
+			['B',	70,	17,	'Tower'],
+			['B',	50,	30,	'Tower'],
+			['R',	50,	70,	'Tower'],
+			['R',	30,	83,	'Tower'],
+			['R',	70,	83,	'Tower'],
 			['R',	50,	100,	'Base'],
+		],
+	elements: [
+			//name, 	x,	y,   max_width,	max_height
+			['bomb', 	750,	200,	0,	0],
+			['bomb', 	50,	200,	0,	0],
+			['fence', 	150,	200,	0,	0],
+			['fence', 	250,	200,	0,	0],
+			['fence', 	350,	200,	0,	0],
+			['fence', 	450,	200,	0,	0],
+			['fence', 	550,	200,	0,	0],
+			['fence', 	0,	400,	50,	0],
+			['fence', 	750,	400,	50,	0],
+			['fence', 	150,	600,	0,	0],
+			['fence', 	250,	600,	0,	0],
+			['fence', 	350,	600,	0,	0],
+			['fence', 	450,	600,	0,	0],
+			['fence', 	550,	600,	0,	0],
+			['bomb', 	750,	600,	0,	0],
+			['bomb', 	50,	600,	0,	0],
 		],
 	bots: [
 		//[team, x%, y%, 	type, 	moving path coordinates]
+		/*
 		['B',	30,	1,	'Soldier',	[[5, 15],[20,41],[20,50],[20,59],[5,85], [45,99]]	],
 		['B',	35,	1,	'Soldier',	[[10,15],[25,41],[25,50],[25,59],[10,85],[45,99]]	],
 		['B',	40,	1,	'Soldier',	[[15,15],[30,41],[30,50],[30,59],[15,85],[45,99]]	],
@@ -51,6 +74,7 @@ MAPS.push({
 		['R',	60,	99,	'Soldier',	[[85,85],[68,59],[68,50],[68,41],[85,15],[55,1]]	],
 		['R',	65,	99,	'Soldier',	[[90,85],[73,59],[73,50],[73,41],[90,15],[55,1]]	],
 		['R',	70,	99,	'Soldier',	[[95,85],[78,59],[78,50],[78,41],[95,15],[55,1]]	],
+		*/
 	],
 	});
 
@@ -59,7 +83,7 @@ MAPS.push({
 MAPS.push({
 	name: "Mini",
 	x:	800,
-	y:	500,
+	y:	350,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	50,	3,	'Base'],
@@ -69,6 +93,12 @@ MAPS.push({
 			['R',	70,	79,	'Tower'],
 			['R',	50,	100,	'Base'],
 		],
+	elements: [
+			//name, 	x,	y,   max_width,	max_height
+			['fence', 	250,	175,	0,	0],
+			['fence', 	350,	175,	0,	0],
+			['fence', 	450,	175,	0,	0],
+		],
 	bots: [],
 	});
 
@@ -77,25 +107,35 @@ MAPS.push({
 MAPS.push({
 	name: "Huge",
 	x:	2000,
-	y:	10000,
+	y:	3000,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	33,	1,	'Base'],
 			['B',	66,	1,	'Base'],
 			['B',	30,	17,	'Tower'],
 			['B',	70,	17,	'Tower'],
-			['B',	27,	31,	'Tower'],
-			['B',	82,	31,	'Tower'],
-			['B',	27,	44,	'Tower'],
-			['B',	82,	44,	'Tower'],
-			['R',	19,	56,	'Tower'],
-			['R',	73,	56,	'Tower'],
-			['R',	19,	69,	'Tower'],
-			['R',	73,	69,	'Tower'],
+			['B',	30,	31,	'Tower'],
+			['B',	70,	31,	'Tower'],
+			['B',	30,	44,	'Tower'],
+			['R',	70,	56,	'Tower'],
+			['R',	30,	69,	'Tower'],
+			['R',	70,	69,	'Tower'],
 			['R',	30,	83,	'Tower'],
 			['R',	70,	83,	'Tower'],
 			['R',	33,	100,	'Base'],
 			['R',	66,	100,	'Base'],
+		],
+	elements: [
+			//name, 	x,	y,   max_width,	max_height
+			['fence', 	566,	175,	0,	0],
+			['fence', 	666,	175,	0,	0],
+			['fence', 	1233,	175,	0,	0],
+			['fence', 	1333,	175,	0,	0],
+			
+			['fence', 	566,	2825,	0,	0],
+			['fence', 	666,	2825,	0,	0],
+			['fence', 	1233,	2825,	0,	0],
+			['fence', 	1333,	2825,	0,	0],
 		],
 	bots: [],
 	});

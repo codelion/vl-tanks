@@ -276,7 +276,7 @@ function get_packet(event){
 		if(TANK_TO===false) log('ERROR: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 		TANK_FROM = get_tank_by_name(DATA[1]);
 		if(TANK_FROM===false) log('ERROR: tank_to "'+DATA[1]+'" was not found on tank_kill.');
-					console.log('+++++++++');
+		
 		//actions
 		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
 		else				TANK_TO.deaths = TANK_TO.deaths + 1;
@@ -431,13 +431,13 @@ function sync_multiplayers(){
 				tmp['type'] = 0;
 			if(ROOM.players[i].team=='B'){
 				//blue top
-				tmp['x'] = WIDTH_MAP/2+Math.floor(block_width*0.6);
+				tmp['x'] = round(WIDTH_SCROLL*2/3);
 				tmp['y'] = 20;
 				tmp['angle'] = 180;
 				}
 			else{
 				//red bottom
-				tmp['x'] = WIDTH_MAP/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+				tmp['x'] = round(WIDTH_SCROLL/3);
 				tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 				tmp['angle'] = 0;
 				}

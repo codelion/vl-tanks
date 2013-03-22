@@ -1,14 +1,14 @@
 /*	future comparison
-
-DPS		10		30		15		20		20+aa
-VS		Heavy		Tiger		Cruiser	Launcher	Sniper	win	loss
--------------------------------------------------------------------
-Heavy		n/a		--		++		--		--	|	1	3	but survive long
-Tiger		++		n/a		++		--		--	|	2	2
-Cruiser	--		--		n/a		0		0	|	0	2	but fast
-Launcher	++		++		0		n/a		0	|	2	0
-Sniper	++		++		0		0		n/a	|	2	0
--------------------------------------------------------------------
+DPS		10		30		15	20		20+aa
+VS		Heavy		Tiger		Cruis	Launcher	Snip		win	loss
+-------------------------------------------------------------------------------------------------
+Heavy		n/a		--		++	--		--	|	1	3	but survive long, need more abilities?
+Tiger		++		n/a		++	--		--	|	2	2
+Cruis		--		--		n/a	0		0	|	0	2	but fast, need more abilities to be usefull
+Launch		++		++		0	n/a		0	|	2	0
+Sniper		++		++		0	0		n/a	|	2	0
+-------------------------------------------------------------------------------------------------
+	
 */
 
 //Heavy
@@ -16,11 +16,11 @@ TYPES.push({
 	name: 'Heavy',					//name
 	type: 'tank',					//tank type
 	description: ["Heavy armor", "Low damage"],	//tank description
-	life: [230, 0],					//[tank life in level 0, life increase in each level]
-	damage: [10, 0],		//10 dps	//[tank damage in level 0, damage increase in each level]
+	life: [230, 20],				//[tank life in level 0, life increase in each level]
+	damage: [10, 1],		//10 dps	//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [60, 0, 60],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 26,					//tank moving speed
 	attack_delay: 1,				//attack delay in seconds
 	turn_speed: 2,					//tank turn speed
@@ -45,11 +45,11 @@ TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
 	description: ["Medium armor", "Huge damage"],
-	life: [200, 0],
-	damage: [30, 0],	//30 dps
+	life: [200, 13],
+	damage: [30, 1],	//30 dps
 	range: 85,
 	scout: 100,
-	armor: [40, 0, 40],
+	armor: [40, 0.3, 50],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 2,
@@ -67,11 +67,11 @@ TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
 	description: ["Light armor", "Fast", "Aaverage damage"],
-	life: [200, 0],
-	damage: [15, 0],	//15 dps
+	life: [200, 13],
+	damage: [15, 1],	//15 dps
 	range: 90,
 	scout: 110,
-	armor: [20, 0, 20],
+	armor: [20, 0.3, 30],
 	speed: 35,
 	attack_delay: 1,
 	turn_speed: 1,
@@ -89,8 +89,8 @@ TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
 	description: ["Missiles", "Long range", "Slow", "Penetrates armor"],
-	life: [100, 0],
-	damage: [100, 0],	//20 dps
+	life: [100, 10],
+	damage: [100, 5],	//20 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
@@ -112,8 +112,8 @@ TYPES.push({
 	name: 'Sniper',
 	type: 'tank',
 	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack", "Inacurate"],
-	life: [100, 0],
-	damage: [40, 0],	//20 dps
+	life: [100, 10],
+	damage: [40, 2],	//20 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
@@ -135,8 +135,8 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage"],
-	life: [50, 0],
-	damage: [10, 0],	//10 dps
+	life: [50, 5],
+	damage: [10, 1],	//10 dps
 	range: 50,
 	scout: 60,
 	armor: [0, 0, 0],
@@ -190,9 +190,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 3,
 	no_repawn: 1,
-	size: ['L', 50],
+	size: ['L', 90],
 	preview: '',
-	icon_top: ['top1.png', 'top2.png'],
+	icon_top: [],
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [],
 	bullet: 'bullet.png',

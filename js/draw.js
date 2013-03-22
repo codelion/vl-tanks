@@ -43,8 +43,8 @@ function draw_main(){
 						TANKS[i].respan_time = 3*1000/FPS;
 					else
 						TANKS[i].respan_time = TANKS[i].level*1000/FPS;
-					if(TANKS[i].team == 'B'){
-						TANKS[i]['x'] = WIDTH_SCROLL/2+Math.floor(block_width*0.6);
+					if(TANKS[i].team == 'B'){	//top
+						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
 						TANKS[i]['y'] = 20;
 						if(i==0){
 							map_offset = [0, 0];
@@ -53,8 +53,8 @@ function draw_main(){
 							}
 						TANKS[i]['hp'] = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
-					else{
-						TANKS[i]['x'] = WIDTH_SCROLL/2-Math.floor(block_width*0.6)-TYPES[TANKS[i].type].size[1];
+					else{	//bottom
+						TANKS[i]['x'] = round(WIDTH_SCROLL/3);
 						TANKS[i]['y'] = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
 						if(i==0){
 							map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
@@ -468,6 +468,7 @@ function draw_logo_tanks(left, top, change_logo){
 			}
 		}
 	for(var t in TYPES){
+		if(TYPES[t].size[1] > 60) continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();

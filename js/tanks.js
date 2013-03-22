@@ -189,7 +189,7 @@ function draw_tank(tank){
 			canvas_main.beginPath();
 			canvas_main.arc(round(map_offset[0]+tank.clicked[0]), round(map_offset[1]+tank.clicked[1]), round(tank.clicked[2]), 0 , 2 * Math.PI, false);	
 			canvas_main.lineWidth = 2;
-			canvas_main.strokeStyle = "#11ee07";
+			canvas_main.strokeStyle = "#196119";
 			canvas_main.stroke();
 			tank.clicked[2] = tank.clicked[2]-1;
 			if(tank.clicked[2] == 1)
@@ -571,31 +571,31 @@ function draw_tank_move(mouseX, mouseY){
 		}
 	}
 //check collisions
-function check_collisions(xx, yy, TANK){							//disabled for few days
-	/*if(TYPES[TANK.type].no_collisions != undefined) return false;
-	
+function check_collisions(xx, yy, TANK){
+	if(TYPES[TANK.type].no_collisions != undefined) return false;
 	xx = Math.round(xx);
 	yy = Math.round(yy);
 
-	max_x = WIDTH_APP/block_width;
-	max_y = HEIGHT_APP/block_height;
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		if(element.collission == false) continue;
+		
+		var elem_width = element.size[0];
+		var elem_height = element.size[1];
+		var elem_x = MAPS[level-1].elements[e][1];
+		var elem_y = MAPS[level-1].elements[e][2];
+		if(MAPS[level-1].elements[e][3]!=0 && MAPS[level-1].elements[e][3] < elem_width)
+			elem_width = MAPS[level-1].elements[e][3];
+		if(MAPS[level-1].elements[e][4]!=0 && MAPS[level-1].elements[e][4] < elem_height)
+			elem_height = MAPS[level-1].elements[e][4];
+		
+		if(xx > elem_x && xx < elem_x+elem_width){
+			if(yy > elem_y && yy < elem_y+elem_height){
+				return true;
+				}
+			}
+		}
 
-	block_x = Math.floor((xx)/block_width);  
-	block_y = Math.floor((yy)/block_height);
-
-	if(block_x==max_x) return true;
-	if(block_y==max_y) return true;
-	
-	if(block_x<0) return true;
-	if(block_y<0) return true;
-	
-	if(MAPS[level-1]['map'][block_y] == undefined)
-		return true;
-	value = MAPS[level-1]['map'][block_y][block_x];
-	
-	if(value == 2 || value == 3 || value == 9)
-		return true;
-	
 	//check on other players
 	if(TYPES[TANK.type].no_repawn == undefined){
 		for (i in TANKS){
@@ -609,7 +609,7 @@ function check_collisions(xx, yy, TANK){							//disabled for few days
 					}
 				}
 			}
-		}*/
+		}
 	
 	return false;
 	}

@@ -22,18 +22,36 @@ function draw_map(map_only){
 		status_y = HEIGHT_APP-150-25;
 		}
 	
-	//show background
+	//background
 	var backround_height;
-	for(var b in ELEMENTS){
-		if(ELEMENTS[b].name=='background')
-			backround_height = ELEMENTS[b].size[1];
-		}
-	if(backround_height==undefined)
+	var background_elem = get_element_by_name('background');
+	if(background_elem==false)
 		alert("ERROR: missing element 'background' config in draw_map().");
+	backround_width = background_elem.size[0];
+	backround_height = background_elem.size[1];
 	for(var i=0; i<Math.ceil(MAPS[level-1].y/backround_height); i++){
-		var img_texture = new Image();
-		img_texture.src = 'img/map/moon.jpg';
-		canvas_map.drawImage(img_texture, 0, 0+i*backround_height);
+		for(var j=0; j<Math.ceil(MAPS[level-1].x/backround_width); j++){
+			var img_texture = new Image();
+			img_texture.src = 'img/map/moon.jpg';
+			canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
+			}
+		}
+	
+	//elements
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		x = MAPS[level-1].elements[e][1];
+		y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+		max_w = element.size[0];
+		if(MAPS[level-1].elements[e][3]!=0)
+			max_w = MAPS[level-1].elements[e][3];
+		max_h = element.size[1];
+		if(MAPS[level-1].elements[e][4]!=0)
+			max_h = MAPS[level-1].elements[e][4];
+			
+		var img_element = new Image();
+		img_element.src = 'img/map/'+element.file;
+		canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
 		}
 	
 	//status bar
@@ -287,6 +305,14 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			canvas_this.strokeStyle = "#196119";
 		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
+	}
+function get_element_by_name(name){
+	for(var i in ELEMENTS){
+		if(ELEMENTS[i].name == name){
+			return ELEMENTS[i];
+			}
+		}
+	return false;
 	}
 function prepare_maps(){
 	//for(var m in MAPS){
