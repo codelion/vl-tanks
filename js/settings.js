@@ -23,6 +23,7 @@ var TANKS = new Array();		//tanks array
 var TYPES = new Array();		//tanks types config
 var BULLETS = new Array();		//bullets config
 var MAPS = new Array();			//maps config
+var ELEMENTS = new Array();		//maps elements
 var BUTTONS = new Array();		//buttons array
 var ROOMS = new Array();		//rooms array
 var PLAYERS = new Array();		//players list

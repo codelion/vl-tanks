@@ -218,8 +218,13 @@ function draw_main(){
 				if(TANKS[i].stun != undefined) continue; //stun
 				if(TANKS[i].bullets[b] == undefined) continue;
 				
-				b_dist_x = TANKS[i].bullets[b].bullet_to[0] - TANKS[i].bullets[b].x;
-				b_dist_y = TANKS[i].bullets[b].bullet_to[1] - TANKS[i].bullets[b].y;
+				//b_dist_x = TANKS[i].bullets[b].bullet_to[0] - TANKS[i].bullets[b].x;
+				//b_dist_y = TANKS[i].bullets[b].bullet_to[1] - TANKS[i].bullets[b].y;
+				//follows tank
+				var bullet_to_target_tank_size_to = TYPES[TANKS[i].bullets[b].bullet_to_target.type].size[1];
+				b_dist_x = (TANKS[i].bullets[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - TANKS[i].bullets[b].x;
+        			b_dist_y = (TANKS[i].bullets[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - TANKS[i].bullets[b].y; 
+				
 				b_distance = Math.sqrt((b_dist_x*b_dist_x)+(b_dist_y*b_dist_y));
 				b_radiance = Math.atan2(b_dist_y, b_dist_x); 
 				
@@ -373,6 +378,7 @@ function draw_main(){
 	}
 var settings_positions = [];
 var last_active_tab = -1;
+var logo_visible = 1;
 //draws main buttons on logo screen
 function add_settings_buttons(canvas_this, text_array, active_i){
 	var button_width = 300;
@@ -391,13 +397,31 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	last_active_tab = active_i;
 	settings_positions = [];
 	
-	//logo
+	//logo backround color
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
+	//back image
+	var img = new Image();
+	img.src = 'img/map/moon.jpg';
+	canvas_backround.drawImage(img, 0, 0, WIDTH_APP, HEIGHT_APP-27, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	//text
+	if(logo_visible==1){
+		var text = "Moon wars".split("").join(String.fromCharCode(8201))
+		canvas_backround.font = "Bold 70px Arial";
+		canvas_backround.strokeStyle = '#ffffff';
+		canvas_backround.strokeText(text, 160, 340);
+		}
+	else{
+		draw_logo_tanks(160, 340-52, false);
+		}
+	//on click event
+	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
+	
+	//logo
 	var img = new Image();
 	img.src = 'img/logo.png';
 	var left = (WIDTH_APP-598)/2;	
-	canvas_backround.drawImage(img, left, 50);
+	canvas_backround.drawImage(img, left, 15);
 	
 	for (i in text_array){
 		//background
@@ -423,6 +447,36 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 		settings_positions.push(tmp);
 		
 		button_i++;
+		}
+	}
+function draw_logo_tanks(left, top, change_logo){
+	//clear
+	var img = new Image();	
+	img.src = 'img/map/moon.jpg';
+	canvas_backround.drawImage(img, left, top, 477, 52+10, left, top, 477, 52+10);
+	if(change_logo==undefined){
+		if(logo_visible==0){
+			logo_visible=1;
+			var text = "Moon wars".split("").join(String.fromCharCode(8201))
+			canvas_backround.font = "Bold 70px Arial";
+			canvas_backround.strokeStyle = '#ffffff';
+			canvas_backround.strokeText(text, left, top+52);
+			return false;
+			}
+		else{
+			logo_visible=0;
+			}
+		}
+	for(var t in TYPES){
+		var tank_size = TYPES[t].size[1];
+		//base
+		var img = new Image();
+		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
+		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		//turrent
+		var img = new Image();
+		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
+		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
 		}
 	}
 var score_button_pos = new Array();
@@ -676,7 +730,7 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.fillStyle = "#dbd9da";
 		canvas_backround.fillRect(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy);
 			
-		canvas_backround.strokeStyle = "#000000";
+		canvas_backround.strokeStyle = "#196119";
 		roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
 		
 		var img_tmp2 = new Image();
@@ -718,7 +772,7 @@ function draw_tank_select_screen(selected_tank){
 	//tank info block
 	var info_left = 15;
 	canvas_backround.fillStyle = "#ffffff";
-	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.strokeStyle = "#196119";
 	roundRect(canvas_backround, info_left, y, 585, 140, 5, true);
 
 	//tank stats
@@ -730,14 +784,14 @@ function draw_tank_select_screen(selected_tank){
 		canvas_backround.drawImage(img_tmp3, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
-		canvas_backround.fillStyle = "#000000";
+		canvas_backround.fillStyle = "#196119";
 		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+15+15);
 		
 		//description
 		var height_space = 15;
 		for(var d in TYPES[selected_tank].description){
 			canvas_backround.font = "bold 13px Verdana";
-			canvas_backround.fillStyle = "#808080";
+			canvas_backround.fillStyle = "#69a126";
 			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+60+d*height_space);
 			}
 		}
