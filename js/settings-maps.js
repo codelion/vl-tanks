@@ -1,19 +1,22 @@
 ELEMENTS.push({
 	name: 'background',
 	file: 'moon.jpg',	
-	size: [1264, 632], 	
+	size: [1264, 632], 
+	alt_color: '#8d8d8d',	
 	collission: false,	
 	});
 ELEMENTS.push({
 	name: 'fence',
-	file: 'fence.png',	
-	size: [100, 22], 	
+	file: 'fence.png',
+	size: [100, 26], 
+	alt_color: '#4e4b44',	
 	collission: true,	
 	});
 ELEMENTS.push({
 	name: 'bomb',
 	file: 'bomb.png',	
 	size: [16, 16], 	
+	alt_color: '#171719',
 	collission: true,	
 	});	
 
@@ -21,11 +24,11 @@ ELEMENTS.push({
 
 MAPS.push({
 	name: "Standart",
-	x:	800,
-	y:	800,
+	width: 800,
+	height: 800,
 	towers: [
 			//team x%,	 y%, 	name
-			['B',	50,	1,	'Base'],
+			['B',	50,	2,	'Base'],
 			['B',	30,	17,	'Tower'],
 			['B',	70,	17,	'Tower'],
 			['B',	50,	30,	'Tower'],
@@ -36,8 +39,6 @@ MAPS.push({
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
-			['bomb', 	750,	200,	0,	0],
-			['bomb', 	50,	200,	0,	0],
 			['fence', 	150,	200,	0,	0],
 			['fence', 	250,	200,	0,	0],
 			['fence', 	350,	200,	0,	0],
@@ -50,8 +51,6 @@ MAPS.push({
 			['fence', 	350,	600,	0,	0],
 			['fence', 	450,	600,	0,	0],
 			['fence', 	550,	600,	0,	0],
-			['bomb', 	750,	600,	0,	0],
-			['bomb', 	50,	600,	0,	0],
 		],
 	bots: [
 		//[team, x%, y%, 	type, 	moving path coordinates]
@@ -82,22 +81,21 @@ MAPS.push({
 
 MAPS.push({
 	name: "Mini",
-	x:	800,
-	y:	350,
+	width: 800,
+	height: 350,
 	towers: [
 			//team x%,	 y%, 	name
-			['B',	50,	3,	'Base'],
-			['B',	30,	21,	'Tower'],
-			['B',	70,	21,	'Tower'],
-			['R',	30,	79,	'Tower'],
-			['R',	70,	79,	'Tower'],
-			['R',	50,	100,	'Base'],
+			['B',	1,	4,	'Base'],
+			['B',	15,	5,	'Tower'],
+			['R',	85,	97,	'Tower'],
+			['R',	100,	100,	'Base'],
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
-			['fence', 	250,	175,	0,	0],
-			['fence', 	350,	175,	0,	0],
-			['fence', 	450,	175,	0,	0],
+			['fence', 	0,	110,	0,	0],
+			['fence', 	100,	110,	0,	0],
+			['fence', 	600,	240,	0,	0],
+			['fence', 	700,	240,	0,	0],
 		],
 	bots: [],
 	});
@@ -106,8 +104,8 @@ MAPS.push({
 
 MAPS.push({
 	name: "Huge",
-	x:	2000,
-	y:	3000,
+	width: 2000,
+	height: 3000,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	33,	1,	'Base'],

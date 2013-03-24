@@ -33,8 +33,7 @@ TYPES.push({
 	icon_base: ['base1.png', 'base2.png'],		//tank top images for all teams
 	preview: 'preview.png',				//tank preview image
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
-		{name: 'Shield',	passive: false,		broadcast: 1},
-		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
 		],
 	bullet: 'bullet.png',				//bullet_image
 	fire_sound: 'shoot.ogg',			//shooting sound
@@ -57,7 +56,9 @@ TYPES.push({
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
+	abilities: [
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	});
@@ -79,7 +80,9 @@ TYPES.push({
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
+	abilities: [
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	});
@@ -102,7 +105,9 @@ TYPES.push({
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
+	abilities: [
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		],
 	bullet: 'missle.png',
 	fire_sound: 'shoot.ogg',
 	});
@@ -125,7 +130,9 @@ TYPES.push({
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
+	abilities: [
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	});
@@ -144,11 +151,13 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 6,
 	no_repawn: 1,
-	size: ['M', 30],
+	size: ['S', 30],
 	preview: 'preview.png',
 	icon_top: [],
 	icon_base: ['top1.png', 'top2.png'],
-	abilities: [],
+	abilities: [
+		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	});

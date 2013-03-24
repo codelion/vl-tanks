@@ -216,23 +216,6 @@ function get_packet(event){
 				}
 			}
 		}
-	else if(type == 'skill_up'){		//tank skill upgrade
-		//DATA = room_id, player, nr=[1,2,3]
-		if(PLACE=="game" && opened_room_id==DATA[0]){
-			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on skill_up.');
-			var nr = DATA[2];
-			
-			TANK.abilities_lvl[nr-1] = TANK.abilities_lvl[nr-1] + 1;
-			TANK.upgrade_points = TANK.upgrade_points - 1;
-			
-			var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_')+"_once";
-			if(ability_function != undefined)
-				window[ability_function](TANK);
-			if(DATA[1] == name)	//me
-				redraw_tank_abilities();
-			}
-		}
 	else if(type == 'skill_do'){	//tank skill start
 		//DATA = room_id, player, nr=[1,2,3]
 		if(PLACE=="game" && opened_room_id==DATA[0]){
@@ -450,7 +433,6 @@ function sync_multiplayers(){
 			tmp['abilities_lvl'] = [1,1,1];
 			tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 			tmp['speed'] = TYPES[tmp['type']].speed;
-			tmp['upgrade_points'] = 27;
 			tmp['armor'] = TYPES[tmp['type']].armor[0];
 			tmp['damage'] = TYPES[tmp['type']].damage[0];
 			tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;

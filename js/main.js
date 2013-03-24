@@ -50,8 +50,8 @@ function init_game(first_time){
 //checks and resizes all canvas layers
 function check_canvas_sizes(){
 	if(FS==false){
-		WIDTH_MAP = MAPS[level-1].x;
-		HEIGHT_MAP = MAPS[level-1].y;
+		WIDTH_MAP = MAPS[level-1].width;
+		HEIGHT_MAP = MAPS[level-1].height;
 		WIDTH_APP = APP_SIZE_CACHE[0];
 		HEIGHT_APP = APP_SIZE_CACHE[1];
 		WIDTH_SCROLL = 800;
@@ -63,8 +63,8 @@ function check_canvas_sizes(){
 		//full screen
 		var dimensions = get_fimensions();
 		//map
-		WIDTH_MAP = MAPS[level-1].x;
-		HEIGHT_MAP = MAPS[level-1].y
+		WIDTH_MAP = MAPS[level-1].width;
+		HEIGHT_MAP = MAPS[level-1].height;
 		//app
 		WIDTH_APP = dimensions[0];
 		HEIGHT_APP = dimensions[1];
@@ -169,10 +169,10 @@ function preload_all_files(){
 		'img/logo.png',
 		'img/mute.png',
 		'img/repair.png',
-		'img/statusbar.png',
 		'img/target.png',
 		'img/unmute.png',
 		'img/button.png',
+		'img/driver.jpg',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -284,7 +284,6 @@ function init_action(map_nr, my_team){
 	tmp['abilities_lvl'] = [1,1,1];
 	tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 	tmp['speed'] = TYPES[tmp['type']].speed;
-	tmp['upgrade_points'] = 0;
 	tmp['armor'] = TYPES[tmp['type']].armor[0];
 	tmp['damage'] = TYPES[tmp['type']].damage[0];
 	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
@@ -320,7 +319,6 @@ function init_action(map_nr, my_team){
 		tmp['abilities_lvl'] = [1,1,1];
 		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['upgrade_points'] = 0;
 		tmp['armor'] = TYPES[tmp['type']].armor[0];
 		tmp['damage'] = TYPES[tmp['type']].damage[0];
 		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
@@ -332,7 +330,7 @@ function init_action(map_nr, my_team){
 	
 	add_towers();
 	
-	//auto add 1 lvl upgrade
+	//auto add 1 lvl upgrade	disabled
 	/*for(ii in TANKS){
 		if(TYPES[TANKS[ii].type].abilities.length != 0 ){
 			for(jj in TYPES[TANKS[ii].type].abilities){ 
@@ -346,7 +344,7 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 		
-	level_hp_regen_id = setInterval(level_hp_regen_handler, 250);
+	level_hp_regen_id = setInterval(level_hp_regen_handler, 2000);
 	level_interval_id = setInterval(tank_level_handler, 2000);
 	bots_interval_id = setInterval(add_bots, 1000*5);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
@@ -373,8 +371,8 @@ function range2real_range(range){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
-	for (i in timed_functions){
-		timed_functions[i].duration = timed_functions[i].duration - 100;
+	for (i in timed_functions){					
+		timed_functions[i].duration = timed_functions[i].duration - 100;	
 		if(timed_functions[i].type == 'REPEAT')
 			window[timed_functions[i].function](timed_functions[i]);
 		if(timed_functions[i].duration<0){

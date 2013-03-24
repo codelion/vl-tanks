@@ -154,7 +154,7 @@ function draw_main(){
 					}
 				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 				radiance = Math.atan2(dist_y, dist_x);
-				if(TYPES[TANKS[i].type].size[0] != "S" && check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
+				if(check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
 					TANKS[i].move = 0;
 					}
 				else{
@@ -255,9 +255,9 @@ function draw_main(){
 						//calc damage
 						if(target_index>-1){
 							if(TANKS[i].bullets[b].damage != undefined && TANKS[i].bullets[b].pierce_armor != undefined)
-								do_damage(TANKS[i], TANKS[target_index], target_index, TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor);
+								do_damage(TANKS[i], TANKS[target_index], TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor);
 							else
-								do_damage(TANKS[i], TANKS[target_index], target_index);
+								do_damage(TANKS[i], TANKS[target_index]);
 							
 							//extra effects for non tower
 							if(TANKS[target_index] != undefined && TANKS[target_index].team != TANKS[i].team && TYPES[TANKS[target_index].type].speed>0){
@@ -279,7 +279,7 @@ function draw_main(){
 							if(distance_b > TANKS[i].bullets[b].aoe_splash_range)	
 								continue;	//too far
 							//do damage
-							do_damage(TANKS[i], TANKS[ii], ii, TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor, 1);
+							do_damage(TANKS[i], TANKS[ii], TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor, 1);
 							
 							//extra effects for non tower
 							if(TYPES[TANKS[ii].type].speed>0){
@@ -450,10 +450,11 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 		}
 	}
 function draw_logo_tanks(left, top, change_logo){
+	var max_size = 60;
 	//clear
 	var img = new Image();	
 	img.src = 'img/map/moon.jpg';
-	canvas_backround.drawImage(img, left, top, 477, 52+10, left, top, 477, 52+10);
+	canvas_backround.drawImage(img, left, top-7, 477, 52+10, left, top-7, 477, 52+10);
 	if(change_logo==undefined){
 		if(logo_visible==0){
 			logo_visible=1;
@@ -468,12 +469,15 @@ function draw_logo_tanks(left, top, change_logo){
 			}
 		}
 	for(var t in TYPES){
-		if(TYPES[t].size[1] > 60) continue;
+		//if(TYPES[t].size[1] > 60) continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
-		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		if(TYPES[t].size[1] < max_size)	//normal
+			canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		else	//resized
+			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/TYPES.length)+(50-max_size)/2, top+52-max_size, max_size, max_size);
 		//turrent
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];

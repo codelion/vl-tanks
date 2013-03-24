@@ -1,6 +1,6 @@
 var MAP;
 //draw main map
-function draw_map(map_only){	
+function draw_map(map_only){
 	if(map_only==false){
 		//clear backround
 		canvas_backround.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
@@ -29,8 +29,8 @@ function draw_map(map_only){
 		alert("ERROR: missing element 'background' config in draw_map().");
 	backround_width = background_elem.size[0];
 	backround_height = background_elem.size[1];
-	for(var i=0; i<Math.ceil(MAPS[level-1].y/backround_height); i++){
-		for(var j=0; j<Math.ceil(MAPS[level-1].x/backround_width); j++){
+	for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
+		for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
 			var img_texture = new Image();
 			img_texture.src = 'img/map/moon.jpg';
 			canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
@@ -56,36 +56,36 @@ function draw_map(map_only){
 	
 	//status bar
 	if(map_only==false){
-		//grey background
-		canvas_backround.fillRect(0, status_y, WIDTH_APP, 150);
+		//background background
+		canvas_backround.fillStyle = "#000000";
+		canvas_backround.fillRect(status_x, status_y, WIDTH_APP, 150);
 		
-		//status bar
-		canvas_backround.fillStyle = "#dadada";
-		canvas_backround.fillRect(0, status_y+150, WIDTH_APP, 21+5);
+		//top line
+		canvas_backround.beginPath();
+		canvas_backround.moveTo(0, HEIGHT_APP-150-25+2.5);
+		canvas_backround.lineTo(WIDTH_APP, HEIGHT_APP-150-25+0.5);
+		canvas_backround.lineWidth = 5;
+		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.stroke();
 		
-		//backgrond image
-		var img = new Image();
-		img.src = 'img/statusbar.png';
-		canvas_backround.drawImage(img, status_x, status_y);
-		
-		//tank icon area in status bar
+		//tank icon
+		var icon_x = 450;
 		if(TYPES[MY_TANK.type].preview != undefined){
-			img2 = new Image();
-			img2.src = "img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
-			canvas_backround.drawImage(img2, status_x+135-5, status_y+45-5, 81, 81);
+			var img = new Image();
+			img.src = "img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
+			canvas_backround.drawImage(img, icon_x+12, HEIGHT_APP-150-25+40);
 			}
-		
-		canvas_backround.fillStyle = "#333333";
+			
+		//tank name
+		canvas_backround.fillStyle = "#8fc74c";
 		canvas_backround.font = "bold 12px Verdana";	
-		canvas_backround.fillText(TYPES[MY_TANK.type].name, status_x+140, status_y+30);
-		canvas_backround.fillStyle = "#555555";
-		canvas_backround.fillText(name, status_x+140, status_y+130);
-		
-		canvas_backround.fillStyle = "#dadada";
-		canvas_backround.fillRect(0, HEIGHT_APP-25, 700, 25);
-		
-		canvas_backround.fillStyle = "#9a9377";
-		canvas_backround.fillRect(0, HEIGHT_APP-25, 700, 1);
+		canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x+30, status_y+27);
+			
+		//tank driver border
+		canvas_backround.lineWidth = 5;
+		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.rect(icon_x+0.5, HEIGHT_APP-150-25+1.5, 115, 150-5);
+		canvas_backround.stroke();
 		
 		draw_status_bar();
 		
@@ -93,78 +93,61 @@ function draw_map(map_only){
 		redraw_tank_abilities();
 		
 		//ability buttons
-		/*i=0;
-		register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(qqq){
-			do_ability(ABILITIES_POS[0].nr, MY_TANK);
-			});
-		i++;
-		register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(qqq){
-			do_ability(ABILITIES_POS[1].nr, MY_TANK);
-			});
-		i++;
-		register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(qqq){
-			do_ability(ABILITIES_POS[2].nr, MY_TANK);
-			});
-		
-		//ability upgrade buttons
-		i=0;
-		register_button(ABILITIES_UPGRADE_POS[i].x, ABILITIES_UPGRADE_POS[i].y, ABILITIES_UPGRADE_POS[i].width, ABILITIES_UPGRADE_POS[i].height, PLACE, function(qqq){
-			upgrade_ability(ABILITIES_UPGRADE_POS[0].nr, MY_TANK);
-			});
-		i++;
-		register_button(ABILITIES_UPGRADE_POS[i].x, ABILITIES_UPGRADE_POS[i].y, ABILITIES_UPGRADE_POS[i].width, ABILITIES_UPGRADE_POS[i].height, PLACE, function(qqq){
-			upgrade_ability(ABILITIES_UPGRADE_POS[1].nr, MY_TANK);
-			});
-		i++;
-		register_button(ABILITIES_UPGRADE_POS[i].x, ABILITIES_UPGRADE_POS[i].y, ABILITIES_UPGRADE_POS[i].width, ABILITIES_UPGRADE_POS[i].height, PLACE, function(qqq){
-			upgrade_ability(ABILITIES_UPGRADE_POS[2].nr, MY_TANK);
-			});*/
+		for(var i=0; i<ABILITIES_POS.length; i++){
+			//execute skill
+			register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
+				do_ability(ABILITIES_POS[i].nr, MY_TANK);
+				}, i);
+			}
 		}
 	//darken all
 	darken_map();
 	}
 //mini map in status bar
 function redraw_mini_map(){
-	//clear mini map
-	status_y = HEIGHT_APP-150-25;
+	//settings
+	var button_width = 120;
+	var button_height = 138;
+	var pos1 = 5;
+	var pos2 = HEIGHT_APP-150-25+5;
 	
-	canvas_backround.fillStyle = "#d5d5d5";
-	canvas_backround.fillRect(status_x+20-8, status_y+17-5, 70+17, 116+10+2);
+	//clear mini map
+	canvas_backround.fillStyle = "#196119";
+	canvas_backround.fillRect(pos1-5, pos2-5, button_width+10, button_height+10);
 	
 	canvas_backround.fillStyle = "#ffffff";
-	canvas_backround.fillRect(status_x+20, status_y+17, 70, 116);
+	canvas_backround.fillRect(pos1, pos2, button_width, button_height);
 	
 	canvas_backround.fillStyle = "#8c8c8c";
 	canvas_backround.fillRect(
-		status_x+20-map_offset[0]*70/WIDTH_MAP, 
-		status_y+17-map_offset[1]*116/HEIGHT_MAP, 
-		WIDTH_SCROLL*70/WIDTH_MAP, 
-		HEIGHT_SCROLL*116/HEIGHT_MAP
+		pos1-map_offset[0]*button_width/WIDTH_MAP, 
+		pos2-map_offset[1]*button_height/HEIGHT_MAP, 
+		WIDTH_SCROLL*button_width/WIDTH_MAP, 
+		HEIGHT_SCROLL*button_height/HEIGHT_MAP
 		);
-	
-	//repaint mini map
-	/*mini_w = 70/MAPS[level-1]['map'][0].length;				//disabled for few days	
-	mini_h = 116/MAPS[level-1]['map'].length;
-	/*try{
-		MAP = eval(MAPS[level-1]['map'].toSource());				
+		
+	//elements
+	var mini_w = (button_width-2)/MAPS[level-1].width;
+	var mini_h = (button_height-2)/MAPS[level-1].height;
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		x = MAPS[level-1].elements[e][1];
+		y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+		max_w = element.size[0];
+		if(MAPS[level-1].elements[e][3]!=0)
+			max_w = MAPS[level-1].elements[e][3];
+		max_h = element.size[1];
+		if(MAPS[level-1].elements[e][4]!=0)
+			max_h = MAPS[level-1].elements[e][4];
+		//minimize
+		max_w = Math.ceil(max_w*button_width/MAPS[level-1].width);
+		max_h = Math.ceil(max_h*button_height/MAPS[level-1].height);
+		x = pos1 + Math.ceil(x*button_width/MAPS[level-1].width);
+		y = pos2 + Math.ceil(y*button_height/MAPS[level-1].height);
+		//draw
+		canvas_backround.fillStyle = element.alt_color;
+		canvas_backround.fillRect(x, y, max_w, max_h);
 		}
-	catch(err){
-		MAP = MAPS[level-1]['map'];
-		}
-	for(var i=0; i<MAP.length; i++){
-		for(var j=0; j<MAP[i].length; j++){
-			img = '';
-			if(MAP[i][j] == '8') img = '';
-			else img = MAP[i][j]+'.png';
-			if(img != ''){
-				//mini map - wall
-				if(MAP[i][j] == 2){
-					canvas_backround.fillStyle = "#666666";
-					canvas_backround.fillRect(status_x+20+j*mini_w, status_y+17+Math.round(i*mini_h), mini_w, mini_h);
-					}
-				}
-			}
-		}*/
 	}
 //darken map - using shadows
 function darken_map(){
@@ -222,48 +205,44 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	for (i in MAPS){
 		//background
 		canvas_this.fillStyle = "#cccccc";
-		canvas_this.fillRect(15+i*(81+gap)+1, top_height+1, 79, 79);
+		canvas_this.fillRect(15+i*(button_width+gap)+1, top_height+1, (button_width-2), (button_width-2));
 		
 		//calcuate mini-size
-		/*ini_w = (button_width-2)/MAPS[i]['map'][0].length;			//disabled for few days
-		mini_h = (button_height-2)/MAPS[i]['map'].length;
-		
-		//paint mini map
-		var pos1 = 15+i*(81+gap)+Math.floor((81-70)/2)-5;
-		var pos2 = top_height+Math.floor((81-70)/2)-5;
-		for(var ii=0; ii<MAPS[i]['map'].length; ii++){
-			for(var jj=0; jj<MAPS[i]['map'][i].length; jj++){
-				img = '';
-				img = MAPS[i]['map'][ii][jj]+'.png';	
-				//mini map - grass
-				if(MAPS[i]['map'][ii][jj] == 0){
-					canvas_this.fillStyle = "#ffffff";
-					canvas_this.fillRect(pos1+1+Math.ceil(jj*mini_w), pos2+1+Math.ceil(ii*mini_h), Math.ceil(mini_w), Math.ceil(mini_h));
-					}
-				//mini map - rock
-				if(MAPS[i]['map'][ii][jj] == 1){
-					canvas_this.fillStyle = "#b2aea2";
-					//do nothing...
-					}
-				//mini map - wall
-				if(MAPS[i]['map'][ii][jj] == 2){
-					canvas_this.fillStyle = "#666666";
-					canvas_this.fillRect(pos1+1+Math.ceil(jj*mini_w), pos2+1+Math.ceil(ii*mini_h), Math.ceil(mini_w), Math.ceil(mini_h));
-					}
-				}
-			}
+		mini_w = (button_width-2)/MAPS[i].width;
+		mini_h = (button_height-2)/MAPS[i].height;
+		var pos1 = 15+i*(button_width+gap)+Math.floor((button_width-70)/2)-5;
+		var pos2 = top_height;
 		
 		//paint towers
 		msize = 3;
 		for (ii in MAPS[i].towers){
-			img = '';
-			//mini map - grass
 			if(MAPS[i].towers[ii][0]=="B")
 				canvas_this.fillStyle = "#0000aa";
 			else
 				canvas_this.fillStyle = "#b12525";
 			canvas_this.fillRect(pos1+1+Math.ceil(MAPS[i].towers[ii][1]*(button_width-2-msize)/100), pos2+1+Math.ceil(MAPS[i].towers[ii][2]*(button_height-2-msize)/100), msize, msize);
-			}*/
+			}
+		
+		//elements
+		for(var e in MAPS[i].elements){
+			var element = get_element_by_name(MAPS[i].elements[e][0]);
+			x = MAPS[i].elements[e][1];
+			y = MAPS[i].elements[e][2] - round(element.size[1]/2);
+			max_w = element.size[0];
+			if(MAPS[i].elements[e][3]!=0)
+				max_w = MAPS[i].elements[e][3];
+			max_h = element.size[1];
+			if(MAPS[i].elements[e][4]!=0)
+				max_h = MAPS[i].elements[e][4];
+			//minimize
+			max_w = Math.ceil(max_w*button_width/MAPS[i].width);
+			max_h = Math.ceil(max_h*button_height/MAPS[i].height);
+			x = pos1 + Math.ceil(x*button_width/MAPS[i].width);
+			y = pos2 + Math.ceil(y*button_height/MAPS[i].height);
+			//draw
+			canvas_this.fillStyle = element.alt_color;
+			canvas_this.fillRect(x, y, max_w, max_h);
+			}
 			
 		//name
 		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
