@@ -288,6 +288,7 @@ function init_action(map_nr, my_team){
 	tmp['armor'] = TYPES[tmp['type']].armor[0];
 	tmp['damage'] = TYPES[tmp['type']].damage[0];
 	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
+	tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
 	tmp['bullets'] = new Array();
 	TANKS.push(tmp);
 	my_tank_id = tmp['id'];
@@ -324,6 +325,7 @@ function init_action(map_nr, my_team){
 		tmp['armor'] = TYPES[tmp['type']].armor[0];
 		tmp['damage'] = TYPES[tmp['type']].damage[0];
 		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
+		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
 		tmp['bullets'] = new Array();
 		TANKS.push(tmp);
 		}
