@@ -163,22 +163,25 @@ function draw_main(){
 					}
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
-				TANKS[i].angle = angle;
-				if(TANKS[i].hit_reuse == 0 && TANKS[i].bullets.length==0)
-					TANKS[i].fire_angle = angle;
-				if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
-					if(TANKS[i].move_to[0].length == undefined){
-						TANKS[i].move = 0;
+				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle)){
+					if(TANKS[i].hit_reuse == 0 && TANKS[i].bullets.length==0)
+						if(body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle)){
 						}
-					else{
-						//we have second way defined
-						if(TANKS[i].move_to[1] != undefined)
-							TANKS[i].move_to.splice(0, 1);
-						else{
+					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
+						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
-							}	
-						}
-					}	
+							}
+						else{
+							//we have second way defined
+							if(TANKS[i].move_to[1] != undefined)
+								TANKS[i].move_to.splice(0, 1);
+							else{
+								TANKS[i].move = 0;
+								}	
+							}
+						}	
+					}
+				}else{
 				}
 			//map scrolling
 			if(i==0 && TANKS[i].move == 1 && TANKS[i].stun == undefined){
@@ -974,3 +977,22 @@ function show_chat(){
 		canvas.fillText(text, 10, bottom-i*gap);
 		}
 	}
+function body_rotation(obj,str,speed,rot) {
+	speed = speed*10;
+	var flag = false;
+	if (obj[str] - 180 > rot){
+		rot += 360;
+	}
+	if (obj[str] + 180 < rot){
+		rot -= 360;
+	}
+	if (obj[str] - rot > speed){
+		obj[str] -= speed;
+	} else if (obj[str] - rot < -speed){
+		obj[str] += speed;
+	} else {
+		obj[str] = rot;
+		flag = true;
+	}
+	return flag;
+}
