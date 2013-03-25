@@ -23,7 +23,7 @@ TYPES.push({
 	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 26,					//tank moving speed
 	attack_delay: 1,				//attack delay in seconds
-	turn_speed: 2,					//tank turn speed
+	turn_speed: 4,					//tank turn speed
 	//no_repawn: 1,					//tank will not respan after death
 	//no_collisions: 1,				//tank will be able to move ower walls, and other tanks
 	//bonus: 1,					//tank will be able only in single mode,  random and mirror
@@ -51,7 +51,7 @@ TYPES.push({
 	armor: [40, 0.3, 50],
 	speed: 30,
 	attack_delay: 1,
-	turn_speed: 2,
+	turn_speed: 3,
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
@@ -75,7 +75,7 @@ TYPES.push({
 	armor: [20, 0.3, 30],
 	speed: 35,
 	attack_delay: 1,
-	turn_speed: 1,
+	turn_speed: 5,
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
@@ -99,7 +99,7 @@ TYPES.push({
 	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 5,
-	turn_speed: 5,
+	turn_speed: 2,
 	ignore_armor: 1,
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -124,7 +124,7 @@ TYPES.push({
 	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 2,
-	turn_speed: 6,
+	turn_speed: 2,
 	size: ['M', 50],
 	ignore_armor: 1,
 	preview: 'preview.png',
@@ -149,7 +149,7 @@ TYPES.push({
 	armor: [0, 0, 0],
 	speed: 25,
 	attack_delay: 1,
-	turn_speed: 6,
+	turn_speed: 4,
 	no_repawn: 1,
 	size: ['S', 30],
 	preview: 'preview.png',
@@ -174,7 +174,7 @@ TYPES.push({
 	armor: [0,0,0],
 	speed: 0,
 	attack_delay: 1,
-	turn_speed: 3,
+	turn_speed: 4,
 	no_repawn: 1,
 	size: ['L', 50],
 	preview: '',
@@ -197,7 +197,7 @@ TYPES.push({
 	armor: [50,0,50],
 	speed: 0,
 	attack_delay: 1,
-	turn_speed: 3,
+	turn_speed: 4,
 	no_repawn: 1,
 	size: ['L', 90],
 	preview: '',
