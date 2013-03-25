@@ -172,7 +172,6 @@ function preload_all_files(){
 		'img/target.png',
 		'img/unmute.png',
 		'img/button.png',
-		'img/driver.jpg',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
