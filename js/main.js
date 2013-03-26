@@ -50,8 +50,8 @@ function init_game(first_time){
 //checks and resizes all canvas layers
 function check_canvas_sizes(){
 	if(FS==false){
-		WIDTH_MAP = MAPS[level-1].x;
-		HEIGHT_MAP = MAPS[level-1].y;
+		WIDTH_MAP = MAPS[level-1].width;
+		HEIGHT_MAP = MAPS[level-1].height;
 		WIDTH_APP = APP_SIZE_CACHE[0];
 		HEIGHT_APP = APP_SIZE_CACHE[1];
 		WIDTH_SCROLL = 800;
@@ -63,8 +63,8 @@ function check_canvas_sizes(){
 		//full screen
 		var dimensions = get_fimensions();
 		//map
-		WIDTH_MAP = MAPS[level-1].x;
-		HEIGHT_MAP = MAPS[level-1].y
+		WIDTH_MAP = MAPS[level-1].width;
+		HEIGHT_MAP = MAPS[level-1].height;
 		//app
 		WIDTH_APP = dimensions[0];
 		HEIGHT_APP = dimensions[1];
@@ -81,12 +81,8 @@ function check_canvas_sizes(){
 		HEIGHT_SCROLL = dimensions[1]-HEIGHT_STATUS_AREA;
 		if(WIDTH_SCROLL > WIDTH_MAP)
 			WIDTH_SCROLL = WIDTH_MAP;
-		if(WIDTH_SCROLL < block_width*11)
-			WIDTH_SCROLL = block_width*11;	
 		if(HEIGHT_SCROLL+HEIGHT_STATUS_AREA > HEIGHT_MAP)
 			HEIGHT_SCROLL = HEIGHT_MAP-HEIGHT_STATUS_AREA;
-		if(HEIGHT_SCROLL < block_height*6)
-			HEIGHT_SCROLL = block_height*6;	
 		}
 	//background
 	document.getElementById("canvas_backround").width  = WIDTH_APP;
@@ -173,16 +169,9 @@ function preload_all_files(){
 		'img/logo.png',
 		'img/mute.png',
 		'img/repair.png',
-		'img/statusbar.png',
 		'img/target.png',
 		'img/unmute.png',
 		'img/button.png',
-		//map elements
-		'img/map/0.png',
-		'img/map/1.png',
-		'img/map/2.png',
-		'img/map/moon.jpg',
-		'img/map/fence.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -191,7 +180,7 @@ function preload_all_files(){
 		];
 		
 	//calculate files count
-	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS.length;
+	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS.length + ELEMENTS.length;
 	for(i in TYPES){
 		preload_left = preload_left + 5;	
 		}
@@ -203,6 +192,9 @@ function preload_all_files(){
 		}
 	for(var i in BULLETS){
 		preload('img/bullets/'+BULLETS[i].file);
+		}
+	for(var i in ELEMENTS){
+		preload('img/map/'+ELEMENTS[i].file);
 		}
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
@@ -272,13 +264,13 @@ function init_action(map_nr, my_team){
 	tmp['type'] = my_tank_nr;
 	if(my_team=='B'){
 		//blue top
-		tmp['x'] = WIDTH_SCROLL/2+Math.floor(block_width*0.6);
+		tmp['x'] = round(WIDTH_SCROLL*2/3);
 		tmp['y'] = 20;
 		tmp['angle'] = 180;
 		}
 	else{
 		//red bottom 
-		tmp['x'] = WIDTH_SCROLL/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+		tmp['x'] = WIDTH_SCROLL/3;
 		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 		tmp['angle'] = 0;
 		}
@@ -291,10 +283,10 @@ function init_action(map_nr, my_team){
 	tmp['abilities_lvl'] = [1,1,1];
 	tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 	tmp['speed'] = TYPES[tmp['type']].speed;
-	tmp['upgrade_points'] = 0;
 	tmp['armor'] = TYPES[tmp['type']].armor[0];
 	tmp['damage'] = TYPES[tmp['type']].damage[0];
 	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
+	tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
 	tmp['bullets'] = new Array();
 	TANKS.push(tmp);
 	my_tank_id = tmp['id'];
@@ -315,7 +307,7 @@ function init_action(map_nr, my_team){
 		tmp['id'] = get_unique_id();
 		tmp['name'] = "Bot";
 		tmp['type'] = enemy_tank_type;
-		tmp['x'] = WIDTH_MAP/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+		tmp['x'] = round(WIDTH_SCROLL/3);
 		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 		tmp['angle'] = 0;
 		tmp['angle'] = 0;
@@ -327,10 +319,10 @@ function init_action(map_nr, my_team){
 		tmp['abilities_lvl'] = [1,1,1];
 		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['upgrade_points'] = 0;
 		tmp['armor'] = TYPES[tmp['type']].armor[0];
 		tmp['damage'] = TYPES[tmp['type']].damage[0];
 		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
+		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
 		tmp['bullets'] = new Array();
 		TANKS.push(tmp);
 		}
@@ -339,7 +331,7 @@ function init_action(map_nr, my_team){
 	
 	add_towers();
 	
-	//auto add 1 lvl upgrade
+	//auto add 1 lvl upgrade	disabled
 	/*for(ii in TANKS){
 		if(TYPES[TANKS[ii].type].abilities.length != 0 ){
 			for(jj in TYPES[TANKS[ii].type].abilities){ 
@@ -353,7 +345,7 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 		
-	level_hp_regen_id = setInterval(level_hp_regen_handler, 250);
+	level_hp_regen_id = setInterval(level_hp_regen_handler, 2000);
 	level_interval_id = setInterval(tank_level_handler, 2000);
 	bots_interval_id = setInterval(add_bots, 1000*5);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
@@ -380,8 +372,8 @@ function range2real_range(range){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
-	for (i in timed_functions){
-		timed_functions[i].duration = timed_functions[i].duration - 100;
+	for (i in timed_functions){					
+		timed_functions[i].duration = timed_functions[i].duration - 100;	
 		if(timed_functions[i].type == 'REPEAT')
 			window[timed_functions[i].function](timed_functions[i]);
 		if(timed_functions[i].duration<0){

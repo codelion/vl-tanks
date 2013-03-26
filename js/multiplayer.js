@@ -216,23 +216,6 @@ function get_packet(event){
 				}
 			}
 		}
-	else if(type == 'skill_up'){		//tank skill upgrade
-		//DATA = room_id, player, nr=[1,2,3]
-		if(PLACE=="game" && opened_room_id==DATA[0]){
-			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on skill_up.');
-			var nr = DATA[2];
-			
-			TANK.abilities_lvl[nr-1] = TANK.abilities_lvl[nr-1] + 1;
-			TANK.upgrade_points = TANK.upgrade_points - 1;
-			
-			var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_')+"_once";
-			if(ability_function != undefined)
-				window[ability_function](TANK);
-			if(DATA[1] == name)	//me
-				redraw_tank_abilities();
-			}
-		}
 	else if(type == 'skill_do'){	//tank skill start
 		//DATA = room_id, player, nr=[1,2,3]
 		if(PLACE=="game" && opened_room_id==DATA[0]){
@@ -276,7 +259,7 @@ function get_packet(event){
 		if(TANK_TO===false) log('ERROR: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 		TANK_FROM = get_tank_by_name(DATA[1]);
 		if(TANK_FROM===false) log('ERROR: tank_to "'+DATA[1]+'" was not found on tank_kill.');
-					console.log('+++++++++');
+		
 		//actions
 		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
 		else				TANK_TO.deaths = TANK_TO.deaths + 1;
@@ -431,13 +414,13 @@ function sync_multiplayers(){
 				tmp['type'] = 0;
 			if(ROOM.players[i].team=='B'){
 				//blue top
-				tmp['x'] = WIDTH_MAP/2+Math.floor(block_width*0.6);
+				tmp['x'] = round(WIDTH_SCROLL*2/3);
 				tmp['y'] = 20;
 				tmp['angle'] = 180;
 				}
 			else{
 				//red bottom
-				tmp['x'] = WIDTH_MAP/2-Math.floor(block_width*0.6)-TYPES[tmp['type']].size[1];
+				tmp['x'] = round(WIDTH_SCROLL/3);
 				tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
 				tmp['angle'] = 0;
 				}
@@ -450,10 +433,10 @@ function sync_multiplayers(){
 			tmp['abilities_lvl'] = [1,1,1];
 			tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
 			tmp['speed'] = TYPES[tmp['type']].speed;
-			tmp['upgrade_points'] = 27;
 			tmp['armor'] = TYPES[tmp['type']].armor[0];
 			tmp['damage'] = TYPES[tmp['type']].damage[0];
 			tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
+			tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
 			tmp['bullets'] = new Array();
 			TANKS.push(tmp);
 			}

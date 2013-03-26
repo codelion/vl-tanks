@@ -43,8 +43,8 @@ function draw_main(){
 						TANKS[i].respan_time = 3*1000/FPS;
 					else
 						TANKS[i].respan_time = TANKS[i].level*1000/FPS;
-					if(TANKS[i].team == 'B'){
-						TANKS[i]['x'] = WIDTH_SCROLL/2+Math.floor(block_width*0.6);
+					if(TANKS[i].team == 'B'){	//top
+						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
 						TANKS[i]['y'] = 20;
 						if(i==0){
 							map_offset = [0, 0];
@@ -53,8 +53,8 @@ function draw_main(){
 							}
 						TANKS[i]['hp'] = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
-					else{
-						TANKS[i]['x'] = WIDTH_SCROLL/2-Math.floor(block_width*0.6)-TYPES[TANKS[i].type].size[1];
+					else{	//bottom
+						TANKS[i]['x'] = round(WIDTH_SCROLL/3);
 						TANKS[i]['y'] = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
 						if(i==0){
 							map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
@@ -154,7 +154,7 @@ function draw_main(){
 					}
 				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 				radiance = Math.atan2(dist_y, dist_x);
-				if(TYPES[TANKS[i].type].size[0] != "S" && check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
+				if(check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
 					TANKS[i].move = 0;
 					}
 				else{
@@ -163,22 +163,25 @@ function draw_main(){
 					}
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
-				TANKS[i].angle = angle;
-				if(TANKS[i].hit_reuse == 0 && TANKS[i].bullets.length==0)
-					TANKS[i].fire_angle = angle;
-				if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
-					if(TANKS[i].move_to[0].length == undefined){
-						TANKS[i].move = 0;
+				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle)){
+					if(TANKS[i].hit_reuse == 0 && TANKS[i].bullets.length==0)
+						if(body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle)){
 						}
-					else{
-						//we have second way defined
-						if(TANKS[i].move_to[1] != undefined)
-							TANKS[i].move_to.splice(0, 1);
-						else{
+					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
+						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
-							}	
-						}
-					}	
+							}
+						else{
+							//we have second way defined
+							if(TANKS[i].move_to[1] != undefined)
+								TANKS[i].move_to.splice(0, 1);
+							else{
+								TANKS[i].move = 0;
+								}	
+							}
+						}	
+					}
+				}else{
 				}
 			//map scrolling
 			if(i==0 && TANKS[i].move == 1 && TANKS[i].stun == undefined){
@@ -255,9 +258,9 @@ function draw_main(){
 						//calc damage
 						if(target_index>-1){
 							if(TANKS[i].bullets[b].damage != undefined && TANKS[i].bullets[b].pierce_armor != undefined)
-								do_damage(TANKS[i], TANKS[target_index], target_index, TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor);
+								do_damage(TANKS[i], TANKS[target_index], TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor);
 							else
-								do_damage(TANKS[i], TANKS[target_index], target_index);
+								do_damage(TANKS[i], TANKS[target_index]);
 							
 							//extra effects for non tower
 							if(TANKS[target_index] != undefined && TANKS[target_index].team != TANKS[i].team && TYPES[TANKS[target_index].type].speed>0){
@@ -279,7 +282,7 @@ function draw_main(){
 							if(distance_b > TANKS[i].bullets[b].aoe_splash_range)	
 								continue;	//too far
 							//do damage
-							do_damage(TANKS[i], TANKS[ii], ii, TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor, 1);
+							do_damage(TANKS[i], TANKS[ii], TANKS[i].bullets[b].damage, TANKS[i].bullets[b].pierce_armor, 1);
 							
 							//extra effects for non tower
 							if(TYPES[TANKS[ii].type].speed>0){
@@ -450,10 +453,11 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 		}
 	}
 function draw_logo_tanks(left, top, change_logo){
+	var max_size = 60;
 	//clear
 	var img = new Image();	
 	img.src = 'img/map/moon.jpg';
-	canvas_backround.drawImage(img, left, top, 477, 52+10, left, top, 477, 52+10);
+	canvas_backround.drawImage(img, left, top-7, 477, 52+10, left, top-7, 477, 52+10);
 	if(change_logo==undefined){
 		if(logo_visible==0){
 			logo_visible=1;
@@ -468,11 +472,15 @@ function draw_logo_tanks(left, top, change_logo){
 			}
 		}
 	for(var t in TYPES){
+		//if(TYPES[t].size[1] > 60) continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
-		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		if(TYPES[t].size[1] < max_size)	//normal
+			canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		else	//resized
+			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/TYPES.length)+(50-max_size)/2, top+52-max_size, max_size, max_size);
 		//turrent
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
@@ -969,3 +977,22 @@ function show_chat(){
 		canvas.fillText(text, 10, bottom-i*gap);
 		}
 	}
+function body_rotation(obj,str,speed,rot) {
+	speed = speed*10;
+	var flag = false;
+	if (obj[str] - 180 > rot){
+		rot += 360;
+	}
+	if (obj[str] + 180 < rot){
+		rot -= 360;
+	}
+	if (obj[str] - rot > speed){
+		obj[str] -= speed;
+	} else if (obj[str] - rot < -speed){
+		obj[str] += speed;
+	} else {
+		obj[str] = rot;
+		flag = true;
+	}
+	return flag;
+}

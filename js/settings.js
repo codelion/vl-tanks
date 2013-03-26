@@ -7,8 +7,6 @@ var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 
 //game settings
 var SOCKET = 'ws://127.0.0.1:8000/list';//socket server
-var block_width = 63;			//map block width
-var block_height = 59;			//map block height
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
 var START_GAME_COUNT_SINGLE=5;		//second how much to count in singleplayer
