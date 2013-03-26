@@ -1,3 +1,4 @@
+minis
 implement accuracy ?
 bullets
 	if speed 0 - instant

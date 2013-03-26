@@ -9,6 +9,7 @@ function draw_status_bar(){
 	canvas_backround.strokeStyle='#999069';
 	canvas_backround.moveTo(0, HEIGHT_APP-26.5);
 	canvas_backround.lineTo(WIDTH_APP, HEIGHT_APP-26.5);
+	canvas_backround.lineWidth = 1;
 	canvas_backround.stroke();
 	
 	//bottom border
