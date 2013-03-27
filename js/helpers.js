@@ -72,9 +72,8 @@ var sort_by = function(field, reverse, primer){
 		}
 	}	
 //function to get random number from 1 to n
-function randomToN(maxVal,floatVal){
-	var randVal = Math.random()*maxVal;
-	return typeof floatVal=='undefined'?Math.round(randVal):randVal.toFixed(floatVal);
+function getRandomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 function round(number){
 	return Math.round(number);
@@ -109,4 +108,15 @@ function get_fimensions(){
 	}
 function log(text){
 	console.log(text);
+	}
+function drawImage_rotated(canvas, file, x, y, width, height, angle){
+	var TO_RADIANS = Math.PI/180;
+	var img = new Image();	
+	img.src = file;
+	
+	canvas.save();
+	canvas.translate(x, y);			//canvas.translate(x+round(width/2), y+round(height/2));
+	canvas.rotate(angle * TO_RADIANS);
+	canvas.drawImage(img, -(width/2), -(height/2));
+	canvas.restore();
 	}

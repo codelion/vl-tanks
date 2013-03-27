@@ -301,7 +301,7 @@ function init_action(map_nr, my_team){
 				possible_types.push(t);
 			}
 		//get random type
-		var enemy_tank_type = possible_types[randomToN(possible_types.length-1)];//randomize
+		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 				
 		var tmp = new Array();
 		tmp['id'] = get_unique_id();

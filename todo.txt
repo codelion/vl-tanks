@@ -1,9 +1,10 @@
-minis
-implement accuracy ?
+map scolling on mouse on
+skill buttons
+skill descriptions
 bullets
-	if speed 0 - instant
 	separate from tanks - on tank death, bullet follows
 	fire animation?
+minis
 improve timing f-tions
 multiplayer:
 	skills

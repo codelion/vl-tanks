@@ -1,7 +1,6 @@
 //draw single tank
 function draw_tank(tank){
 	if(PLACE != 'game' || tank == undefined) return false;
-	var TO_RADIANS = Math.PI/180;
 	var tank_size =  TYPES[tank.type].size[1];
 	var visibility = 0;
 	
@@ -235,7 +234,7 @@ function redraw_tank_stats(){
 	status_y = HEIGHT_APP-150-25;
 	var left_x = 150;
 	var left_x_values = 200;
-	var gap = 19;
+	var gap = 17;
 	var top_y = HEIGHT_APP-150-25+30;
 	var nr = 0;
 	
@@ -281,6 +280,14 @@ function redraw_tank_stats(){
 	canvas_backround.fillText("Armor:", left_x, top_y+nr*gap);
 	var armor_text = Math.floor(MY_TANK.armor);
 	canvas_backround.fillText(armor_text+"%", left_x_values, top_y+nr*gap);
+	nr++;
+	
+	//accuracy
+	canvas_backround.fillText("Acuracy:", left_x, top_y+nr*gap);
+	var accuracy = TYPES[MY_TANK.type].accuracy;
+	if(MY_TANK.move==1)
+		accuracy = accuracy-10;
+	canvas_backround.fillText(accuracy+"%", left_x_values, top_y+nr*gap);
 	nr++;
 	
 	//range
@@ -468,7 +475,12 @@ function add_player_name(tank){
 		var tmp_object = tmp_canvas.getContext("2d");
 	
 		//add data
-		tmp_object.fillStyle = "#ffffff";
+		if(tank.team=='B')		tmp_object.fillStyle = "#0000ff";
+		else if(tank.team=='R')		tmp_object.fillStyle = "#b12525";
+		else if(tank.team=='G')		tmp_object.fillStyle = "#196119";
+		else if(tank.team=='Y')		tmp_object.fillStyle = "#ffff00";
+		else 				tmp_object.fillStyle = "#ffffff";
+		
 		tmp_object.font = "normal 9px Verdana";
 		tmp_object.fillText(player_name, 0+name_padding, 12);
 		
@@ -856,6 +868,24 @@ function check_enemies(TANK){
 function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force, silent){
 	if(TANK_TO == undefined) return false;
 	if(TANK['dead'] == 1) return false;
+	
+	//accuracy
+	var accuracy = TYPES[TANK.type].accuracy;
+	if(TANK.move==1)
+		accuracy = accuracy-10;
+	if(TANK_TO.move==1)
+		accuracy = accuracy-10;
+	if(getRandomInt(1, 10) > accuracy/10) return false;
+	
+	//draw explosion
+	explode_x = TANK.x+TYPES[TANK.type].size[1]/2;
+	explode_y = TANK.y+TYPES[TANK.type].size[1]/2;
+	dist_x = TANK_TO.x+TYPES[TANK_TO.type].size[1]/2 - explode_x;
+	dist_y = TANK_TO.y+TYPES[TANK_TO.type].size[1]/2 - explode_y;
+	radiance = Math.atan2(dist_y, dist_x);
+	explode_x = explode_x + Math.cos(radiance)*(TYPES[TANK.type].size[1]/2+10);
+	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);			
+	drawImage_rotated(canvas_main, 'img/explosion.png', explode_x, explode_y, 24, 32, TANK.fire_angle);
 	
 	//sound	fire_sound
 	if(silent == undefined && muted==false && TYPES[TANK.type].fire_sound != undefined){
@@ -1265,7 +1295,7 @@ function choose_and_register_tanks(ROOM){
 	//choose
 	if(ROOM.settings[0]=='random'){
 		for(var p in ROOM.players){
-			random_type = possible_types[randomToN(possible_types.length-1)];//randomize
+			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type);
 			}
@@ -1276,7 +1306,7 @@ function choose_and_register_tanks(ROOM){
 		//first team
 		for(var p in ROOM.players){
 			if(ROOM.players[p].team != first_team) continue;
-			random_type = possible_types[randomToN(possible_types.length-1)];//randomize
+			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 			selected_types.push(random_type);
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type);
@@ -1285,7 +1315,7 @@ function choose_and_register_tanks(ROOM){
 		for(var p in ROOM.players){
 			if(ROOM.players[p].team == first_team) continue;
 			//get index
-			random_type_i = randomToN(selected_types.length-1);
+			random_type_i = getRandomInt(0, selected_types.length-1);
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i]);
 

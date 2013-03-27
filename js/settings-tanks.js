@@ -1,5 +1,5 @@
 /*	future comparison
-DPS		10		30		15	20		20+aa
+DPS		10		30		15	25		20+aa
 VS		Heavy		Tiger		Cruis	Launcher	Snip		win	loss
 -------------------------------------------------------------------------------------------------
 Heavy		n/a		--		++	--		--	|	1	3	but survive long, need more abilities?
@@ -8,7 +8,14 @@ Cruis		--		--		n/a	0		0	|	0	2	but fast, need more abilities to be usefull
 Launch		++		++		0	n/a		0	|	2	0
 Sniper		++		++		0	0		n/a	|	2	0
 -------------------------------------------------------------------------------------------------
-	
+
+more ideas:
+	1/2 skill for each tank
+	heavy - some skills for save team?
+	tiger - less defence?
+	cruiser - some skill for team support
+	launcher - aoe skill?
+	sniper - some semi-hide skill?
 */
 
 //Heavy
@@ -37,6 +44,7 @@ TYPES.push({
 		],
 	bullet: 'bullet.png',				//bullet_image
 	fire_sound: 'shoot.ogg',			//shooting sound
+	accuracy: 90,					//chance to hit target, %
 	});
 
 //Tiger
@@ -61,13 +69,14 @@ TYPES.push({
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});
 
 //Cruiser
 TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
-	description: ["Light armor", "Fast", "Aaverage damage"],
+	description: ["Light armor", "Fast", "Average damage"],
 	life: [200, 13],
 	damage: [15, 1],	//15 dps
 	range: 90,
@@ -85,22 +94,22 @@ TYPES.push({
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});
 
 //Launcher
 TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
-	description: ["Missiles", "Long range", "Slow", "Penetrates armor"],
+	description: ["Missiles", "Long range", "Slow", "Penetrates armor", "High accuracy"],
 	life: [100, 10],
-	damage: [100, 5],	//20 dps
+	damage: [50, 5],	//25 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
 	speed: 23,
-	attack_delay: 5,
+	attack_delay: 2,
 	turn_speed: 2,
-	ignore_armor: 1,
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
@@ -110,15 +119,16 @@ TYPES.push({
 		],
 	bullet: 'missle.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 100,
 	});
 
 //Sniper
 TYPES.push({
 	name: 'Sniper',
 	type: 'tank',
-	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack", "Inacurate"],
+	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack", "Low accuracy"],
 	life: [100, 10],
-	damage: [40, 2],	//20 dps
+	damage: [50, 2],	//25 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
@@ -135,6 +145,7 @@ TYPES.push({
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 80,
 	});
 
 //Soldier
@@ -160,6 +171,7 @@ TYPES.push({
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});
 
 //TOWER
@@ -183,6 +195,7 @@ TYPES.push({
 	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});
 
 //BASE
@@ -206,4 +219,5 @@ TYPES.push({
 	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});

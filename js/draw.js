@@ -4,6 +4,7 @@ function draw_main(){
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);	//clear layer
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	//clear sight layer
 	
+	//quality
 	if(QUALITY>1){
 		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.4)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
@@ -17,7 +18,6 @@ function draw_main(){
 	redraw_mini_map();	// mini map actions
 	
 	//tanks actions
-	var TO_RADIANS = Math.PI/180;
 	for (var i in TANKS){
 		try{
 			//speed multiplier
@@ -143,7 +143,6 @@ function draw_main(){
 				}
 			//move tank
 			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined){
-				//move x coord
 				if(TANKS[i].move_to[0].length == undefined){
 					dist_x = TANKS[i].move_to[0] - TANKS[i].x;
 					dist_y = TANKS[i].move_to[1] - TANKS[i].y;
@@ -154,13 +153,6 @@ function draw_main(){
 					}
 				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 				radiance = Math.atan2(dist_y, dist_x);
-				if(check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
-					TANKS[i].move = 0;
-					}
-				else{
-					TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
-					TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
-					}
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle)){
@@ -179,9 +171,15 @@ function draw_main(){
 								TANKS[i].move = 0;
 								}	
 							}
+						}
+					if(check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
+						TANKS[i].move = 0;
+						}
+					else{
+						TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
+						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
 						}	
 					}
-				}else{
 				}
 			//map scrolling
 			if(i==0 && TANKS[i].move == 1 && TANKS[i].stun == undefined){

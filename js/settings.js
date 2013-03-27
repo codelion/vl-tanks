@@ -63,7 +63,7 @@ var status_x=0				//status bar x coordinates
 var chat_mode=0;				//if 1, show textbox for writing
 var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank
-
+var TO_RADIANS = Math.PI/180; 		//for rotating
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
 var level_interval_id;			//controller for level handling function
