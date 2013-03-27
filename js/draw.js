@@ -218,28 +218,6 @@ function draw_main(){
 				if(map_offset[1] < -1*(HEIGHT_MAP-HEIGHT_SCROLL))
 					map_offset[1] = -1*(HEIGHT_MAP-HEIGHT_SCROLL);
 				}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			//shooting
 			for(var b in BULLETS){
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
@@ -371,31 +349,6 @@ function draw_main(){
 						}
 					}
 				}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			if(TANKS[i] != undefined){	//if tank alive
 				check_enemies(TANKS[i]);
 				draw_tank(TANKS[i]);
@@ -774,7 +727,7 @@ function draw_tank_select_screen(selected_tank){
 	j = 0;
 	preview_xy = 90;
 	for(var i in TYPES){
-		if(TYPES[i].preview == '') continue;
+		if(TYPES[i].type != 'tank') continue;
 		if(15+j*(preview_xy+gap)+ preview_xy > WIDTH_APP){
 			y = y + preview_xy+gap;
 			j = 0;
