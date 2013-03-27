@@ -19,7 +19,8 @@ var VERSION = "1.0";			//app version
 //other global variables
 var TANKS = new Array();		//tanks array
 var TYPES = new Array();		//tanks types config
-var BULLETS = new Array();		//bullets config
+var BULLETS_TYPES = new Array();	//bullets types config
+var BULLETS = new Array();		//tanks bullets
 var MAPS = new Array();			//maps config
 var ELEMENTS = new Array();		//maps elements
 var BUTTONS = new Array();		//buttons array
@@ -64,6 +65,8 @@ var chat_mode=0;				//if 1, show textbox for writing
 var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank
 var TO_RADIANS = Math.PI/180; 		//for rotating
+var SKILL_BUTTON = 55;			//skill button width and height
+
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
 var level_interval_id;			//controller for level handling function

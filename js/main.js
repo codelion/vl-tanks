@@ -172,6 +172,7 @@ function preload_all_files(){
 		'img/target.png',
 		'img/unmute.png',
 		'img/button.png',
+		'img/explosion.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -180,7 +181,7 @@ function preload_all_files(){
 		];
 		
 	//calculate files count
-	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS.length + ELEMENTS.length;
+	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS_TYPES.length + ELEMENTS.length;
 	for(i in TYPES){
 		preload_left = preload_left + 5;	
 		}
@@ -190,8 +191,8 @@ function preload_all_files(){
 	for(var i in images_to_preload){
 		preload(images_to_preload[i]);
 		}
-	for(var i in BULLETS){
-		preload('img/bullets/'+BULLETS[i].file);
+	for(var i in BULLETS_TYPES){
+		preload('img/bullets/'+BULLETS_TYPES[i].file);
 		}
 	for(var i in ELEMENTS){
 		preload('img/map/'+ELEMENTS[i].file);
@@ -287,7 +288,6 @@ function init_action(map_nr, my_team){
 	tmp['damage'] = TYPES[tmp['type']].damage[0];
 	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
 	tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-	tmp['bullets'] = new Array();
 	TANKS.push(tmp);
 	my_tank_id = tmp['id'];
 	MY_TANK = TANKS[(TANKS.length-1)];
@@ -323,7 +323,6 @@ function init_action(map_nr, my_team){
 		tmp['damage'] = TYPES[tmp['type']].damage[0];
 		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
 		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-		tmp['bullets'] = new Array();
 		TANKS.push(tmp);
 		}
 	
@@ -349,13 +348,6 @@ function init_action(map_nr, my_team){
 	level_interval_id = setInterval(tank_level_handler, 2000);
 	bots_interval_id = setInterval(add_bots, 1000*5);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
-	
-	//show fps
-	var tmp = new Array();
-	tmp['function'] = "update_fps";
-	//tmp['duration'] = ability_reuse;
-	tmp['type'] = 'REPEAT';
-	timed_functions.push(tmp);
 	}
 //get unique id
 function get_unique_id(){

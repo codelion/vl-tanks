@@ -337,6 +337,8 @@ function redraw_tank_stats(){
 	canvas_backround.fillText(text, left_x_values, top_y+nr*gap);
 	nr++;
 	
+	//show fps
+	update_fps();
 	}
 var ABILITIES_POS = [];
 //redraw tank skills
@@ -344,8 +346,7 @@ function redraw_tank_abilities(){
 	var gap = 10;
 	var status_x_tmp = 569+gap;
 	var status_y = HEIGHT_APP-150-25+4+gap;
-	var ability_img_dim = 60;
-	var letter_width = 5;
+	var letter_width = 5.5;
 	
 	for (i in TYPES[MY_TANK.type].abilities){
 		//check if abilites not in use
@@ -357,33 +358,33 @@ function redraw_tank_abilities(){
 			//passive
 			canvas_backround.strokeStyle = "#196144";
 			canvas_backround.fillStyle = "#8fc74c";
-			roundRect(canvas_backround, status_x_tmp+i*70, status_y, 60, 60, 3, true);
+			roundRect(canvas_backround, status_x_tmp+i*(SKILL_BUTTON+gap), status_y, SKILL_BUTTON, SKILL_BUTTON, 3, true);
 			}
 		else{
 			canvas_backround.strokeStyle = "#196144";
 			canvas_backround.fillStyle = "#69a126";
-			roundRect(canvas_backround, status_x_tmp+i*70, status_y, 60, 60, 3, true);
+			roundRect(canvas_backround, status_x_tmp+i*(SKILL_BUTTON+gap), status_y, SKILL_BUTTON, SKILL_BUTTON, 3, true);
 			}
 			
 		//text
 		ability_text = TYPES[MY_TANK.type].abilities[i].name;
 		canvas_backround.fillStyle = "#196119";
 		canvas_backround.font = "bold 10px Verdana";
-		canvas_backround.fillText(ability_text, status_x_tmp+i*70+Math.floor((ability_img_dim-ability_text.length*letter_width)/2), status_y+ability_img_dim/2+3);
+		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
 	
 		//save position
 		if(ABILITIES_POS.length<3){
 			var tmp = new Array();
 			tmp['x'] = status_x_tmp+i*70;
 			tmp['y'] = status_y;
-			tmp['width'] = 60;
-			tmp['height'] = 60;
+			tmp['width'] = SKILL_BUTTON;
+			tmp['height'] = SKILL_BUTTON;
 			tmp['nr'] = parseInt(i)+1;
 			ABILITIES_POS.push(tmp);
 			}
 		}
 	}
-//redraw tanks skills upgrades
+//redraw tanks skills animation
 function redraw_tank_abilities_mini(object){
 	if(object['tank']['respan_time'] != undefined || object['tank']['ability_'+(object.nr+1)+'_in_use'] != 1){
 		object.duration=0;	//tank dead
@@ -391,10 +392,9 @@ function redraw_tank_abilities_mini(object){
 	var gap = 10;
 	var status_x_tmp = 569+gap;
 	var status_y = HEIGHT_APP-150-25+4+gap;
-	var ability_img_dim = 60;
-	var letter_width = 5;
+	var letter_width = 5.5;
 	
-	var i = object.nr;		//log(object.duration);
+	var i = object.nr;
 	
 	if(object.duration==0){
 		delete object['tank']['ability_'+(i+1)+'_in_use'];
@@ -405,33 +405,33 @@ function redraw_tank_abilities_mini(object){
 		//passive
 		canvas_backround.strokeStyle = "#196144";
 		canvas_backround.fillStyle = "#8fc74c";
-		roundRect(canvas_backround, status_x_tmp+i*70, status_y, 60, 60, 3, true);
+		roundRect(canvas_backround, status_x_tmp+i*(SKILL_BUTTON+gap), status_y, SKILL_BUTTON, SKILL_BUTTON, 3, true);
 		}
 	else{
 		canvas_backround.strokeStyle = "#196144";
 		canvas_backround.fillStyle = "#69a126";
-		roundRect(canvas_backround, status_x_tmp+i*70, status_y, 60, 60, 3, true);
+		roundRect(canvas_backround, status_x_tmp+i*(SKILL_BUTTON+gap), status_y, SKILL_BUTTON, SKILL_BUTTON, 3, true);
 		}
 	
 	//if active
 	if(TYPES[MY_TANK.type].abilities[i].passive == false){
 		var img = new Image();
-		var img_height = 60 * object.duration / object.max;
+		var img_height = SKILL_BUTTON * object.duration / object.max;
 		if(img_height<1){
 			canvas_backround.fillStyle = "#8fc74c";
-			img_height = 60;
+			img_height = SKILL_BUTTON;
 			}
 		else
 			canvas_backround.fillStyle = "#69a126";
 		//canvas_backround.fillStyle = "#ff0000";
-		canvas_backround.fillRect(status_x_tmp+i*70, status_y, 60, Math.floor(img_height));
+		canvas_backround.fillRect(status_x_tmp+i*(SKILL_BUTTON+gap), status_y, SKILL_BUTTON, Math.floor(img_height));
 		}
 
 	//text
 	canvas_backround.fillStyle = "#196119";
 	canvas_backround.font = "bold 10px Verdana";
 	var ability_text = TYPES[MY_TANK.type].abilities[i].name;
-	canvas_backround.fillText(ability_text, status_x_tmp+i*70+Math.floor((ability_img_dim-ability_text.length*letter_width)/2), status_y+ability_img_dim/2+3);
+	canvas_backround.fillText(ability_text, status_x_tmp+i*70+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
 	}
 //tank hp bar above
 function add_hp_bar(tank){
@@ -733,10 +733,9 @@ function check_enemies(TANK){
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
 			tmp['bullet_to_target'] = TANKS[i]; 
-			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
-			tmp['target'] = [i,TANKS[i].id];
+			tmp['bullet_from_target'] = TANK;
 			tmp['angle'] = round(f_angle);
-			TANK.bullets.push(tmp);
+			BULLETS.push(tmp);
 			TANK.hit_reuse = TANK.attack_delay*1000;	
 			TANK.fire_angle = round(f_angle);
 			found = true;
@@ -799,10 +798,9 @@ function check_enemies(TANK){
 		tmp['x'] = TANK.x+tank_size_from/2;
 		tmp['y'] = TANK.y+tank_size_from/2;
 		tmp['bullet_to_target'] = TANKS[i]; 
-		tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
-		tmp['target'] = [i,TANKS[i].id];
+		tmp['bullet_from_target'] = TANK;
 		tmp['angle'] = round(f_angle);
-		TANK.bullets.push(tmp);
+		BULLETS.push(tmp);
 		TANK.hit_reuse = TANK.attack_delay*1000;	
 		TANK.fire_angle = round(f_angle);
 		found = true;
@@ -844,10 +842,9 @@ function check_enemies(TANK){
 			tmp['x'] = TANK.x+tank_size_from/2;
 			tmp['y'] = TANK.y+tank_size_from/2;
 			tmp['bullet_to_target'] = TANKS[i]; 
-			tmp['bullet_to'] = [TANKS[i].x+tank_size_to/2, TANKS[i].y+tank_size_to/2];
-			tmp['target'] = [i,TANKS[i].id];
+			tmp['bullet_from_target'] = TANK;
 			tmp['angle'] = round(f_angle);
-			TANK.bullets.push(tmp);
+			BULLETS.push(tmp);
 			TANK.hit_reuse = TANK.attack_delay*1000;	
 			
 			TANK.fire_angle = round(f_angle);
@@ -1068,7 +1065,7 @@ function death(tank){
 		tank.respan_time = 3*1000/FPS;
 	else
 		tank.respan_time = tank.level*1000/FPS;
-	tank.bullets = [];
+	BULLETS = [];
 	}
 //add towers to map
 function add_towers(){
@@ -1109,7 +1106,6 @@ function add_towers(){
 			tmp['fire_angle'] = 0;
 			}
 		tmp['hp'] = TYPES[tmp['type']].life[0];	
-		tmp['bullets'] = new Array();	
 		TANKS.push(tmp);		
 		}
 	}
@@ -1180,7 +1176,6 @@ function add_bots(){
 			}
 		else
 			tmp['move'] = 0;
-		tmp['bullets'] = new Array();	
 		TANKS.push(tmp);	
 		}
 	}
@@ -1326,9 +1321,9 @@ function choose_and_register_tanks(ROOM){
 	}
 //returns bullet by filename
 function get_bullet(filename){
-	for(var i in BULLETS){
-		if(BULLETS[i].file == filename){
-			return BULLETS[i];
+	for(var i in BULLETS_TYPES){
+		if(BULLETS_TYPES[i].file == filename){
+			return BULLETS_TYPES[i];
 			}
 		}
 	return false;

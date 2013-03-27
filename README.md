@@ -17,3 +17,4 @@ HTML5 based tank game.
 
 ## Latest News
 * added accuracy
+* upgraded shooting

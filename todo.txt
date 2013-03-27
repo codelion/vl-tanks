@@ -1,9 +1,4 @@
 map scolling on mouse on
-skill buttons
-skill descriptions
-bullets
-	separate from tanks - on tank death, bullet follows
-	fire animation?
 minis
 improve timing f-tions
 multiplayer:
