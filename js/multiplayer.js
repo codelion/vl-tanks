@@ -437,7 +437,6 @@ function sync_multiplayers(){
 			tmp['damage'] = TYPES[tmp['type']].damage[0];
 			tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
 			tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-			tmp['bullets'] = new Array();
 			TANKS.push(tmp);
 			}
 		}

@@ -80,6 +80,28 @@ function on_mousemove_background(event){
 		if(found == false)
 			add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"], 99);		
 		}
+	if(PLACE=='game'){
+		//mouse hover on abilities
+		var new_i;
+		for(var i=0; i<ABILITIES_POS.length; i++){
+			if(mouseX>ABILITIES_POS[i].x && mouseX<ABILITIES_POS[i].x+ABILITIES_POS[i].width){
+				if(mouseY>ABILITIES_POS[i].y && mouseY<ABILITIES_POS[i].y+ABILITIES_POS[i].height){
+					new_i = i;
+					}
+				}
+			}
+		if(new_i != ability_hover_id){
+			ability_hover_id = new_i;
+			if(new_i != undefined && TYPES[MY_TANK.type].abilities[new_i] != undefined){
+				function_name = TYPES[MY_TANK.type].abilities[new_i].name.replace(/ /g,'_');
+				ability_hover_text = window[function_name](MY_TANK, true);
+				}
+			else
+				ability_hover_text = '';
+			//renew
+			redraw_tank_abilities_mini();	
+			}
+		}		
 	}
 //mouse move on map
 function on_mousemove(event){
