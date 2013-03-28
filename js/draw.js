@@ -937,7 +937,7 @@ function show_chat(){
 		}
 	}
 function body_rotation(obj,str,speed,rot) {
-	speed = speed*10;
+	speed = speed*100/FPS;
 	var flag = false;
 	if (obj[str] - 180 > rot){
 		rot += 360;
