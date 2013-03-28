@@ -1,7 +1,6 @@
-map scolling on mouse on mini map
-minis
-dead minis transparent?
-improve timing f-tions
+game end issue
+improve timing f-tions:	requestAnimationFrame
+check other sight f-tions: https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Compositing?redirectlocale=en-US&redirectslug=Canvas_tutorial%2FCompositing
 multiplayer:
 	skills
 		active skills, dont send command on prepare skill

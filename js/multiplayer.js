@@ -229,7 +229,7 @@ function get_packet(event){
 				TANK['ability_'+nr+'_in_use']=1;
 				if(DATA[1] == name){
 					var tmp = new Array();
-					tmp['function'] = "redraw_tank_abilities_mini";
+					tmp['function'] = "draw_ability_reuse";
 					tmp['duration'] = ability_reuse;
 					tmp['type'] = 'REPEAT';
 					tmp['nr'] = nr-1;	

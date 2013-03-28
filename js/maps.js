@@ -90,7 +90,7 @@ function draw_map(map_only){
 		draw_status_bar();
 		
 		redraw_tank_stats();
-		redraw_tank_abilities();
+		draw_tank_abilities();
 		
 		//ability buttons
 		for(var i=0; i<ABILITIES_POS.length; i++){
@@ -103,6 +103,60 @@ function draw_map(map_only){
 	//darken all
 	darken_map();
 	}
+//move map by user mouse coordinates on mini map
+function move_to_place(mouse_x, mouse_y){
+	area_width = 120;
+	area_height = 138;
+	mouse_x = mouse_x - 5;
+	mouse_y = mouse_y - (HEIGHT_APP-150-25+5);
+	visible_block_x_half = WIDTH_SCROLL*area_width/WIDTH_MAP/2;
+	visible_block_y_half = HEIGHT_SCROLL*area_height/HEIGHT_MAP/2;
+	
+	//check
+	if(mouse_x-visible_block_x_half<0)	mouse_x=visible_block_x_half;
+	if(mouse_y-visible_block_y_half<0)	mouse_y=visible_block_y_half;
+	if(mouse_x+visible_block_x_half>area_width)	mouse_x=area_width-visible_block_x_half;
+	if(mouse_y+visible_block_y_half>area_height)	mouse_y=area_height-visible_block_y_half;
+	
+	//calc	
+	mouse_x = mouse_x - visible_block_x_half;
+	mouse_y = mouse_y - visible_block_y_half;
+	pos_x_pecentage = round(mouse_x*100/area_width);
+	pos_y_pecentage = round(mouse_y*100/area_height);
+	tmp_x = round(WIDTH_MAP*pos_x_pecentage/100);
+	tmp_y = round(HEIGHT_MAP*pos_y_pecentage/100);
+
+	//scroll map here
+	map_offset[0] = -tmp_x;
+	map_offset[1] = -tmp_y;
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	document.getElementById("canvas_map").style.marginTop = map_offset[1]+"px";
+	}
+//cancel manuel map move controlls
+function move_to_place_reset(){
+	MAP_SCROLL_CONTROLL=false;
+	auto_scoll_map();
+	}
+//move map by tank position
+function auto_scoll_map(){
+	var tank_size_half = round(TYPES[MY_TANK.type].size[1]/2);
+		
+	//calc
+	map_offset[0] = -1 * (MY_TANK.x+tank_size_half) + WIDTH_SCROLL/2;
+	map_offset[1] = -1 * (MY_TANK.y+tank_size_half) + HEIGHT_SCROLL/2;
+	
+	//check
+	if(map_offset[0]>0)	map_offset[0]=0;
+	if(map_offset[1]>0)	map_offset[1]=0;
+	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
+		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
+	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
+		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
+			
+	//scroll
+	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	}
 //mini map in status bar
 function redraw_mini_map(){
 	//settings
@@ -111,13 +165,15 @@ function redraw_mini_map(){
 	var pos1 = 5;
 	var pos2 = HEIGHT_APP-150-25+5;
 	
-	//clear mini map
+	//clear mini map - borders
 	canvas_backround.fillStyle = "#196119";
 	canvas_backround.fillRect(pos1-5, pos2-5, button_width+10, button_height+10);
 	
+	//white color
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.fillRect(pos1, pos2, button_width, button_height);
 	
+	//active zone
 	canvas_backround.fillStyle = "#8c8c8c";
 	canvas_backround.fillRect(
 		pos1-map_offset[0]*button_width/WIDTH_MAP, 

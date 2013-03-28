@@ -1,3 +1,6 @@
+//check support
+if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
+
 //canvas = map, sight, backgrounds, moving objects
 var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map layer
 var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//map sight layer
@@ -9,7 +12,7 @@ var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 var SOCKET = 'ws://127.0.0.1:8000/list';//socket server
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
-var START_GAME_COUNT_SINGLE=5;		//second how much to count in singleplayer
+var START_GAME_COUNT_SINGLE=2;		//second how much to count in singleplayer
 var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
@@ -66,6 +69,7 @@ var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank
 var TO_RADIANS = Math.PI/180; 		//for rotating
 var SKILL_BUTTON = 55;			//skill button width and height
+var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
@@ -80,6 +84,7 @@ var chat_interval_id;			//controller for chat
 window.onbeforeunload = disconnect_server;
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
+document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
 canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.onkeydown = function(e) {return on_keyboard_action(e); }

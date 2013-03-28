@@ -46,7 +46,7 @@ function draw_main(){
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
 						TANKS[i]['y'] = 20;
-						if(i==0){
+						if(TANKS[i].id==MY_TANK.id){
 							map_offset = [0, 0];
 							document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 							document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
@@ -56,7 +56,7 @@ function draw_main(){
 					else{	//bottom
 						TANKS[i]['x'] = round(WIDTH_SCROLL/3);
 						TANKS[i]['y'] = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
-						if(i==0){
+						if(TANKS[i].id==MY_TANK.id){
 							map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 							document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 							document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
@@ -186,40 +186,11 @@ function draw_main(){
 					}
 				}
 			//map scrolling
-			if(i==0 && TANKS[i].move == 1 && TANKS[i].stun == undefined){
-				gap_x = TANKS[i].x +round(TYPES[TANKS[i].type].size[1]/2) + map_offset[0];
-				gap_y = TANKS[i].y +round(TYPES[TANKS[i].type].size[1]/2) + map_offset[1];
-				tmp_y = Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);	
-				tmp_x = Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);	
-				if(gap_y < HEIGHT_SCROLL/2 && map_offset[1] < 0){	
-					//go up
-					map_offset[1] = map_offset[1] - tmp_y;
-					document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-					}
-				else if(gap_y > HEIGHT_SCROLL/2 && map_offset[1] > -1*(HEIGHT_MAP-HEIGHT_SCROLL)){	
-					//go down
-					map_offset[1] = map_offset[1] - tmp_y;
-					document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-					}
-				if(gap_x < WIDTH_SCROLL/2 && map_offset[0] < 0){	
-					//go left
-					map_offset[0] = map_offset[0] - tmp_x;
-					document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
-					} 
-				else if(gap_x > WIDTH_SCROLL/2 && map_offset[0] > -1*(WIDTH_MAP-WIDTH_SCROLL)){	
-					//go right
-					map_offset[0] = map_offset[0] - tmp_x;
-					document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
-					}
-				if(map_offset[0] > 0)	map_offset[0] = 0;
-				if(map_offset[1] > 0)	map_offset[1] = 0;
-				if(map_offset[0] < -1*(WIDTH_MAP-WIDTH_SCROLL))
-					map_offset[0] = -1*(WIDTH_MAP-WIDTH_SCROLL);
-				if(map_offset[1] < -1*(HEIGHT_MAP-HEIGHT_SCROLL))
-					map_offset[1] = -1*(HEIGHT_MAP-HEIGHT_SCROLL);
+			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false){
+				auto_scoll_map();
 				}
 			//shooting
-			for(var b in BULLETS){
+			for (b = 0; b < BULLETS.length; b++) {
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
 				if(TANKS[i].stun != undefined) continue; //stun
 				
@@ -259,7 +230,7 @@ function draw_main(){
 							
 							//extra effects for non tower
 							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].speed>0){
-								if(BULLETS[b].stun_effect != undefined)	//stun
+								if(BULLETS[b]!=undefined && BULLETS[b].stun_effect != undefined)	//stun
 									bullet_target.stun = TANKS[i].id;
 								}
 							}
@@ -297,7 +268,7 @@ function draw_main(){
 								}
 							}
 						}
-					BULLETS.splice(b, 1);
+					BULLETS.splice(b, 1); b--;	//must be done after splice
 					}
 				else{
 					//draw bullet

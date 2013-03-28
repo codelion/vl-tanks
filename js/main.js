@@ -237,7 +237,7 @@ function init_action(map_nr, my_team){
 		my_tank_nr=0;
 	
 	if(my_team=='B')
-		map_offset = [0, 0]
+		map_offset = [0, 0];
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
@@ -341,6 +341,12 @@ function init_action(map_nr, my_team){
 				}
 			}
 		}*/
+	
+	//handler for mini map
+	register_button(5, HEIGHT_APP-150-25+5, 120, 138, 'game', function(xx, yy){ 
+		MAP_SCROLL_CONTROLL=true; 
+		move_to_place(xx, yy);
+		});
 		
 	draw_map(false);
 		
