@@ -103,6 +103,60 @@ function draw_map(map_only){
 	//darken all
 	darken_map();
 	}
+//darken map - using shadows
+function darken_map(){
+	try{
+		imgData = canvas_map.getImageData(0, 0, WIDTH_MAP, HEIGHT_MAP);
+		pix = imgData.data;
+		dark_weight = 15;
+		for (var i = 0, n = pix.length; i < n; i += 4) {
+			if(pix[i+0]>dark_weight)	pix[i+0] = pix[i+0] - dark_weight;
+			if(pix[i+1]>dark_weight)	pix[i+1] = pix[i+1] - dark_weight;
+			if(pix[i+2]>dark_weight)	pix[i+2] = pix[i+2] - dark_weight;
+		}
+		canvas_map.putImageData(imgData, 0, 0);
+		}
+	catch(err){
+		console.log("ERROR: "+err.message);
+		}
+	}
+//visible tank area in map are light
+//there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all insted by increasing app quality.
+function lighten_pixels(tank){
+	if(QUALITY !=3) return false;
+	if(tank.team != MY_TANK.team) return false;
+			
+	var half_size = round(TYPES[tank.type].size[1]/2);
+	var xx = round(tank.x+map_offset[0]+half_size);
+	var yy = round(tank.y+map_offset[1]+half_size);
+	
+	canvas_map_sight.beginPath();
+	canvas_map_sight.save();
+	
+	canvas_map_sight.arc(xx, yy, tank.sight, 0 , 2 * Math.PI, true);
+	canvas_map_sight.clip(); 
+	canvas_map_sight.clearRect(xx-tank.sight, yy-tank.sight, tank.sight*2, tank.sight*2);
+	
+	canvas_map_sight.restore();
+	}
+//visible all tanks areas are light
+function lighten_pixels_all(tank){
+	if(QUALITY != 2) return false;
+	
+	canvas_map_sight.save();
+	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
+	for(var i in TANKS){
+		if(TANKS[i].team != MY_TANK.team) continue;
+		
+		var half_size = round(TYPES[TANKS[i].type].size[1]/2);
+		var xx = round(TANKS[i].x+map_offset[0]+half_size);
+		var yy = round(TANKS[i].y+map_offset[1]+half_size);
+		canvas_map_sight.beginPath();
+		canvas_map_sight.arc(xx, yy, TANKS[i].sight, 0 , 2 * Math.PI, true);
+		canvas_map_sight.fill();
+		}
+	canvas_map_sight.restore();	
+	}
 //move map by user mouse coordinates on mini map
 function move_to_place(mouse_x, mouse_y){
 	area_width = 120;
@@ -204,41 +258,6 @@ function redraw_mini_map(){
 		canvas_backround.fillStyle = element.alt_color;
 		canvas_backround.fillRect(x, y, max_w, max_h);
 		}
-	}
-//darken map - using shadows
-function darken_map(){
-	try{
-		imgData = canvas_map.getImageData(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		pix = imgData.data;
-		dark_weight = 15;
-		for (var i = 0, n = pix.length; i < n; i += 4) {
-			if(pix[i+0]>dark_weight)	pix[i+0] = pix[i+0] - dark_weight;
-			if(pix[i+1]>dark_weight)	pix[i+1] = pix[i+1] - dark_weight;
-			if(pix[i+2]>dark_weight)	pix[i+2] = pix[i+2] - dark_weight;
-		}
-		canvas_map.putImageData(imgData, 0, 0);
-		}
-	catch(err){
-		console.log("ERROR: "+err.message);
-		}
-	}
-//visible area in map are light
-function lighten_pixels(tank){
-	if(QUALITY==1) return false;
-	if(tank.team != MY_TANK.team) return false;
-			
-	var half_size = round(TYPES[tank.type].size[1]/2);
-	var xx = round(tank.x+map_offset[0]+half_size);
-	var yy = round(tank.y+map_offset[1]+half_size);
-	
-	canvas_map_sight.beginPath();
-	canvas_map_sight.save();
-	
-	canvas_map_sight.arc(xx,yy, tank.sight, 0 , 2 * Math.PI, true);
-	canvas_map_sight.clip(); 
-	canvas_map_sight.clearRect(xx-tank.sight, yy-tank.sight, tank.sight*2, tank.sight*2);
-	
-	canvas_map_sight.restore();  
 	}
 var maps_positions = [];
 //redraw actions in selecting tank/map window

@@ -12,7 +12,7 @@ var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 var SOCKET = 'ws://127.0.0.1:8000/list';//socket server
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
-var START_GAME_COUNT_SINGLE=2;		//second how much to count in singleplayer
+var START_GAME_COUNT_SINGLE=5;		//second how much to count in singleplayer
 var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
@@ -30,7 +30,6 @@ var BUTTONS = new Array();		//buttons array
 var ROOMS = new Array();		//rooms array
 var PLAYERS = new Array();		//players list
 var opened_room_id = -1;		//active room id
-var FPS_real;				//fps, that user gets
 var WIDTH_MAP;				//map width, if big, offset start to work (works as scroll)
 var HEIGHT_MAP;				//map height, if big, offset start to work (works as scroll)
 var WIDTH_SCROLL;			//visible map part width, similar to WIDTH_APP

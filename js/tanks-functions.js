@@ -17,18 +17,19 @@ function Nothing(TANK, descrition_only){
 	return 10000;
 	}
 function Soldiers(TANK, descrition_only){
+	var n = 3;
 	if(descrition_only != undefined)
 		return 'Send 3 soldiers to help you in fight. ';
 	
-	//get type
+	//find type
 	var type = '';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
 			type = t;
 		}
 	
-	//add
-	for(var i=0; i<3; i++){
+	//add soldiers
+	for(var i=0; i<n; i++){
 		var tmp = new Array();
 		tmp['move'] = 1;
 		tmp['level'] = 1;	

@@ -710,7 +710,7 @@ function check_enemies(TANK){
 		}
 	//wait for reuse
 	if(TANK.check_enemies_reuse > 0){ 
-		TANK.check_enemies_reuse = TANK.check_enemies_reuse - 1;
+		TANK.check_enemies_reuse = TANK.check_enemies_reuse - 2*1000/FPS;
 		return false;
 		}
 	
@@ -881,7 +881,7 @@ function check_enemies(TANK){
 		TANK.move = 1;
 	//if not found, do short pause till next search for enemies
 	if(found == false){
-		TANK.check_enemies_reuse = FPS/2;	//2 times per second
+		TANK.check_enemies_reuse = 1000;
 		}
 	}
 //draw tank shooting fire
@@ -1040,7 +1040,14 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force, silent){
 					register_tank_action('kill', opened_room_id, name, TANK_TO.id);
 					}
 				}
-			TANKS.splice(i, 1);
+			//remove tank
+			var del_index = false;
+			for(var j in TANKS){
+				if(TANKS[j].id == TANK_TO.id){
+					TANKS.splice(j, 1);
+					break;
+					}
+				}
 			}
 		else{
 			if(TYPES[TANK_TO.type].speed > 0){
@@ -1083,12 +1090,12 @@ function death(tank){
 	delete tank['target_shoot_lock'];
 	
 	tank['move'] = 0;
-	tank['death_respan'] = 1000/FPS;
+	tank['death_respan'] = 2;
 	tank['dead'] = 1;
 	if(tank.level < 3)
-		tank.respan_time = 3*1000/FPS;
+		tank.respan_time = 3+2;
 	else
-		tank.respan_time = tank.level*1000/FPS;
+		tank.respan_time = tank.level*1+2;
 	}
 //add towers to map
 function add_towers(){
@@ -1133,7 +1140,7 @@ function add_towers(){
 		}
 	}
 //add mini tanks to map
-function add_bots(){
+function add_bots(){				return false;	//disabled
 	bots_row = bots_row + 1;
 	if(bots_row%4 != 2) return false;
 	for (i in MAPS[level-1]['bots']){
@@ -1257,7 +1264,7 @@ function check_enemy_visibility(tank){
 		return true;	//friend
 	//wait for reuse
 	if(tank.cache_scouted_reuse > 0){ 
-		tank.cache_scouted_reuse = tank.cache_scouted_reuse - 1;
+		tank.cache_scouted_reuse = tank.cache_scouted_reuse - 3*1000/FPS; 
 		return tank.cache_scouted;
 		}
 	
@@ -1279,12 +1286,12 @@ function check_enemy_visibility(tank){
 		range = range2real_range(range);
 		
 		if(distance < range){
-			tank.cache_scouted_reuse = FPS/3;
+			tank.cache_scouted_reuse = 1000;
 			tank.cache_scouted = true;
 			return true;	//found by enemy
 			}				
 		}
-	tank.cache_scouted_reuse = FPS/3;
+	tank.cache_scouted_reuse = 1000;
 	tank.cache_scouted = false;
 	return false;
 	}
@@ -1338,7 +1345,7 @@ function choose_and_register_tanks(ROOM){
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i]);
 
 			//remove selected type
-			selected_types.splice(i, 1);
+			selected_types.splice(i, 1);  i--;
 			}
 		}
 	}

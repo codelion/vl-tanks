@@ -202,7 +202,7 @@ TYPES.push({
 	name: 'Base',
 	type: 'tower',
 	description: ["Main base"],
-	life: [2000,0],
+	life: [1000,0],
 	damage: [30, 0],	//30 dps
 	range: 110,
 	scout: 120,
