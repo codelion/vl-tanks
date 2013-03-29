@@ -10,7 +10,7 @@ Sniper		++		++		0	0		n/a	|	2	0
 -------------------------------------------------------------------------------------------------
 
 more ideas:
-	1/2 skill for each tank
+	1 or 2 skill for each tank
 	heavy - some skills for save team?
 	tiger - less defence?
 	cruiser - some skill for team support
@@ -40,7 +40,8 @@ TYPES.push({
 	icon_base: ['base1.png', 'base2.png'],		//tank top images for all teams
 	preview: 'preview.png',				//tank preview image
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		{name: 'Nothing',	passive: false,		broadcast: 1},
 		],
 	bullet: 'bullet.png',				//bullet_image
 	fire_sound: 'shoot.ogg',			//shooting sound
@@ -65,7 +66,7 @@ TYPES.push({
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
@@ -90,7 +91,7 @@ TYPES.push({
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
@@ -115,7 +116,7 @@ TYPES.push({
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	bullet: 'missle.png',
 	fire_sound: 'shoot.ogg',
@@ -141,7 +142,7 @@ TYPES.push({
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
@@ -166,9 +167,7 @@ TYPES.push({
 	preview: 'preview.png',
 	icon_top: [],
 	icon_base: ['top1.png', 'top2.png'],
-	abilities: [
-		{name: 'Suicide',	passive: false,		broadcast: 1}, 
-		],
+	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -203,7 +202,7 @@ TYPES.push({
 	name: 'Base',
 	type: 'tower',
 	description: ["Main base"],
-	life: [2000,0],
+	life: [1000,0],
 	damage: [30, 0],	//30 dps
 	range: 110,
 	scout: 120,
