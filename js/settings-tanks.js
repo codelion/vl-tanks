@@ -16,13 +16,6 @@ more ideas:
 	cruiser - some skill for team support, or survival? evasion?
 	launcher - aoe skill?
 	sniper - some semi-hide skill?
-	
-new types:
-	Miner - lands mines
-	Tech - send virus to stop enemy for 5s, long cast, small range.
-	Transporter - send 6 minis, but 0 dps
-	Helicopter - rockets and armor
-	Bomber - bombs, speed and low defence
 */
 
 //Heavy
@@ -84,7 +77,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
-	description: ["Light armor", "Fast", "Average damage", "Weak against all", "Strong in team play"],
+	description: ["Light armor", "Fast", "Weak against all", "Strong in team play"],
 	life: [200, 13],
 	damage: [15, 1],	//15 dps
 	range: 90,
@@ -109,7 +102,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
-	description: ["Missiles", "Long range", "Slow", "Penetrates armor", "High accuracy"],
+	description: ["Missiles", "Long range, but slow", "Penetrates armor", "High accuracy"],
 	life: [100, 10],
 	damage: [50, 5],	//25 dps
 	range: 150,
@@ -134,7 +127,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Sniper',
 	type: 'tank',
-	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack", "Low accuracy"],
+	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack"],
 	life: [100, 10],
 	damage: [50, 2],	//25 dps
 	range: 150,
@@ -154,6 +147,135 @@ TYPES.push({
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 80,
+	});
+
+//Miner
+TYPES.push({
+	name: 'Miner',
+	type: 'tank',
+	description: ["Lands mines", "Low damage", "Light armor", "Weak against air and long range units"],
+	life: [200, 10],
+	damage: [10, 1],	//10 dps
+	range: 80,
+	scout: 100,
+	armor: [20, 0.3, 30],
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 4,
+	size: ['M', 50],
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	preview: 'preview.png',
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	accuracy: 90,
+	});
+
+//Tech
+TYPES.push({
+	name: 'Tech',
+	type: 'tank',
+	description: ["Can send virus to deactivate enemy", "Low damage", "Light armor", "Weak against air and long range units"],
+	life: [200, 10],
+	damage: [10, 1],	//10 dps
+	range: 80,
+	scout: 100,
+	armor: [20, 0.3, 30],	
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 4,
+	size: ['M', 50],
+	icon_top: ['top1.png', 'top2.png'],
+	icon_base: ['base1.png', 'base2.png'],
+	preview: 'preview.png',
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	accuracy: 90,
+	});
+
+//Truck
+TYPES.push({
+	name: 'Truck',
+	type: 'tank',
+	description: ["Uses soldiers for attack", "Very low damage", "Depends on soldiers only"],
+	life: [200, 10],
+	damage: [5, 1],	//5 dps
+	range: 80,
+	scout: 100,
+	armor: [10, 0, 10],
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 4,
+	size: ['M', 50],
+	icon_top: [],
+	icon_base: ['base1.png', 'base2.png'],
+	preview: 'preview.png',
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	accuracy: 90,
+	});
+
+//Helicopter
+TYPES.push({
+	name: 'Helicopter',
+	type: 'tank',
+	description: ["Medium armor", "Missiles", "Strong against all"],
+	life: [200, 10],
+	damage: [20, 1],	//20 dps
+	range: 80,
+	scout: 100,
+	armor: [40, 0.5, 50],	
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 6,
+	bonus: 1,
+	no_collisions: 1,
+	size: ['M', 50],
+	icon_top: [],
+	icon_base: ['base1.png', 'base2.png'],
+	preview: 'preview.png',
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	accuracy: 90,
+	});
+
+//Bomber
+TYPES.push({
+	name: 'Bomber',
+	type: 'tank',
+	description: ["Bombs", "Fast speed", "Low defence"],
+	life: [100, 10],
+	damage: [15, 1],	//15 dps
+	range: 60,
+	scout: 100,
+	armor: [10, 0, 10],
+	speed: 35,
+	attack_delay: 1,
+	turn_speed: 4,
+	bonus: 1,
+	no_collisions: 1,
+	size: ['M', 50],
+	icon_top: [],
+	icon_base: ['base1.png', 'base2.png'],
+	preview: 'preview.png',
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
+		],
+	bullet: 'bullet.png',
+	fire_sound: 'shoot.ogg',
+	accuracy: 90,
 	});
 
 //Soldier

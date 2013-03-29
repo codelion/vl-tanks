@@ -736,31 +736,32 @@ function draw_tank_select_screen(selected_tank){
 	
 	//tank info block
 	var info_left = 15;
+	var info_block_height = 100;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.strokeStyle = "#196119";
-	roundRect(canvas_backround, info_left, y, 585, 140, 5, true);
+	roundRect(canvas_backround, info_left, y, 585, info_block_height, 5, true);
 
 	//tank stats
 	if(selected_tank != undefined){
 		var img_tmp3 = new Image();
 		img_tmp3.src = 'img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
-		var pos2 = y+((140-preview_xy)/2);
+		var pos2 = y+((info_block_height-preview_xy)/2);
 		canvas_backround.drawImage(img_tmp3, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
-		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+15+15);
+		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+25);
 		
 		//description
-		var height_space = 15;
+		var height_space = 13;
 		for(var d in TYPES[selected_tank].description){
-			canvas_backround.font = "bold 13px Verdana";
+			canvas_backround.font = "bold 11px Verdana";
 			canvas_backround.fillStyle = "#69a126";
-			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+60+d*height_space);
+			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+50+d*height_space);
 			}
 		}
-	y = y + 140+15;
+	y = y + info_block_height+15;
 	
 	//mini maps
 	if(game_mode == 1){	

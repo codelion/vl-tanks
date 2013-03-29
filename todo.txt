@@ -1,5 +1,5 @@
-more tanks
-	more skills
+tanks graphics
+	tank skills
 multiplayer:
 	skills
 		active skills, dont send command on prepare skill
