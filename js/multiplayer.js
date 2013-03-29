@@ -46,7 +46,7 @@ function get_packet(event){
 	else if(type == 'delete_room'){	//room was deleted
 		for(var i in ROOMS){
 			if(ROOMS[i].id == DATA){
-				ROOMS.splice(i, 1);
+				ROOMS.splice(i, 1); i--;
 				if(PLACE=='rooms')
 					draw_rooms_list();
 				if(PLACE=='room' && opened_room_id == DATA){
@@ -70,7 +70,7 @@ function get_packet(event){
 		if(ROOM != false){
 			for(var j in ROOM.players){
 				if(ROOM.players[j].name == DATA[1]){
-					ROOM.players.splice(j, 1);
+					ROOM.players.splice(j, 1); j--;
 					if(PLACE=='room')
 						draw_room(ROOM.id);
 					return false;
@@ -88,7 +88,7 @@ function get_packet(event){
 		if(ROOM != false){
 			for(var j in ROOM.players){
 				if(ROOM.players[j].name == DATA[1]){
-					ROOM.players.splice(j, 1);
+					ROOM.players.splice(j, 1);  j--;
 					if(DATA[1]==name){
 						if(PLACE=='room'){
 							//i was kicked ... go back
@@ -229,7 +229,7 @@ function get_packet(event){
 				TANK['ability_'+nr+'_in_use']=1;
 				if(DATA[1] == name){
 					var tmp = new Array();
-					tmp['function'] = "redraw_tank_abilities_mini";
+					tmp['function'] = "draw_ability_reuse";
 					tmp['duration'] = ability_reuse;
 					tmp['type'] = 'REPEAT';
 					tmp['nr'] = nr-1;	
@@ -275,7 +275,7 @@ function get_packet(event){
 				}
 			for(var b in TANKS){
 				if(TANKS[b].id==TANK_TO.id){	
-					TANKS.splice(b, 1);
+					TANKS.splice(b, 1);  b--;
 					break;
 					}
 				}
@@ -344,7 +344,7 @@ function register_tank_action(action, room_id, player, data){			//lots of broadc
 				if(ROOM.host == player){
 					//host leaving room
 					send_packet('delete_room', room_id);
-					ROOMS.splice(i, 1);
+					ROOMS.splice(i, 1);  i--;
 					}
 				else{
 					//player leaving room

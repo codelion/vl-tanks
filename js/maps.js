@@ -90,7 +90,7 @@ function draw_map(map_only){
 		draw_status_bar();
 		
 		redraw_tank_stats();
-		redraw_tank_abilities();
+		draw_tank_abilities();
 		
 		//ability buttons
 		for(var i=0; i<ABILITIES_POS.length; i++){
@@ -103,6 +103,114 @@ function draw_map(map_only){
 	//darken all
 	darken_map();
 	}
+//darken map - using shadows
+function darken_map(){
+	try{
+		imgData = canvas_map.getImageData(0, 0, WIDTH_MAP, HEIGHT_MAP);
+		pix = imgData.data;
+		dark_weight = 15;
+		for (var i = 0, n = pix.length; i < n; i += 4) {
+			if(pix[i+0]>dark_weight)	pix[i+0] = pix[i+0] - dark_weight;
+			if(pix[i+1]>dark_weight)	pix[i+1] = pix[i+1] - dark_weight;
+			if(pix[i+2]>dark_weight)	pix[i+2] = pix[i+2] - dark_weight;
+		}
+		canvas_map.putImageData(imgData, 0, 0);
+		}
+	catch(err){
+		console.log("ERROR: "+err.message);
+		}
+	}
+//visible tank area in map are light
+//there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all insted by increasing app quality.
+function lighten_pixels(tank){
+	if(QUALITY !=3) return false;
+	if(tank.team != MY_TANK.team) return false;
+			
+	var half_size = round(TYPES[tank.type].size[1]/2);
+	var xx = round(tank.x+map_offset[0]+half_size);
+	var yy = round(tank.y+map_offset[1]+half_size);
+	
+	canvas_map_sight.beginPath();
+	canvas_map_sight.save();
+	
+	canvas_map_sight.arc(xx, yy, tank.sight, 0 , 2 * Math.PI, true);
+	canvas_map_sight.clip(); 
+	canvas_map_sight.clearRect(xx-tank.sight, yy-tank.sight, tank.sight*2, tank.sight*2);
+	
+	canvas_map_sight.restore();
+	}
+//visible all tanks areas are light
+function lighten_pixels_all(tank){
+	if(QUALITY != 2) return false;
+	
+	canvas_map_sight.save();
+	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
+	for(var i in TANKS){
+		if(TANKS[i].team != MY_TANK.team) continue;
+		
+		var half_size = round(TYPES[TANKS[i].type].size[1]/2);
+		var xx = round(TANKS[i].x+map_offset[0]+half_size);
+		var yy = round(TANKS[i].y+map_offset[1]+half_size);
+		canvas_map_sight.beginPath();
+		canvas_map_sight.arc(xx, yy, TANKS[i].sight, 0 , 2 * Math.PI, true);
+		canvas_map_sight.fill();
+		}
+	canvas_map_sight.restore();	
+	}
+//move map by user mouse coordinates on mini map
+function move_to_place(mouse_x, mouse_y){
+	area_width = 120;
+	area_height = 138;
+	mouse_x = mouse_x - 5;
+	mouse_y = mouse_y - (HEIGHT_APP-150-25+5);
+	visible_block_x_half = WIDTH_SCROLL*area_width/WIDTH_MAP/2;
+	visible_block_y_half = HEIGHT_SCROLL*area_height/HEIGHT_MAP/2;
+	
+	//check
+	if(mouse_x-visible_block_x_half<0)	mouse_x=visible_block_x_half;
+	if(mouse_y-visible_block_y_half<0)	mouse_y=visible_block_y_half;
+	if(mouse_x+visible_block_x_half>area_width)	mouse_x=area_width-visible_block_x_half;
+	if(mouse_y+visible_block_y_half>area_height)	mouse_y=area_height-visible_block_y_half;
+	
+	//calc	
+	mouse_x = mouse_x - visible_block_x_half;
+	mouse_y = mouse_y - visible_block_y_half;
+	pos_x_pecentage = round(mouse_x*100/area_width);
+	pos_y_pecentage = round(mouse_y*100/area_height);
+	tmp_x = round(WIDTH_MAP*pos_x_pecentage/100);
+	tmp_y = round(HEIGHT_MAP*pos_y_pecentage/100);
+
+	//scroll map here
+	map_offset[0] = -tmp_x;
+	map_offset[1] = -tmp_y;
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	document.getElementById("canvas_map").style.marginTop = map_offset[1]+"px";
+	}
+//cancel manuel map move controlls
+function move_to_place_reset(){
+	MAP_SCROLL_CONTROLL=false;
+	auto_scoll_map();
+	}
+//move map by tank position
+function auto_scoll_map(){
+	var tank_size_half = round(TYPES[MY_TANK.type].size[1]/2);
+		
+	//calc
+	map_offset[0] = -1 * (MY_TANK.x+tank_size_half) + WIDTH_SCROLL/2;
+	map_offset[1] = -1 * (MY_TANK.y+tank_size_half) + HEIGHT_SCROLL/2;
+	
+	//check
+	if(map_offset[0]>0)	map_offset[0]=0;
+	if(map_offset[1]>0)	map_offset[1]=0;
+	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
+		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
+	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
+		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
+			
+	//scroll
+	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	}
 //mini map in status bar
 function redraw_mini_map(){
 	//settings
@@ -111,13 +219,15 @@ function redraw_mini_map(){
 	var pos1 = 5;
 	var pos2 = HEIGHT_APP-150-25+5;
 	
-	//clear mini map
+	//clear mini map - borders
 	canvas_backround.fillStyle = "#196119";
 	canvas_backround.fillRect(pos1-5, pos2-5, button_width+10, button_height+10);
 	
+	//white color
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.fillRect(pos1, pos2, button_width, button_height);
 	
+	//active zone
 	canvas_backround.fillStyle = "#8c8c8c";
 	canvas_backround.fillRect(
 		pos1-map_offset[0]*button_width/WIDTH_MAP, 
@@ -148,41 +258,6 @@ function redraw_mini_map(){
 		canvas_backround.fillStyle = element.alt_color;
 		canvas_backround.fillRect(x, y, max_w, max_h);
 		}
-	}
-//darken map - using shadows
-function darken_map(){
-	try{
-		imgData = canvas_map.getImageData(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		pix = imgData.data;
-		dark_weight = 15;
-		for (var i = 0, n = pix.length; i < n; i += 4) {
-			if(pix[i+0]>dark_weight)	pix[i+0] = pix[i+0] - dark_weight;
-			if(pix[i+1]>dark_weight)	pix[i+1] = pix[i+1] - dark_weight;
-			if(pix[i+2]>dark_weight)	pix[i+2] = pix[i+2] - dark_weight;
-		}
-		canvas_map.putImageData(imgData, 0, 0);
-		}
-	catch(err){
-		console.log("ERROR: "+err.message);
-		}
-	}
-//visible area in map are light
-function lighten_pixels(tank){
-	if(QUALITY==1) return false;
-	if(tank.team != MY_TANK.team) return false;
-			
-	var half_size = round(TYPES[tank.type].size[1]/2);
-	var xx = round(tank.x+map_offset[0]+half_size);
-	var yy = round(tank.y+map_offset[1]+half_size);
-	
-	canvas_map_sight.beginPath();
-	canvas_map_sight.save();
-	
-	canvas_map_sight.arc(xx,yy, tank.sight, 0 , 2 * Math.PI, true);
-	canvas_map_sight.clip(); 
-	canvas_map_sight.clearRect(xx-tank.sight, yy-tank.sight, tank.sight*2, tank.sight*2);
-	
-	canvas_map_sight.restore();  
 	}
 var maps_positions = [];
 //redraw actions in selecting tank/map window

@@ -12,9 +12,12 @@ HTML5 based tank game.
 * using html5, no flash
 
 ## Install
-* download and open index.html
+* no install - just download and open index.html in modern browser.
+* or use quick access - http://htmlpreview.github.com/?https://github.com/viliusle/vl-tanks/blob/master/index.html
 * multiplayer requires additional websockets server.
 
 ## Latest News
+* added soldiers for support in battle
+* add map access from mini map.
 * added accuracy
 * upgraded shooting

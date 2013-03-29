@@ -1,3 +1,6 @@
+//check support
+if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
+
 //canvas = map, sight, backgrounds, moving objects
 var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map layer
 var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//map sight layer
@@ -27,7 +30,6 @@ var BUTTONS = new Array();		//buttons array
 var ROOMS = new Array();		//rooms array
 var PLAYERS = new Array();		//players list
 var opened_room_id = -1;		//active room id
-var FPS_real;				//fps, that user gets
 var WIDTH_MAP;				//map width, if big, offset start to work (works as scroll)
 var HEIGHT_MAP;				//map height, if big, offset start to work (works as scroll)
 var WIDTH_SCROLL;			//visible map part width, similar to WIDTH_APP
@@ -66,6 +68,7 @@ var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank
 var TO_RADIANS = Math.PI/180; 		//for rotating
 var SKILL_BUTTON = 55;			//skill button width and height
+var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
@@ -80,6 +83,7 @@ var chat_interval_id;			//controller for chat
 window.onbeforeunload = disconnect_server;
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
+document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
 canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.onkeydown = function(e) {return on_keyboard_action(e); }

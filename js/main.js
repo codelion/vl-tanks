@@ -237,15 +237,16 @@ function init_action(map_nr, my_team){
 		my_tank_nr=0;
 	
 	if(my_team=='B')
-		map_offset = [0, 0]
+		map_offset = [0, 0];
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
+		
+	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+	window.requestAnimationFrame = requestAnimationFrame;
+				
 	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 	document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
-	var currentTime = new Date();
-	start_time = currentTime.getTime()-1338210799152;
-	
-	draw_interval_id = setInterval(draw_main, Math.floor(1000/FPS));
+	draw_interval_id = requestAnimationFrame(draw_main);
 
 	//sound
 	if(muted==false){
@@ -341,6 +342,12 @@ function init_action(map_nr, my_team){
 				}
 			}
 		}*/
+	
+	//handler for mini map
+	register_button(5, HEIGHT_APP-150-25+5, 120, 138, 'game', function(xx, yy){ 
+		MAP_SCROLL_CONTROLL=true; 
+		move_to_place(xx, yy);
+		});
 		
 	draw_map(false);
 		
@@ -371,7 +378,7 @@ function timed_functions_handler(){
 		if(timed_functions[i].duration<0){
 			if(timed_functions[i].type == 'ON_END')
 				window[timed_functions[i].function](timed_functions[i]);
-			timed_functions.splice(i, 1);
+			timed_functions.splice(i, 1);	i++;
 			}
 		}
 	}
@@ -524,8 +531,9 @@ function controll_chat(){
 	time = time.getTime();
 	var max_time = 10000;
 	for(var i in CHAT_LINES){
-		if(time - CHAT_LINES[i].time > max_time)
-			CHAT_LINES.splice(i, 1);
+		if(time - CHAT_LINES[i].time > max_time){
+			CHAT_LINES.splice(i, 1); i--;
+			}
 		}
 	//show?
 	if(PLACE == 'room' || PLACE == 'select'){

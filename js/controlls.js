@@ -99,7 +99,11 @@ function on_mousemove_background(event){
 			else
 				ability_hover_text = '';
 			//renew
-			redraw_tank_abilities_mini();	
+			show_skill_description();	
+			}
+		//mini map scrolling
+		if(MAP_SCROLL_CONTROLL==true){
+			move_to_place(mouseX, mouseY);
 			}
 		}		
 	}
@@ -184,6 +188,13 @@ function on_mousedown_back(event){
 			else
 				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
 			}
+		}
+	}
+//mouse click release on background
+function on_mouseup_back(event){
+	if(PLACE=='game' && MAP_SCROLL_CONTROLL==true){
+		MAP_SCROLL_CONTROLL=false;
+		move_to_place_reset();
 		}
 	}
 //fullscreen on modern browsers

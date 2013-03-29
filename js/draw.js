@@ -19,6 +19,7 @@ function draw_main(){
 	
 	//tanks actions
 	for (var i in TANKS){
+		if(PLACE != 'game') return false;
 		try{
 			//speed multiplier
 			var speed_multiplier = 1;
@@ -36,40 +37,28 @@ function draw_main(){
 			
 			//check for respawn
 			if(TANKS[i].death_respan != undefined){
-				TANKS[i].death_respan = TANKS[i].death_respan - 1;
-				if(TANKS[i].death_respan==0){
+				TANKS[i].death_respan = TANKS[i].death_respan - 1/FPS;
+				if(TANKS[i].death_respan<0){
 					delete TANKS[i].death_respan;
-					if(TANKS[i].level < 3)
-						TANKS[i].respan_time = 3*1000/FPS;
-					else
-						TANKS[i].respan_time = TANKS[i].level*1000/FPS;
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
 						TANKS[i]['y'] = 20;
-						if(i==0){
-							map_offset = [0, 0];
-							document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-							document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
-							}
 						TANKS[i]['hp'] = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
 					else{	//bottom
 						TANKS[i]['x'] = round(WIDTH_SCROLL/3);
 						TANKS[i]['y'] = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
-						if(i==0){
-							map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
-							document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-							document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
-							}
 						TANKS[i]['hp'] = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
+					if(TANKS[i].id==MY_TANK.id)
+						auto_scoll_map();
 					}
 				}
 			//check for ghost mode
 			if(TANKS[i].respan_time != undefined){
 				speed_multiplier = 0.5;
-				TANKS[i].respan_time = TANKS[i].respan_time - 1;
-				if(TANKS[i].respan_time==0){	
+				TANKS[i].respan_time = TANKS[i].respan_time - 1/FPS;
+				if(TANKS[i].respan_time<0){	
 					delete TANKS[i].respan_time;
 					delete TANKS[i]['dead'];
 					}
@@ -143,7 +132,7 @@ function draw_main(){
 			
 			//tank waiting
 			if(TANKS[i].sleep != undefined && TANKS[i].sleep > 0){
-				TANKS[i].sleep = TANKS[i].sleep - 1;
+				TANKS[i].sleep = TANKS[i].sleep - 1/FPS;
 				}
 			//move tank
 			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined){
@@ -186,40 +175,11 @@ function draw_main(){
 					}
 				}
 			//map scrolling
-			if(i==0 && TANKS[i].move == 1 && TANKS[i].stun == undefined){
-				gap_x = TANKS[i].x +round(TYPES[TANKS[i].type].size[1]/2) + map_offset[0];
-				gap_y = TANKS[i].y +round(TYPES[TANKS[i].type].size[1]/2) + map_offset[1];
-				tmp_y = Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);	
-				tmp_x = Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);	
-				if(gap_y < HEIGHT_SCROLL/2 && map_offset[1] < 0){	
-					//go up
-					map_offset[1] = map_offset[1] - tmp_y;
-					document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-					}
-				else if(gap_y > HEIGHT_SCROLL/2 && map_offset[1] > -1*(HEIGHT_MAP-HEIGHT_SCROLL)){	
-					//go down
-					map_offset[1] = map_offset[1] - tmp_y;
-					document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-					}
-				if(gap_x < WIDTH_SCROLL/2 && map_offset[0] < 0){	
-					//go left
-					map_offset[0] = map_offset[0] - tmp_x;
-					document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
-					} 
-				else if(gap_x > WIDTH_SCROLL/2 && map_offset[0] > -1*(WIDTH_MAP-WIDTH_SCROLL)){	
-					//go right
-					map_offset[0] = map_offset[0] - tmp_x;
-					document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
-					}
-				if(map_offset[0] > 0)	map_offset[0] = 0;
-				if(map_offset[1] > 0)	map_offset[1] = 0;
-				if(map_offset[0] < -1*(WIDTH_MAP-WIDTH_SCROLL))
-					map_offset[0] = -1*(WIDTH_MAP-WIDTH_SCROLL);
-				if(map_offset[1] < -1*(HEIGHT_MAP-HEIGHT_SCROLL))
-					map_offset[1] = -1*(HEIGHT_MAP-HEIGHT_SCROLL);
+			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false){
+				auto_scoll_map();
 				}
 			//shooting
-			for(var b in BULLETS){
+			for (b = 0; b < BULLETS.length; b++) {
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
 				if(TANKS[i].stun != undefined) continue; //stun
 				
@@ -259,7 +219,7 @@ function draw_main(){
 							
 							//extra effects for non tower
 							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].speed>0){
-								if(BULLETS[b].stun_effect != undefined)	//stun
+								if(BULLETS[b]!=undefined && BULLETS[b].stun_effect != undefined)	//stun
 									bullet_target.stun = TANKS[i].id;
 								}
 							}
@@ -297,7 +257,7 @@ function draw_main(){
 								}
 							}
 						}
-					BULLETS.splice(b, 1);
+					BULLETS.splice(b, 1); b--;	//must be done after splice
 					}
 				else{
 					//draw bullet
@@ -358,9 +318,9 @@ function draw_main(){
 			console.log("ERROR: "+err.message);
 			}
 		}
-	
+	lighten_pixels_all();
 	if(MY_TANK['dead']==1)	
-		draw_message(canvas_main, "You will respan in  "+Math.ceil(MY_TANK.respan_time/1000*FPS)+" seconds.");
+		draw_message(canvas_main, "You will respan in  "+Math.ceil(MY_TANK.respan_time)+" seconds.");
 	
 	//show live scroes?
 	if(tab_scores==true){
@@ -371,8 +331,11 @@ function draw_main(){
 	
 	//fps
 	var thisLoop = new Date;
-	FPS_real = 1000 / (thisLoop - lastLoop);
+	FPS = 1000 / (thisLoop - lastLoop);
 	lastLoop = thisLoop;
+	
+	//request next draw
+	requestAnimationFrame(draw_main);
 	}
 var settings_positions = [];
 var last_active_tab = -1;
@@ -685,11 +648,7 @@ function draw_message(this_convas, message){
 //show FPS
 function update_fps(){
 	try{
-		var fps_string;
-		if(FPS_real==undefined)
-			fps_string='';
-		else
-			fps_string = Math.round(FPS_real*10)/10;
+		var fps_string = Math.round(FPS*10)/10;
 		parent.document.getElementById("fps").innerHTML = fps_string;	
 		}catch(error){}
 	}
@@ -978,7 +937,7 @@ function show_chat(){
 		}
 	}
 function body_rotation(obj,str,speed,rot) {
-	speed = speed*10;
+	speed = speed*100/FPS;
 	var flag = false;
 	if (obj[str] - 180 > rot){
 		rot += 360;

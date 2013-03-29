@@ -1,7 +1,3 @@
-map scolling on mouse on mini map
-minis
-dead minis transparent?
-improve timing f-tions
 multiplayer:
 	skills
 		active skills, dont send command on prepare skill
