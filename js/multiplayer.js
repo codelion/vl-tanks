@@ -426,9 +426,9 @@ function sync_multiplayers(){
 				}
 			tmp['angle'] = 0;
 			tmp['move'] = 0;
-			tmp['hp'] = TYPES[tmp['type']].life[0];
-			tmp['level'] = 1;
 			tmp['sublevel'] = 0;
+			tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
+			tmp['level'] = 1;
 			tmp['team'] = ROOM.players[i].team;
 			tmp['abilities_lvl'] = [1,1,1];
 			tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;

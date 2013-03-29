@@ -1,10 +1,16 @@
 //main drawing
+var frame_time;
+var frame_last_time;
 function draw_main(){
 	if(PLACE != 'game') return false;
+	frame_last_time = frame_time;
+	if(frame_last_time==undefined)
+		frame_last_time = Date.now();
+	frame_time = Date.now();
+	var time_gap = Date.now() - frame_last_time;
+	
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);	//clear layer
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	//clear sight layer
-	
-	//quality
 	if(QUALITY>1){
 		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.4)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
@@ -37,8 +43,7 @@ function draw_main(){
 			
 			//check for respawn
 			if(TANKS[i].death_respan != undefined){
-				TANKS[i].death_respan = TANKS[i].death_respan - 1/FPS;
-				if(TANKS[i].death_respan<0){
+				if(TANKS[i].death_respan - Date.now() < 0){
 					delete TANKS[i].death_respan;
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
@@ -57,8 +62,7 @@ function draw_main(){
 			//check for ghost mode
 			if(TANKS[i].respan_time != undefined){
 				speed_multiplier = 0.5;
-				TANKS[i].respan_time = TANKS[i].respan_time - 1/FPS;
-				if(TANKS[i].respan_time<0){	
+				if(TANKS[i].respan_time - Date.now() < 0){	
 					delete TANKS[i].respan_time;
 					delete TANKS[i]['dead'];
 					}
@@ -131,8 +135,8 @@ function draw_main(){
 				}
 			
 			//tank waiting
-			if(TANKS[i].sleep != undefined && TANKS[i].sleep > 0){
-				TANKS[i].sleep = TANKS[i].sleep - 1/FPS;
+			if(TANKS[i].sleep != undefined && TANKS[i].sleep - Date.now() > 0){
+				//do nothing - sleep
 				}
 			//move tank
 			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined){
@@ -148,11 +152,11 @@ function draw_main(){
 				radiance = Math.atan2(dist_y, dist_x);
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
-				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle)){
+				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
 					if(TANKS[i].hit_reuse == 0)
 						if(body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle)){
 						}
-					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
+					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
 							}
@@ -169,8 +173,8 @@ function draw_main(){
 						TANKS[i].move = 0;
 						}
 					else{
-						TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
-						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
+						TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
+						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
 						}	
 					}
 				}
@@ -179,7 +183,7 @@ function draw_main(){
 				auto_scoll_map();
 				}
 			//shooting
-			for (b = 0; b < BULLETS.length; b++) {
+			for (b = 0; b < BULLETS.length; b++){
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
 				if(TANKS[i].stun != undefined) continue; //stun
 				
@@ -195,10 +199,10 @@ function draw_main(){
 				if(BULLETS[b].bullet_icon != undefined)
 					var bullet = get_bullet(BULLETS[b].bullet_icon);
 				if(bullet !== false)
-					bullet_speed_tmp = bullet.speed;
+					bullet_speed_tmp = speed2pixels(bullet.speed, time_gap);
 				else{
 					if(TYPES[TANKS[i].type].aoe != undefined)
-						bullet_speed_tmp = 100;
+						bullet_speed_tmp = 1000;
 					else{
 						log("ERROR: missing bullet stats for "+TANKS[i].id+" in draw_main()");
 						}
@@ -216,12 +220,6 @@ function draw_main(){
 								do_damage(TANKS[i], bullet_target, BULLETS[b].damage, BULLETS[b].pierce_armor);
 							else
 								do_damage(TANKS[i], bullet_target);
-							
-							//extra effects for non tower
-							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].speed>0){
-								if(BULLETS[b]!=undefined && BULLETS[b].stun_effect != undefined)	//stun
-									bullet_target.stun = TANKS[i].id;
-								}
 							}
 						}
 					//aoe hit
@@ -243,7 +241,7 @@ function draw_main(){
 							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor, 1);
 							
 							//extra effects for non tower
-							if(TYPES[TANKS[ii].type].speed>0){
+							if(TYPES[TANKS[ii].type].type != 'tower'){
 								if(BULLETS[b].modify_speed != undefined){	//modify speed in %
 									if(TANKS[ii].debuffs == undefined)
 										TANKS[ii].debuffs = [];
@@ -309,7 +307,7 @@ function draw_main(){
 						}
 					}
 				}
-			if(TANKS[i] != undefined){	//if tank alive
+			if(TANKS[i] != undefined){
 				check_enemies(TANKS[i]);
 				draw_tank(TANKS[i]);
 				}
@@ -320,13 +318,14 @@ function draw_main(){
 		}
 	lighten_pixels_all();
 	if(MY_TANK['dead']==1)	
-		draw_message(canvas_main, "You will respan in  "+Math.ceil(MY_TANK.respan_time)+" seconds.");
+		draw_message(canvas_main, "You will respan in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
 	//show live scroes?
 	if(tab_scores==true){
 		draw_final_score(true);
 		}
 	
+	//show chat lines
 	show_chat();
 	
 	//fps
@@ -477,7 +476,6 @@ function draw_final_score(live, lost_team){
 		clearInterval(draw_interval_id);
 		clearInterval(level_interval_id);
 		clearInterval(level_hp_regen_id);
-		clearInterval(bots_interval_id);
 		clearInterval(timed_functions_id);
 		
 		if(audio_main != undefined)
@@ -936,8 +934,8 @@ function show_chat(){
 		canvas.fillText(text, 10, bottom-i*gap);
 		}
 	}
-function body_rotation(obj,str,speed,rot) {
-	speed = speed*100/FPS;
+function body_rotation(obj, str, speed, rot, time_diff){
+	speed = speed * 100 * time_diff/1000;
 	var flag = false;
 	if (obj[str] - 180 > rot){
 		rot += 360;

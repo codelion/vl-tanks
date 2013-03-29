@@ -13,31 +13,38 @@ more ideas:
 	1 or 2 skill for each tank
 	heavy - some skills for save team?
 	tiger - less defence?
-	cruiser - some skill for team support
+	cruiser - some skill for team support, or survival? evasion?
 	launcher - aoe skill?
 	sniper - some semi-hide skill?
+	
+new types:
+	Miner - lands mines
+	Tech - send virus to stop enemy for 5s, long cast, small range.
+	Transporter - send 6 minis, but 0 dps
+	Helicopter - rockets and armor
+	Bomber - bombs, speed and low defence
 */
 
 //Heavy
 TYPES.push({
-	name: 'Heavy',					//name
-	type: 'tank',					//tank type
-	description: ["Heavy armor", "Low damage"],	//tank description
+	name: 'Heavy',
+	type: 'tank',
+	description: ["Heavy armor", "Low damage", "Weak against Sniper and Tiger"],
 	life: [230, 20],				//[tank life in level 0, life increase in each level]
-	damage: [10, 1],		//10 dps	//[tank damage in level 0, damage increase in each level]
+	damage: [10, 1],	//10 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
-	speed: 26,					//tank moving speed
-	attack_delay: 1,				//attack delay in seconds
-	turn_speed: 4,					//tank turn speed
-	//no_repawn: 1,					//tank will not respan after death
-	//no_collisions: 1,				//tank will be able to move ower walls, and other tanks
-	//bonus: 1,					//tank will be able only in single mode,  random and mirror
+	speed: 30,
+	attack_delay: 1,
+	turn_speed: 4,
+	//no_repawn: 1,
+	//no_collisions: 1,
+	//bonus: 1,					//tank will be available only in single mode, random and mirror
 	//ignore_armor: 1,				//tank will ignore armor
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
-	icon_top: ['top1.png', 'top2.png'],		//tank base images for all teams
-	icon_base: ['base1.png', 'base2.png'],		//tank top images for all teams
+	icon_top: ['top1.png', 'top2.png'],		//tank base images
+	icon_base: ['base1.png', 'base2.png'],		//tank top images
 	preview: 'preview.png',				//tank preview image
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
@@ -52,13 +59,13 @@ TYPES.push({
 TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
-	description: ["Medium armor", "Huge damage"],
+	description: ["Medium armor", "Huge damage", "Strong against slow enemies", "Weak against fast enemies"],
 	life: [200, 13],
 	damage: [30, 1],	//30 dps
-	range: 85,
+	range: 80,
 	scout: 100,
 	armor: [40, 0.3, 50],
-	speed: 30,
+	speed: 25,
 	attack_delay: 1,
 	turn_speed: 3,
 	size: ['M', 50],
@@ -77,7 +84,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
-	description: ["Light armor", "Fast", "Average damage"],
+	description: ["Light armor", "Fast", "Average damage", "Weak against all", "Strong in team play"],
 	life: [200, 13],
 	damage: [15, 1],	//15 dps
 	range: 90,
@@ -108,7 +115,7 @@ TYPES.push({
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],
-	speed: 23,
+	speed: 25,
 	attack_delay: 2,
 	turn_speed: 2,
 	size: ['M', 50],
@@ -153,9 +160,9 @@ TYPES.push({
 TYPES.push({
 	name: 'Soldier',
 	type: 'human',
-	description: ["Infantry", "No armor", "Low damage"],
+	description: ["Infantry", "No armor", "Low damage", "Supports in battle"],
 	life: [50, 5],
-	damage: [10, 1],	//10 dps
+	damage: [7, 1],	//7 dps
 	range: 50,
 	scout: 60,
 	armor: [0, 0, 0],

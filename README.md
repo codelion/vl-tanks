@@ -4,7 +4,7 @@ HTML5 based tank game.
 
 ## Features:
 * 5 tanks
-* 3 maps
+* 4 maps
 * single player
 * multi player
 * open source
@@ -17,7 +17,8 @@ HTML5 based tank game.
 * multiplayer requires additional websockets server.
 
 ## Latest News
+* added new map
 * added soldiers for support in battle
-* add map access from mini map.
+* add map access from mini map
 * added accuracy
 * upgraded shooting

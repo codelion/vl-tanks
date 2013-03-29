@@ -34,7 +34,7 @@ function init_game(first_time){
 	var img = new Image();
 	img.src = 'img/logo.png';
 	img.onload = function(){	//wait till background is loaded
-		var img = new Image();	
+		var img = new Image();
 		img.src = 'img/logo.png';
 		var left = (WIDTH_APP-598)/2;	
 		canvas_backround.drawImage(img, left, 15);
@@ -178,6 +178,7 @@ function preload_all_files(){
 		'sounds/click.ogg',
 		'sounds/main.ogg',
 		'sounds/shoot.ogg',
+		'sounds/metal.ogg',
 		];
 		
 	//calculate files count
@@ -243,9 +244,6 @@ function init_action(map_nr, my_team){
 		
 	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 	window.requestAnimationFrame = requestAnimationFrame;
-				
-	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-	document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
 	draw_interval_id = requestAnimationFrame(draw_main);
 
 	//sound
@@ -278,8 +276,8 @@ function init_action(map_nr, my_team){
 		}
 	tmp['fire_angle'] = 180;
 	tmp['move'] = 0;
-	tmp['hp'] = TYPES[my_tank_nr].life[0];	
-	tmp['level'] = 1;	
+	tmp['level'] = 1;
+	tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);	
 	tmp['sublevel'] = 0;
 	tmp['team'] = my_team;
 	tmp['abilities_lvl'] = [1,1,1];
@@ -292,6 +290,8 @@ function init_action(map_nr, my_team){
 	TANKS.push(tmp);
 	my_tank_id = tmp['id'];
 	MY_TANK = TANKS[(TANKS.length-1)];
+	
+	auto_scoll_map();
 
 	//add enemy if single player
 	if(game_mode==1){
@@ -303,7 +303,8 @@ function init_action(map_nr, my_team){
 			}
 		//get random type
 		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
-				
+		//enemy_tank_type = 4;	
+		
 		var tmp = new Array();
 		tmp['id'] = get_unique_id();
 		tmp['name'] = "Bot";
@@ -313,8 +314,8 @@ function init_action(map_nr, my_team){
 		tmp['angle'] = 0;
 		tmp['angle'] = 0;
 		tmp['move'] = 0;
-		tmp['hp'] = TYPES[tmp['type']].life[0];
 		tmp['level'] = 1;
+		tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
 		tmp['sublevel'] = 0;
 		tmp['team'] = 'R';
 		tmp['abilities_lvl'] = [1,1,1];
@@ -353,7 +354,6 @@ function init_action(map_nr, my_team){
 		
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 2000);
 	level_interval_id = setInterval(tank_level_handler, 2000);
-	bots_interval_id = setInterval(add_bots, 1000*5);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
 	}
 //get unique id
@@ -362,12 +362,8 @@ function get_unique_id(){
 	return unique_id;
 	}
 //tank moving speed conversion
-function speed2pixels(speed){
-	return speed/14*25/FPS;
-	}
-//ability to change global range
-function range2real_range(range){
-	return range*1;
+function speed2pixels(speed, time_diff){
+	return speed * 1.7 * time_diff/1000;
 	}
 //repeat some functions in time
 function timed_functions_handler(){
@@ -392,7 +388,6 @@ function quit_game(init_next_game){
 	clearInterval(draw_interval_id);
 	clearInterval(level_interval_id);
 	clearInterval(level_hp_regen_id);
-	clearInterval(bots_interval_id);
 	clearInterval(timed_functions_id);	
 	clearInterval(start_game_timer_id);
 	
