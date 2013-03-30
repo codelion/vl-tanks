@@ -154,8 +154,7 @@ function draw_main(){
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
 					if(TANKS[i].hit_reuse == 0)
-						if(body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle)){
-						}
+						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
@@ -177,6 +176,8 @@ function draw_main(){
 						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
 						}	
 					}
+				else if(TANKS[i].hit_reuse == 0)
+						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 				}
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false){
@@ -414,7 +415,7 @@ function draw_logo_tanks(left, top, change_logo){
 	//clear
 	var img = new Image();	
 	img.src = 'img/map/moon.jpg';
-	canvas_backround.drawImage(img, left, top-7, 477, 52+10, left, top-7, 477, 52+10);
+	canvas_backround.drawImage(img, left, top-7, 500, 52+10, left, top-7, 500, 52+10);
 	if(change_logo==undefined){
 		if(logo_visible==0){
 			logo_visible=1;
@@ -429,19 +430,18 @@ function draw_logo_tanks(left, top, change_logo){
 			}
 		}
 	for(var t in TYPES){
-		//if(TYPES[t].size[1] > 60) continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
 		if(TYPES[t].size[1] < max_size)	//normal
-			canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+			canvas_backround.drawImage(img, left+t*round(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
 		else	//resized
 			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/TYPES.length)+(50-max_size)/2, top+52-max_size, max_size, max_size);
 		//turrent
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
-		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		canvas_backround.drawImage(img, left+t*round(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
 		}
 	}
 var score_button_pos = new Array();
@@ -935,6 +935,7 @@ function show_chat(){
 		canvas.fillText(text, 10, bottom-i*gap);
 		}
 	}
+//calculate body and turret rotation
 function body_rotation(obj, str, speed, rot, time_diff){
 	speed = speed * 100 * time_diff/1000;
 	var flag = false;

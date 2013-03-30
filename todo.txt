@@ -1,5 +1,4 @@
-tanks graphics
-	tank skills
+tank skills
 multiplayer:
 	skills
 		active skills, dont send command on prepare skill

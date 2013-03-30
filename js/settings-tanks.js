@@ -113,7 +113,7 @@ TYPES.push({
 	turn_speed: 2,
 	size: ['M', 50],
 	preview: 'preview.png',
-	icon_top: ['top1.png', 'top2.png'],
+	icon_top: ['top1.png', 'top2.png'],	
 	icon_base: ['base1.png', 'base2.png'],
 	abilities: [
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
