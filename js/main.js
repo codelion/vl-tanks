@@ -175,7 +175,7 @@ function preload_all_files(){
 		'img/button.png',
 		'img/explosion.png',
 		'img/explosion_big.png',
-		'img/map/min.png',
+		'img/map/mine.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
