@@ -12,13 +12,6 @@ ELEMENTS.push({
 	alt_color: '#4e4b44',	
 	collission: true,	
 	});
-ELEMENTS.push({
-	name: 'bomb',
-	file: 'bomb.png',	
-	size: [16, 16], 	
-	alt_color: '#171719',
-	collission: true,	
-	});	
 
 //====== Main ==================================================================
 
@@ -148,7 +141,6 @@ MAPS.push({
 			['fence', 	666,	175,	0,	0],
 			['fence', 	1233,	175,	0,	0],
 			['fence', 	1333,	175,	0,	0],
-			
 			['fence', 	566,	2825,	0,	0],
 			['fence', 	666,	2825,	0,	0],
 			['fence', 	1233,	2825,	0,	0],
