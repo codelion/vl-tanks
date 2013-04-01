@@ -1,4 +1,3 @@
-tank skills
 multiplayer:
 	skills
 		active skills, dont send command on prepare skill
@@ -8,6 +7,6 @@ multiplayer:
 		if me - broadcast
 		if other tank - dont broadcast
 		if tower - host broadcasts
-		if minis - minis owner broadcasts
+		if soldier - soldier owner broadcasts
 		if host dc - assign host to other person 
 	find server lib with several rooms support

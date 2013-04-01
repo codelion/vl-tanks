@@ -71,8 +71,8 @@ function draw_main(){
 			if(PLACE != 'game') return false;
 			var tank_size =  TYPES[TANKS[i].type].size[1];
 			
-			//if mini shooting - stop
-			if(TYPES[TANKS[i].type].size[0] == "S"){
+			//if soldiers shooting - stop
+			if(TYPES[TANKS[i].type].type == "human"){
 				for(var b in BULLETS){
 					if(BULLETS[b].bullet_from_target.id == TANKS[i].id)
 						TANKS[i].move = 0;	
@@ -133,6 +133,8 @@ function draw_main(){
 					delete TANKS[i].reach_pos_and_execute;
 					}
 				}
+			if(TANKS[i].use_AI == true)
+				check_path_AI(TANKS[i]);
 			
 			//tank waiting
 			if(TANKS[i].sleep != undefined && TANKS[i].sleep - Date.now() > 0){
@@ -153,7 +155,7 @@ function draw_main(){
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
-					if(TANKS[i].hit_reuse == 0)
+					if(TANKS[i].hit_reuse - Date.now() < 0)
 						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
@@ -176,7 +178,7 @@ function draw_main(){
 						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
 						}	
 					}
-				else if(TANKS[i].hit_reuse == 0)
+				else if(TANKS[i].hit_reuse - Date.now() < 0)
 						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 				}
 			//map scrolling
@@ -189,9 +191,20 @@ function draw_main(){
 				if(TANKS[i].stun != undefined) continue; //stun
 				
 				//follows tank
-				var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
-				b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - BULLETS[b].x;
-        			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - BULLETS[b].y; 
+				if(BULLETS[b].bullet_to_target != undefined){
+					var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
+					b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - BULLETS[b].x;
+	        			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - BULLETS[b].y; 
+	        			}
+	        		else if(BULLETS[b].bullet_to_area != undefined){
+	        			//bullet with coordinates instead of target
+					b_dist_x = BULLETS[b].bullet_to_area[0] - BULLETS[b].x;
+	        			b_dist_y = BULLETS[b].bullet_to_area[1] - BULLETS[b].y; 
+	        			}
+	        		else{
+	        			log('ERROR: bullet without target');
+	        			continue;
+	        			}
 				
 				b_distance = Math.sqrt((b_dist_x*b_dist_x)+(b_dist_y*b_dist_y));
 				b_radiance = Math.atan2(b_dist_y, b_dist_x); 
@@ -221,6 +234,12 @@ function draw_main(){
 								do_damage(TANKS[i], bullet_target, BULLETS[b].damage, BULLETS[b].pierce_armor);
 							else
 								do_damage(TANKS[i], bullet_target);
+								
+							//extra effects for non tower
+							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].type!='tower'){
+								if(BULLETS[b].stun_effect != undefined)	
+									bullet_target.stun = TANKS[i].id; //stun
+								}
 							}
 						}
 					//aoe hit
@@ -230,9 +249,8 @@ function draw_main(){
 								continue; //friend
 							
 							//check range
-							var enemy = get_tank_by_id(BULLETS[b].bullet_to_targe);
-							var enemy_x = enemy.x + TYPES[enemy.type].size[1]/2;
-							var enemy_y = enemy.y + TYPES[enemy.type].size[1]/2;
+							var enemy_x = BULLETS[b].bullet_to_area[0];
+							var enemy_y = BULLETS[b].bullet_to_area[1];
 							dist_x_b = TANKS[ii].x+TYPES[TANKS[ii].type].size[1]/2 - enemy_x;
 							dist_y_b = TANKS[ii].y+TYPES[TANKS[ii].type].size[1]/2 - enemy_y;
 							var distance_b = Math.sqrt((dist_x_b*dist_x_b)+(dist_y_b*dist_y_b));
@@ -716,7 +734,6 @@ function draw_tank_select_screen(selected_tank){
 				ROOM = get_room_by_id(opened_room_id);
 				if(ROOM.settings[0]=='normal'){
 					if(TYPES[index].bonus != undefined){
-						//alert(TYPES[index].name+" can not be selected in normal mode. \nChoose single player, mirror or random to play this it.");
 						return false;
 						}
 					else{
@@ -800,7 +817,7 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.fillText(text, 15+10, y+1+round(ICON_WIDTH/2));
 			
 			//players
-			for(var p in ROOM.players){	//alert(ROOM.players[p].name);
+			for(var p in ROOM.players){
 				if(ROOM.players[p].team == teams[t]){
 					//background
 					canvas_backround.strokeStyle = "#000000";
@@ -937,6 +954,8 @@ function show_chat(){
 	}
 //calculate body and turret rotation
 function body_rotation(obj, str, speed, rot, time_diff){
+	if(obj.stun != undefined)	return false; //stun
+	if(obj.speed == 0)	return false; //0 speed
 	speed = speed * 100 * time_diff/1000;
 	var flag = false;
 	if (obj[str] - 180 > rot){

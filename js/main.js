@@ -1,6 +1,7 @@
 /*
-Name: VL Tanks
-Author: VL
+Name: Moon wars
+Author: Vilius
+Email: www.viliusl@gmail.com
 */
 
 //start
@@ -173,6 +174,8 @@ function preload_all_files(){
 		'img/unmute.png',
 		'img/button.png',
 		'img/explosion.png',
+		'img/explosion_big.png',
+		'img/map/min.png',
 		];
 	audio_to_preload = [
 		'sounds/click.ogg',
@@ -303,7 +306,7 @@ function init_action(map_nr, my_team){
 			}
 		//get random type
 		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
-		//enemy_tank_type = 4;	
+		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
 		
 		var tmp = new Array();
 		tmp['id'] = get_unique_id();
@@ -325,6 +328,7 @@ function init_action(map_nr, my_team){
 		tmp['damage'] = TYPES[tmp['type']].damage[0];
 		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
 		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
+		tmp['use_AI'] = true;
 		TANKS.push(tmp);
 		}
 	
@@ -332,17 +336,21 @@ function init_action(map_nr, my_team){
 	
 	add_towers();
 	
-	//auto add 1 lvl upgrade	disabled
-	/*for(ii in TANKS){
+	//auto add 1 lvl upgrade
+	for(ii in TANKS){
 		if(TYPES[TANKS[ii].type].abilities.length != 0 ){
 			for(jj in TYPES[TANKS[ii].type].abilities){ 
 				var nr = 1+parseInt(jj);
 				var ability_function = TYPES[TANKS[ii].type].abilities[jj].name.replace(/ /g,'_')+"_once";
-				if(ability_function != undefined)
-					window[ability_function](TANKS[ii]);
+				if(ability_function != undefined){
+					try{
+						window[ability_function](TANKS[ii]);
+						}
+					catch(err){	}
+					}
 				}
 			}
-		}*/
+		}
 	
 	//handler for mini map
 	register_button(5, HEIGHT_APP-150-25+5, 120, 138, 'game', function(xx, yy){ 
@@ -352,7 +360,7 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 		
-	level_hp_regen_id = setInterval(level_hp_regen_handler, 2000);
+	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 2000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
 	}
@@ -397,6 +405,7 @@ function quit_game(init_next_game){
 	
 	if(PLACE=='game'){
 		TANKS = [];
+		MINES = [];
 		timed_functions = [];
 		pre_draw_functions = [];
 		on_click_functions = [];

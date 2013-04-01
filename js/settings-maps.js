@@ -29,12 +29,12 @@ MAPS.push({
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	50,	2,	'Base'],
-			['B',	30,	12,	'Tower'],
-			['B',	70,	12,	'Tower'],
+			['B',	30,	11,	'Tower'],
+			['B',	70,	11,	'Tower'],
 			['B',	50,	25,	'Tower'],
 			['R',	50,	75,	'Tower'],
-			['R',	30,	88,	'Tower'],
-			['R',	70,	88,	'Tower'],
+			['R',	30,	89,	'Tower'],
+			['R',	70,	89,	'Tower'],
 			['R',	50,	100,	'Base'],
 		],
 	elements: [
@@ -64,10 +64,10 @@ MAPS.push({
 			//team x%,	 y%, 	name
 			['B',	50,	2,	'Base'],
 			['B',	60,	3,	'Tower'],
-			['B',	15,	25,	'Tower'],
-			['B',	85,	25,	'Tower'],
-			['R',	15,	75,	'Tower'],
-			['R',	85,	75,	'Tower'],
+			['B',	15,	21,	'Tower'],
+			['B',	85,	21,	'Tower'],
+			['R',	15,	79,	'Tower'],
+			['R',	85,	79,	'Tower'],
 			['R',	60,	99,	'Tower'],
 			['R',	50,	100,	'Base'],
 		],

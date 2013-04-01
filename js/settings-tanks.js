@@ -13,17 +13,14 @@ more ideas:
 	1 or 2 skill for each tank
 	heavy - some skills for save team?
 	tiger - less defence?
-	cruiser - some skill for team support, or survival? evasion?
-	launcher - aoe skill?
-	sniper - some semi-hide skill?
 */
 
 //Heavy
 TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
-	description: ["Heavy armor", "Low damage", "Weak against Sniper and Tiger"],
-	life: [230, 20],				//[tank life in level 0, life increase in each level]
+	description: ["Heavy armor, high defence", "Low damage", "Weak only against Sniper and Tiger"],
+	life: [250, 15],				//[tank life in level 0, life increase in each level]
 	damage: [10, 1],	//10 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
@@ -35,14 +32,14 @@ TYPES.push({
 	//no_collisions: 1,
 	//bonus: 1,					//tank will be available only in single mode, random and mirror
 	//ignore_armor: 1,				//tank will ignore armor
+	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
+		{name: 'Rest',		passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: ['top1.png', 'top2.png'],		//tank base images
 	icon_base: ['base1.png', 'base2.png'],		//tank top images
 	preview: 'preview.png',				//tank preview image
-	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		{name: 'Nothing',	passive: false,		broadcast: 1},
-		],
 	bullet: 'bullet.png',				//bullet_image
 	fire_sound: 'shoot.ogg',			//shooting sound
 	accuracy: 90,					//chance to hit target, %
@@ -52,8 +49,8 @@ TYPES.push({
 TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
-	description: ["Medium armor", "Huge damage", "Strong against slow enemies", "Weak against fast enemies"],
-	life: [200, 13],
+	description: ["Medium armor", "Huge damage", "Strong against slow enemies"],
+	life: [200, 12],
 	damage: [30, 1],	//30 dps
 	range: 80,
 	scout: 100,
@@ -61,13 +58,14 @@ TYPES.push({
 	speed: 25,
 	attack_delay: 1,
 	turn_speed: 3,
+	abilities: [
+		{name: 'Berserk',	passive: false,		broadcast: 1},
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -77,22 +75,24 @@ TYPES.push({
 TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
-	description: ["Light armor", "Fast", "Weak against all", "Strong in team play"],
-	life: [200, 13],
-	damage: [15, 1],	//15 dps
+	description: ["Fast scout", "Repair for allies", "Light armor"],
+	life: [200, 12],
+	damage: [10, 1],	//10 dps
 	range: 90,
 	scout: 110,
 	armor: [20, 0.3, 30],
-	speed: 35,
+	speed: 32,
 	attack_delay: 1,
 	turn_speed: 5,
+	abilities: [
+		{name: 'Fleet',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -102,7 +102,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
-	description: ["Missiles", "Long range, but slow", "Penetrates armor", "High accuracy"],
+	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [100, 10],
 	damage: [50, 5],	//25 dps
 	range: 150,
@@ -111,13 +111,14 @@ TYPES.push({
 	speed: 25,
 	attack_delay: 2,
 	turn_speed: 2,
+	abilities: [
+		{name: 'Mortar',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],	
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		],
 	bullet: 'missle.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 100,
@@ -127,8 +128,8 @@ TYPES.push({
 TYPES.push({
 	name: 'Sniper',
 	type: 'tank',
-	description: ["Long range", "Huge damage", "Penetrates armor", "Slow speed and attack"],
-	life: [100, 10],
+	description: ["Camouflage", "Long range and huge damage", "Penetrates armor", "Slow speed and attack"],
+	life: [150, 10],
 	damage: [50, 2],	//25 dps
 	range: 150,
 	scout: 110,
@@ -136,14 +137,15 @@ TYPES.push({
 	speed: 23,
 	attack_delay: 2,
 	turn_speed: 2,
+	abilities: [
+		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	ignore_armor: 1,
 	preview: 'preview.png',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 80,
@@ -153,22 +155,23 @@ TYPES.push({
 TYPES.push({
 	name: 'Miner',
 	type: 'tank',
-	description: ["Lands mines", "Low damage", "Light armor", "Weak against air and long range units"],
-	life: [200, 10],
+	description: ["Lands mines", "Light armor", "Low damage", "Very weak agains air units"],
+	life: [150, 10],
 	damage: [10, 1],	//10 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [20, 0.3, 30],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 4,
+	abilities: [
+		{name: 'Mine',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	preview: 'preview.png',
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -178,8 +181,8 @@ TYPES.push({
 TYPES.push({
 	name: 'Tech',
 	type: 'tank',
-	description: ["Can send virus to deactivate enemy", "Low damage", "Light armor", "Weak against air and long range units"],
-	life: [200, 10],
+	description: ["Can send virus to deactivate enemy", "Light armor", "Low damage"],
+	life: [150, 10],
 	damage: [10, 1],	//10 dps
 	range: 80,
 	scout: 100,
@@ -187,13 +190,14 @@ TYPES.push({
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 4,
+	abilities: [
+		{name: 'Virus',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
 	preview: 'preview.png',
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -203,22 +207,23 @@ TYPES.push({
 TYPES.push({
 	name: 'Truck',
 	type: 'tank',
-	description: ["Uses soldiers for attack", "Very low damage", "Depends on soldiers only"],
-	life: [200, 10],
+	description: ["Uses many soldiers for attack", "Very low damage"],
+	life: [150, 10],
 	damage: [5, 1],	//5 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [10, 0, 10],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 4,
+	abilities: [
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
 	icon_top: [],
 	icon_base: ['base1.png', 'base2.png'],
 	preview: 'preview.png',
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -228,24 +233,24 @@ TYPES.push({
 TYPES.push({
 	name: 'Helicopter',
 	type: 'tank',
-	description: ["Medium armor", "Missiles", "Strong against all"],
-	life: [200, 10],
+	description: ["Missiles", "Medium armor", "Strong against all"],
+	life: [150, 10],
 	damage: [20, 1],	//20 dps
 	range: 80,
-	scout: 100,
+	scout: 110,
 	armor: [40, 0.5, 50],	
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 6,
 	bonus: 1,
 	no_collisions: 1,
+	abilities: [
+		{name: 'Airstrike',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
-	icon_top: [],
+	icon_top: [	],
 	icon_base: ['base1.png', 'base2.png'],
 	preview: 'preview.png',
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -259,20 +264,20 @@ TYPES.push({
 	life: [100, 10],
 	damage: [15, 1],	//15 dps
 	range: 60,
-	scout: 100,
+	scout: 110,
 	armor: [10, 0, 10],
 	speed: 35,
 	attack_delay: 1,
 	turn_speed: 4,
 	bonus: 1,
 	no_collisions: 1,
+	abilities: [
+		{name: 'Bomb',	passive: false,		broadcast: 1}, 
+		],
 	size: ['M', 50],
-	icon_top: [],
+	icon_top: [	],
 	icon_base: ['base1.png', 'base2.png'],
 	preview: 'preview.png',
-	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 0}, 
-		],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -282,7 +287,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Soldier',
 	type: 'human',
-	description: ["Infantry", "No armor", "Low damage", "Supports in battle"],
+	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [50, 5],
 	damage: [7, 1],	//7 dps
 	range: 50,
@@ -292,11 +297,11 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
+	abilities: [],
 	size: ['S', 30],
 	preview: 'preview.png',
 	icon_top: [],
 	icon_base: ['top1.png', 'top2.png'],
-	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -316,11 +321,11 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
+	abilities: [],
 	size: ['L', 50],
 	preview: '',
 	icon_top: ['top1.png', 'top2.png'],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
@@ -340,11 +345,11 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
+	abilities: [],
 	size: ['L', 90],
 	preview: '',
 	icon_top: [],
 	icon_base: ['base1.png', 'base2.png'],
-	abilities: [],
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,

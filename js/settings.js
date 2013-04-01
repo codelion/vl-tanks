@@ -17,7 +17,7 @@ var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
-var VERSION = "1.0";			//app version
+var VERSION = "1.1";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -43,7 +43,6 @@ var my_tank_nr = -1;			//my tank type: [0,1...n]
 var my_tank_id = -1;			//my tank id: [1,2...n]
 var audio_main;				//main audio track controller
 var map_offset = [0, 0];		//map offest [x ,y], < 0, this is for map scrolling, if map bigger then canvas size
-var bots_row = 0;			//minis row number: [0,1...n]
 var unique_id = 0;			//number for id generation
 var preview_id = [];			//tmp array for on_mousemove f-tion
 var timed_functions = [];		//timed functions array, for repeative exec.
