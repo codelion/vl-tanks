@@ -560,7 +560,7 @@ function do_airstrike(tank_id, enemy){
 		var tmp = new Array();
 		tmp['x'] = TANK.x+tank_size;
 		tmp['y'] = TANK.y+tank_size;
-		tmp['bullet_to_target'] = enemy; 
+		tmp['bullet_to_target'] = enemy;
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = TANK.try_airstrike[1];
 		tmp['pierce_armor'] = 1;

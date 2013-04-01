@@ -1373,6 +1373,7 @@ function get_tank_by_coords(mouseX, mouseY, team, tank_from){
 				index: i,
 				id: TANKS[i].id,
 				range: distance2,
+				type: TANKS[i].type,
 				};
 			}
 		}
