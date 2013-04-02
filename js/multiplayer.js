@@ -2,35 +2,98 @@ var socket;
 var socket_live = false;
 //connecto to sockets server
 function connect_server(){
-	socket = new WebPush(SOCKET);
-	socket.bind('message', function(data){ get_packet(data);  } );
-	socket.bind('open', function() {  
-		socket_live=true;  
-		try{
-			parent.document.getElementById("connected").innerHTML = 'yes';
-			}catch(error){}
-		register_tank_action('ask_rooms', false, name);
-		});
-	socket.bind('close', function() {  
-		socket_live=false;  
-		try{
-			parent.document.getElementById("connected").innerHTML = 'no';
-			}catch(error){}
-		});
+	// Create the Orbiter instance, used to connect to and communicate
+	orbiter = new net.user1.orbiter.Orbiter();
+	orbiter.getConnectionMonitor().setAutoReconnectFrequency(15000);
+	orbiter.getLog().setLevel(net.user1.logger.Logger.DEBUG);
+	
+	// If required JavaScript capabilities are missing, abort
+	if (!orbiter.getSystem().isJavaScriptCompatible())
+		return log("Your browser is not supported.");
+	
+	// Register for Orbiter's connection events
+	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.READY, readyListener, this);
+	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.CLOSE, disconnect_server, this);
+	log("Connecting to Union...");
+	
+	// Connect to Union Server
+	orbiter.connect(SOCKET[0], SOCKET[1]);
+	}
+// Triggered when the connection is ready
+function readyListener(e) {
+	log("Connected.");
+	log("Joining room");
+	
+	// Create room on the server
+	SOCKET_ROOM = SOCKET_ROOM_PREFIX+"rooms";
+	Room = orbiter.getRoomManager().createRoom(SOCKET_ROOM);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+	
+	// Listen for messages
+	Room.addMessageListener("CHAT_MESSAGE", get_packet);
+	
+	// Join the room
+	Room.join();
+	}
+//we joined the room
+function joinRoomListener (e) {
+	log("Ready!");
+	log("Number of people: " + Room.getNumOccupants());
+	socket_live=true;
+	try{
+		parent.document.getElementById("connected").innerHTML = 'yes';
+		}catch(error){}
+	register_tank_action('ask_rooms', false, name);
 	add_player_to_stats(name);
 	}
+//client joins room
+function addOccupantListener (e) {
+	if (Room.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
+		log("User" + e.getClientID() + " joined." + " People: " + Room.getNumOccupants());
+		}
+	}
+//client leaves room
+function removeOccupantListener (e) {
+	log("User" + e.getClientID() + " left." + " People: " + Room.getNumOccupants());
+	}
 //disconnect from server
-function disconnect_server(){
+function disconnect_server(e){
 	quit_game(false);
-	if(socket_live==true)
-		socket.disconnect();
+	socket_live = false;
+	socket_live=false;  
+	try{
+		parent.document.getElementById("connected").innerHTML = 'no';
+		}catch(error){}
+	}
+//send packet to server
+function send_packet(type, message){
+	if(message.length == 0){
+		console.log('Error: empty message, type: '+type);
+		return false;
+		}
+	if(socket_live==false){
+		console.log('Error: trying to send without connection: '+type);
+		return false;
+		}
+	console.log("send message: "+type);
+	try{
+		parent.document.getElementById("messages_out").innerHTML = parseInt(parent.document.getElementById("messages_out").innerHTML)+1;
+		}catch(error){}
+	message = {
+		type: type,
+		message: message,
+		};
+	message = JSON.stringify(message);
+	Room.sendMessage("CHAT_MESSAGE", "true", null, message);
 	}
 //get packets from server
-function get_packet(event){
+function get_packet(fromClient, message){	
 	try{
-		parent.document.getElementById("messages_in").innerHTML = parseInt(document.getElementById("messages_in").innerHTML)+1;
+		parent.document.getElementById("messages_in").innerHTML = parseInt(parent.document.getElementById("messages_in").innerHTML)+1;
 		}catch(error){}
-	DATA = JSON.parse(event);
+	DATA = JSON.parse(message);
 	var type = DATA.type;
 	DATA = DATA.message;
 	console.log("reveived message: "+type);
@@ -293,23 +356,6 @@ function get_packet(event){
 			}
 		}
 	}
-//send packet to server
-function send_packet(type, message){
-	if(socket_live==false){
-		console.log('Error: trying to send without connection: '+type);
-		return false;
-		}
-	console.log("send message: "+type);
-	try{
-		parent.document.getElementById("messages_out").innerHTML = parseInt(document.getElementById("messages_out").innerHTML)+1;
-		}catch(error){}
-	message = {
-		type: type,
-		message: message,
-		};
-	message = JSON.stringify(message);
-	socket.send(message);
-	}
 //sending action to other players
 function register_tank_action(action, room_id, player, data){			//lots of broadcasting
 	if(action=='move')
@@ -405,39 +451,7 @@ function sync_multiplayers(){
 	var ROOM = get_room_by_id(opened_room_id);
 	for(var i in ROOM.players){
 		if(ROOM.players[i].name != name){	//if not me
-			var tmp = new Array();
-			tmp['id'] = ROOM.players[i].name;
-			tmp['name'] = ROOM.players[i].name;
-			if(ROOM.players[i].tank != undefined)
-				tmp['type'] = ROOM.players[i].tank;
-			else
-				tmp['type'] = 0;
-			if(ROOM.players[i].team=='B'){
-				//blue top
-				tmp['x'] = round(WIDTH_SCROLL*2/3);
-				tmp['y'] = 20;
-				tmp['angle'] = 180;
-				}
-			else{
-				//red bottom
-				tmp['x'] = round(WIDTH_SCROLL/3);
-				tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-				tmp['angle'] = 0;
-				}
-			tmp['angle'] = 0;
-			tmp['move'] = 0;
-			tmp['sublevel'] = 0;
-			tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
-			tmp['level'] = 1;
-			tmp['team'] = ROOM.players[i].team;
-			tmp['abilities_lvl'] = [1,1,1];
-			tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-			tmp['speed'] = TYPES[tmp['type']].speed;
-			tmp['armor'] = TYPES[tmp['type']].armor[0];
-			tmp['damage'] = TYPES[tmp['type']].damage[0];
-			tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-			tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-			TANKS.push(tmp);
+			add_tank(1, ROOM.players[i].name, ROOM.players[i].name, ROOM.players[i].tank, ROOM.players[i].team);
 			}
 		}
 	}

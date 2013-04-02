@@ -300,7 +300,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	
 	//back button block
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#c50000";
 	roundRect(canvas_backround, 10+offset_left+120, 60+offset_top, 105, 30, 2, true);
 	
 	//back button text

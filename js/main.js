@@ -4,9 +4,6 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 */
 
-//start
-init_game(true);
-
 //init hello screen
 function init_game(first_time){
 	PLACE = 'init';
@@ -232,6 +229,7 @@ function preload_all_files(){
 	}
 //start game
 function init_action(map_nr, my_team){
+	if(PLACE=='game') return false; //already started
 	PLACE = 'game';
 	level = map_nr;
 	
@@ -265,75 +263,23 @@ function init_action(map_nr, my_team){
 		}
 	
 	//create ... me
-	var tmp = new Array();
-	tmp['id'] = name;
-	tmp['name'] = name;
-	tmp['type'] = my_tank_nr;
-	if(my_team=='B'){
-		//blue top
-		tmp['x'] = round(WIDTH_SCROLL*2/3);
-		tmp['y'] = 20;
-		tmp['angle'] = 180;
-		}
-	else{
-		//red bottom 
-		tmp['x'] = WIDTH_SCROLL/3;
-		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-		tmp['angle'] = 0;
-		}
-	tmp['fire_angle'] = 180;
-	tmp['move'] = 0;
-	tmp['level'] = 1;
-	tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);	
-	tmp['sublevel'] = 0;
-	tmp['team'] = my_team;
-	tmp['abilities_lvl'] = [1,1,1];
-	tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-	tmp['speed'] = TYPES[tmp['type']].speed;
-	tmp['armor'] = TYPES[tmp['type']].armor[0];
-	tmp['damage'] = TYPES[tmp['type']].damage[0];
-	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-	tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-	TANKS.push(tmp);
-	my_tank_id = tmp['id'];
+	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
 	auto_scoll_map();
 
 	//add enemy if single player
 	if(game_mode==1){
-		//get possible types
+		//get random type
 		var possible_types = [];
 		for(var t in TYPES){
 			if(TYPES[t].type=="tank")
 				possible_types.push(t);
 			}
-		//get random type
 		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
 		
-		var tmp = new Array();
-		tmp['id'] = get_unique_id();
-		tmp['name'] = "Bot";
-		tmp['type'] = enemy_tank_type;
-		tmp['x'] = round(WIDTH_SCROLL/3);
-		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-		tmp['angle'] = 0;
-		tmp['angle'] = 0;
-		tmp['move'] = 0;
-		tmp['level'] = 1;
-		tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
-		tmp['sublevel'] = 0;
-		tmp['team'] = 'R';
-		tmp['abilities_lvl'] = [1,1,1];
-		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['armor'] = TYPES[tmp['type']].armor[0];
-		tmp['damage'] = TYPES[tmp['type']].damage[0];
-		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-		tmp['use_AI'] = true;
-		TANKS.push(tmp);
+		add_tank(1, get_unique_id(), "Bot", enemy_tank_type, 'R', undefined, undefined, undefined, true);
 		}
 	
 	sync_multiplayers();
@@ -521,7 +467,7 @@ function chat(text, author, team){
 	if(text=='') return false;
 	
 	//save
-	var time = 	new Date();
+	var time = new Date();
 	time = time.getTime();
 	CHAT_LINES.push({
 		text: text,

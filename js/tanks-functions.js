@@ -5,7 +5,22 @@ function Soldiers(TANK, descrition_only){
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight.';
 	
-	add_soldiers('Soldier', n, TANK);
+	//prepare
+	var type = '0';
+	for(var t in TYPES){
+		if(TYPES[t].name == 'Soldier')
+			type = t;
+		}
+	var angle = 180;
+	if(TANK.team != 'B')
+		angle = 0;
+	
+	//add
+	for(var i=0; i<n; i++){
+		x = round(TANK.x)-30+i*30;
+		y = round(TANK.y);
+		add_tank(TANK.level, 'bot'+TANK.team+get_unique_id()+"."+x+"."+y, '', type, TANK.team, x, y, angle, true, TANK);
+		}
 	
 	//return reuse
 	return 30*1000;
@@ -137,10 +152,7 @@ function Repair(TANK, descrition_only){
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
-		//check range
-		dist_x = TANKS[ii].x+TYPES[TANKS[ii].type].size[1]/2 - (TANK.x+tank_size_from);
-		dist_y = TANKS[ii].y+TYPES[TANKS[ii].type].size[1]/2 - (TANK.y+tank_size_from);
-		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		if(TANKS[ii].extra_icon==undefined)
 			TANKS[ii].extra_icon = [];
@@ -277,7 +289,7 @@ function Camouflage(TANK, descrition_only){
 	var reuse = 15000;
 	var duration = 10000;
 	
-	TANK.speed = 0;
+	//TANK.speed = 0;
 	TANK.invisibility = 1;
 	delete TANK.target_move;
 	delete TANK.target_shoot_lock;
@@ -295,7 +307,7 @@ function Camouflage(TANK, descrition_only){
 	}
 function Camouflage_stop(object){
 	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
+	//TANK.speed = TYPES[TANK.type].speed;
 	delete TANK.invisibility;
 	}
 

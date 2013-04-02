@@ -91,12 +91,7 @@ function draw_main(){
 					delete TANKS[i].target_move;
 					}
 				else{
-					//get distance
-					tmp_dist_x = TANKS[i_locked].x+TYPES[TANKS[i_locked].type].size[1]/2-(TANKS[i].x+TYPES[TANKS[i].type].size[1]/2)
-					tmp_dist_y = TANKS[i_locked].y+TYPES[TANKS[i_locked].type].size[1]/2-(TANKS[i].y+TYPES[TANKS[i].type].size[1]/2)
-					tmp_distance = Math.sqrt((tmp_dist_x*tmp_dist_x)+(tmp_dist_y*tmp_dist_y));
-					tmp_distance =  tmp_distance -  TYPES[TANKS[i].type].size[1]/2 - TYPES[TANKS[i_locked].type].size[1]/2;
-					
+					tmp_distance = get_distance_between_tanks(TANKS[i_locked], TANKS[i]);
 					//executing custom function
 					if(TANKS[i].reach_tank_and_execute != undefined && tmp_distance < TANKS[i].reach_tank_and_execute[0]){
 						//executing custom function
@@ -337,7 +332,7 @@ function draw_main(){
 		}
 	lighten_pixels_all();
 	if(MY_TANK['dead']==1)	
-		draw_message(canvas_main, "You will respan in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
+		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
 	//show live scroes?
 	if(tab_scores==true){
@@ -447,19 +442,23 @@ function draw_logo_tanks(left, top, change_logo){
 			logo_visible=0;
 			}
 		}
+	var n = 0;
+	for(var t in TYPES)
+		if(TYPES[t].type == 'tank') n++;
 	for(var t in TYPES){
+		if(TYPES[t].type != 'tank') continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
 		if(TYPES[t].size[1] < max_size)	//normal
-			canvas_backround.drawImage(img, left+t*round(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+			canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		else	//resized
-			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/TYPES.length)+(50-max_size)/2, top+52-max_size, max_size, max_size);
-		//turrent
+			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
+		//turret
 		var img = new Image();
 		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
-		canvas_backround.drawImage(img, left+t*round(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		}
 	}
 var score_button_pos = new Array();
@@ -778,7 +777,7 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+50+d*height_space);
 			}
 		}
-	y = y + info_block_height+15;
+	y = y + info_block_height+10;
 	
 	//mini maps
 	if(game_mode == 1){	
@@ -790,7 +789,7 @@ function draw_tank_select_screen(selected_tank){
 	if(game_mode == 2){
 		ROOM = get_room_by_id(opened_room_id);
 		players_n = ROOM.players.length;	
-		var ICON_WIDTH = 63;
+		var ICON_WIDTH = 55;
 		//find my team
 		var my_team;
 		for(var t in ROOM.players){
@@ -973,4 +972,4 @@ function body_rotation(obj, str, speed, rot, time_diff){
 		flag = true;
 	}
 	return flag;
-}
+	}

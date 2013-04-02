@@ -1,4 +1,5 @@
 multiplayer:
+	check http://www.unionplatform.com/
 	skills
 		active skills, dont send command on prepare skill
 	sync deaths by time

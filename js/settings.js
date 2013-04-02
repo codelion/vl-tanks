@@ -9,7 +9,7 @@ var canvas_base = document.getElementById("canvas_main");
 var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 
 //game settings
-var SOCKET = 'ws://127.0.0.1:8000/list';//socket server
+var SOCKET = ['tryunion.com', '80'];	//socket server
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
 var START_GAME_COUNT_SINGLE=3;		//second how much to count in singleplayer
@@ -17,11 +17,13 @@ var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
+var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
 var VERSION = "1.1";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
 var TYPES = new Array();		//tanks types config
+var SOCKET_ROOM = '';			//room name in websocket server
 var BULLETS_TYPES = new Array();	//bullets types config
 var BULLETS = new Array();		//tanks bullets
 var MAPS = new Array();			//maps config
@@ -40,7 +42,6 @@ var level = 1;				//map index
 var name="user-"+Math.floor(Math.random()*9999);	//user name
 var me_server = true;			//if me is server
 var my_tank_nr = -1;			//my tank type: [0,1...n]
-var my_tank_id = -1;			//my tank id: [1,2...n]
 var audio_main;				//main audio track controller
 var map_offset = [0, 0];		//map offest [x ,y], < 0, this is for map scrolling, if map bigger then canvas size
 var unique_id = 0;			//number for id generation

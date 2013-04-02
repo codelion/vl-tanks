@@ -17,8 +17,8 @@ function check_path_AI(TANK){
 		TANK.move = 1; 
 		}
 	
-	//if in battle - stop
-	if(TANK.attacking == 1){
+	//if in battle
+	if(TANK.attacking != undefined && TANK.attacking != 0){
 		TANK.move = 0; 
 		return false; 
 		}

@@ -45,10 +45,8 @@ function on_keyboard_action(event){
 		}
 	
 	//disable some keys
-	//if(k >= 37 && k <= 40)
-	//	return false;	//scroll
-	if(k==9)
-		return false;	//TAB
+	if(k >= 37 && k <= 40)	return false;	//scroll with left, rigth, up and down
+	if(k==9)	return false;	//TAB
 		
 	return true;
 	}

@@ -43,7 +43,7 @@ function draw_tank(tank){
 		cache_id += "SI:"+tank_size+',';
 		for (i in tank.extra_icon)
 			cache_id += "E:"+tank.extra_icon[i][0]+',';
-		if(tank.id == my_tank_id)
+		if(tank.id == MY_TANK.id)
 			cache_id += 'SI,';	
 		if(tank.stun != undefined)
 			cache_id += 'ST,';
@@ -752,9 +752,8 @@ function check_enemies(TANK){
 		}
 	//target lock
 	if(TYPES[TANK.type].aoe == undefined 
-			&& TANK.target_shoot_lock != undefined
 			&& i_locked !== false 
-			&& TANKS[i_locked] != undefined 
+			&& TANKS[i_locked] != undefined
 			&& TANKS[i_locked].dead != 1 
 			&& TANKS[i_locked].invisibility != 1
 			){
@@ -766,6 +765,7 @@ function check_enemies(TANK){
 		
 		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 		distance = distance - TYPES[TANKS[i].type].size[1]/2 - tank_size_from;
+		
 		if(distance < range){
 			//start shooting
 			var tank_size_from = TYPES[TANK.type].size[1];
@@ -783,6 +783,7 @@ function check_enemies(TANK){
 			TANK.hit_reuse = TANK.attack_delay*1000+Date.now();	
 			TANK.fire_angle = round(f_angle);
 			found = true;
+			TANK.attacking = TANKS[i].id;
 			TANK.check_enemies_reuse = 0;
 			draw_fire(TANK, TANKS[i]);
 			}
@@ -804,14 +805,9 @@ function check_enemies(TANK){
 			if(TANKS[i].invisibility==1)
 				continue;	//blur mode
 			
-			//exact range
-			dist_x = TANKS[i].x+TYPES[TANKS[i].type].size[1]/2 - (TANK.x+tank_size_from);
-			dist_y = TANKS[i].y+TYPES[TANKS[i].type].size[1]/2 - (TANK.y+tank_size_from);
+			distance = get_distance_between_tanks(TANKS[i], TANK);
 			
-			distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-			distance = distance - TYPES[TANKS[i].type].size[1]/2 - tank_size_from;
-			
-			if(range < distance){
+			if(distance > range){
 				//target too far
 				continue;	
 				}
@@ -819,10 +815,10 @@ function check_enemies(TANK){
 			if(ENEMY_NEAR==undefined){
 				ENEMY_NEAR = [range, i];
 				}
-			else if(range < ENEMY_NEAR[0]){
+			else if(distance < ENEMY_NEAR[0]){
 				ENEMY_NEAR = [range, i];
 				}
-			}
+			}	
 		}
 	
 	//single attack on closest enemy
@@ -849,6 +845,7 @@ function check_enemies(TANK){
 		TANK.hit_reuse = TANK.attack_delay*1000+Date.now();	
 		TANK.fire_angle = round(f_angle);
 		found = true;
+		TANK.attacking = TANKS[i].id;
 		TANK.check_enemies_reuse = 0;
 		draw_fire(TANK, TANKS[i]);
 		}
@@ -864,7 +861,6 @@ function check_enemies(TANK){
 				if(TYPES[TANK.type].aoe == undefined)
 					continue;	//already checked above
 				}
-			//if(TANKS[i].invisibility==1)		continue;	//blur mode
 			
 			//exact range
 			dist_x = TANKS[i].x+TYPES[TANKS[i].type].size[1]/2 - (TANK.x+tank_size_from);
@@ -891,10 +887,9 @@ function check_enemies(TANK){
 			tmp['angle'] = round(f_angle);
 			BULLETS.push(tmp);
 			TANK.hit_reuse = TANK.attack_delay*1000+Date.now();	
-			
 			TANK.fire_angle = round(f_angle);
-			
 			found = true;
+			TANK.attacking = TANKS[i].id;
 			TANK.check_enemies_reuse = 0;
 			}
 		}
@@ -906,8 +901,6 @@ function check_enemies(TANK){
 		TANK.check_enemies_reuse = 1000/2+Date.now();	//half second pause
 		TANK.attacking = 0;
 		}
-	else
-		TANK.attacking = 1;
 	}
 //draw tank shooting fire
 function draw_fire(TANK, TANK_TO){
@@ -950,11 +943,14 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force, silent){
 		else{
 			try{
 				var audio_fire = document.createElement('audio');
-				if(TANK.id==MY_TANK.id)	//me
+				if(TANK.id == MY_TANK.id){	//me shooting
 					audio_fire.setAttribute('src', 'sounds/'+TYPES[TANK.type].fire_sound);
-				else
+					audio_fire.play();
+					}
+				else if(TANK_TO.id == MY_TANK.id){ //enemy shoots to me
 					audio_fire.setAttribute('src', 'sounds/metal.ogg');
-				audio_fire.play();
+					audio_fire.play();
+					}
 				}
 			catch(error){}
 			}
@@ -1140,75 +1136,16 @@ function add_towers(){
 				}
 			}
 		if(type=='') alert('ERROR: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
-		
+		var team = MAPS[level-1]['towers'][i][0];	
+		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
+		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
+		var x = round(MAPS[level-1]['towers'][i][1]*width_tmp/100);
+		var y = round(MAPS[level-1]['towers'][i][2]*height_tmp/100);
+		var angle = 180;
+		if(team != 'B')
+			angle = 0;
 		//add
-		var tmp = new Array();
-		tmp['move'] = 0;
-		tmp['level'] = 1;	
-		tmp['sublevel'] = 0;
-		tmp['type'] = type;
-		tmp['team'] = MAPS[level-1]['towers'][i][0];
-		tmp['sight'] = TYPES[tmp['type']].scout+round(TYPES[tmp['type']].size[1]/2);
-		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['armor'] = TYPES[tmp['type']].armor[0];	
-		tmp['damage'] = TYPES[tmp['type']].damage[0];
-		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-		var width_tmp = WIDTH_MAP - TYPES[tmp['type']].size[1];
-		var height_tmp = HEIGHT_MAP - TYPES[tmp['type']].size[1];
-		tmp['x'] = round(MAPS[level-1]['towers'][i][1]*width_tmp/100);
-		tmp['y'] = round(MAPS[level-1]['towers'][i][2]*height_tmp/100);
-		tmp['id'] = 'tow'+tmp['team']+tmp['x']+"."+tmp['y'];
-		if(tmp['team']=='B'){
-			tmp['angle'] = 180;
-			tmp['fire_angle'] = 180;
-			}
-		else{
-			tmp['angle'] = 0;
-			tmp['fire_angle'] = 0;
-			}
-		tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
-		TANKS.push(tmp);		
-		}
-	}
-//add add_soldiers to map
-function add_soldiers(type_name, n, TANK){
-	//find type
-	var type = '';
-	for(var t in TYPES){
-		if(TYPES[t].name == type_name)
-			type = t;
-		}
-	//add soldiers
-	for(var i=0; i<n; i++){
-		var tmp = new Array();
-		tmp['move'] = 0;
-		tmp['level'] = TANK.level;	
-		tmp['sublevel'] = 0;
-		tmp['type'] = type;
-		tmp['team'] = TANK.team
-		tmp['abilities_lvl'] = [1,1,1];
-		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['armor'] = TYPES[tmp['type']].armor[0];
-		tmp['damage'] = TYPES[tmp['type']].damage[0];
-		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-		var width_tmp = WIDTH_MAP - TYPES[tmp['type']].size[1];
-		var height_tmp = HEIGHT_MAP - TYPES[tmp['type']].size[1];
-		tmp['x'] = round(TANK.x)-30+i*30;
-		tmp['y'] = round(TANK.y);
-		tmp['id'] = 'bot'+tmp['team']+get_unique_id()+"."+tmp['x']+"."+tmp['y'];
-		if(tmp['team']=='B'){	//top
-			tmp['angle'] = 180;
-			tmp['fire_angle'] = 180;
-			}
-		else{	//bottom
-			tmp['angle'] = 0; 
-			tmp['fire_angle'] = 0;
-			}
-		tmp['hp'] = TYPES[tmp['type']].life[0]+TYPES[tmp['type']].life[1]*(tmp['level']-1);
-		tmp['use_AI'] = true;
-		tmp['master'] = TANK;	
-		TANKS.push(tmp);
+		add_tank(1, 'tow'+team+x+"."+y, '', type, team, x, y, angle);
 		}
 	}
 //tank special ability activated	
@@ -1277,11 +1214,7 @@ function check_enemy_visibility(tank){
 			continue;	//target dead
 		
 		//exact range
-		dist_x = TANKS[i].x+TYPES[TANKS[i].type].size[1]/2 - (tank.x+tank_size_from);
-		dist_y = TANKS[i].y+TYPES[TANKS[i].type].size[1]/2 - (tank.y+tank_size_from);
-		
-		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - TYPES[TANKS[i].type].size[1]/2 - tank_size_from;
+		distance = get_distance_between_tanks(TANKS[i], tank);
 		
 		var range = TANKS[i].sight;
 		if(distance < range){
@@ -1364,18 +1297,78 @@ function get_tank_by_coords(mouseX, mouseY, team, tank_from){
 		var size_to_half = round(TYPES[TANKS[i].type].size[1]/2);
 		if(team != undefined && TANKS[i].team != team) continue;
 		if(Math.abs(TANKS[i].x+size_to_half - mouseX) < size_to_half && Math.abs(TANKS[i].y+size_to_half - mouseY) < size_to_half){
-			//distance calculation
-			dist_x2 = (TANKS[i].x+size_to_half) - (tank_from.x+size_from_half);
-			dist_y2 = (TANKS[i].y+size_to_half) - (tank_from.y+size_from_half);
-			distance2 = Math.sqrt((dist_x2*dist_x2)+(dist_y2*dist_y2));
-			distance2 = distance2 - size_to_half - size_from_half;
+			distance = get_distance_between_tanks(TANKS[i], tank_from);
 			return {
 				index: i,
 				id: TANKS[i].id,
-				range: distance2,
+				range: distance,
 				type: TANKS[i].type,
 				};
 			}
 		}
 	return false;
+	}
+function get_distance_between_tanks(id1, id2){	
+	if(typeof id1 == 'object')
+		tank1 = id1;
+	else
+		tank1 = get_tank_by_id(id1);
+	if(typeof id2 == 'object')
+		tank2 = id2;
+	else
+		tank2 = get_tank_by_id(id2);
+	if(tank1===false || tank2===false) return 100000;
+	if(tank1.id==tank2.id) return 0;
+	
+	dist_x = tank1.x+TYPES[tank1.type].size[1]/2 - (tank2.x+TYPES[tank2.type].size[1]/2);
+	dist_y = tank1.y+TYPES[tank1.type].size[1]/2 - (tank2.y+TYPES[tank2.type].size[1]/2);
+	
+	distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+	distance = distance - TYPES[tank1.type].size[1]/2 - TYPES[tank2.type].size[1]/2;
+	distance = round(distance);
+	if(distance<0) distance = 0;
+	return distance;
+	}
+function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
+	if(type==undefined) type = 0;
+	//default coordinates
+	if(x==undefined && y==undefined && angle==undefined){
+		if(team=='B'){	//blue top
+			x = round(WIDTH_SCROLL*2/3);
+			y = 20;
+			angle = 180;
+			}
+		else{		//red bottom 
+			x = WIDTH_SCROLL/3;
+			y = HEIGHT_MAP-20-TYPES[type].size[1];
+			angle = 0;
+			}
+		}
+	TANK = {
+		id: id,
+		name: name,
+		type: type,
+		team: team,
+		x: x,
+		y: y,
+		angle: angle,
+		fire_angle: angle,
+		move: 0,
+		level: level,
+		sublevel: 0,			
+		hp: TYPES[type].life[0]+TYPES[type].life[1]*(level-1),
+		abilities_lvl: [1,1,1],
+		sight: TYPES[type].scout + round(TYPES[type].size[1]/2),
+		speed: TYPES[type].speed,
+		armor: TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1),
+		damage: TYPES[type].damage[0] + TYPES[type].damage[1]*(level-1),
+		attack_delay: TYPES[type].attack_delay,
+		turn_speed: TYPES[type].turn_speed,
+		master: master_tank,
+		};
+	if(AI != undefined)
+		TANK.use_AI = AI;
+	if(master_tank != true)
+		TANK.master = master_tank;		
+	TANKS.push(TANK);
 	}

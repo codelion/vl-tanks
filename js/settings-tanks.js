@@ -21,7 +21,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Sniper and Tiger"],
 	life: [250, 15],				//[tank life in level 0, life increase in each level]
-	damage: [10, 1],	//10 dps		//[tank damage in level 0, damage increase in each level]
+	damage: [10, 1],	//5 dps			//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
@@ -49,12 +49,12 @@ TYPES.push({
 TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
-	description: ["Medium armor", "Huge damage", "Strong against slow enemies"],
-	life: [200, 12],
+	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
+	life: [180, 12],
 	damage: [30, 1],	//30 dps
 	range: 80,
 	scout: 100,
-	armor: [40, 0.3, 50],
+	armor: [30, 0.3, 40],
 	speed: 25,
 	attack_delay: 1,
 	turn_speed: 3,
@@ -182,11 +182,11 @@ TYPES.push({
 	name: 'Tech',
 	type: 'tank',
 	description: ["Can send virus to deactivate enemy", "Light armor", "Low damage"],
-	life: [150, 10],
+	life: [160, 10],
 	damage: [10, 1],	//10 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.3, 30],	
+	armor: [30, 0.3, 40],	
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -288,12 +288,12 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [50, 5],
+	life: [50, 5],			//life: [5000, 5],
 	damage: [7, 1],	//7 dps
-	range: 50,
+	range: 60,
 	scout: 60,
 	armor: [0, 0, 0],
-	speed: 25,
+	speed: 25,			//speed: 100,
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
@@ -316,7 +316,7 @@ TYPES.push({
 	damage: [30, 0],	//30 dps
 	range: 110,
 	scout: 120,
-	armor: [0,0,0],
+	armor: [20,0,20],
 	speed: 0,
 	attack_delay: 1,
 	turn_speed: 4,
