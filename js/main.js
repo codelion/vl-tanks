@@ -245,7 +245,11 @@ function init_action(map_nr, my_team){
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 		
-	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+	var requestAnimationFrame = window.requestAnimationFrame 
+				|| window.mozRequestAnimationFrame 
+				|| window.webkitRequestAnimationFrame 
+				|| window.msRequestAnimationFrame
+				|| function(callback){ setInterval(callback, 1000/25); };
 	window.requestAnimationFrame = requestAnimationFrame;
 	draw_interval_id = requestAnimationFrame(draw_main);
 
