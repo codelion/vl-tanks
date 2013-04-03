@@ -162,6 +162,7 @@ function preload_all_files(){
 	images_to_preload = [
 		//general
 		'img/background.jpg',
+		'img/map/moon.jpg',
 		'img/favicon.png',
 		'img/lock.png',
 		'img/logo.png',
