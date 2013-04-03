@@ -13,7 +13,7 @@ HTML5 based tank game.
 
 ## Getting Started
 * no install - just download and open index.html in modern browser.
-* or use quick access - http://htmlpreview.github.com/?https://github.com/viliusle/vl-tanks/blob/master/index.html
+* or use quick access - http://htmlpreview.github.com/?https://github.com/viliusle/vl-tanks/blob/master/index.html (do not work with Google Chrome)
 * multiplayer requires additional websockets server.
 
 ## Latest News

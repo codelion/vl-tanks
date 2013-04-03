@@ -129,6 +129,7 @@ function add_first_screen_elements(){
 				draw_tank_select_screen();
 				}
 			else if(extra==1){
+				room_id_to_join = -1;
 				//multi player
 				if(socket_live==false)
 					connect_server();
@@ -339,10 +340,21 @@ function timed_functions_handler(){
 	}
 //quit button - quits all possible actions
 function quit_game(init_next_game){
+	if(PLACE=='init'){
+		//disconnect
+		/*if(socket_live == true)
+			orbiter.disconnect();
+		//update status
+		socket_live = false;
+		try{
+			parent.document.getElementById("connected").innerHTML = 'no';
+			}catch(error){}*/
+		}
 	if(PLACE=='game' && game_mode == 2){
 		if(confirm("Do you really want to quit game?")==false)
 			return false;
 		}
+	room_id_to_join = -1;
 	
 	clearInterval(draw_interval_id);
 	clearInterval(level_interval_id);
@@ -383,7 +395,6 @@ function quit_game(init_next_game){
 			}
 		opened_room_id = -1;
 		}
-		
 	if(init_next_game!=false){
 		init_game(false);
 		}
@@ -462,7 +473,7 @@ function chat(text, author, team){
 		else
 			team = '';
 		
-		if(PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game')))
+		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game')))
 			register_tank_action('chat', opened_room_id, name, text);
 		}
 	if(text=='') return false;
@@ -475,14 +486,14 @@ function chat(text, author, team){
 		author: author,
 		team: team,
 		time: time,
-		})
+		});
 	}
 //controlls chat lines
-function controll_chat(){	
-	if(CHAT_LINES.length==0) return false;
+function controll_chat(){ 
+	if(CHAT_LINES.length==0) return false;	
 	
 	//remove old
-	var time = 	new Date();
+	var time = new Date();
 	time = time.getTime();
 	var max_time = 10000;
 	for(var i in CHAT_LINES){
@@ -491,7 +502,7 @@ function controll_chat(){
 			}
 		}
 	//show?
-	if(PLACE == 'room' || PLACE == 'select'){
+	if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select'){
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		show_chat();
 		}

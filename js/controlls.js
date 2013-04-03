@@ -28,7 +28,7 @@ function on_keyboard_action(event){
 		}
 	if(k==13){
 		//enter
-		if(PLACE=='room' || PLACE=='game' || PLACE=='select'){
+		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select'){
 			if(chat_mode==0){
 				//begin write
 				chat_mode=1;

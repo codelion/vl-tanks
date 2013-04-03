@@ -1,5 +1,4 @@
 multiplayer:
-	check http://www.unionplatform.com/
 	skills
 		active skills, dont send command on prepare skill
 	sync deaths by time
@@ -9,5 +8,4 @@ multiplayer:
 		if other tank - dont broadcast
 		if tower - host broadcasts
 		if soldier - soldier owner broadcasts
-		if host dc - assign host to other person 
-	find server lib with several rooms support
+		if host dc - assign host to other person

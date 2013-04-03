@@ -120,3 +120,6 @@ function drawImage_rotated(canvas, file, x, y, width, height, angle){
 	canvas.drawImage(img, -(width/2), -(height/2));
 	canvas.restore();
 	}
+function convertToSlug(Text){
+	return Text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
+}

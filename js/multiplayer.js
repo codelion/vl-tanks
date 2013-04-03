@@ -1,28 +1,29 @@
 var socket;
 var socket_live = false;
+var Room;
+var waiting_users = 0;
 //connecto to sockets server
 function connect_server(){
 	// Create the Orbiter instance, used to connect to and communicate
 	orbiter = new net.user1.orbiter.Orbiter();
 	orbiter.getConnectionMonitor().setAutoReconnectFrequency(15000);
-	orbiter.getLog().setLevel(net.user1.logger.Logger.DEBUG);
+	orbiter.getLog().setLevel(net.user1.logger.Logger.FATAL);
 	
 	// If required JavaScript capabilities are missing, abort
 	if (!orbiter.getSystem().isJavaScriptCompatible())
-		return log("Your browser is not supported.");
+		return alert("Error: your browser do not support JavaScript.");
 	
 	// Register for Orbiter's connection events
 	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.READY, readyListener, this);
 	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.CLOSE, disconnect_server, this);
-	log("Connecting to Union...");
+	//log("Connecting to Union...");
 	
 	// Connect to Union Server
 	orbiter.connect(SOCKET[0], SOCKET[1]);
 	}
 // Triggered when the connection is ready
 function readyListener(e) {
-	log("Connected.");
-	log("Joining room");
+	//log("Connected. Joining room");
 	
 	// Create room on the server
 	SOCKET_ROOM = SOCKET_ROOM_PREFIX+"rooms";
@@ -37,36 +38,80 @@ function readyListener(e) {
 	// Join the room
 	Room.join();
 	}
+function change_room(new_room){
+	new_room = SOCKET_ROOM_PREFIX+new_room;
+	if(SOCKET_ROOM==new_room || SOCKET_ROOM=='') return false;
+	//leave
+	Room.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
+	Room.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+	Room.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+	Room.removeMessageListener("CHAT_MESSAGE", get_packet);
+	Room.leave();	
+
+	//new
+	SOCKET_ROOM = new_room;
+	Room = orbiter.getRoomManager().createRoom(SOCKET_ROOM);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+	Room.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+	Room.addMessageListener("CHAT_MESSAGE", get_packet);
+	Room.join();
+	}
 //we joined the room
-function joinRoomListener (e) {
-	log("Ready!");
-	log("Number of people: " + Room.getNumOccupants());
-	socket_live=true;
-	try{
-		parent.document.getElementById("connected").innerHTML = 'yes';
-		}catch(error){}
-	register_tank_action('ask_rooms', false, name);
+function joinRoomListener(e){
+	//log("Ready. Number of people: " + Room.getNumOccupants());
+	//update status
+	if(socket_live==false){
+		socket_live=true;
+		try{
+			parent.document.getElementById("connected").innerHTML = 'yes';
+			}catch(error){}
+		}
 	add_player_to_stats(name);
+	if(SOCKET_ROOM == SOCKET_ROOM_PREFIX+'rooms'){
+		register_tank_action('ask_rooms', false, name);
+		waiting_users = Room.getNumOccupants();
+		draw_rooms_list();
+		}
+	else if(room_id_to_join != -1){
+		register_tank_action('join_room', room_id_to_join, name);
+		draw_room(room_id_to_join);
+		return false;
+		}	
 	}
 //client joins room
 function addOccupantListener (e) {
 	if (Room.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
-		log("User" + e.getClientID() + " joined." + " People: " + Room.getNumOccupants());
+		//log("User" + e.getClientID() + " joined." + " People: " + Room.getNumOccupants());
+		if(PLACE=='rooms'){
+			waiting_users = Room.getNumOccupants();
+			draw_rooms_list();
+			}
 		}
 	}
 //client leaves room
 function removeOccupantListener (e) {
-	log("User" + e.getClientID() + " left." + " People: " + Room.getNumOccupants());
+	//log("User" + e.getClientID() + " left." + " People: " + Room.getNumOccupants());
+	if(PLACE=='rooms'){
+		waiting_users = Room.getNumOccupants();
+		draw_rooms_list();
+		}
 	}
 //disconnect from server
 function disconnect_server(e){
 	quit_game(false);
+	//disconnect
+	if(socket_live == true)
+		orbiter.disconnect();
+	//update status
 	socket_live = false;
-	socket_live=false;  
 	try{
 		parent.document.getElementById("connected").innerHTML = 'no';
 		}catch(error){}
 	}
+
+//==============================================================================
+
 //send packet to server
 function send_packet(type, message){
 	if(message.length == 0){
@@ -145,7 +190,7 @@ function get_packet(fromClient, message){
 		//DATA = [room_id, player_name]
 		var ROOM = get_room_by_id(DATA[0]);
 		if(ROOM.host==DATA[1]){
-			console.log('ERROR: attempt to kick host from room...');
+			console.log('Error: attempt to kick host from room...');
 			return false; // host was kicked, this is probably hack from outside
 			}
 		if(ROOM != false){
@@ -266,7 +311,7 @@ function get_packet(fromClient, message){
 		}
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on tank_move.');
+			if(TANK===false) log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
 			TANK.x = DATA[2][0];
 			TANK.y = DATA[2][1];
 			TANK.move = 1;
@@ -283,7 +328,7 @@ function get_packet(fromClient, message){
 		//DATA = room_id, player, nr=[1,2,3]
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on skill_do.');
+			if(TANK===false) log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
 			var nr = DATA[2];	
 			var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
 			//execute
@@ -319,9 +364,9 @@ function get_packet(fromClient, message){
 		//DATA = room_id, player, killed_tank_id
 		if(DATA[1]==name) return false; 	//already done
 		TANK_TO = get_tank_by_id(DATA[2]);
-		if(TANK_TO===false) log('ERROR: tank_to "'+DATA[2]+'" was not found on tank_kill.');
+		if(TANK_TO===false) log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 		TANK_FROM = get_tank_by_name(DATA[1]);
-		if(TANK_FROM===false) log('ERROR: tank_to "'+DATA[1]+'" was not found on tank_kill.');
+		if(TANK_FROM===false) log('Error: tank_to "'+DATA[1]+'" was not found on tank_kill.');
 		
 		//actions
 		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
@@ -438,7 +483,7 @@ function register_new_room(room_name, mode, type, max_players, map){
 	return ROOM.id;
 	}
 //register new player for total count
-function add_player_to_stats(new_name){
+function add_player_to_stats(new_name){	return false;
 	for(var i in PLAYERS){
 		if(PLAYERS[i] == new_name)
 			return false;
@@ -455,4 +500,6 @@ function sync_multiplayers(){
 			}
 		}
 	}
-
+function get_waiting_players_count(){
+	return waiting_users;
+	}

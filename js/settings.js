@@ -69,6 +69,7 @@ var MY_TANK;				//my tank
 var TO_RADIANS = Math.PI/180; 		//for rotating
 var SKILL_BUTTON = 55;			//skill button width and height
 var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
+var room_id_to_join=-1;			//id of room, requested to join
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

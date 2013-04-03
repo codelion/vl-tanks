@@ -1,6 +1,8 @@
 //rooms list window
 function draw_rooms_list(){
 	PLACE = 'rooms';
+	change_room('rooms');
+	
 	x = 10;
 	y = 10;
 	gap = 10;
@@ -41,14 +43,15 @@ function draw_rooms_list(){
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 14px Arial";
 	canvas_backround.fillText(text, x+letter_padding_left+5, y+(height+font_pixel_to_height(14))/2);
-	y = y + height+10;
-	x = x - 100-10;
-	
+
 	//online players text
-	text = "Online Players: "+PLAYERS.length;
+	text = "Online Players: "+get_waiting_players_count();
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x, y+25);
+	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);
+	
+	y = y + height+10;
+	x = x - 100-10;
 		
 	//show rooms
 	padding_top = 20;
@@ -90,8 +93,11 @@ function draw_rooms_list(){
 			register_button(x+width-70, y, 70, height, PLACE, function(xx, yy, extra){
 				var ROOM = get_room_by_id(extra); 
 				if(ROOM != false && ROOM.players.length < ROOM.max){
-					register_tank_action('join_room', extra, name);
-					draw_room(extra);
+					room_id_to_join = extra;
+					new_room_name = convertToSlug(ROOM.name);
+					change_room(new_room_name);
+					//register_tank_action('join_room', extra, name);
+					//draw_room(extra);
 					}
 				}, ROOMS[i].id);
 	
@@ -296,6 +302,8 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	register_button(10+offset_left, 60+offset_top, 105, 30, PLACE, function(){
 		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map);
 		draw_room(new_id);
+		new_room_name = convertToSlug(game_name);
+		change_room(new_room_name);
 		});	
 	
 	//back button block
@@ -311,6 +319,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	
 	//register back button
 	register_button(10+offset_left+120, 60+offset_top, 105, 30, PLACE, function(){
+		room_id_to_join = -1;
 		draw_rooms_list();
 		});
 	}
@@ -320,6 +329,7 @@ function draw_room(room_id){
 	ROOM = get_room_by_id(room_id);
 	opened_room_id = ROOM.id;
 	players = ROOM.players;
+	
 	x = 10;
 	y = 10;
 	width = 135;
@@ -341,6 +351,7 @@ function draw_room(room_id){
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		register_tank_action('leave_room', ROOM.id, name);
+		room_id_to_join = -1;
 		draw_rooms_list();
 		});
 	//text
