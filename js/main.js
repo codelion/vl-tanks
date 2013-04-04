@@ -361,6 +361,9 @@ function quit_game(init_next_game){
 	clearInterval(level_hp_regen_id);
 	clearInterval(timed_functions_id);	
 	clearInterval(start_game_timer_id);
+	//chrome bugfix
+	clearInterval(chat_interval_id);	
+	chat_interval_id = setInterval(controll_chat, 1000);
 	
 	starting_timer = -1;
 	ROOMS = [];
@@ -380,8 +383,10 @@ function quit_game(init_next_game){
 			audio_main.pause();
 		
 		//leave_game(name, opened_room_id);
-		if(game_mode == 2)
+		if(game_mode == 2){
 			register_tank_action('leave_game', opened_room_id, name);
+			room_controller();
+			}
 		opened_room_id = -1;
 		
 		if(FS==true){
@@ -489,8 +494,8 @@ function chat(text, author, team){
 		});
 	}
 //controlls chat lines
-function controll_chat(){ 
-	if(CHAT_LINES.length==0) return false;	
+function controll_chat(){
+	if(CHAT_LINES.length==0) return false;
 	
 	//remove old
 	var time = new Date();

@@ -252,7 +252,7 @@ function draw_main(){
 							if(distance_b > BULLETS[b].aoe_splash_range)	
 								continue;	//too far
 							//do damage
-							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor, 1);
+							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor);
 							
 							//extra effects for non tower
 							if(TYPES[TANKS[ii].type].type != 'tower'){
@@ -673,6 +673,7 @@ function draw_tank_select_screen(selected_tank){
 	PLACE = 'select';
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+	room_controller();
 	
 	var y = 10;
 	var gap = 5;

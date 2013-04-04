@@ -1,116 +1,135 @@
 var socket;
 var socket_live = false;
-var Room;
+var orbiter;
+var Rooms_obj;
+var Room_id_obj;
 var waiting_users = 0;
+var SOCKET_ROOMS = '';
+var SOCKET_ROOM_ID = '';
+
+//===== LIBRARY ================================================================
+
 //connecto to sockets server
 function connect_server(){
-	// Create the Orbiter instance, used to connect to and communicate
 	orbiter = new net.user1.orbiter.Orbiter();
 	orbiter.getConnectionMonitor().setAutoReconnectFrequency(15000);
 	orbiter.getLog().setLevel(net.user1.logger.Logger.FATAL);
-	
-	// If required JavaScript capabilities are missing, abort
 	if (!orbiter.getSystem().isJavaScriptCompatible())
 		return alert("Error: your browser do not support JavaScript.");
-	
-	// Register for Orbiter's connection events
 	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.READY, readyListener, this);
 	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.CLOSE, disconnect_server, this);
-	//log("Connecting to Union...");
-	
-	// Connect to Union Server
 	orbiter.connect(SOCKET[0], SOCKET[1]);
 	}
-// Triggered when the connection is ready
-function readyListener(e) {
-	//log("Connected. Joining room");
-	
-	// Create room on the server
-	SOCKET_ROOM = SOCKET_ROOM_PREFIX+"rooms";
-	Room = orbiter.getRoomManager().createRoom(SOCKET_ROOM);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
-	
-	// Listen for messages
-	Room.addMessageListener("CHAT_MESSAGE", get_packet);
-	
-	// Join the room
-	Room.join();
+//on connection ready
+function readyListener(e){
+	SOCKET_ROOMS = SOCKET_ROOM_PREFIX+"rooms";
+	Rooms_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOMS);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+	Rooms_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner);
+	Rooms_obj.join();
+	//status
+	socket_live = true;
+	try{parent.document.getElementById("connected").innerHTML = 'Yes';}catch(error){}
 	}
-function change_room(new_room){
-	new_room = SOCKET_ROOM_PREFIX+new_room;
-	if(SOCKET_ROOM==new_room || SOCKET_ROOM=='') return false;
-	//leave
-	Room.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
-	Room.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
-	Room.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
-	Room.removeMessageListener("CHAT_MESSAGE", get_packet);
-	Room.leave();	
-
-	//new
-	SOCKET_ROOM = new_room;
-	Room = orbiter.getRoomManager().createRoom(SOCKET_ROOM);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
-	Room.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
-	Room.addMessageListener("CHAT_MESSAGE", get_packet);
-	Room.join();
+//controlls which rooms to join and leave
+function room_controller(new_room){
+	if(socket_live == false) return false;
+	if((PLACE == 'rooms' || PLACE == 'room' || PLACE == 'create_room') && SOCKET_ROOMS==''){
+		//connect to rooms list
+		SOCKET_ROOMS = SOCKET_ROOM_PREFIX+"rooms";
+		Rooms_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOMS);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+		Rooms_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner);
+		Rooms_obj.join();
+		}
+	else if(PLACE == 'select' && SOCKET_ROOMS != ''){
+		//disconnect from all rooms
+		SOCKET_ROOMS = '';
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+		Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
+		Rooms_obj.leave();
+		}
+	else if(PLACE == 'rooms' && SOCKET_ROOM_ID != ''){
+		//disconnect from last room
+		SOCKET_ROOM_ID = '';
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener_id);
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener_id);
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);
+		Room_id_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner_id);
+		Room_id_obj.leave();
+		}
+	else if((PLACE == 'room' || PLACE == 'select' || PLACE == 'game') && SOCKET_ROOM_ID==''){
+		//connect to room
+		SOCKET_ROOM_ID = SOCKET_ROOM_PREFIX+new_room;
+		Room_id_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOM_ID);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener_id);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener_id);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);  
+		Room_id_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner_id);
+		Room_id_obj.join();
+		}
 	}
 //we joined the room
-function joinRoomListener(e){
-	//log("Ready. Number of people: " + Room.getNumOccupants());
-	//update status
-	if(socket_live==false){
-		socket_live=true;
-		try{
-			parent.document.getElementById("connected").innerHTML = 'yes';
-			}catch(error){}
-		}
-	add_player_to_stats(name);
-	if(SOCKET_ROOM == SOCKET_ROOM_PREFIX+'rooms'){
-		register_tank_action('ask_rooms', false, name);
-		waiting_users = Room.getNumOccupants();
-		draw_rooms_list();
-		}
-	else if(room_id_to_join != -1){
+function joinRoomsListener(e){
+	//redraw list
+	register_tank_action('ask_rooms', false, name);
+	waiting_users = Rooms_obj.getNumOccupants();
+	draw_rooms_list();
+	}
+function joinRoomListener_id(e){
+	if(room_id_to_join != -1){
 		register_tank_action('join_room', room_id_to_join, name);
 		draw_room(room_id_to_join);
-		return false;
+		room_id_to_join = -1;
 		}	
 	}
 //client joins room
 function addOccupantListener (e) {
-	if (Room.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
-		//log("User" + e.getClientID() + " joined." + " People: " + Room.getNumOccupants());
+	if (Rooms_obj.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
 		if(PLACE=='rooms'){
-			waiting_users = Room.getNumOccupants();
+			waiting_users = Rooms_obj.getNumOccupants();
 			draw_rooms_list();
 			}
 		}
 	}
+function addOccupantListener_id (e) {}
 //client leaves room
 function removeOccupantListener (e) {
-	//log("User" + e.getClientID() + " left." + " People: " + Room.getNumOccupants());
 	if(PLACE=='rooms'){
-		waiting_users = Room.getNumOccupants();
+		waiting_users = Rooms_obj.getNumOccupants();
 		draw_rooms_list();
 		}
 	}
-//disconnect from server
+function removeOccupantListener_id (e) {}
+//do clean disconnect from server
 function disconnect_server(e){
 	quit_game(false);
 	//disconnect
-	if(socket_live == true)
+	if(socket_live == true){
+		if(SOCKET_ROOMS != '')
+			Rooms_obj.leave();
+		if(SOCKET_ROOM_ID != '')	
+			Room_id_obj.leave();
 		orbiter.disconnect();
+		}
 	//update status
 	socket_live = false;
-	try{
-		parent.document.getElementById("connected").innerHTML = 'no';
-		}catch(error){}
+	try{parent.document.getElementById("connected").innerHTML = 'no';}catch(error){}
+	}
+function get_packet_inner(fromClient, message){
+	get_packet(fromClient, message);
+	}
+function get_packet_inner_id(fromClient, message){
+	get_packet(fromClient, message);
 	}
 
-//==============================================================================
+//===== COMMUNICATION ==========================================================
 
 //send packet to server
 function send_packet(type, message){
@@ -131,7 +150,12 @@ function send_packet(type, message){
 		message: message,
 		};
 	message = JSON.stringify(message);
-	Room.sendMessage("CHAT_MESSAGE", "true", null, message);
+	if(SOCKET_ROOMS != '')
+		Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
+	else if(SOCKET_ROOM_ID != '')
+		Room_id_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
+	else
+		log('Error: we are not joined any room.');
 	}
 //get packets from server
 function get_packet(fromClient, message){	
@@ -147,7 +171,6 @@ function get_packet(fromClient, message){
 		var n = ROOMS.length;
 		if(get_room_by_id(DATA.id)!= false) return false;
 		ROOMS.push(DATA);
-		add_player_to_stats(DATA.host);
 		if(PLACE=='rooms')
 			draw_rooms_list();
 		}
@@ -170,7 +193,6 @@ function get_packet(fromClient, message){
 			if(ROOM.host==name)
 				send_packet('new_room', ROOM);	//broadcast it
 			}
-		add_player_to_stats(DATA);
 		}
 	else if(type == 'leave_room'){	//player leaving room
 		//DATA = [room_id, player_name]
@@ -234,7 +256,6 @@ function get_packet(fromClient, message){
 			if(PLACE=='room')
 				draw_room(ROOM.id);
 			}
-		add_player_to_stats(DATA[1]);
 		}
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
 		if(PLACE=="room" && opened_room_id==DATA){
@@ -362,7 +383,6 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'tank_kill'){	//tank was killed
 		//DATA = room_id, player, killed_tank_id
-		if(DATA[1]==name) return false; 	//already done
 		TANK_TO = get_tank_by_id(DATA[2]);
 		if(TANK_TO===false) log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 		TANK_FROM = get_tank_by_name(DATA[1]);
@@ -372,8 +392,8 @@ function get_packet(fromClient, message){
 		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
 		else				TANK_TO.deaths = TANK_TO.deaths + 1;
 		
-		//tower dead - decreasing base armor
 		if(TYPES[TANK_TO.type].name == "Tower"){
+			//change base stats
 			for(var b in TANKS){
 				if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
 					TANKS[b].armor = TANKS[b].armor - 10;
@@ -381,6 +401,7 @@ function get_packet(fromClient, message){
 						TANKS[b].armor = 0;	
 					}
 				}
+			//removing tower
 			for(var b in TANKS){
 				if(TANKS[b].id==TANK_TO.id){	
 					TANKS.splice(b, 1);  b--;
@@ -388,6 +409,7 @@ function get_packet(fromClient, message){
 					}
 				}
 			}
+		//adding kill stats
 		if(TYPES[TANK_TO.type].no_repawn == undefined){
 			//player
 			if(TANK_FROM.kills == undefined)	TANK_FROM.kills = 1;
@@ -481,15 +503,6 @@ function register_new_room(room_name, mode, type, max_players, map){
 	ROOMS.push(ROOM);
 	send_packet('new_room', ROOM);						//broadcast it
 	return ROOM.id;
-	}
-//register new player for total count
-function add_player_to_stats(new_name){	return false;
-	for(var i in PLAYERS){
-		if(PLAYERS[i] == new_name)
-			return false;
-		}
-	//unique name
-	PLAYERS.push(new_name);
 	}
 //sync multiplayer data to local room data
 function sync_multiplayers(){

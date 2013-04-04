@@ -12,11 +12,11 @@ HTML5 based tank game. Requires Firefox, Chrome or Safari.
 * using html5, no flash
 
 ## Getting Started
-* no install - just download and open index.html in modern browser.
-* or use quick access - http://htmlpreview.github.com/?https://github.com/viliusle/vl-tanks/blob/master/index.html (do not work with Google Chrome)
-* If graphics are not loaded, try: download ZIP arcive and open it, refresh page and change quality in game.
+* http://viliusle.github.com/vl-tanks/ Play with Forefox or Chrome.
+* or download and open index.html in modern browser to play dev version
 
 ## Latest News
+* added multiplayer server (there are still sync. issues)
 * added units skills
 * added brains for soldiers (AI)
 * added new map, and more units

@@ -1,7 +1,7 @@
 //rooms list window
 function draw_rooms_list(){
 	PLACE = 'rooms';
-	change_room('rooms');
+	room_controller();
 	
 	x = 10;
 	y = 10;
@@ -93,11 +93,11 @@ function draw_rooms_list(){
 			register_button(x+width-70, y, 70, height, PLACE, function(xx, yy, extra){
 				var ROOM = get_room_by_id(extra); 
 				if(ROOM != false && ROOM.players.length < ROOM.max){
+					draw_room(extra);
 					room_id_to_join = extra;
-					new_room_name = convertToSlug(ROOM.name);
-					change_room(new_room_name);
+					new_room_name = convertToSlug(ROOM.name);  log('join....');
+					room_controller(new_room_name);
 					//register_tank_action('join_room', extra, name);
-					//draw_room(extra);
 					}
 				}, ROOMS[i].id);
 	
@@ -227,7 +227,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Game Mode:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = ['normal', 'random', 'mirror', 'freedom'];
+	values = ['normal', 'random', 'mirror'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";
@@ -303,7 +303,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map);
 		draw_room(new_id);
 		new_room_name = convertToSlug(game_name);
-		change_room(new_room_name);
+		room_controller(new_room_name);
 		});	
 	
 	//back button block
@@ -374,7 +374,7 @@ function draw_room(room_id){
 		register_button(x, y, width, height, PLACE, function(xx, yy){
 			//check if room has correct player number
 			var room_tmp = get_room_by_id(opened_room_id);
-			if(room_tmp == false /*|| room_tmp.players.length%2==1*/){
+			if(room_tmp == false || room_tmp.players.length%2==1){
 				return false;	//error or wrong count
 				}
 			//show select tanks room

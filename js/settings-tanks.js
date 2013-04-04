@@ -112,7 +112,7 @@ TYPES.push({
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Mortar',	passive: false,		broadcast: 1}, 
+		{name: 'Mortar',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
@@ -191,7 +191,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Virus',	passive: false,		broadcast: 1}, 
+		{name: 'Virus',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
@@ -245,7 +245,7 @@ TYPES.push({
 	bonus: 1,
 	no_collisions: 1,
 	abilities: [
-		{name: 'Airstrike',	passive: false,		broadcast: 1}, 
+		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
 		],
 	size: ['M', 50],
 	icon_top: [	],
@@ -272,7 +272,7 @@ TYPES.push({
 	bonus: 1,
 	no_collisions: 1,
 	abilities: [
-		{name: 'Bomb',	passive: false,		broadcast: 1}, 
+		{name: 'Bomb',	passive: false,		broadcast: 2}, 
 		],
 	size: ['M', 50],
 	icon_top: [	],
