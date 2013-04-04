@@ -348,7 +348,8 @@ function draw_main(){
 	lastLoop = thisLoop;
 	
 	//request next draw
-	requestAnimationFrame(draw_main);
+	if(window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame)
+		requestAnimationFrame(draw_main);
 	}
 var settings_positions = [];
 var last_active_tab = -1;
