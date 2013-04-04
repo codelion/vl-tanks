@@ -594,6 +594,7 @@ function draw_tank_move(mouseX, mouseY){
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY), target_lock_id]);
 			else
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
+			TANK.move = 0;
 			return false;
 			}
 		else{

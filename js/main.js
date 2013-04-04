@@ -340,16 +340,6 @@ function timed_functions_handler(){
 	}
 //quit button - quits all possible actions
 function quit_game(init_next_game){
-	if(PLACE=='init'){
-		//disconnect
-		/*if(socket_live == true)
-			orbiter.disconnect();
-		//update status
-		socket_live = false;
-		try{
-			parent.document.getElementById("connected").innerHTML = 'no';
-			}catch(error){}*/
-		}
 	if(PLACE=='game' && game_mode == 2){
 		if(confirm("Do you really want to quit game?")==false)
 			return false;

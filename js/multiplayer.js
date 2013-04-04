@@ -109,7 +109,6 @@ function removeOccupantListener (e) {
 function removeOccupantListener_id (e) {}
 //do clean disconnect from server
 function disconnect_server(e){
-	quit_game(false);
 	//disconnect
 	if(socket_live == true){
 		if(SOCKET_ROOMS != '')
@@ -316,20 +315,17 @@ function get_packet(fromClient, message){
 	else if(type == 'leave_game'){		//player leaving game
 		//DATA = [room_id, player_name]
 		chat(DATA[1]+" left the game.", false, false);
-		}	
+		}
 	else if(type == 'tank_move'){		//tank move
 		//DATA = room_id, player, [from_x, from_y, to_x, to_y, lock] 
 		if(DATA[1] == name && muted==false){
 			try{
 				audio_finish = document.createElement('audio');
-				if(Math.floor(Math.random()*10) < 5)
-					audio_finish.setAttribute('src', 'sounds/click1.ogg');
-				else
-					audio_finish.setAttribute('src', 'sounds/click2.ogg');
+				audio_finish.setAttribute('src', 'sounds/click.ogg');
 				audio_finish.play();
 				}
 			catch(error){}
-		}
+			}
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
 			if(TANK===false) log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
@@ -369,9 +365,6 @@ function get_packet(fromClient, message){
 				}
 			}
 		}
-	else if(type == 'leave_game'){	//player leaving game
-		//DATA = room_id, player
-		}	
 	else if(type == 'chat'){		//chat
 		//DATA = room_id, data, player, team, place
 		if(PLACE != DATA[4]) return false;
@@ -515,4 +508,10 @@ function sync_multiplayers(){
 	}
 function get_waiting_players_count(){
 	return waiting_users;
+	}
+function disconnect_game(e){
+	if(PLACE=='game' && game_mode == 2){
+		if(confirm("Do you really want to quit game???")==false)
+			return false;
+		}
 	}

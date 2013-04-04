@@ -81,7 +81,7 @@ var start_game_timer_id;		//controller for timer in select window
 var chat_interval_id;			//controller for chat
 
 //keyboard and mouse capture handlers
-window.onbeforeunload = disconnect_server;
+window.onbeforeunload = disconnect_game;
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
