@@ -348,7 +348,7 @@ function draw_main(){
 	lastLoop = thisLoop;
 	
 	//request next draw
-	if(window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame)
+	if(render_mode == 'requestAnimationFrame')
 		requestAnimationFrame(draw_main);
 	}
 var settings_positions = [];

@@ -249,7 +249,7 @@ function init_action(map_nr, my_team){
 				|| window.mozRequestAnimationFrame 
 				|| window.webkitRequestAnimationFrame 
 				|| window.msRequestAnimationFrame
-				|| function(callback){ setInterval(callback, 1000/25); };
+				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
 	window.requestAnimationFrame = requestAnimationFrame;
 	draw_interval_id = requestAnimationFrame(draw_main);
 
