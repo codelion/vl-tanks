@@ -128,7 +128,7 @@ function on_mousedown(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
-	mouse_click_pos = [mouseX,mouseY];
+	mouse_click_pos = [mouseX, mouseY];
 	if(PLACE != 'game'){
 		for(var i in BUTTONS){
 			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;

@@ -16,7 +16,7 @@ HTML5 based tank game. Requires Firefox, Chrome or Opera.
 * or download and open index.html in modern browser to play dev version
 
 ## Latest News
-* added multiplayer server (there are still sync. issues)
+* added multiplayer server
 * added units skills
 * added brains for soldiers (AI)
 * added new map, and more units

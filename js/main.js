@@ -7,6 +7,8 @@ Email: www.viliusl@gmail.com
 //init hello screen
 function init_game(first_time){
 	PLACE = 'init';
+	if(socket_live == true)
+		room_controller();
 	
 	//check if muted
 	if(getCookie("muted") != '')
@@ -39,7 +41,7 @@ function init_game(first_time){
 		if(first_time==true){
 			preload_all_files();
 			if(chat_interval_id==undefined)
-				chat_interval_id = setInterval(controll_chat, 1000);
+				chat_interval_id = setInterval(controll_chat, 500);
 			}
 		if(preloaded==true)
 			add_first_screen_elements();
@@ -334,6 +336,7 @@ function timed_functions_handler(){
 		if(timed_functions[i].duration<0){
 			if(timed_functions[i].type == 'ON_END')
 				window[timed_functions[i].function](timed_functions[i]);
+			//unregister f-tion
 			timed_functions.splice(i, 1);	i++;
 			}
 		}
@@ -353,7 +356,7 @@ function quit_game(init_next_game){
 	clearInterval(start_game_timer_id);
 	//chrome bugfix
 	clearInterval(chat_interval_id);	
-	chat_interval_id = setInterval(controll_chat, 1000);
+	chat_interval_id = setInterval(controll_chat, 500);
 	
 	starting_timer = -1;
 	ROOMS = [];
@@ -390,6 +393,11 @@ function quit_game(init_next_game){
 			}
 		opened_room_id = -1;
 		}
+	try{
+		parent.document.getElementById("messages_in").innerHTML = 0;
+		parent.document.getElementById("messages_out").innerHTML = 0;
+		}catch(error){}
+	
 	if(init_next_game!=false){
 		init_game(false);
 		}
@@ -490,7 +498,7 @@ function controll_chat(){
 	//remove old
 	var time = new Date();
 	time = time.getTime();
-	var max_time = 10000;
+	var max_time = 10000;	//10s
 	for(var i in CHAT_LINES){
 		if(time - CHAT_LINES[i].time > max_time){
 			CHAT_LINES.splice(i, 1); i--;

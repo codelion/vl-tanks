@@ -503,8 +503,7 @@ function add_player_name(tank){
 	var player_name = ""+tank.name+" "+tank.level+"";
 	player_name = player_name.substring(0, 15);
 	var name_padding = round((TYPES[tank.type].size[1] - 5*player_name.length)/2);	//in pixels 5px per letter
-	
-
+	if(name_padding<0) name_padding = 0;
 	
 	if(tank.cache_name != undefined && tank.cache_name.level == tank.level){
 		//read from cache
@@ -594,7 +593,7 @@ function draw_tank_move(mouseX, mouseY){
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY), target_lock_id]);
 			else
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
-			TANK.move = 0;
+			MY_TANK.move = 0;
 			return false;
 			}
 		else{
@@ -937,13 +936,15 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force){
 	if(TANK_TO == undefined) return false;
 	if(TANK_TO.dead == 1) return false;
 	
-	//accuracy
-	var accuracy = TYPES[TANK.type].accuracy;
-	if(TANK.move==1)
-		accuracy = accuracy-10;
-	if(TANK_TO.move==1)
-		accuracy = accuracy-10;
-	if(getRandomInt(1, 10) > accuracy/10) return false;
+	//accuracy - do not work in multiplayer, must enable bullets sync !!!
+	if(game_mode == 1){
+		var accuracy = TYPES[TANK.type].accuracy;
+		if(TANK.move==1)
+			accuracy = accuracy-10;
+		if(TANK_TO.move==1)
+			accuracy = accuracy-10;
+		if(getRandomInt(1, 10) > accuracy/10) return false;
+		}
 	
 	//sound	fire_sound - i was hit
 	if(TANK_TO.id == MY_TANK.id && muted==false){
@@ -1027,10 +1028,12 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force){
 			redraw_tank_stats();
 		
 		//updates deaths
-		if(TANK_TO.deaths == undefined)
-			TANK_TO.deaths = 1;
-		else
-			TANK_TO.deaths = TANK_TO.deaths + 1;
+		if(game_mode == 1){
+			if(TANK_TO.deaths == undefined)
+				TANK_TO.deaths = 1;
+			else
+				TANK_TO.deaths = TANK_TO.deaths + 1;
+			}
 		//find killer
 		var killer = TANK;
 		if(TANK.master != undefined){
@@ -1057,7 +1060,7 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force){
 				}
 			if(game_mode == 2){
 				if(check_if_broadcast_kill(TANK, TANK_TO)==true)
-					register_tank_action('kill', opened_room_id, killer.name, TANK_TO.id);
+					register_tank_action('kill', opened_room_id, killer.id, TANK_TO.id);
 				}
 			else{
 				//remove tank
@@ -1085,13 +1088,14 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force){
 					TANK.score = TANK.score + 20;	// +20 for kill
 					}
 				if(game_mode==2){
-					var killer = killer.name;
-					if(killer != undefined)
+					if(killer.name != '' && check_if_broadcast_kill(TANK, TANK_TO)==true)
 						register_tank_action('chat', opened_room_id, false, "Player "+TANK_TO.name+" was killed by "+killer.name+"!");
 					}	
 				}
-			if(game_mode == 2 && TYPES[TANK_TO.type].type != 'human' && check_if_broadcast_kill(TANK, TANK_TO)==true)
-				register_tank_action('kill', opened_room_id, killer.name, TANK_TO.id);
+			if(game_mode == 2 && TYPES[TANK_TO.type].type != 'human'){
+				if(check_if_broadcast_kill(TANK, TANK_TO)==true)
+					register_tank_action('kill', opened_room_id, killer.id, TANK_TO.id);
+				}
 		
 			//player death			
 			if(game_mode == 1)
@@ -1104,7 +1108,7 @@ function check_if_broadcast_kill(KILLER, VICTIM){
 	var ROOM = get_room_by_id(opened_room_id);
 	
 	//me killer
-	if(KILLER.name = name) return true;	
+	if(KILLER.name == name) return true;	
 	
 	//only host broadcast tower kills
 	if(TYPES[KILLER.type].type == 'tower' && ROOM.host == name) return true; 
@@ -1145,7 +1149,7 @@ function add_towers(){
 				break;
 				}
 			}
-		if(type=='') alert('ERROR: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
+		if(type=='') alert('Error: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
 		var team = MAPS[level-1]['towers'][i][0];	
 		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
 		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
@@ -1320,12 +1324,8 @@ function get_tank_by_coords(mouseX, mouseY, team, tank_from){
 		if(team != undefined && TANKS[i].team != team) continue;
 		if(Math.abs(TANKS[i].x+size_to_half - mouseX) < size_to_half && Math.abs(TANKS[i].y+size_to_half - mouseY) < size_to_half){
 			distance = get_distance_between_tanks(TANKS[i], tank_from);
-			return {
-				index: i,
-				id: TANKS[i].id,
-				range: distance,
-				type: TANKS[i].type,
-				};
+			TANKS[i].tmp_range = distance;
+			return TANKS[i];
 			}
 		}
 	return false;

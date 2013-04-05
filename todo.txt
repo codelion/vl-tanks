@@ -1,3 +1,2 @@
-active skills, dont send command on prepare skill, after effect only
-sync ai actions
-sync every bullet???
+sync AI actions
+sync every bullet? + enable accuracy

@@ -68,6 +68,11 @@ function draw_main(){
 					}
 				}
 			
+			//check stun
+			if(TANKS[i].stun - Date.now() < 0){
+				delete TANKS[i].stun;
+				}
+			
 			if(PLACE != 'game') return false;
 			var tank_size =  TYPES[TANKS[i].type].size[1];
 			
@@ -98,7 +103,7 @@ function draw_main(){
 						TANKS[i].move = 0;
 						delete TANKS[i].target_move_lock;
 						delete TANKS[i].move_to;
-						window[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked]);
+						window[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
 						delete TANKS[i].reach_tank_and_execute;
 						}
 					//reached targeted enemy for general attack
@@ -124,7 +129,7 @@ function draw_main(){
 					TANKS[i].move = 0;
 					delete TANKS[i].target_move_lock;
 					delete TANKS[i].move_to;
-					window[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true);
+					window[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true, true);
 					delete TANKS[i].reach_pos_and_execute;
 					}
 				}
@@ -197,13 +202,12 @@ function draw_main(){
 	        			b_dist_y = BULLETS[b].bullet_to_area[1] - BULLETS[b].y; 
 	        			}
 	        		else{
-	        			log('ERROR: bullet without target');
+	        			console.log('Error: bullet without target');
 	        			continue;
 	        			}
-				
+				//bullet details
 				b_distance = Math.sqrt((b_dist_x*b_dist_x)+(b_dist_y*b_dist_y));
 				b_radiance = Math.atan2(b_dist_y, b_dist_x); 
-				
 				var bullet = get_bullet(TYPES[TANKS[i].type].bullet);
 				if(BULLETS[b].bullet_icon != undefined)
 					var bullet = get_bullet(BULLETS[b].bullet_icon);
@@ -213,7 +217,7 @@ function draw_main(){
 					if(TYPES[TANKS[i].type].aoe != undefined)
 						bullet_speed_tmp = 1000;
 					else{
-						log("ERROR: missing bullet stats for "+TANKS[i].id+" in draw_main()");
+						console.log("Error: missing bullet stats for "+TANKS[i].id+" in draw_main()");
 						}
 					}
 				BULLETS[b].x += Math.cos(b_radiance)*bullet_speed_tmp;
@@ -232,8 +236,8 @@ function draw_main(){
 								
 							//extra effects for non tower
 							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].type!='tower'){
-								if(BULLETS[b].stun_effect != undefined)	
-									bullet_target.stun = TANKS[i].id; //stun
+								if(BULLETS[b].stun_effect != undefined)
+									bullet_target.stun = Date.now() + BULLETS[b].stun_effect;
 								}
 							}
 						}
@@ -253,20 +257,6 @@ function draw_main(){
 								continue;	//too far
 							//do damage
 							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor);
-							
-							//extra effects for non tower
-							if(TYPES[TANKS[ii].type].type != 'tower'){
-								if(BULLETS[b].modify_speed != undefined){	//modify speed in %
-									if(TANKS[ii].debuffs == undefined)
-										TANKS[ii].debuffs = [];
-									TANKS[ii].debuffs.push(['slow', BULLETS[b].modify_speed, TANKS[i].id]);
-									}
-								if(BULLETS[b].modify_dps != undefined){	//modify dps in %
-									if(TANKS[ii].debuffs == undefined)
-										TANKS[ii].debuffs = [];
-									TANKS[ii].debuffs.push(['weak', BULLETS[b].modify_dps, TANKS[i].id]);
-									}
-								}
 							}
 						}
 					BULLETS.splice(b, 1); b--;	//must be done after splice
@@ -327,7 +317,7 @@ function draw_main(){
 				}
 			}
 		catch(err){
-			console.log("ERROR: "+err.message);
+			console.log("Error: "+err.message);
 			}
 		}
 	lighten_pixels_all();

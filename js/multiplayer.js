@@ -55,7 +55,7 @@ function room_controller(new_room){
 		Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
 		Rooms_obj.leave();
 		}
-	else if(PLACE == 'rooms' && SOCKET_ROOM_ID != ''){
+	else if((PLACE == 'rooms' || PLACE == 'init') && SOCKET_ROOM_ID != ''){
 		//disconnect from last room
 		SOCKET_ROOM_ID = '';
 		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener_id);
@@ -80,7 +80,8 @@ function joinRoomsListener(e){
 	//redraw list
 	register_tank_action('ask_rooms', false, name);
 	waiting_users = Rooms_obj.getNumOccupants();
-	draw_rooms_list();
+	if(PLACE=='rooms')
+		draw_rooms_list();
 	}
 function joinRoomListener_id(e){
 	if(room_id_to_join != -1){
@@ -140,10 +141,23 @@ function send_packet(type, message){
 		console.log('Error: trying to send without connection: '+type);
 		return false;
 		}
-	console.log("send message: "+type);
+	if(NETWORK_PACKETS_LOG)
+		console.log("["+type+"]------->");
+	
+	//log packets count
+	packets_sent = 0;
 	try{
-		parent.document.getElementById("messages_out").innerHTML = parseInt(parent.document.getElementById("messages_out").innerHTML)+1;
+		packets_sent = parseInt(parent.document.getElementById("messages_out").innerHTML);
 		}catch(error){}
+	if(packets_sent>MAX_SENT_PACKETS){
+		console.log('Error: '+MAX_SENT_PACKETS+' packets reached.');
+		return false;
+		}
+	try{
+		parent.document.getElementById("messages_out").innerHTML = packets_sent+1;
+		}catch(error){}
+	
+	//make and send message
 	message = {
 		type: type,
 		message: message,
@@ -154,7 +168,7 @@ function send_packet(type, message){
 	else if(SOCKET_ROOM_ID != '')
 		Room_id_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
 	else
-		log('Error: we are not joined any room.');
+		console.log('Error: we are not joined any room.');
 	}
 //get packets from server
 function get_packet(fromClient, message){	
@@ -164,7 +178,8 @@ function get_packet(fromClient, message){
 	DATA = JSON.parse(message);
 	var type = DATA.type;
 	DATA = DATA.message;
-	console.log("reveived message: "+type);
+	if(NETWORK_PACKETS_LOG)
+		console.log("<-------["+type+"]");
 	
 	if(type == 'new_room'){		//new room was created
 		var n = ROOMS.length;
@@ -328,7 +343,7 @@ function get_packet(fromClient, message){
 			}
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
+			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
 			TANK.x = DATA[2][0];
 			TANK.y = DATA[2][1];
 			TANK.move = 1;
@@ -343,25 +358,24 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'skill_do'){	//tank skill start
 		//DATA = room_id, player, nr=[1,2,3]
-		if(PLACE=="game" && opened_room_id==DATA[0]){
-			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
-			var nr = DATA[2];	
-			var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
-			//execute
-			var ability_reuse = window[ability_function](TANK);
-			if(ability_reuse != undefined && ability_reuse != 0){
-				TANK['ability_'+nr+'_in_use']=1;
-				if(DATA[1] == name){
-					var tmp = new Array();
-					tmp['function'] = "draw_ability_reuse";
-					tmp['duration'] = ability_reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = ability_reuse;
-					tmp['tank'] = TANK;
-					timed_functions.push(tmp);
-					}
+		if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
+		TANK = get_tank_by_name(DATA[1]);
+		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
+		var nr = DATA[2];	
+		var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
+		//execute
+		var ability_reuse = window[ability_function](TANK);
+		if(ability_reuse != undefined && ability_reuse != 0){
+			TANK['ability_'+nr+'_in_use']=1;
+			if(DATA[1] == name){
+				var tmp = new Array();
+				tmp['function'] = "draw_ability_reuse";
+				tmp['duration'] = ability_reuse;
+				tmp['type'] = 'REPEAT';
+				tmp['nr'] = nr-1;	
+				tmp['max'] = ability_reuse;
+				tmp['tank'] = TANK;
+				timed_functions.push(tmp);
 				}
 			}
 		}
@@ -374,12 +388,38 @@ function get_packet(fromClient, message){
 		if(DATA[2] != name)
 			chat(DATA[1], DATA[2], DATA[3]);
 		}
+	else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
+		/*DATA = room_id, player, {
+				function: 'function_name',
+				fparam: [param1, param2, param3],
+				tank_params: [	{key: 'xxxx', value: 'xxxx'},	]
+				}*/
+		if(PLACE != "game" || opened_room_id != DATA[0]) return false;
+		TANK = get_tank_by_name(DATA[1]);
+		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
+		var skill_data = DATA[2];
+		//adding extra info to tank
+		for(var i in skill_data.tank_params){
+			var key = skill_data.tank_params[i].key;
+			TANK[key] = skill_data.tank_params[i].value
+			}
+		//executing function
+		var function_name = skill_data.function;
+		if(function_name != '')	
+			window[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+		}
 	else if(type == 'tank_kill'){	//tank was killed
 		//DATA = room_id, player, killed_tank_id
 		TANK_TO = get_tank_by_id(DATA[2]);
-		if(TANK_TO===false) log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
-		TANK_FROM = get_tank_by_name(DATA[1]);
-		if(TANK_FROM===false) log('Error: tank_to "'+DATA[1]+'" was not found on tank_kill.');
+		if(TANK_TO===false){	
+			console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
+			return false;
+			}
+		TANK_FROM = get_tank_by_id(DATA[1]);
+		if(TANK_FROM===false){
+			console.log('Error: tank_from "'+DATA[1]+'" was not found on tank_kill.');
+			return false;
+			}
 		
 		//actions
 		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
@@ -394,7 +434,9 @@ function get_packet(fromClient, message){
 						TANKS[b].armor = 0;	
 					}
 				}
-			//removing tower
+			}
+		if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			//removing
 			for(var b in TANKS){
 				if(TANKS[b].id==TANK_TO.id){	
 					TANKS.splice(b, 1);  b--;
@@ -406,7 +448,7 @@ function get_packet(fromClient, message){
 		if(TYPES[TANK_TO.type].no_repawn == undefined){
 			//player
 			if(TANK_FROM.kills == undefined)	TANK_FROM.kills = 1;
-			else					TANK_FROM.kills = TANK_FROM.kills + 1;
+			else					TANK_FROM.kills = TANK_FROM.kills + 1;	
 			//score
 			if(TANK_FROM.score == undefined)
 				TANK_FROM.score = 0;
@@ -444,6 +486,9 @@ function register_tank_action(action, room_id, player, data){			//lots of broadc
 		send_packet('change_tank', [room_id, data, player]);
 	else if(action=='kill')
 		send_packet('tank_kill', [room_id, player, data]);
+	else if(action=='skill_advanced'){
+		send_packet('skill_advanced', [room_id, player, data]);
+		}
 	else if(action=='leave_room'){
 		for(var i in ROOMS){
 			if(ROOMS[i].id == room_id){

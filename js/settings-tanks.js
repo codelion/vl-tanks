@@ -103,7 +103,7 @@ TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
-	life: [100, 10],
+	life: [120, 10],
 	damage: [50, 5],	//25 dps
 	range: 150,
 	scout: 110,
@@ -242,7 +242,7 @@ TYPES.push({
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 6,
-	bonus: 1,
+	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
@@ -261,7 +261,7 @@ TYPES.push({
 	name: 'Bomber',
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
-	life: [100, 10],
+	life: [120, 10],
 	damage: [15, 1],	//15 dps
 	range: 60,
 	scout: 110,
@@ -269,7 +269,7 @@ TYPES.push({
 	speed: 35,
 	attack_delay: 1,
 	turn_speed: 4,
-	bonus: 1,
+	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
 		{name: 'Bomb',	passive: false,		broadcast: 2}, 

@@ -196,9 +196,9 @@ function Mortar(TANK, descrition_only){
 	if(descrition_only != undefined)
 		return 'Launch missile with area damage.';
 		
-	var reuse = 20000;
-	var power = 70;
-	var range = 150;
+	var reuse = 20000;	reuse = 1000;
+	var power = 90;		power = 2000;
+	var range = 150;	range = 200;
 	var splash_range = 70;
 		
 	if(TANK.try_mortar != undefined){
@@ -222,17 +222,23 @@ function Mortar_once(TANK){
 function draw_mortar_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_mortar'] != undefined){
+	if(TANK['try_mortar'] != undefined && TANK.name == name){
 		img = new Image();
 		img.src = 'img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
-function do_mortar(tank_id, distance_ok){
+function do_mortar(tank_id, distance_ok, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_mortar == undefined) return false;
-	var mouseX = mouse_click_pos[0];
-	var mouseY = mouse_click_pos[1];
+	if(TANK.name == name){
+		mouseX = mouse_click_pos[0];
+		mouseY = mouse_click_pos[1];
+		}
+	else{
+		mouseX = TANK.mortyr_x;
+		mouseY = TANK.mortyr_y;
+		}
 	var tank_size = TYPES[TANK.type].size[1]/2;
 	
 	if(distance_ok !== true){
@@ -244,22 +250,53 @@ function do_mortar(tank_id, distance_ok){
 		if(distance > TANK.try_mortar[0]){
 			//too far - move to target
 			mouse_click_controll = false;
-			TANK.move = 1;
-			TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
-			TANK.reach_pos_and_execute = [TANK.try_mortar[0], 'do_mortar', mouseX, mouseY, tank_id];
+			if(game_mode == 2 && skip_broadcast !== true){
+				//broadcast
+				DATA = {
+					function: '',
+					fparam: [tank_id, true, true],
+					tank_params: [
+						{key: 'move', value: 1},
+						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'reach_pos_and_execute', value: [TANK.try_mortar[0], 'do_mortar', mouseX, mouseY, tank_id]},
+						{key: 'try_mortar', value: TANK['try_mortar']},
+						{key: 'mortyr_x', value: mouse_click_pos[0]},
+						{key: 'mortyr_y', value: mouse_click_pos[1]},
+						],
+					};
+				register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+				delete TANK.try_mortar;
+				}
+			else{
+				TANK.move = 1;
+				TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
+				TANK.reach_pos_and_execute = [TANK.try_mortar[0], 'do_mortar', mouseX, mouseY, tank_id];
+				}
 			return false;
 			}
 		}
 	//broadcast
-	if(game_mode == 2){
-		//return register_tank_action('skill_do', opened_room_id, name,  nr);
+	if(game_mode == 2 && skip_broadcast !== true){
+		DATA = {
+			function: 'do_mortar',
+			fparam: [tank_id, true, true],
+			tank_params: [
+				{key: 'try_mortar', value: TANK['try_mortar']},
+				{key: 'mortyr_x', value: mouse_click_pos[0]},
+				{key: 'mortyr_y', value: mouse_click_pos[1]},
+				],
+			};
+		register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+		delete TANK.try_mortar;
+		mouse_click_controll = false;
+		return false;
 		}
 	
 	//bullet	
 	var tmp = new Array();
 	tmp['x'] = TANK.x+tank_size;
 	tmp['y'] = TANK.y+tank_size;
-	tmp['bullet_to_area'] = [mouseX, mouseY];	//todo
+	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['bullet_icon'] = 'bomb.png';
 	tmp['aoe_effect'] = 1;
@@ -267,17 +304,19 @@ function do_mortar(tank_id, distance_ok){
 	tmp['damage'] = TANK.try_mortar[2];
 	tmp['pierce_armor'] = 1;
 	BULLETS.push(tmp);
-	
+
 	//init reuse
-	TANK['ability_1_in_use']=1;
-	var tmp = new Array();
-	tmp['function'] = "draw_ability_reuse";
-	tmp['duration'] = TANK.try_mortar[3];
-	tmp['type'] = 'REPEAT';
-	tmp['nr'] = 0;	
-	tmp['max'] = TANK.try_mortar[3];
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	if(game_mode == 1 || TANK.name == name){
+		TANK['ability_1_in_use']=1;
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_mortar[3];
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = 0;	
+		tmp['max'] = TANK.try_mortar[3];
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_mortar;
 	mouse_click_controll = false;	
@@ -397,7 +436,7 @@ function Virus(TANK, descrition_only){
 	if(descrition_only != undefined)
 		return 'Send virus to deactivate enemy for short period.';
 		
-	var reuse = 20000;
+	var reuse = 20000;			reuse = 1000;
 	var duration = 5000;
 	var range = 70;
 		
@@ -410,14 +449,6 @@ function Virus(TANK, descrition_only){
 	mouse_click_controll = true;
 	TANK['try_stun'] = [range, duration, reuse];
 	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "virus_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
-	
 	//return reuse - later, on use
 	return 0;
 	}
@@ -427,53 +458,88 @@ function Virus_once(TANK){
 	if(TANK.abilities_lvl[0]==1)
 		on_click_functions.push(['do_stun', TANK.id]);
 	}
-function virus_stop(object){
-	var TANK = object.tank;
-	for (ii in TANKS){
-		if(TANKS[ii].stun == TANK.id)
-			delete TANKS[ii].stun;
-		}	
-	}
 function draw_virus_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_stun'] != undefined){
+	if(TANK['try_stun'] != undefined && TANK.name == name){
 		img = new Image();
 		img.src = 'img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
-function do_stun(tank_id, enemy){
+function do_stun(tank_id, enemy_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_stun == undefined) return false;
-	var mouseX = mouse_click_pos[0];
-	var mouseY = mouse_click_pos[1];
+	if(TANK.name == name){
+		var mouseX = mouse_click_pos[0];
+		var mouseY = mouse_click_pos[1];
+		}
+	else{
+		mouseX = TANK.stun_x;
+		mouseY = TANK.stun_y;
+		}
 	var tank_size = TYPES[TANK.type].size[1]/2;
 		
 	//find target
-	var target_id = -1;
-	if(enemy==undefined || enemy.id == false){
+	if(enemy_id==undefined){
 		if(TANK.team=='R')
 			enemy = get_tank_by_coords(mouseX, mouseY, 'B', TANK);
 		else
 			enemy = get_tank_by_coords(mouseX, mouseY, 'R', TANK);
 		if(enemy==false) return false;
 		if(enemy.dead == 1) return false;
+		if(enemy.invisibility == 1) return false;
 		
-		if(enemy.range > TANK.try_stun[0]){
+		if(enemy.tmp_range > TANK.try_stun[0]){
 			//too far - move to target
 			mouse_click_controll = false;
-			TANK['target_move_lock'] = enemy.id;
-			TANK.move = 1;
-			TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
-			TANK.reach_tank_and_execute = [TANK.try_stun[0], 'do_stun', tank_id];
+			if(game_mode == 2 && skip_broadcast !== true){
+				//broadcast
+				DATA = {
+					function: '',
+					fparam: [tank_id, enemy_id, true],
+					tank_params: [
+						{key: 'target_move_lock', value: enemy.id},
+						{key: 'move', value: 1},
+						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'reach_tank_and_execute', value: [TANK.try_stun[0], 'do_stun', tank_id]},
+						{key: 'try_stun', value: TANK['try_stun']},
+						{key: 'stun_x', value: mouse_click_pos[0]},
+						{key: 'stun_y', value: mouse_click_pos[1]},
+						],
+					};
+				register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+				delete TANK.try_stun;
+				}
+			else{
+				TANK.target_move_lock = enemy.id;
+				TANK.move = 1;
+				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
+				TANK.reach_tank_and_execute = [TANK.try_stun[0], 'do_stun', tank_id];
+				}
 			return false;
 			}
 		}
+	else{
+		enemy = get_tank_by_id(enemy_id);
+		if(enemy===false) return false;
+		}
 		
 	//broadcast
-	if(game_mode == 2){
-		//return register_tank_action('skill_do', opened_room_id, name,  nr);
+	if(game_mode == 2 && skip_broadcast !== true){
+		DATA = {
+			function: 'do_stun',
+			fparam: [tank_id, enemy_id, true],
+			tank_params: [
+				{key: 'try_stun', value: TANK['try_stun']},
+				{key: 'stun_x', value: mouse_click_pos[0]},
+				{key: 'stun_y', value: mouse_click_pos[1]},
+				],
+			};
+		register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+		delete TANK.try_stun;
+		mouse_click_controll = false;
+		return false;
 		}
 	
 	//bullet	
@@ -488,15 +554,17 @@ function do_stun(tank_id, enemy){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	TANK['ability_1_in_use']=1;
-	var tmp = new Array();
-	tmp['function'] = "draw_ability_reuse";
-	tmp['duration'] = TANK.try_stun[2];
-	tmp['type'] = 'REPEAT';
-	tmp['nr'] = 0;	
-	tmp['max'] = TANK.try_stun[2];
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	if(game_mode == 1 || TANK.name == name){
+		TANK['ability_1_in_use']=1;
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_stun[2];
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = 0;	
+		tmp['max'] = TANK.try_stun[2];
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_stun;
 	mouse_click_controll = false;	
@@ -511,7 +579,7 @@ function Airstrike(TANK, descrition_only){
 		return 'Send 3 missiles to the target.';
 		
 	var reuse = 10000;
-	var power = 100;
+	var power = 70;
 	var range = 150;
 	
 	if(TANK.try_airstrike != undefined){
@@ -535,40 +603,71 @@ function Airstrike_once(TANK){
 function draw_airstrike_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_airstrike'] != undefined){
+	if(TANK['try_airstrike'] != undefined && TANK.name == name){
 		img = new Image();
 		img.src = 'img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
-function do_airstrike(tank_id, enemy){
+function do_airstrike(tank_id, enemy_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_airstrike == undefined) return false;
-	var mouseX = mouse_click_pos[0];
-	var mouseY = mouse_click_pos[1];
-	var tank_size = TYPES[TANK.type].size[1]/2;
+	if(TANK.name == name){
+		var mouseX = mouse_click_pos[0];
+		var mouseY = mouse_click_pos[1];
+		}
+	else{
+		mouseX = TANK.strike_x;
+		mouseY = TANK.strike_y;
+		}
+	var tank_size = TYPES[TANK.type].size[1]/2;		
 
 	//find target
-	var target_id = -1;
-	if(enemy==undefined || enemy.id == false){
+	if(enemy_id==undefined){
 		if(TANK.team=='R')
 			enemy = get_tank_by_coords(mouseX, mouseY, 'B', TANK);
 		else
 			enemy = get_tank_by_coords(mouseX, mouseY, 'R', TANK);
 		if(enemy==false) return false;
 		if(enemy.dead == 1) return false;
+		if(enemy.invisibility == 1) return false;
 		
-		if(enemy.range > TANK.try_airstrike[0]){
+		if(enemy.tmp_range > TANK.try_airstrike[0]){
 			//too far - move to target
 			mouse_click_controll = false;
-			TANK['target_move_lock'] = enemy.id;
-			TANK.move = 1;
-			TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
-			TANK.reach_tank_and_execute = [TANK.try_airstrike[0], 'do_airstrike', tank_id];
+			if(game_mode == 2 && skip_broadcast !== true){
+				//broadcast
+				DATA = {
+					function: '',
+					fparam: [tank_id, enemy_id, true],
+					tank_params: [
+						{key: 'target_move_lock', value: enemy.id},
+						{key: 'move', value: 1},
+						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'reach_tank_and_execute', value: [TANK.try_airstrike[0], 'do_airstrike', tank_id]},
+						{key: 'try_airstrike', value: TANK['try_airstrike']},
+						{key: 'strike_x', value: mouse_click_pos[0]},
+						{key: 'strike_y', value: mouse_click_pos[1]},
+						],
+					};
+				register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+				delete TANK.try_airstrike;
+				}
+			else{
+				TANK.target_move_lock = enemy.id;
+				TANK.move = 1;
+				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
+				TANK.reach_tank_and_execute = [TANK.try_airstrike[0], 'do_airstrike', tank_id];
+				}
 			return false;
 			}
 		}
+	else{
+		enemy = get_tank_by_id(enemy_id);
+		if(enemy===false) return false;
+		}	
 	
+	//find angle
 	dist_x = enemy.x - TANK.x;
 	dist_y = enemy.y - TANK.y;
 	var radiance = Math.atan2(dist_y, dist_x);
@@ -576,8 +675,20 @@ function do_airstrike(tank_id, enemy){
 	angle = round(angle);
 		
 	//broadcast
-	if(game_mode == 2){
-		//return register_tank_action('skill_do', opened_room_id, name,  nr);
+	if(game_mode == 2 && skip_broadcast !== true){
+		DATA = {
+			function: 'do_airstrike',
+			fparam: [tank_id, enemy_id, true],
+			tank_params: [
+				{key: 'try_airstrike', value: TANK['try_airstrike']},
+				{key: 'strike_x', value: mouse_click_pos[0]},
+				{key: 'strike_y', value: mouse_click_pos[1]},
+				],
+			};
+		register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+		delete TANK.try_airstrike;
+		mouse_click_controll = false;
+		return false;
 		}
 		
 	//bullet	
@@ -593,15 +704,17 @@ function do_airstrike(tank_id, enemy){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	TANK['ability_1_in_use']=1;
-	var tmp = new Array();
-	tmp['function'] = "draw_ability_reuse";
-	tmp['duration'] = TANK.try_airstrike[2];
-	tmp['type'] = 'REPEAT';
-	tmp['nr'] = 0;	
-	tmp['max'] = TANK.try_airstrike[2];
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	if(game_mode == 1 || TANK.name == name){
+		TANK['ability_1_in_use']=1;
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_airstrike[2];
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = 0;	
+		tmp['max'] = TANK.try_airstrike[2];
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_airstrike;
 	mouse_click_controll = false;	
@@ -614,7 +727,7 @@ function Bomb(TANK, descrition_only){
 		return 'Drop powerfull bomb with area damage.';
 
 	var reuse = 15000;
-	var power = 150;
+	var power = 110;
 	var range = 60;
 	var splash_range = 70;
 	
@@ -639,17 +752,23 @@ function Bomb_once(TANK){
 function draw_bomb_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_bomb'] != undefined){
+	if(TANK['try_bomb'] != undefined && TANK.name == name){
 		img = new Image();
 		img.src = 'img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
-function do_bomb(tank_id, distance_ok){
+function do_bomb(tank_id, distance_ok, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_bomb == undefined) return false;
-	var mouseX = mouse_click_pos[0];
-	var mouseY = mouse_click_pos[1];
+	if(TANK.name == name){
+		mouseX = mouse_click_pos[0];
+		mouseY = mouse_click_pos[1];
+		}
+	else{
+		mouseX = TANK.bomb_x;
+		mouseY = TANK.bomb_y;
+		}
 	var tank_size = TYPES[TANK.type].size[1]/2;
 
 	if(distance_ok !== true){
@@ -661,23 +780,53 @@ function do_bomb(tank_id, distance_ok){
 		if(distance > TANK.try_bomb[0]){
 			//too far - move to target
 			mouse_click_controll = false;
-			TANK.move = 1;
-			TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
-			TANK.reach_pos_and_execute = [TANK.try_bomb[0], 'do_bomb', mouseX, mouseY, tank_id];
+			if(game_mode == 2 && skip_broadcast !== true){
+				//broadcast
+				DATA = {
+					function: '',
+					fparam: [tank_id, true, true],
+					tank_params: [
+						{key: 'move', value: 1},
+						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'reach_pos_and_execute', value: [TANK.try_bomb[0], 'do_bomb', mouseX, mouseY, tank_id]},
+						{key: 'try_bomb', value: TANK['try_bomb']},
+						{key: 'bomb_x', value: mouse_click_pos[0]},
+						{key: 'bomb_y', value: mouse_click_pos[1]},
+						],
+					};
+				register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+				delete TANK.try_bomb;
+				}
+			else{
+				TANK.move = 1;
+				TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
+				TANK.reach_pos_and_execute = [TANK.try_bomb[0], 'do_bomb', mouseX, mouseY, tank_id];
+				}
 			return false;
 			}
 		}
-		
 	//broadcast
-	if(game_mode == 2){
-		//return register_tank_action('skill_do', opened_room_id, name,  nr);
+	if(game_mode == 2 && skip_broadcast !== true){
+		DATA = {
+			function: 'do_bomb',
+			fparam: [tank_id, true, true],
+			tank_params: [
+				{key: 'try_bomb', value: TANK['try_bomb']},
+				{key: 'bomb_x', value: mouse_click_pos[0]},
+				{key: 'bomb_y', value: mouse_click_pos[1]},
+				],
+			};
+		register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+		delete TANK.try_bomb;
+		mouse_click_controll = false;
+		return false;
 		}
 	
 	//bullet	
 	var tmp = new Array();
 	tmp['x'] = TANK.x+tank_size;
 	tmp['y'] = TANK.y+tank_size;
-	tmp['bullet_to_area'] = [mouseX, mouseY];	//todo
+	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['bullet_icon'] = 'bomb.png';
 	tmp['aoe_effect'] = 1;
@@ -687,15 +836,17 @@ function do_bomb(tank_id, distance_ok){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	TANK['ability_1_in_use']=1;
-	var tmp = new Array();
-	tmp['function'] = "draw_ability_reuse";
-	tmp['duration'] = TANK.try_bomb[3];
-	tmp['type'] = 'REPEAT';
-	tmp['nr'] = 0;	
-	tmp['max'] = TANK.try_bomb[3];
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	if(game_mode == 1 || TANK.name == name){
+		TANK['ability_1_in_use']=1;
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_bomb[3];
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = 0;	
+		tmp['max'] = TANK.try_bomb[3];
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_bomb;
 	mouse_click_controll = false;	
