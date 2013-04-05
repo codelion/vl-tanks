@@ -1,2 +1,3 @@
-sync AI actions
+soldiers in multiplayer
+	sync AI actions
 sync every bullet? + enable accuracy

@@ -3,7 +3,9 @@
 function Soldiers(TANK, descrition_only){
 	var n = 3;
 	if(descrition_only != undefined)
-		return 'Send '+n+' soldiers to the fight.';
+		return 'Send '+n+' soldiers to the fight. Only in single player.';
+	
+	if(game_mode == 2) return 0;
 	
 	//prepare
 	var type = '0';
@@ -358,7 +360,7 @@ function Camouflage_stop(object){
 var MINES = [];
 function Mine(TANK, descrition_only){
 	if(descrition_only != undefined)
-		return 'Put mine on the ground. Sadly we don\'t have mines yet. Sorry.';
+		return 'Put mine on the ground.';
 		
 	var reuse = 10000;
 	var power = 150;
@@ -387,7 +389,7 @@ function Mine_once(TANK){
 function draw_mines(tank_id){
 	var tank = get_tank_by_id(tank_id);
 	for(var i in MINES){
-		if(MINES[i].team != tank.team) continue;	//enemy dont see it
+		if(MINES[i].team != MY_TANK.team) continue;	//enemy dont see it
 		img = new Image();
 		img.src = 'img/map/mine.png';
 		canvas_main.drawImage(img, MINES[i].x-7+map_offset[0], MINES[i].y-7+map_offset[1]);

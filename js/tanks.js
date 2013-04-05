@@ -1,6 +1,7 @@
 //draw single tank
 function draw_tank(tank){
 	if(PLACE != 'game' || tank == undefined) return false;
+	if(tank.invisibility != undefined && tank.team != MY_TANK.team) return false; //enemy in hide mode
 	var tank_size =  TYPES[tank.type].size[1];
 	var visibility = 0;
 	
@@ -457,11 +458,14 @@ function show_skill_description(){
 	if(ability_hover_text.length > limit){
 		var words = ability_hover_text.split(" ");
 		ability_hover_text = '';
+		active_line = 1;
 		for(var i in words){
-			if(ability_hover_text.concat(' ').concat(words[i]).length < limit)
+			if(ability_hover_text.concat(' ').concat(words[i]).length < limit && active_line==1)
 				ability_hover_text = ability_hover_text+" "+words[i];
-			else 
+			else{ 
 				ability_hover_text_more = ability_hover_text_more+" "+words[i];
+				active_line=2;
+				}
 			}
 		}
 	
