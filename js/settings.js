@@ -20,7 +20,7 @@ var HEIGHT_STATUS_AREA = 171;		//status are height
 var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
 var MAX_SENT_PACKETS = 1000;		//max packets, that we can send to server per game, on stable should be 1000+?
 var NETWORK_PACKETS_LOG = false;	//if show sent and received packets log
-var VERSION = "1.1.8";			//app version
+var VERSION = "1.1.9";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
