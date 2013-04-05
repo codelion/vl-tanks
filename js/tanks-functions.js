@@ -196,9 +196,9 @@ function Mortar(TANK, descrition_only){
 	if(descrition_only != undefined)
 		return 'Launch missile with area damage.';
 		
-	var reuse = 20000;	reuse = 1000;
-	var power = 90;		power = 2000;
-	var range = 150;	range = 200;
+	var reuse = 20000;
+	var power = 90;
+	var range = 150;
 	var splash_range = 70;
 		
 	if(TANK.try_mortar != undefined){
@@ -436,7 +436,7 @@ function Virus(TANK, descrition_only){
 	if(descrition_only != undefined)
 		return 'Send virus to deactivate enemy for short period.';
 		
-	var reuse = 20000;			reuse = 1000;
+	var reuse = 20000;
 	var duration = 5000;
 	var range = 70;
 		
