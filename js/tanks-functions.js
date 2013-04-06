@@ -226,7 +226,7 @@ function draw_mortar_marker(tank_id){
 	//some drawings
 	if(TANK['try_mortar'] != undefined && TANK.name == name){
 		img = new Image();
-		img.src = 'img/target.png';
+		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
@@ -391,7 +391,7 @@ function draw_mines(tank_id){
 	for(var i in MINES){
 		if(MINES[i].team != MY_TANK.team) continue;	//enemy dont see it
 		img = new Image();
-		img.src = 'img/map/mine.png';
+		img.src = '../img/map/mine.png';
 		canvas_main.drawImage(img, MINES[i].x-7+map_offset[0], MINES[i].y-7+map_offset[1]);
 		}
 	}
@@ -420,7 +420,7 @@ function check_mines(tank_id){
 		
 					//draw it
 					img = new Image();
-					img.src = 'img/explosion_big.png';
+					img.src = '../img/explosion_big.png';
 					canvas_main.drawImage(img, MINES[m].x-25+map_offset[0], MINES[m].y-25+map_offset[1]);
 					
 					//delete mine
@@ -465,7 +465,7 @@ function draw_virus_marker(tank_id){
 	//some drawings
 	if(TANK['try_stun'] != undefined && TANK.name == name){
 		img = new Image();
-		img.src = 'img/target.png';
+		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
@@ -607,7 +607,7 @@ function draw_airstrike_marker(tank_id){
 	//some drawings
 	if(TANK['try_airstrike'] != undefined && TANK.name == name){
 		img = new Image();
-		img.src = 'img/target.png';
+		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}
@@ -756,7 +756,7 @@ function draw_bomb_marker(tank_id){
 	//some drawings
 	if(TANK['try_bomb'] != undefined && TANK.name == name){
 		img = new Image();
-		img.src = 'img/target.png';
+		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
 		}
 	}

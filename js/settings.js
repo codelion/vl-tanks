@@ -12,15 +12,15 @@ var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
-var START_GAME_COUNT_SINGLE=3;		//second how much to count in singleplayer
-var START_GAME_COUNT_MULTI=5;		//second how much to count in multiplayer
+var START_GAME_COUNT_SINGLE=10;		//second how much to count in singleplayer
+var START_GAME_COUNT_MULTI=10;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
 var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
-var MAX_SENT_PACKETS = 1000;		//max packets, that we can send to server per game, on stable should be 1000+?
+var MAX_SENT_PACKETS = 5000;		//max packets, that we can send to server per game
 var NETWORK_PACKETS_LOG = false;	//if show sent and received packets log
-var VERSION = "1.1.9";			//app version
+var VERSION = "1.1.10;			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array

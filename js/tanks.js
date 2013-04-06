@@ -116,9 +116,9 @@ function draw_tank(tank){
 			//draw tank base
 			img_me = new Image();
 			if(tank.team == 'B')
-				img_me.src = 'img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
+				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
 			else
-				img_me.src = 'img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[1];
+				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[1];
 			if(TYPES[tank.type].icon_base[2] == "no-rotate"){
 				//draw without rotation
 				tmp_object.restore();
@@ -142,9 +142,9 @@ function draw_tank(tank){
 				
 				img_me = new Image();
 				if(tank.team == 'B')
-					img_me.src = 'img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
+					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
 				else
-					img_me.src = 'img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[1];
+					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[1];
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.fire_angle * TO_RADIANS);
 				tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
@@ -164,7 +164,7 @@ function draw_tank(tank){
 				else{	
 					//default version
 					img_me = new Image();
-					img_me.src = 'img/'+tank.extra_icon[i][0];
+					img_me.src = '../img/'+tank.extra_icon[i][0];
 					tmp_object.drawImage(img_me, padding+tank_size/2-tank.extra_icon[i][1]/2, padding+tank_size/2-tank.extra_icon[i][2]/2);
 					}
 				}
@@ -235,7 +235,7 @@ function redraw_tank_stats(){
 	status_y = HEIGHT_APP-150-25;
 	var left_x = 150;
 	var left_x_values = 200;
-	var gap = 17;
+	var gap = 19;
 	var top_y = HEIGHT_APP-150-25+30;
 	var nr = 0;
 	
@@ -284,12 +284,12 @@ function redraw_tank_stats(){
 	nr++;
 	
 	//accuracy
-	canvas_backround.fillText("Acuracy:", left_x, top_y+nr*gap);
+	/*canvas_backround.fillText("Acuracy:", left_x, top_y+nr*gap);
 	var accuracy = TYPES[MY_TANK.type].accuracy;
 	if(MY_TANK.move==1)
 		accuracy = accuracy-10;
 	canvas_backround.fillText(accuracy+"%", left_x_values, top_y+nr*gap);
-	nr++;
+	nr++;*/
 	
 	//range
 	canvas_backround.fillText("Range:", left_x, top_y+nr*gap);
@@ -597,7 +597,7 @@ function draw_tank_move(mouseX, mouseY){
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY), target_lock_id]);
 			else
 				register_tank_action('move', opened_room_id, name, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
-			MY_TANK.move = 0;
+			//MY_TANK.move = 0;
 			return false;
 			}
 		else{
@@ -921,7 +921,7 @@ function draw_fire(TANK, TANK_TO){
 	radiance = Math.atan2(dist_y, dist_x);
 	explode_x = explode_x + Math.cos(radiance)*(TYPES[TANK.type].size[1]/2+10);
 	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);			
-	drawImage_rotated(canvas_main, 'img/explosion.png', explode_x+map_offset[0], explode_y+map_offset[1], 24, 32, TANK.fire_angle);
+	drawImage_rotated(canvas_main, '../img/explosion.png', explode_x+map_offset[0], explode_y+map_offset[1], 24, 32, TANK.fire_angle);
 	}
 //shooting
 function shoot_sound(TANK){
@@ -930,7 +930,7 @@ function shoot_sound(TANK){
 	if(TYPES[TANK.type].fire_sound == undefined) return false;
 	try{
 		var audio_fire = document.createElement('audio');
-		audio_fire.setAttribute('src', 'sounds/'+TYPES[TANK.type].fire_sound);
+		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound);
 		audio_fire.play();
 		}
 	catch(error){}
@@ -954,7 +954,7 @@ function do_damage(TANK, TANK_TO, force_damage, armor_piercing_force){
 	if(TANK_TO.id == MY_TANK.id && muted==false){
 		try{
 			var audio_fire = document.createElement('audio');
-			audio_fire.setAttribute('src', 'sounds/metal.ogg');
+			audio_fire.setAttribute('src', '../sounds/metal.ogg');
 			audio_fire.play();
 			}
 		catch(error){}
@@ -1355,17 +1355,28 @@ function get_distance_between_tanks(id1, id2){
 	if(distance<0) distance = 0;
 	return distance;
 	}
+function get_team_tanks_count(team){
+	var n = 0;
+	for(var i in TANKS){
+		if(TANKS[i].team == team && TYPES[TANKS[i].type].type == 'tank')
+			n++;
+		}
+	return n;
+	}
 function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 	if(type==undefined) type = 0;
+	var space = 35;
 	//default coordinates
 	if(x==undefined && y==undefined && angle==undefined){
 		if(team=='B'){	//blue top
-			x = round(WIDTH_SCROLL*2/3);
+			x = round(WIDTH_SCROLL*5.5/10);
+			x = x + get_team_tanks_count(team)*space;
 			y = 20;
 			angle = 180;
 			}
 		else{		//red bottom 
-			x = WIDTH_SCROLL/3;
+			x = WIDTH_SCROLL*4/10;
+			x = x - get_team_tanks_count(team)*space;
 			y = HEIGHT_MAP-20-TYPES[type].size[1];
 			angle = 0;
 			}

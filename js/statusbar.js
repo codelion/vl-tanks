@@ -35,9 +35,9 @@ function draw_mute_button(){
 	//paint
 	sound_img = new Image();
 	if(muted==true)
-		sound_img.src = 'img/mute.png';
+		sound_img.src = '../img/mute.png';
 	else
-		sound_img.src = 'img/unmute.png';
+		sound_img.src = '../img/unmute.png';
 	canvas_backround.drawImage(sound_img, WIDTH_APP-21-5, HEIGHT_APP-23);
 	
 	register_button(WIDTH_APP-21-5, HEIGHT_APP-23, 21, 18, '', 'mute_unmute');
@@ -46,7 +46,7 @@ function draw_mute_button(){
 function draw_quality_button(first_run){
 	PADDING = 145;
 	q_img = new Image();
-	q_img.src = 'img/button.png';
+	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
 	quality_cookie = getCookie("quality");
@@ -81,7 +81,7 @@ function draw_fs_button(){
 	if(PLACE != 'game' ) return false;
 	PADDING = 200;
 	q_img = new Image();
-	q_img.src = 'img/button.png';
+	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
 	fs_text = "Full Scr.";
@@ -97,7 +97,7 @@ function draw_fs_button(){
 function draw_quit_button(){
 	PADDING = 90;
 	quit_img = new Image();
-	quit_img.src = 'img/button.png';
+	quit_img.src = '../img/button.png';
 	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	q_text = "Quit";
 	canvas_backround.fillStyle = "#8A8A8A";

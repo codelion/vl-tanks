@@ -1,3 +1,8 @@
+bugs:
+	sync level up
+	manual scroll
+	not visible towers on startup
+	if host dc - give host to another person
 soldiers in multiplayer
 	sync AI actions
-sync every bullet? + enable accuracy
+sync every bullet

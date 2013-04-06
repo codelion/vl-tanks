@@ -104,7 +104,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [120, 10],
-	damage: [50, 5],	//25 dps
+	damage: [40, 5],	//20 dps
 	range: 150,
 	scout: 110,
 	armor: [10, 0, 10],

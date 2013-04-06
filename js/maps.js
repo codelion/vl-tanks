@@ -29,29 +29,33 @@ function draw_map(map_only){
 		alert("ERROR: missing element 'background' config in draw_map().");
 	backround_width = background_elem.size[0];
 	backround_height = background_elem.size[1];
-	for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
-		for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
-			var img_texture = new Image();
-			img_texture.src = 'img/map/moon.jpg';
-			canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
+	var img_texture = new Image();
+	img_texture.src = '../img/map/moon.jpg';
+	img_texture.onload = function(){
+		for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
+			for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
+				var img_texture = new Image();
+				img_texture.src = '../img/map/moon.jpg';
+				canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
+				}
 			}
-		}
-	
-	//elements
-	for(var e in MAPS[level-1].elements){
-		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-		x = MAPS[level-1].elements[e][1];
-		y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
-		max_w = element.size[0];
-		if(MAPS[level-1].elements[e][3]!=0)
-			max_w = MAPS[level-1].elements[e][3];
-		max_h = element.size[1];
-		if(MAPS[level-1].elements[e][4]!=0)
-			max_h = MAPS[level-1].elements[e][4];
 			
-		var img_element = new Image();
-		img_element.src = 'img/map/'+element.file;
-		canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
+		//elements
+		for(var e in MAPS[level-1].elements){
+			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+			x = MAPS[level-1].elements[e][1];
+			y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+			max_w = element.size[0];
+			if(MAPS[level-1].elements[e][3]!=0)
+				max_w = MAPS[level-1].elements[e][3];
+			max_h = element.size[1];
+			if(MAPS[level-1].elements[e][4]!=0)
+				max_h = MAPS[level-1].elements[e][4];
+				
+			var img_element = new Image();
+			img_element.src = '../img/map/'+element.file;
+			canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
+			}
 		}
 	
 	//status bar
@@ -72,7 +76,7 @@ function draw_map(map_only){
 		var icon_x = 450;
 		if(TYPES[MY_TANK.type].preview != undefined){
 			var img = new Image();
-			img.src = "img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
+			img.src = "../img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
 			canvas_backround.drawImage(img, icon_x+12, HEIGHT_APP-150-25+40);
 			}
 			
@@ -274,7 +278,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	
 	//clear name ara
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){

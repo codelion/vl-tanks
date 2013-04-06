@@ -336,7 +336,7 @@ function get_packet(fromClient, message){
 		if(DATA[1] == name && muted==false){
 			try{
 				audio_finish = document.createElement('audio');
-				audio_finish.setAttribute('src', 'sounds/click.ogg');
+				audio_finish.setAttribute('src', '../sounds/click.ogg');
 				audio_finish.play();
 				}
 			catch(error){}
@@ -344,8 +344,8 @@ function get_packet(fromClient, message){
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
 			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
-			TANK.x = DATA[2][0];
-			TANK.y = DATA[2][1];
+			//TANK.x = DATA[2][0];
+			//TANK.y = DATA[2][1];
 			TANK.move = 1;
 			TANK.move_to = [DATA[2][2], DATA[2][3]];
 			delete TANK.target_move_lock;

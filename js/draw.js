@@ -12,7 +12,7 @@ function draw_main(){
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);	//clear layer
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	//clear sight layer
 	if(QUALITY>1){
-		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.4)";
+		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 		}
 	
@@ -266,12 +266,12 @@ function draw_main(){
 					img_bullet = new Image();
 					if(BULLETS[b].bullet_icon != undefined){	
 						//custom bullet
-						img_bullet.src = 'img/bullets/'+BULLETS[b].bullet_icon;
+						img_bullet.src = '../img/bullets/'+BULLETS[b].bullet_icon;
 						bullet_stats = get_bullet(BULLETS[b].bullet_icon);
 						}
 					else{	
 						//default bullet
-						img_bullet.src = 'img/bullets/'+TYPES[TANKS[i].type].bullet;
+						img_bullet.src = '../img/bullets/'+TYPES[TANKS[i].type].bullet;
 						bullet_stats = get_bullet(TYPES[TANKS[i].type].bullet);
 						}
 					if(TYPES[TANKS[i].type].bullet==undefined) continue;
@@ -367,7 +367,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//back image
 	var img = new Image();
-	img.src = 'img/map/moon.jpg';
+	img.src = '../img/map/moon.jpg';
 	canvas_backround.drawImage(img, 0, 0, WIDTH_APP, HEIGHT_APP-27, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//text
 	if(logo_visible==1){
@@ -384,7 +384,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	
 	//logo
 	var img = new Image();
-	img.src = 'img/logo.png';
+	img.src = '../img/logo.png';
 	var left = (WIDTH_APP-598)/2;	
 	canvas_backround.drawImage(img, left, 15);
 	
@@ -418,8 +418,8 @@ function draw_logo_tanks(left, top, change_logo){
 	var max_size = 60;
 	//clear
 	var img = new Image();	
-	img.src = 'img/map/moon.jpg';
-	canvas_backround.drawImage(img, left, top-7, 500, 52+10, left, top-7, 500, 52+10);
+	img.src = '../img/map/moon.jpg';
+	canvas_backround.drawImage(img, left, top-7, 600, 52+10, left, top-7, 600, 52+10);
 	if(change_logo==undefined){
 		if(logo_visible==0){
 			logo_visible=1;
@@ -441,14 +441,14 @@ function draw_logo_tanks(left, top, change_logo){
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
-		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
+		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
 		if(TYPES[t].size[1] < max_size)	//normal
 			canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		else	//resized
 			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
 		//turret
 		var img = new Image();
-		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
+		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
 		canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		}
 	}
@@ -468,8 +468,22 @@ function draw_final_score(live, lost_team){
 		canvas = canvas_main;
 	else
 		canvas = canvas_backround;
-	
-	if(live==false){
+		
+	//find tanks count
+	var tanks_n = 0;
+	for (var i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'tank')
+			tanks_n++;
+		}
+	if(live==true && tanks_n > 13 && tanks_n < 17 ){
+		button_height = 12;
+		buttons_gap = 4;
+		}
+	else if(live==true && tanks_n > 16){
+		button_height = 10;
+		buttons_gap = 3;
+		}
+	if(live==false){					//final scores
 		//add some score to winning team
 		for (var i in TANKS){
 			if(TANKS[i].score == undefined)
@@ -493,12 +507,12 @@ function draw_final_score(live, lost_team){
 		
 		//background
 		var img = new Image();
-		img.src = 'img/background.jpg';
+		img.src = '../img/background.jpg';
 		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
 		canvas_backround.strokeStyle = "#000000";	
 		canvas_backround.fillStyle = "rgba(255, 255, 255, 0.7)";
-		roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20-25, 0, true);
+		roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_APP-20*2-10, 0, true);
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#382da3";
@@ -531,7 +545,7 @@ function draw_final_score(live, lost_team){
 		canvas_backround.font = "bold 16px Helvetica";
 		canvas_backround.fillText("Quit", Math.round((WIDTH_APP-button_width)/2)+20, 45);
 		}
-	else{
+	else{							//scores in game
 		//background in live stats
 		canvas_main.strokeStyle = "#000000";
 		canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -686,7 +700,7 @@ function draw_tank_select_screen(selected_tank){
 	
 	//background
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//show all possible tanks
@@ -708,7 +722,7 @@ function draw_tank_select_screen(selected_tank){
 		roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
 		
 		var img_tmp2 = new Image();
-		img_tmp2.src = 'img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
+		img_tmp2.src = '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
 		var pos1 = 15+j*(preview_xy+gap);
 		var pos2 = y;
 		canvas_backround.drawImage(img_tmp2, pos1, pos2, preview_xy, preview_xy);
@@ -716,7 +730,7 @@ function draw_tank_select_screen(selected_tank){
 		ROOM = get_room_by_id(opened_room_id);
 		if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
 			var img_lock = new Image();
-			img_lock.src = 'img/lock.png';
+			img_lock.src = '../img/lock.png';
 			canvas_backround.drawImage(img_lock, pos1+50, pos2+45);
 			}
 		
@@ -752,7 +766,7 @@ function draw_tank_select_screen(selected_tank){
 	//tank stats
 	if(selected_tank != undefined){
 		var img_tmp3 = new Image();
-		img_tmp3.src = 'img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
+		img_tmp3.src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_xy)/2);
 		canvas_backround.drawImage(img_tmp3, pos1, pos2);
@@ -828,7 +842,7 @@ function draw_tank_select_screen(selected_tank){
 					//icon	
 					var img_tmp2 = new Image();
 					tank_i = ROOM.players[p].tank;
-					img_tmp2.src = 'img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
+					img_tmp2.src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
 					canvas_backround.drawImage(img_tmp2, pos1, pos2, ICON_WIDTH, ICON_WIDTH);
@@ -855,7 +869,7 @@ function draw_timer_graph(){
 	
 	//background
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 15-2, red_line_y-2, graph_width+4, graph_height+4, 15-2, red_line_y-2, graph_width+4, graph_height+4);
 	
 	//red block
@@ -913,7 +927,7 @@ function show_chat(){
 	canvas = canvas_main;
 	
 	canvas.font = "bold 13px Helvetica";
-	for(var i in CHAT_LINES){
+	for(var i = CHAT_LINES.length - 1; i >= 0; i--){
 		var text;
 		if(CHAT_LINES[i].author===false)
 			text = CHAT_LINES[i].text;
@@ -923,11 +937,10 @@ function show_chat(){
 			text = text.substring(0, 100);
 		
 		//background
-		if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select'){
-			canvas.font = "normal 13px Helvetica";
-			canvas.fillStyle = "#dbd9da";
-			roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);
-			}
+		//if(PLACE != 'game'){
+		canvas.font = "normal 13px Helvetica";
+		canvas.fillStyle = "#dbd9da";
+		roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);
 		
 		//text color
 		if(CHAT_LINES[i].author===false)

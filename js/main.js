@@ -32,10 +32,10 @@ function init_game(first_time){
 	canvas_backround.strokeStyle = '#ffffff';
 	canvas_backround.strokeText(text, 160, 340);
 	var img = new Image();
-	img.src = 'img/logo.png';
+	img.src = '../img/logo.png';
 	img.onload = function(){	//wait till background is loaded
 		var img = new Image();
-		img.src = 'img/logo.png';
+		img.src = '../img/logo.png';
 		var left = (WIDTH_APP-598)/2;	
 		canvas_backround.drawImage(img, left, 15);
 		if(first_time==true){
@@ -106,12 +106,17 @@ function check_canvas_sizes(){
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 	}
+var menu_pressed = false;
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
 	
 	name_tmp = getCookie("player_name");
 	if(name_tmp != ''){
-		name = name_tmp+Math.floor(Math.random()*99);
+		name = name_tmp;
+		}
+	counter_tmp = getCookie("start_count");
+	if(counter_tmp != ''){
+		START_GAME_COUNT_SINGLE = counter_tmp;
 		}
 	if(muted==false){
 		if(audio_main != undefined)
@@ -124,6 +129,8 @@ function add_first_screen_elements(){
 	for (i in settings_positions){
 		//register menu buttons
 		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'init', function(xx, yy, extra){
+			if(menu_pressed == true) return false;
+			menu_pressed = true;
 			if(extra==0){
 				// single player
 				game_mode = 1;
@@ -139,24 +146,37 @@ function add_first_screen_elements(){
 				}
 			else if(extra==2){
 				//settings
+				add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 				PLACE = 'settings';
-				add_settings_buttons(canvas_backround, ["Player name: "+name,"Back"]);
 				}
 			}, i);
 		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'settings', function(xx, yy, extra){
+			if(menu_pressed == true) return false;
+			menu_pressed = true;
 			if(extra==0){
 				//edit name
 				var name_tmp = prompt("Please enter your name", name);
 				if(name_tmp != null){
 					name = name_tmp;
-					add_settings_buttons(canvas_backround, ["Player name: "+name,"Back"]);
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 					setCookie("player_name", name, 30);
 					}
 				}
 			else if(extra==1){
+				//edit start game couter
+				var value_tmp = prompt("Please enter number 1-30", START_GAME_COUNT_SINGLE);
+				if(value_tmp != null){
+					START_GAME_COUNT_SINGLE = parseInt(value_tmp);
+					if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
+					if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+					setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
+					}
+				}
+			else if(extra==2){
 				//back to first screen
-				PLACE = 'init';
 				add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
+				PLACE = 'init';
 				}
 			}, i);
 		}
@@ -164,25 +184,25 @@ function add_first_screen_elements(){
 function preload_all_files(){
 	images_to_preload = [
 		//general
-		'img/background.jpg',
-		'img/map/moon.jpg',
-		'img/favicon.png',
-		'img/lock.png',
-		'img/logo.png',
-		'img/mute.png',
-		'img/repair.png',
-		'img/target.png',
-		'img/unmute.png',
-		'img/button.png',
-		'img/explosion.png',
-		'img/explosion_big.png',
-		'img/map/mine.png',
+		'../img/background.jpg',
+		'../img/map/moon.jpg',
+		'../img/favicon.png',
+		'../img/lock.png',
+		'../img/logo.png',
+		'../img/mute.png',
+		'../img/repair.png',
+		'../img/target.png',
+		'../img/unmute.png',
+		'../img/button.png',
+		'../img/explosion.png',
+		'../img/explosion_big.png',
+		'../img/map/mine.png',
 		];
 	audio_to_preload = [
-		'sounds/click.ogg',
-		'sounds/main.ogg',
-		'sounds/shoot.ogg',
-		'sounds/metal.ogg',
+		'../sounds/click.ogg',
+		'../sounds/main.ogg',
+		'../sounds/shoot.ogg',
+		'../sounds/metal.ogg',
 		];
 		
 	//calculate files count
@@ -197,10 +217,10 @@ function preload_all_files(){
 		preload(images_to_preload[i]);
 		}
 	for(var i in BULLETS_TYPES){
-		preload('img/bullets/'+BULLETS_TYPES[i].file);
+		preload('../img/bullets/'+BULLETS_TYPES[i].file);
 		}
 	for(var i in ELEMENTS){
-		preload('img/map/'+ELEMENTS[i].file);
+		preload('../img/map/'+ELEMENTS[i].file);
 		}
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
@@ -208,25 +228,25 @@ function preload_all_files(){
 	for(i in TYPES){
 		//preview
 		if(TYPES[i].preview != '')
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview);
 		else
 			update_preload(1);
 		//icon_top
 		if(TYPES[i].icon_top[0] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
 		else
 			update_preload(1);
 		if(TYPES[i].icon_top[1] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[1]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[1]);
 		else
 			update_preload(1);
 		//icon_base
 		if(TYPES[i].icon_base[0] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
 		else
 			update_preload(1);
 		if(TYPES[i].icon_base[1] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[1]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[1]);
 		else
 			update_preload(1);
 		}
@@ -258,7 +278,7 @@ function init_action(map_nr, my_team){
 	//sound
 	if(muted==false){
 		audio_main = document.createElement('audio');
-		audio_main.setAttribute('src', 'sounds/main.ogg');
+		audio_main.setAttribute('src', '../sounds/main.ogg');
 		audio_main.setAttribute('loop', 'loop');
 		try{
 			audio_main.play();
@@ -282,7 +302,6 @@ function init_action(map_nr, my_team){
 			}
 		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
-		
 		add_tank(1, get_unique_id(), "Bot", enemy_tank_type, 'R', undefined, undefined, undefined, true);
 		}
 	
@@ -490,6 +509,8 @@ function chat(text, author, team){
 		team: team,
 		time: time,
 		});
+	if(CHAT_LINES.length > 16)
+		CHAT_LINES.splice(0,1);	//remove first
 	}
 //controlls chat lines
 function controll_chat(){
@@ -498,7 +519,7 @@ function controll_chat(){
 	//remove old
 	var time = new Date();
 	time = time.getTime();
-	var max_time = 10000;	//10s
+	var max_time = 20000;	//20s
 	for(var i in CHAT_LINES){
 		if(time - CHAT_LINES[i].time > max_time){
 			CHAT_LINES.splice(i, 1); i--;

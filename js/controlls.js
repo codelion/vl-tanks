@@ -130,6 +130,7 @@ function on_mousedown(event){
 		}
 	mouse_click_pos = [mouseX, mouseY];
 	if(PLACE != 'game'){
+		menu_pressed = false;	
 		for(var i in BUTTONS){
 			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
@@ -153,7 +154,8 @@ function on_mousedown_back(event){
 	else if(event.layerX) {
 		mouseX = event.layerX;
 		mouseY = event.layerY;
-		}			
+		}
+	menu_pressed = false;		
 	for(var i in BUTTONS){
 		if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 		if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;

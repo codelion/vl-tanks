@@ -10,7 +10,7 @@ function draw_rooms_list(){
 	
 	//background
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//create button
@@ -140,7 +140,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		
 	PLACE = 'create_room';
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	game_name = name+"'s room";
@@ -339,7 +339,7 @@ function draw_room(room_id){
 	
 	//background
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//back button
