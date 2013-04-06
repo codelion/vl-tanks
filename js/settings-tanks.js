@@ -204,7 +204,7 @@ TYPES.push({
 	});
 
 //Truck
-TYPES.push({
+/*TYPES.push({
 	name: 'Truck',
 	type: 'tank',
 	description: ["Uses many soldiers for attack", "Very low damage"],
@@ -227,7 +227,7 @@ TYPES.push({
 	bullet: 'bullet.png',
 	fire_sound: 'shoot.ogg',
 	accuracy: 90,
-	});
+	});*/
 
 //Helicopter
 TYPES.push({
@@ -261,7 +261,7 @@ TYPES.push({
 	name: 'Bomber',
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
-	life: [120, 10],
+	life: [130, 10],
 	damage: [15, 1],	//15 dps
 	range: 60,
 	scout: 110,

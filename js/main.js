@@ -334,7 +334,7 @@ function init_action(map_nr, my_team){
 	draw_map(false);
 		
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
-	level_interval_id = setInterval(tank_level_handler, 2000);
+	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
 	}
 //get unique id
@@ -380,10 +380,10 @@ function quit_game(init_next_game){
 	starting_timer = -1;
 	ROOMS = [];
 	PLAYERS = [];
+	MINES = [];
+	TANKS = [];
 	
 	if(PLACE=='game'){
-		TANKS = [];
-		MINES = [];
 		timed_functions = [];
 		pre_draw_functions = [];
 		on_click_functions = [];

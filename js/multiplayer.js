@@ -421,9 +421,7 @@ function get_packet(fromClient, message){
 			return false;
 			}
 		
-		//actions
-		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
-		else				TANK_TO.deaths = TANK_TO.deaths + 1;
+		TANK_TO.deaths = TANK_TO.deaths + 1;
 		
 		if(TYPES[TANK_TO.type].name == "Tower"){
 			//change base stats
@@ -447,11 +445,8 @@ function get_packet(fromClient, message){
 		//adding kill stats
 		if(TYPES[TANK_TO.type].no_repawn == undefined){
 			//player
-			if(TANK_FROM.kills == undefined)	TANK_FROM.kills = 1;
-			else					TANK_FROM.kills = TANK_FROM.kills + 1;	
+			TANK_FROM.kills = TANK_FROM.kills + 1;	
 			//score
-			if(TANK_FROM.score == undefined)
-				TANK_FROM.score = 0;
 			TANK_FROM.score = TANK_FROM.score + 20;	// +20 for kill
 			
 			death(TANK_TO);

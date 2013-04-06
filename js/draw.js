@@ -486,8 +486,6 @@ function draw_final_score(live, lost_team){
 	if(live==false){					//final scores
 		//add some score to winning team
 		for (var i in TANKS){
-			if(TANKS[i].score == undefined)
-				TANKS[i].score = 0;
 			if(TANKS[i].team == lost_team)
 				continue;
 			TANKS[i].score = TANKS[i].score + 100;	//+100 for win
@@ -611,20 +609,12 @@ function draw_final_score(live, lost_team){
 			//kills
 			canvas.font = "bold 12px Helvetica";
 			canvas.fillStyle = "#0669ff";
-			var kills = 0;
-			if(TANKS[i].kills != undefined)
-				kills = TANKS[i].kills;
-			else
-				kills = 0;
+			var kills = TANKS[i].kills;
 			canvas.fillText(kills, Math.round((WIDTH_APP-button_width)/2)+300, text_y);
 			
 			//deaths
 			canvas.fillStyle = "#9c0309";
-			var deaths = 0;
-			if(TANKS[i].deaths != undefined)
-				deaths = TANKS[i].deaths;
-			else
-				deaths = 0;
+			var deaths = TANKS[i].deaths;
 			canvas.fillText(deaths, Math.round((WIDTH_APP-button_width)/2)+350, text_y);
 			
 			//towers
@@ -643,9 +633,7 @@ function draw_final_score(live, lost_team){
 			
 			//score
 			canvas.fillStyle = "#ff3405";
-			var score = 0;
-			if(TANKS[i].score != undefined)
-				score = TANKS[i].score;
+			var score = TANKS[i].score;
 			canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+500, text_y);
 			
 			j++;
