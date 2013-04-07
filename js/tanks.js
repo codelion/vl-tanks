@@ -52,11 +52,11 @@ function draw_tank(tank){
 		if(TYPES[tank.type].icon_top[0] != undefined)
 			cache_id += "SA:"+tank.fire_angle+',';
 		
-		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id && tank.cache_tank_verified==2 ){		if(tank.id==MY_TANK.id) log('cache');
+		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id && tank.cache_tank_verified==2 ){
 			//read from cache
 			canvas_main.drawImage(tank.cache_tank.object, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
 			}
-		else{														if(tank.id==MY_TANK.id) log('renew.....');
+		else{
 			tank.cache_tank_verified = 0;
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
@@ -628,6 +628,7 @@ function check_collisions(xx, yy, TANK, mode){
 				if(TANKS[i].id == TANK.id) continue;			//same tank
 				if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
 				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
+				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
 				if(TANKS[i].dead == 1) continue;		//tank dead
 				var size2 = TYPES[TANKS[i].type].size[1];
 				if(TYPES[TANKS[i].type].type == 'human')	

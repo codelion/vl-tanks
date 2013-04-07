@@ -1,5 +1,4 @@
 bugs:
-	sync bullets
+	sync bullets, accuracy?
 soldiers in multiplayer
 	sync AI actions
-

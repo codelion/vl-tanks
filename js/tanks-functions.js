@@ -16,12 +16,14 @@ function Soldiers(TANK, descrition_only){
 	var angle = 180;
 	if(TANK.team != 'B')
 		angle = 0;
+	//delete TANK.soldiers_direction
 	
 	//add
 	for(var i=0; i<n; i++){
 		x = round(TANK.x)-30+i*30;
 		y = round(TANK.y);
-		add_tank(TANK.level, 'bot'+TANK.team+get_unique_id()+"."+x+"."+y, '', type, TANK.team, x, y, angle, true, TANK);
+		id = 'bot'+TANK.team+get_unique_id()+"."+x+"."+y;
+		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
 		}
 	
 	//return reuse
@@ -156,6 +158,7 @@ function Repair(TANK, descrition_only){
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
+		//add effect
 		if(TANKS[ii].extra_icon==undefined)
 			TANKS[ii].extra_icon = [];
 		TANKS[ii].extra_icon.push(['repair.png', 16, 16, TANK.id]);
@@ -182,8 +185,9 @@ function Repair_stop(object){
 	var TANK = object.tank;
 	for (ii in TANKS){
 		for (jj in TANKS[ii].extra_icon){
-			if(TANKS[ii].extra_icon[jj][0] == 'repair.png' && TANK.id == TANKS[ii].id)
+			if(TANKS[ii].extra_icon[jj][0] == 'repair.png' && TANK.id == TANKS[ii].extra_icon[jj][3]){
 				TANKS[ii].extra_icon.splice(jj, 1);
+				}
 			}
 		for (jj in TANKS[ii].extra_hp){
 			if(TANKS[ii].extra_hp[jj][1] == TANK.id)
@@ -331,7 +335,7 @@ function Camouflage(TANK, descrition_only){
 		return 'Slowly become invisible.';
 	
 	var reuse = 15000;
-	var duration = 10000;
+	var duration = 5000;
 	
 	//TANK.speed = 0;
 	TANK.invisibility = 1;

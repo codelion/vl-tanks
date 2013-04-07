@@ -293,7 +293,7 @@ TYPES.push({
 	range: 60,
 	scout: 60,
 	armor: [0, 0, 0],
-	speed: 25,			//speed: 100,
+	speed: 25,			//speed: 50,
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,

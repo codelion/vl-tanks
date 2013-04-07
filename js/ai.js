@@ -15,6 +15,10 @@ function check_path_AI(TANK){
 	if(TANK.move == 0 && TANK.move_to == undefined){
 		TANK.move_to = [TANK.x, y_direction];
 		TANK.move = 1; 
+		if(TANK.team=='B')
+			TANK.move_direction = 'down';
+		else
+			TANK.move_direction = 'up';	
 		}
 	
 	//if in battle
@@ -29,9 +33,6 @@ function set_random_path_AI(TANK){
 	var tank_size = TYPES[TANK.type].size[1];
 	var max_width = WIDTH_MAP - tank_size;
 	var max_height = HEIGHT_MAP - tank_size;
-	var y_direction = 0;
-	if(TANK.team=='B') //top
-		y_direction = max_height;
 	collision_gap = 5;
 	
 	var direction;
@@ -52,6 +53,7 @@ function set_random_path_AI(TANK){
 	if(TANK.team=='B' && TANK.y<max_height && check_collisions(TANK.x+tank_size/2, TANK.y+tank_size+collision_gap, TANK)==false){
 		TANK.move_to = [TANK.x, max_height];
 		TANK.move=1;
+		TANK.move_direction = 'down';
 		return true;
 		}
 		
@@ -59,6 +61,7 @@ function set_random_path_AI(TANK){
 	if(TANK.team!='B' && TANK.y>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
 		TANK.move_to = [TANK.x, 0];
 		TANK.move=1;
+		TANK.move_direction = 'up';
 		return true;
 		}
 	
@@ -66,10 +69,12 @@ function set_random_path_AI(TANK){
 	if(direction == 'left'){
 		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false){
 			TANK.move_to = [0, TANK.y];
+			TANK.move_direction = 'left';
 			}
 		else{
 			//must turn right
 			TANK.move_to = [max_width, TANK.y];	
+			TANK.move_direction = 'right';
 			direction = 'right';
 			if(TANK.master != undefined)
 				TANK.master.soldiers_direction = direction;
@@ -80,10 +85,12 @@ function set_random_path_AI(TANK){
 	else{	//right
 		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false){
 			TANK.move_to = [max_width, TANK.y];
+			TANK.move_direction = 'right';
 			}
 		else{
 			//must turn left
 			TANK.move_to = [0, TANK.y];
+			TANK.move_direction = 'left';
 			direction = 'left';
 			if(TANK.master != undefined)
 				TANK.master.soldiers_direction = direction;
