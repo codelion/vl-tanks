@@ -208,7 +208,7 @@ function preload_all_files(){
 	//calculate files count
 	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS_TYPES.length + ELEMENTS.length;
 	for(i in TYPES){
-		preload_left = preload_left + 5;	
+		preload_left = preload_left + 3;	
 		}
 	preload_total = preload_left;
 	
@@ -236,17 +236,9 @@ function preload_all_files(){
 			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
 		else
 			update_preload(1);
-		if(TYPES[i].icon_top[1] != undefined)
-			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[1]);
-		else
-			update_preload(1);
 		//icon_base
 		if(TYPES[i].icon_base[0] != undefined)
 			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
-		else
-			update_preload(1);
-		if(TYPES[i].icon_base[1] != undefined)
-			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[1]);
 		else
 			update_preload(1);
 		}
@@ -289,7 +281,7 @@ function init_action(map_nr, my_team){
 	//create ... me
 	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
-	
+
 	auto_scoll_map();
 
 	//add enemy if single player
@@ -304,7 +296,7 @@ function init_action(map_nr, my_team){
 		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
 		add_tank(1, get_unique_id(), "Bot", enemy_tank_type, 'R', undefined, undefined, undefined, true);
 		}
-	
+
 	sync_multiplayers();
 	
 	add_towers();

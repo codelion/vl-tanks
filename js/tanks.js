@@ -39,16 +39,12 @@ function draw_tank(tank){
 		
 		var cache_id = "";
 		cache_id += "T:"+tank.type+',';
-		cache_id += "TE:"+tank.team+',';
 		cache_id += "A:"+tank.angle+',';
-		cache_id += "SI:"+tank_size+',';
 		for (i in tank.extra_icon)
 			cache_id += "E:"+tank.extra_icon[i][0]+',';
-		//if(tank.id == MY_TANK.id)	cache_id += 'SI,';	
 		if(tank.stun != undefined)	cache_id += 'ST,';
 		if(tank.clicked_on != undefined){
 			cache_id += 'EC,';
-			
 			tank.clicked_on = tank.clicked_on - 1;
 			if(tank.clicked_on == 0)
 				delete tank.clicked_on;
@@ -56,11 +52,12 @@ function draw_tank(tank){
 		if(TYPES[tank.type].icon_top[0] != undefined)
 			cache_id += "SA:"+tank.fire_angle+',';
 		
-		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id){
+		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id && tank.cache_tank_verified==2 ){		if(tank.id==MY_TANK.id) log('cache');
 			//read from cache
 			canvas_main.drawImage(tank.cache_tank.object, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
 			}
-		else{
+		else{														if(tank.id==MY_TANK.id) log('renew.....');
+			tank.cache_tank_verified = 0;
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
 			tmp_canvas.width = 105
@@ -101,10 +98,10 @@ function draw_tank(tank){
 			
 			//draw tank base
 			img_me = new Image();
-			if(tank.team == 'B')
-				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
-			else
-				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[1];
+			img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
+			img_me.onload = function(){
+				tank.cache_tank_verified++;
+				}
 			if(TYPES[tank.type].icon_base[1] == "no-rotate"){
 				//draw without rotation
 				tmp_object.restore();
@@ -124,10 +121,10 @@ function draw_tank(tank){
 			if(TYPES[tank.type].icon_top[0] != undefined){
 				tmp_object.save();
 				img_me = new Image();
-				if(tank.team == 'B')
-					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
-				else
-					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[1];
+				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
+				img_me.onload = function(){
+					tank.cache_tank_verified++;
+					}
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.fire_angle * TO_RADIANS);
 				tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
@@ -1378,6 +1375,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 		score: 0,
 		kills: 0,
 		deaths: 0,
+		cache_tank: [],
 		};
 	if(AI != undefined)
 		TANK.use_AI = AI;

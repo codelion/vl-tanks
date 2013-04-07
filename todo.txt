@@ -1,5 +1,4 @@
 bugs:
-	not visible towers on startup
 	sync bullets
 soldiers in multiplayer
 	sync AI actions

@@ -687,6 +687,8 @@ function draw_tank_select_screen(selected_tank){
 		}
 	
 	//background
+	canvas_backround.fillStyle = "#f0f9e4";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	img = new Image();
 	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
