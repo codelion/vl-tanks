@@ -1,11 +1,6 @@
 bugs:
-	clean mines after game
-	sync level up
-	manual scroll
 	not visible towers on startup
-	if host dc - give host to another person
-	person on base
-	kicking kicks more
+	sync bullets
 soldiers in multiplayer
 	sync AI actions
-sync every bullet
+

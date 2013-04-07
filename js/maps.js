@@ -31,7 +31,7 @@ function draw_map(map_only){
 	backround_height = background_elem.size[1];
 	var img_texture = new Image();
 	img_texture.src = '../img/map/moon.jpg';
-	img_texture.onload = function(){
+	img_texture.onload = function(){	//on background load
 		for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
 			for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
 				var img_texture = new Image();
@@ -39,22 +39,26 @@ function draw_map(map_only){
 				canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
 				}
 			}
-			
+		
 		//elements
-		for(var e in MAPS[level-1].elements){
-			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-			x = MAPS[level-1].elements[e][1];
-			y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
-			max_w = element.size[0];
-			if(MAPS[level-1].elements[e][3]!=0)
-				max_w = MAPS[level-1].elements[e][3];
-			max_h = element.size[1];
-			if(MAPS[level-1].elements[e][4]!=0)
-				max_h = MAPS[level-1].elements[e][4];
-				
-			var img_element = new Image();
-			img_element.src = '../img/map/'+element.file;
-			canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
+		var img_wall = new Image();
+		img_wall.src = '../img/map/fence.png';
+		img_wall.onload = function(){	//on wall load
+			for(var e in MAPS[level-1].elements){
+				var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+				x = MAPS[level-1].elements[e][1];
+				y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+				max_w = element.size[0];
+				if(MAPS[level-1].elements[e][3]!=0)
+					max_w = MAPS[level-1].elements[e][3];
+				max_h = element.size[1];
+				if(MAPS[level-1].elements[e][4]!=0)
+					max_h = MAPS[level-1].elements[e][4];
+					
+				var img_element = new Image();
+				img_element.src = '../img/map/'+element.file;
+				canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
+				}
 			}
 		}
 	

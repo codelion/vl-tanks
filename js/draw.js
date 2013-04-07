@@ -182,7 +182,7 @@ function draw_main(){
 						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 				}
 			//map scrolling
-			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false){
+			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
 				auto_scoll_map();
 				}
 			//shooting
@@ -319,9 +319,9 @@ function draw_main(){
 		catch(err){
 			console.log("Error: "+err.message);
 			}
-		}
+		}		//PLACE = 'sdf';
 	lighten_pixels_all();
-	if(MY_TANK['dead']==1)	
+	if(MY_TANK.dead == 1)	
 		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
 	//show live scroes?

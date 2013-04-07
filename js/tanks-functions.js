@@ -199,8 +199,8 @@ function Mortar(TANK, descrition_only){
 		return 'Launch missile with area damage.';
 		
 	var reuse = 20000;
-	var power = 90;
-	var range = 150;
+	var power = 80;
+	var range = 120;
 	var splash_range = 70;
 		
 	if(TANK.try_mortar != undefined){
@@ -582,7 +582,7 @@ function Airstrike(TANK, descrition_only){
 		
 	var reuse = 10000;
 	var power = 70;
-	var range = 150;
+	var range = 120;
 	
 	if(TANK.try_airstrike != undefined){
 		delete TANK.try_airstrike;

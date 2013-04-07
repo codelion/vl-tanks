@@ -112,7 +112,7 @@ function add_first_screen_elements(){
 	
 	name_tmp = getCookie("player_name");
 	if(name_tmp != ''){
-		name = name_tmp;
+		name = name_tmp+Math.floor(Math.random()*99);
 		}
 	counter_tmp = getCookie("start_count");
 	if(counter_tmp != ''){
@@ -366,7 +366,6 @@ function quit_game(init_next_game){
 		if(confirm("Do you really want to quit game?")==false)
 			return false;
 		}
-	room_id_to_join = -1;
 	
 	clearInterval(draw_interval_id);
 	clearInterval(level_interval_id);
@@ -377,6 +376,7 @@ function quit_game(init_next_game){
 	clearInterval(chat_interval_id);	
 	chat_interval_id = setInterval(controll_chat, 500);
 	
+	room_id_to_join = -1;
 	starting_timer = -1;
 	ROOMS = [];
 	PLAYERS = [];
@@ -399,8 +399,7 @@ function quit_game(init_next_game){
 			register_tank_action('leave_game', opened_room_id, name);
 			room_controller();
 			}
-		opened_room_id = -1;
-		
+	
 		if(FS==true){
 			fullscreen(false);
 			PLACE = 'init';
@@ -416,6 +415,18 @@ function quit_game(init_next_game){
 		parent.document.getElementById("messages_in").innerHTML = 0;
 		parent.document.getElementById("messages_out").innerHTML = 0;
 		}catch(error){}
+	
+	//reset other variables
+	opened_room_id = -1;
+	BULLETS = [];
+	BUTTONS = [];
+	opened_room_id = -1;
+	CHAT_LINES = [];
+	timed_functions = [];
+	pre_draw_functions = [];
+	on_click_functions = [];
+	mouse_move_controll = false;
+	mouse_click_controll = false;
 	
 	if(init_next_game!=false){
 		init_game(false);
@@ -495,7 +506,7 @@ function chat(text, author, team){
 		else
 			team = '';
 		
-		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game')))
+		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score')))
 			register_tank_action('chat', opened_room_id, name, text);
 		}
 	if(text=='') return false;
@@ -526,7 +537,7 @@ function controll_chat(){
 			}
 		}
 	//show?
-	if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select'){
+	if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select' || PLACE == 'score'){
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		show_chat();
 		}

@@ -28,7 +28,7 @@ function on_keyboard_action(event){
 		}
 	if(k==13){
 		//enter
-		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select'){
+		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
 			if(chat_mode==0){
 				//begin write
 				chat_mode=1;
@@ -41,6 +41,14 @@ function on_keyboard_action(event){
 				document.getElementById("chat_write").style.visibility = 'hidden';
 				chat();
 				}
+			}
+		}
+	if(k==83){
+		//s
+		if(MAP_SCROLL_MODE==1) MAP_SCROLL_MODE = 2;
+		else{
+			MAP_SCROLL_MODE = 1;
+			auto_scoll_map();
 			}
 		}
 	
@@ -194,7 +202,8 @@ function on_mousedown_back(event){
 function on_mouseup_back(event){
 	if(PLACE=='game' && MAP_SCROLL_CONTROLL==true){
 		MAP_SCROLL_CONTROLL=false;
-		move_to_place_reset();
+		if(MAP_SCROLL_MODE==1)
+			move_to_place_reset();
 		}
 	}
 //fullscreen on modern browsers

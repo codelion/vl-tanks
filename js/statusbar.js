@@ -115,33 +115,23 @@ function draw_version(){
 	}
 //do mute or unmute on user request
 function mute_unmute(){
-	if(muted==false){
+	if(muted==false){	
+		//disable sound
 		muted=true;
 		setCookie("muted", "1", 30);
 		if(audio_main != undefined)	audio_main.pause();
 		}
 	else{
+		//enable sound
 		muted = false;
 		if(getCookie("muted") != '')	
 			delCookie("muted");
 		try{
 			if(PLACE == 'game'){
 				audio_main = document.createElement('audio');
-				audio_main.setAttribute('src', 'sounds/main.ogg');
+				audio_main.setAttribute('src', '../sounds/main.ogg');
 				audio_main.setAttribute('loop', 'loop');
 				audio_main.play();
-				}
-			else if(PLACE == 'select'){
-				audio_prepare = document.createElement('audio');
-				audio_prepare.setAttribute('src', 'sounds/prepare.ogg');
-				audio_prepare.setAttribute('loop', 'loop');
-				audio_prepare.play();
-				}
-			else {
-				audio_begin = document.createElement('audio');
-				audio_begin.setAttribute('src', 'sounds/begin.ogg');
-				audio_begin.setAttribute('loop', 'loop');
-				audio_begin.play();
 				}
 			}
 		catch(error){}

@@ -30,7 +30,7 @@ function draw_tank(tank){
 			tank_size = tank_size*0.8;
 		
 		if(check_enemy_visibility(tank)==false){
-			//return false;	//out of sight
+			return false;	//out of sight
 			}
 		
 		lighten_pixels(tank);
@@ -63,25 +63,13 @@ function draw_tank(tank){
 		else{
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
-			tmp_canvas.width = 100
-			tmp_canvas.height = 100;
+			tmp_canvas.width = 105
+			tmp_canvas.height = 105;
 			var tmp_object = tmp_canvas.getContext("2d");
 		
 			//start adding data
 			tmp_object.save();
 		
-			//if me - show yellow circle
-			/*if(tank.id == MY_TANK.id){
-				tmp_object.beginPath();
-				var radius = tank_size/2;
-				if(radius>35)
-					radius=35;
-				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
-				tmp_object.lineWidth = 3;
-				tmp_object.strokeStyle = "#e0da25";
-				tmp_object.stroke();
-				}*/
-				
 			//draw extra layer
 			for (i in tank.extra_icon){
 				if(tank.extra_icon[i][0]=='_SHIELD_'){
@@ -117,12 +105,10 @@ function draw_tank(tank){
 				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
 			else
 				img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[1];
-			if(TYPES[tank.type].icon_base[2] == "no-rotate"){
+			if(TYPES[tank.type].icon_base[1] == "no-rotate"){
 				//draw without rotation
 				tmp_object.restore();
-				
 				tmp_object.drawImage(img_me, padding, padding, tank_size, tank_size);
-				
 				tmp_object.save();
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
@@ -137,7 +123,6 @@ function draw_tank(tank){
 			//draw top
 			if(TYPES[tank.type].icon_top[0] != undefined){
 				tmp_object.save();
-				
 				img_me = new Image();
 				if(tank.team == 'B')
 					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
@@ -146,25 +131,14 @@ function draw_tank(tank){
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.fire_angle * TO_RADIANS);
 				tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
-				
 				tmp_object.restore();
 				}
 
-			
 			//draw extra layer
 			for (i in tank.extra_icon){
-				if(tank.extra_icon[i][0]=='_SHIELD_'){
-					//shield - already painted
-					}
-				else 	if(tank.extra_icon[i][0]=='_SLOW_'){
-					//glue bomb - already painted
-					}	
-				else{	
-					//default version
-					img_me = new Image();
-					img_me.src = '../img/'+tank.extra_icon[i][0];
-					tmp_object.drawImage(img_me, padding+tank_size/2-tank.extra_icon[i][1]/2, padding+tank_size/2-tank.extra_icon[i][2]/2);
-					}
+				img_me = new Image();
+				img_me.src = '../img/'+tank.extra_icon[i][0];
+				tmp_object.drawImage(img_me, padding+tank_size/2-tank.extra_icon[i][1]/2, padding+tank_size/2-tank.extra_icon[i][2]/2);
 				}
 
 			//enemy checked
@@ -202,7 +176,7 @@ function draw_tank(tank){
 		}	
 
 	//draw tank in mini-map 20x17 - 70x116
-	if(tank.respan_time == undefined && (visibility==1 || TYPES[tank.type].type=='tower')){
+	if(TYPES[tank.type].type=='tower' ||( tank.dead != 1 && check_enemy_visibility(tank)==true)){
 		//settings
 		var button_width = 120;
 		var button_height = 138;
@@ -328,6 +302,15 @@ function redraw_tank_stats(){
 	var text = MY_TANK.deaths;
 	canvas_backround.fillText(text, left_x_values, top_y+nr*gap);
 	nr++;
+	
+	//players
+	if(game_mode == 2){
+		canvas_backround.fillText("Players:", left_x, top_y+nr*gap);
+		ROOM = get_room_by_id(opened_room_id);
+		var text = ROOM.players_on+"/"+ROOM.players_max;
+		canvas_backround.fillText(text, left_x_values, top_y+nr*gap);
+		nr++;
+		}
 	
 	//show fps
 	update_fps();
@@ -579,7 +562,7 @@ function draw_tank_move(mouseX, mouseY){
 		if(found_something==false)
 			MY_TANK.clicked = [mouseX,mouseY,8];
 	
-		var tank_size = TYPES[my_tank_nr].size[1];
+		var tank_size = TYPES[MY_TANK.type].size[1];
 		mouseX = mouseX-tank_size/2;	
 		mouseY = mouseY-tank_size/2;
 		mouseX = Math.floor(mouseX);
@@ -688,8 +671,11 @@ function tank_level_handler(){	//once per second
 				TANKS[i].armor = TYPES[TANKS[i].type].armor[2];
 			redraw_tank_stats();	
 			TANKS[i].score = TANKS[i].score + 25*(TANKS[i].level-last_level);	// +23 for 1 lvl
-			if(TANKS[i].id == MY_TANK.id)
+			if(TANKS[i].id == MY_TANK.id){
+				if(game_mode == 2)
+					register_tank_action('level_up', opened_room_id, TANKS[i].id, TANKS[i].level);
 				draw_tank_abilities();
+				}
 			}
 		}
 	}
@@ -1213,14 +1199,14 @@ function do_ability(nr, TANK){
 		}
 	}
 //check if enemy visible
-function check_enemy_visibility(tank){
+function check_enemy_visibility(tank){		
 	if(TYPES[tank.type].no_repawn != undefined)
 		return true;	//tower
 	if(tank.team==MY_TANK.team)
 		return true;	//friend
 	//wait for reuse
 	if(tank.cache_scouted_reuse - Date.now() > 0)
-		return tank.cache_scouted;		
+		return tank.cache_scouted;	
 	
 	var tank_size_from = TYPES[tank.type].size[1]/2;
 	for (i in TANKS){
@@ -1231,15 +1217,14 @@ function check_enemy_visibility(tank){
 		
 		//exact range
 		distance = get_distance_between_tanks(TANKS[i], tank);
-		
-		var range = TANKS[i].sight;
+		var range = TANKS[i].sight - TYPES[TANKS[i].type].size[1]/2;
 		if(distance < range){
-			tank.cache_scouted_reuse = 1000+Date.now();
+			tank.cache_scouted_reuse = 500+Date.now();
 			tank.cache_scouted = true;
 			return true;	//found by enemy
 			}				
 		}
-	tank.cache_scouted_reuse = 1000+Date.now();
+	tank.cache_scouted_reuse = 500+Date.now();
 	tank.cache_scouted = false;
 	return false;
 	}
@@ -1262,7 +1247,7 @@ function choose_and_register_tanks(ROOM){
 	//get possible types
 	var possible_types = [];
 	for(var t in TYPES){
-		if(TYPES[t].hide_name==undefined)
+		if(TYPES[t].type=='tank')
 			possible_types.push(t);
 		}
 	//choose
@@ -1397,6 +1382,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 	if(AI != undefined)
 		TANK.use_AI = AI;
 	if(master_tank != true)
-		TANK.master = master_tank;		
+		TANK.master = master_tank;	
 	TANKS.push(TANK);
 	}
+ 
