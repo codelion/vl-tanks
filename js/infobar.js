@@ -138,12 +138,13 @@ function redraw_tank_stats(){
 	canvas_backround.fillText(hp+"/"+hp_max, life_x+life_width-54, life_y+life_height-5);
 	
 	//players
-	/*if(game_mode == 2){
-		canvas_backround.fillText("Players:", left_x, top_y);
+	if(game_mode == 2){
+		canvas_backround.fillStyle = "#294111";
+		canvas_backround.font = "normal 10px Verdana";
 		ROOM = get_room_by_id(opened_room_id);
 		var text = ROOM.players_on+"/"+ROOM.players_max;
-		canvas_backround.fillText(text, left_x_values, top_y);
-		}*/
+		canvas_backround.fillText(text, status_x+225, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+110);
+		}
 	
 	//show fps
 	update_fps();
