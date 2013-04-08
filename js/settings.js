@@ -64,7 +64,8 @@ var preload_total=0;			//total images for preload
 var preload_left=0;			//total images left for preload
 var FS=false;				//fullscreen off/on
 var tab_scores=false;			//show live scroes on TAB
-var status_x=0				//status bar x coordinates
+var status_x=0;				//info bar x coordinates
+var status_y=0;				//info bar y coordinates
 var chat_mode=0;				//if 1, show textbox for writing
 var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank

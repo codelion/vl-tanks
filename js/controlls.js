@@ -69,6 +69,11 @@ function on_mousemove_background(event){
 		mouseY = event.layerY;
 		}
 	mouse_pos = [mouseX, mouseY];
+	//full screen fix
+	if(FS==true){
+		mouseX = mouseX - status_x;	
+		mouseY = mouseY + APP_SIZE_CACHE[1] - HEIGHT_APP;
+		}
 	//settings actions
 	if(PLACE == 'init'){
 		if(preloaded==false)
@@ -163,7 +168,12 @@ function on_mousedown_back(event){
 		mouseX = event.layerX;
 		mouseY = event.layerY;
 		}
-	menu_pressed = false;		
+	menu_pressed = false;
+	//full screen fix
+	if(FS==true){
+		mouseX = mouseX - status_x;	
+		mouseY = mouseY + APP_SIZE_CACHE[1] - HEIGHT_APP;
+		}
 	for(var i in BUTTONS){
 		if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 		if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
@@ -172,30 +182,6 @@ function on_mousedown_back(event){
 			window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 		else
 			BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
-		}
-	if(PLACE=='game' && FS==true){
-		//alternative #1 - y coord changes couse of FS screen size change
-		mouseY = mouseY + 175 - HEIGHT_APP + 350;
-		for(var i in BUTTONS){
-			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
-			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
-			if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
-			if(typeof BUTTONS[i].function == 'string')
-				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
-			else
-				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
-			}
-		//alternative #2 - x coord changes couse of statsu bar can be centered
-		mouseX = mouseX - round((WIDTH_APP-700)/2);
-		for(var i in BUTTONS){
-			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
-			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
-			if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
-			if(typeof BUTTONS[i].function == 'string')
-				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
-			else
-				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
-			}
 		}
 	}
 //mouse click release on background

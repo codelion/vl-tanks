@@ -1,5 +1,4 @@
 bugs:
-	full screen statusbar
 	sync bullets, accuracy?
 soldiers in multiplayer
 	sync AI actions

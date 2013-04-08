@@ -74,6 +74,11 @@ function draw_quality_button(first_run){
 			QUALITY = 1;
 		setCookie("quality", QUALITY, 30);
 		draw_quality_button(false);
+		
+		//reset tanks image cache 
+		for(var i in TANKS){
+			TANKS[i].cache_tank_verified = 0;
+			}
 		});
 	}
 //show fullscreen button in statusbar
