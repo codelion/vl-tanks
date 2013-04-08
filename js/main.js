@@ -57,7 +57,7 @@ function check_canvas_sizes(){
 		WIDTH_SCROLL = 800;
 		if(WIDTH_MAP<800)
 			WIDTH_SCROLL = WIDTH_MAP;
-		HEIGHT_SCROLL = HEIGHT_APP-150-25;
+		HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		}
 	else{
 		//full screen
@@ -72,17 +72,17 @@ function check_canvas_sizes(){
 			WIDTH_APP = WIDTH_MAP;
 		if(WIDTH_APP < APP_SIZE_CACHE[0])
 			WIDTH_APP = APP_SIZE_CACHE[0];	
-		if(HEIGHT_APP > HEIGHT_MAP)
-			HEIGHT_APP = HEIGHT_MAP;
+		if(HEIGHT_APP > HEIGHT_MAP+INFO_HEIGHT+STATUS_HEIGHT)
+			HEIGHT_APP = HEIGHT_MAP+INFO_HEIGHT+STATUS_HEIGHT;
 		if(HEIGHT_APP < APP_SIZE_CACHE[1])
 			HEIGHT_APP = APP_SIZE_CACHE[1];	
 		//scroll
 		WIDTH_SCROLL = dimensions[0];
-		HEIGHT_SCROLL = dimensions[1]-HEIGHT_STATUS_AREA;
+		HEIGHT_SCROLL = HEIGHT_MAP;
 		if(WIDTH_SCROLL > WIDTH_MAP)
 			WIDTH_SCROLL = WIDTH_MAP;
-		if(HEIGHT_SCROLL+HEIGHT_STATUS_AREA > HEIGHT_MAP)
-			HEIGHT_SCROLL = HEIGHT_MAP-HEIGHT_STATUS_AREA;
+		if(HEIGHT_SCROLL+INFO_HEIGHT+STATUS_HEIGHT > HEIGHT_APP)
+			HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		}
 	//background
 	document.getElementById("canvas_backround").width  = WIDTH_APP;
@@ -196,6 +196,9 @@ function preload_all_files(){
 		'../img/button.png',
 		'../img/explosion.png',
 		'../img/explosion_big.png',
+		'../img/statusbar.png',
+		'../img/level.png',
+		'../img/skill.png',
 		'../img/map/mine.png',
 		];
 	audio_to_preload = [
@@ -318,7 +321,7 @@ function init_action(map_nr, my_team){
 		}
 	
 	//handler for mini map
-	register_button(5, HEIGHT_APP-150-25+5, 120, 138, 'game', function(xx, yy){ 
+	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
 		MAP_SCROLL_CONTROLL=true; 
 		move_to_place(xx, yy);
 		});

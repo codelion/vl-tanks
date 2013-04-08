@@ -19,7 +19,7 @@ function draw_map(map_only){
 			status_x = round((WIDTH_APP-700)/2);
 			if(status_x<0) status_x=0;
 			}
-		status_y = HEIGHT_APP-150-25;
+		status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		}
 	
 	//background
@@ -66,43 +66,34 @@ function draw_map(map_only){
 	if(map_only==false){
 		//background background
 		canvas_backround.fillStyle = "#000000";
-		canvas_backround.fillRect(status_x, status_y, WIDTH_APP, 150);
+		canvas_backround.fillRect(status_x, status_y, WIDTH_APP, INFO_HEIGHT);
 		
-		//top line
-		canvas_backround.beginPath();
-		canvas_backround.moveTo(0, HEIGHT_APP-150-25+2.5);
-		canvas_backround.lineTo(WIDTH_APP, HEIGHT_APP-150-25+0.5);
-		canvas_backround.lineWidth = 5;
-		canvas_backround.strokeStyle = "#196119";
-		canvas_backround.stroke();
+		//image
+		var img = new Image();
+		img.src = '../img/statusbar.png';
+		canvas_backround.drawImage(img, status_x, status_y);
 		
 		//tank icon
-		var icon_x = 450;
+		var icon_x = 140;
 		if(TYPES[MY_TANK.type].preview != undefined){
 			var img = new Image();
 			img.src = "../img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
-			canvas_backround.drawImage(img, icon_x+12, HEIGHT_APP-150-25+40);
+			canvas_backround.drawImage(img, icon_x, status_y+37);
 			}
 			
 		//tank name
-		canvas_backround.fillStyle = "#8fc74c";
-		canvas_backround.font = "bold 12px Verdana";	
-		canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x+30, status_y+27);
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";	
+		canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x-5, status_y+25);
 			
-		//tank driver border
-		canvas_backround.lineWidth = 5;
-		canvas_backround.strokeStyle = "#196119";
-		canvas_backround.rect(icon_x+0.5, HEIGHT_APP-150-25+1.5, 115, 150-5);
-		canvas_backround.stroke();
-		
 		draw_status_bar();
 		
 		redraw_tank_stats();
-		draw_tank_abilities();
 		
-		//ability buttons
+		//abilities
+		draw_tank_abilities();
 		for(var i=0; i<ABILITIES_POS.length; i++){
-			//execute skill
+			//register skill button
 			register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
 				do_ability(ABILITIES_POS[i].nr, MY_TANK);
 				}, i);
@@ -167,10 +158,11 @@ function lighten_pixels_all(tank){
 	}
 //move map by user mouse coordinates on mini map
 function move_to_place(mouse_x, mouse_y){
-	area_width = 120;
-	area_height = 138;
-	mouse_x = mouse_x - 5;
-	mouse_y = mouse_y - (HEIGHT_APP-150-25+5);
+	//settings
+	area_width = MINI_MAP_PLACE[2];
+	area_height = MINI_MAP_PLACE[3];
+	mouse_x = mouse_x - MINI_MAP_PLACE[0];
+	mouse_y = mouse_y - (HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1]);
 	visible_block_x_half = WIDTH_SCROLL*area_width/WIDTH_MAP/2;
 	visible_block_y_half = HEIGHT_SCROLL*area_height/HEIGHT_MAP/2;
 	
@@ -222,21 +214,22 @@ function auto_scoll_map(){
 //mini map in status bar
 function redraw_mini_map(){
 	//settings
-	var button_width = 120;
-	var button_height = 138;
-	var pos1 = 5;
-	var pos2 = HEIGHT_APP-150-25+5;
+	var button_width = MINI_MAP_PLACE[2];
+	var button_height = MINI_MAP_PLACE[3];
+	var pos1 = MINI_MAP_PLACE[0];
+	var pos2 = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1];
+	var border = MINI_MAP_PLACE[4];
 	
 	//clear mini map - borders
-	canvas_backround.fillStyle = "#196119";
-	canvas_backround.fillRect(pos1-5, pos2-5, button_width+10, button_height+10);
+	canvas_backround.fillStyle = "#162508";
+	canvas_backround.fillRect(pos1-border, pos2-border, button_width+border*2, button_height+border*2);
 	
 	//white color
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.fillRect(pos1, pos2, button_width, button_height);
 	
 	//active zone
-	canvas_backround.fillStyle = "#8c8c8c";
+	canvas_backround.fillStyle = "#97998c";
 	canvas_backround.fillRect(
 		pos1-map_offset[0]*button_width/WIDTH_MAP, 
 		pos2-map_offset[1]*button_height/HEIGHT_MAP, 

@@ -20,7 +20,10 @@ var HEIGHT_STATUS_AREA = 171;		//status are height
 var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
 var MAX_SENT_PACKETS = 5000;		//max packets, that we can send to server per game
 var NETWORK_PACKETS_LOG = false;	//if show sent and received packets log
-var VERSION = "1.1.12";			//app version
+var INFO_HEIGHT = 130;			//height of information block
+var STATUS_HEIGHT = 25;			//height of statusbar
+var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
+var VERSION = "1.1.13";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -66,7 +69,7 @@ var chat_mode=0;				//if 1, show textbox for writing
 var CHAT_LINES=new Array();		//chat array lines
 var MY_TANK;				//my tank
 var TO_RADIANS = Math.PI/180; 		//for rotating
-var SKILL_BUTTON = 55;			//skill button width and height
+var SKILL_BUTTON = 57;			//skill button width and height
 var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join=-1;			//id of room, requested to join

@@ -95,7 +95,7 @@ MAPS.push({
 MAPS.push({
 	name: "Mini",
 	width: 800,
-	height: 350,
+	height: 370,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	1,	4,	'Base'],
