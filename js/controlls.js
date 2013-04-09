@@ -43,7 +43,7 @@ function on_keyboard_action(event){
 				}
 			}
 		}
-	if(k==83){
+	if(k==83 && chat_mode==0){
 		//s
 		if(MAP_SCROLL_MODE==1) MAP_SCROLL_MODE = 2;
 		else{

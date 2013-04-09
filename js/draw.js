@@ -59,12 +59,13 @@ function draw_main(){
 						auto_scoll_map();
 					}
 				}
+			
 			//check for ghost mode
 			if(TANKS[i].respan_time != undefined){
 				speed_multiplier = 0.5;
 				if(TANKS[i].respan_time - Date.now() < 0){	
 					delete TANKS[i].respan_time;
-					delete TANKS[i]['dead'];
+					delete TANKS[i].dead;
 					}
 				}
 			
@@ -662,6 +663,7 @@ function update_fps(){
 	}
 var red_line_y=0;
 //selecting tank window
+var last_selected = -1;
 function draw_tank_select_screen(selected_tank){
 	PLACE = 'select';
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
@@ -687,11 +689,13 @@ function draw_tank_select_screen(selected_tank){
 		}
 	
 	//background
-	canvas_backround.fillStyle = "#f0f9e4";
-	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	if(last_selected == -1){
+		canvas_backround.fillStyle = "#f0f9e4";
+		canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
+		img = new Image();
+		img.src = '../img/background.jpg';
+		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		}
 	
 	//show all possible tanks
 	j = 0;
@@ -702,48 +706,54 @@ function draw_tank_select_screen(selected_tank){
 			y = y + preview_xy+gap;
 			j = 0;
 			}
-		if(selected_tank != undefined && selected_tank == i)
-			canvas_backround.fillStyle = "#8fc74c";	//selected
-		else
-			canvas_backround.fillStyle = "#dbd9da";
-		canvas_backround.fillRect(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy);
+		if(i == selected_tank || i == last_selected || last_selected==-1){
+			//reset
 			
-		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
-		
-		var img_tmp2 = new Image();
-		img_tmp2.src = '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
-		var pos1 = 15+j*(preview_xy+gap);
-		var pos2 = y;
-		canvas_backround.drawImage(img_tmp2, pos1, pos2, preview_xy, preview_xy);
-		
-		ROOM = get_room_by_id(opened_room_id);
-		if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
-			var img_lock = new Image();
-			img_lock.src = '../img/lock.png';
-			canvas_backround.drawImage(img_lock, pos1+50, pos2+45);
-			}
-		
-		register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
-			if(game_mode == 2){
-				ROOM = get_room_by_id(opened_room_id);
-				if(ROOM.settings[0]=='normal'){
-					if(TYPES[index].bonus != undefined){
-						return false;
-						}
-					else{
-						register_tank_action('change_tank', opened_room_id, name, index);
-						return false;
-						}
-					}
-				else
-					return false;
+			//background
+			if(selected_tank != undefined && selected_tank == i)
+				canvas_backround.fillStyle = "#8fc74c";	//selected
+			else
+				canvas_backround.fillStyle = "#dbd9da";
+			canvas_backround.fillRect(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy);
+			canvas_backround.strokeStyle = "#196119";
+			roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
+			
+			//logo
+			var pos1 = 15+j*(preview_xy+gap);
+			var pos2 = y;
+			drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE);
+			
+			//if bonus
+			ROOM = get_room_by_id(opened_room_id);
+			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
+				var img_lock = new Image();
+				img_lock.src = '../img/lock.png';
+				canvas_backround.drawImage(img_lock, pos1+90-14-5, pos2+90-20-5);
 				}
-			my_tank_nr = index;
-			draw_tank_select_screen(index);
-			}, i);
+			
+			//register button
+			register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
+				if(game_mode == 2){
+					ROOM = get_room_by_id(opened_room_id);
+					if(ROOM.settings[0]=='normal'){
+						if(TYPES[index].bonus != undefined){
+							return false;
+							}
+						else{
+							register_tank_action('change_tank', opened_room_id, name, index);
+							return false;
+							}
+						}
+					else
+						return false;
+					}
+				my_tank_nr = index;
+				draw_tank_select_screen(index);
+				}, i);
+			}
 		j++;
 		}
+	last_selected = selected_tank;
 	y = y + preview_xy+10;
 	
 	//tank info block
@@ -755,11 +765,10 @@ function draw_tank_select_screen(selected_tank){
 
 	//tank stats
 	if(selected_tank != undefined){
-		var img_tmp3 = new Image();
-		img_tmp3.src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
+		var src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_xy)/2);
-		canvas_backround.drawImage(img_tmp3, pos1, pos2);
+		drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
@@ -830,12 +839,12 @@ function draw_tank_select_screen(selected_tank){
 						ROOM.players[p].tank = selected_tank;
 					
 					//icon	
-					var img_tmp2 = new Image();
 					tank_i = ROOM.players[p].tank;
-					img_tmp2.src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
+					src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
-					canvas_backround.drawImage(img_tmp2, pos1, pos2, ICON_WIDTH, ICON_WIDTH);
+					drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH);
+					
 					j++;
 					}
 				}
@@ -891,7 +900,7 @@ function update_preload(images_loaded){
 	canvas_backround.fillStyle = "#dbd9da";
 	roundRect(canvas_backround, 0, HEIGHT_APP-24, WIDTH_APP, 23, 0, true);
 	
-	if(preload_left==0){
+	if(preload_left==0 || preload_left < 3){
 		preloaded=true;
 		add_first_screen_elements();
 		return false;

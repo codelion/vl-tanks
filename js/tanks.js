@@ -20,7 +20,8 @@ function draw_tank(tank){
 	else{
 		visibility = 1;
 		if(tank.dead == 1 && tank.death_respan != undefined){
-			return false;
+			tank_size = tank_size/2;
+			//return false;
 			}
 		if(tank.dead == 1 && tank.death_respan == undefined){
 			tank_size = tank_size/2;
@@ -43,6 +44,7 @@ function draw_tank(tank){
 		for (i in tank.extra_icon)
 			cache_id += "E:"+tank.extra_icon[i][0]+',';
 		if(tank.stun != undefined)	cache_id += 'ST,';
+		if(tank.berserker != undefined)	cache_id += 'B,';
 		if(tank.clicked_on != undefined){
 			cache_id += 'EC,';
 			tank.clicked_on = tank.clicked_on - 1;
@@ -85,6 +87,18 @@ function draw_tank(tank){
 					tmp_object.strokeStyle = "#C0C0C0";
 					tmp_object.stroke();
 					}
+				}
+				
+			//draw berserker
+			if(tank.berserker != undefined){
+				tmp_object.beginPath();
+				var radius = tank_size/2;
+				if(radius>35)
+				radius=35;
+				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
+				tmp_object.lineWidth = 3;
+				tmp_object.strokeStyle = "#c10000";
+				tmp_object.stroke();
 				}
 			
 			//draw stun
@@ -251,13 +265,15 @@ function draw_tank_move(mouseX, mouseY){
 		delete MY_TANK.try_mortar;
 		delete MY_TANK.try_bomb;
 		delete MY_TANK.try_airstrike;
-				
+		
+		if(MY_TANK.death_respan != undefined) return false;
+			
 		//check clicks
 		var found_something = false;
 		target_lock_id=0;
 		if(MY_TANK.target_move_lock != undefined)
 			delete MY_TANK.target_move_lock;
-		if(MY_TANK['respan_time'] == undefined){ 
+		if(MY_TANK.respan_time == undefined){
 			for(var i in TANKS){
 				var tank_size =  0.9*TYPES[TANKS[i].type].size[1];
 				if(TANKS[i].team == MY_TANK.team){
@@ -403,13 +419,13 @@ function tank_level_handler(){	//once per second
 		}
 	}
 //checks tanks hp regen
-function level_hp_regen_handler(){		//once per 1 second - 1%/s
+function level_hp_regen_handler(){		//once per 1 second - 2%/s
 	for (i in TANKS){
 		if(TANKS[i].dead == 1 || TANKS[i].type == 'tower') continue;
 		if(TYPES[TANKS[i].type].no_repawn == undefined){
 			var max_hp = TYPES[TANKS[i].type].life[0] + TYPES[TANKS[i].type].life[1] * (TANKS[i].level-1);
 			//passive hp regain - 1%/s
-			var extra_hp = max_hp * 1.0 / 100;
+			var extra_hp = max_hp * 2.0 / 100;
 			if(TANKS[i].hp < max_hp){
 				TANKS[i].hp = TANKS[i].hp + extra_hp;
 				if(TANKS[i].hp > max_hp)
@@ -818,17 +834,16 @@ function check_if_broadcast_kill(KILLER, VICTIM){
 function death(tank){
 	tank.hp = 0;
 	tank.move = 0;
-
+	tank.death_respan = 2*1000+Date.now();
+	tank.dead = 1;
+	
 	//renew specials
 	delete tank['ability_1_in_use'];
 	delete tank['ability_2_in_use'];
 	delete tank['ability_3_in_use'];
 	delete tank['target_move_lock'];
 	delete tank['target_shoot_lock'];
-	
-	tank['move'] = 0;
-	tank['death_respan'] = 2*1000+Date.now();
-	tank['dead'] = 1;
+
 	if(tank.level < 3)
 		tank.respan_time = 5*1000+Date.now();
 	else

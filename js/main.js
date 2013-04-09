@@ -112,7 +112,9 @@ function add_first_screen_elements(){
 	
 	name_tmp = getCookie("player_name");
 	if(name_tmp != ''){
-		name = name_tmp+Math.floor(Math.random()*99);
+		name = name_tmp;
+		if(DEBUG==true)
+			name = name_tmp+Math.floor(Math.random()*99);
 		}
 	counter_tmp = getCookie("start_count");
 	if(counter_tmp != ''){
@@ -198,7 +200,7 @@ function preload_all_files(){
 		'../img/explosion_big.png',
 		'../img/statusbar.png',
 		'../img/level.png',
-		'../img/skill.png',
+		'../img/logo-small.png',
 		'../img/map/mine.png',
 		];
 	audio_to_preload = [
@@ -373,8 +375,6 @@ function quit_game(init_next_game){
 	
 	room_id_to_join = -1;
 	starting_timer = -1;
-	ROOMS = [];
-	PLAYERS = [];
 	MINES = [];
 	TANKS = [];
 	
@@ -389,7 +389,6 @@ function quit_game(init_next_game){
 		if(audio_main != undefined)
 			audio_main.pause();
 		
-		//leave_game(name, opened_room_id);
 		if(game_mode == 2){
 			register_tank_action('leave_game', opened_room_id, name);
 			room_controller();
@@ -412,6 +411,8 @@ function quit_game(init_next_game){
 		}catch(error){}
 	
 	//reset other variables
+	ROOMS = [];
+	PLAYERS = [];
 	opened_room_id = -1;
 	BULLETS = [];
 	BUTTONS = [];
@@ -422,6 +423,8 @@ function quit_game(init_next_game){
 	on_click_functions = [];
 	mouse_move_controll = false;
 	mouse_click_controll = false;
+	ABILITIES_POS = [];
+	game_mode = 1;
 	
 	if(init_next_game!=false){
 		init_game(false);

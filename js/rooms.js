@@ -1,5 +1,5 @@
 //rooms list window
-function draw_rooms_list(){
+function draw_rooms_list(message){	log('draw_rooms_list.....');
 	PLACE = 'rooms';
 	room_controller();
 	
@@ -32,6 +32,23 @@ function draw_rooms_list(){
 	
 	x = x + 100+10;
 	
+	//refresh button
+	width = 100;
+	height = 30;
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#69a126";
+	roundRect(canvas_backround, x, y, width, height, 5, true);
+	register_button(x, y, width, height, PLACE, function(xx, yy){
+		register_tank_action('ask_rooms', false, name);
+		draw_rooms_list();
+		});
+	//text
+	text = "Refresh";
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "Bold 13px Helvetica";
+	canvas_backround.fillText(text, x+letter_padding_left+12, y+(height+font_pixel_to_height(13))/2);
+	x = x + 100+10;
+	
 	//back button
 	width = 80;
 	canvas_backround.strokeStyle = "#000000";
@@ -47,10 +64,17 @@ function draw_rooms_list(){
 	canvas_backround.fillText(text, x+letter_padding_left+5, y+(height+font_pixel_to_height(14))/2);
 
 	//waiting players text
-	text = "Waiting Players: "+get_waiting_players_count();
+	text = "Waiting Soldiers: "+get_waiting_players_count();
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 12px Helvetica";
 	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);
+	
+	//error
+	if(message != undefined){
+		canvas_backround.fillStyle = "#c50000";
+		canvas_backround.font = "Bold 14px Helvetica";
+		canvas_backround.fillText(message, 500, y+(height+font_pixel_to_height(14))/2);
+		}
 	
 	y = y + height+10;
 	x = x - 100-10;
@@ -99,6 +123,8 @@ function draw_rooms_list(){
 					room_id_to_join = extra;
 					room_controller("room"+room_id_to_join);
 					}
+				else
+					draw_rooms_list("Error, room does not exists.");
 				}, ROOMS[i].id);
 	
 			//join text
@@ -330,6 +356,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 function draw_room(room_id){
 	PLACE = 'room';
 	ROOM = get_room_by_id(room_id);
+	game_mode = 2;
 	opened_room_id = ROOM.id;
 	players = ROOM.players;
 	
@@ -380,7 +407,8 @@ function draw_room(room_id){
 			//check if room has correct player number
 			var room_tmp = get_room_by_id(opened_room_id);
 			if(room_tmp == false || room_tmp.players.length%2==1){
-				return false;	//error or wrong count
+				if(DEBUG==false) 
+					return false;	//error or wrong count
 				}
 			//show select tanks room
 			game_mode = 2;
@@ -413,7 +441,7 @@ function draw_room(room_id){
 		}
 		
 	//Waiting players text
-	text = "Waiting Players: "+get_waiting_players_count();
+	text = "Waiting Soldiers: "+get_waiting_players_count();
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 12px Helvetica";
 	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);		

@@ -145,7 +145,7 @@ function send_packet(type, message){
 		console.log('Error: trying to send without connection: '+type);
 		return false;
 		}
-	if(NETWORK_PACKETS_LOG)
+	if(DEBUG==true)
 		console.log("["+type+"]------->");
 	
 	//log packets count
@@ -182,7 +182,7 @@ function get_packet(fromClient, message){
 	DATA = JSON.parse(message);
 	var type = DATA.type;
 	DATA = DATA.message;
-	if(NETWORK_PACKETS_LOG)
+	if(DEBUG==true)
 		console.log("<-------["+type+"]");
 	
 	if(type == 'new_room'){		//new room was created
@@ -225,6 +225,8 @@ function get_packet(fromClient, message){
 					}
 				}
 			}
+		else
+			log('Error: can not find room for leaving.');
 		}
 	else if(type == 'kick_player'){	//player was kicked
 		//DATA = [room_id, player_name]
@@ -565,6 +567,12 @@ function get_waiting_players_count(){
 	return waiting_users;
 	}
 function disconnect_game(e){
+	if(PLACE=='room' && game_mode == 2){
+		if(confirm("Do you really want to leave this room?")==false){
+			return false;
+			}
+		register_tank_action('leave_room', opened_room_id, name);
+		}
 	if(PLACE=='game' && game_mode == 2){
 		if(confirm("Do you really want to quit game???")==false){
 			return false;
