@@ -1,23 +1,29 @@
 # Moon wars
 
-HTML5 based tank game.
+HTML5 based tank game. Requires Firefox, Chrome or Opera.
 
 ## Features:
-* 5 tanks
-* 3 maps
+* 8 tanks and 2 air units
+* 4 maps
 * single player
 * multi player
 * open source
 * full screen support
 * using html5, no flash
 
-## Install
-* no install - just download and open index.html in modern browser.
-* or use quick access - http://htmlpreview.github.com/?https://github.com/viliusle/vl-tanks/blob/master/index.html
-* multiplayer requires additional websockets server.
+## Getting Started
+* http://viliusle.github.com/vl-tanks/
+* or download and open index.html in modern browser to play dev version
 
 ## Latest News
+* added multiplayer server
+* added units skills
+* added brains for soldiers (AI)
+* added new map, and more units
 * added soldiers for support in battle
-* add map access from mini map.
+* add map access from mini map
 * added accuracy
 * upgraded shooting
+
+## Contacts
+Email me www.viliusl@gmail.com

@@ -1,14 +1,18 @@
 //rooms list window
 function draw_rooms_list(){
 	PLACE = 'rooms';
+	room_controller();
+	
 	x = 10;
 	y = 10;
 	gap = 10;
 	letter_padding_left = 15;
 	
 	//background
+	canvas_backround.fillStyle = "#f0f9e4";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//create button
@@ -41,14 +45,15 @@ function draw_rooms_list(){
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 14px Arial";
 	canvas_backround.fillText(text, x+letter_padding_left+5, y+(height+font_pixel_to_height(14))/2);
-	y = y + height+10;
-	x = x - 100-10;
-	
-	//online players text
-	text = "Online Players: "+PLAYERS.length;
+
+	//waiting players text
+	text = "Waiting Players: "+get_waiting_players_count();
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x, y+25);
+	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);
+	
+	y = y + height+10;
+	x = x - 100-10;
 		
 	//show rooms
 	padding_top = 20;
@@ -90,8 +95,9 @@ function draw_rooms_list(){
 			register_button(x+width-70, y, 70, height, PLACE, function(xx, yy, extra){
 				var ROOM = get_room_by_id(extra); 
 				if(ROOM != false && ROOM.players.length < ROOM.max){
-					register_tank_action('join_room', extra, name);
 					draw_room(extra);
+					room_id_to_join = extra;
+					room_controller("room"+room_id_to_join);
 					}
 				}, ROOMS[i].id);
 	
@@ -133,8 +139,12 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		game_map='Classic';
 		
 	PLACE = 'create_room';
+	
+	//background
+	canvas_backround.fillStyle = "#f0f9e4";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	game_name = name+"'s room";
@@ -221,7 +231,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Game Mode:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = ['normal', 'random', 'mirror', 'freedom'];
+	values = ['normal', 'random', 'mirror'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";
@@ -296,11 +306,12 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	register_button(10+offset_left, 60+offset_top, 105, 30, PLACE, function(){
 		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map);
 		draw_room(new_id);
+		room_controller("room"+new_id);
 		});	
 	
 	//back button block
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#c50000";
 	roundRect(canvas_backround, 10+offset_left+120, 60+offset_top, 105, 30, 2, true);
 	
 	//back button text
@@ -311,6 +322,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	
 	//register back button
 	register_button(10+offset_left+120, 60+offset_top, 105, 30, PLACE, function(){
+		room_id_to_join = -1;
 		draw_rooms_list();
 		});
 	}
@@ -320,6 +332,7 @@ function draw_room(room_id){
 	ROOM = get_room_by_id(room_id);
 	opened_room_id = ROOM.id;
 	players = ROOM.players;
+	
 	x = 10;
 	y = 10;
 	width = 135;
@@ -328,8 +341,10 @@ function draw_room(room_id){
 	letter_padding_left = 15;
 	
 	//background
+	canvas_backround.fillStyle = "#f0f9e4";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//back button
@@ -341,6 +356,7 @@ function draw_room(room_id){
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		register_tank_action('leave_room', ROOM.id, name);
+		room_id_to_join = -1;
 		draw_rooms_list();
 		});
 	//text
@@ -363,12 +379,27 @@ function draw_room(room_id){
 		register_button(x, y, width, height, PLACE, function(xx, yy){
 			//check if room has correct player number
 			var room_tmp = get_room_by_id(opened_room_id);
-			if(room_tmp == false /*|| room_tmp.players.length%2==1*/){
+			if(room_tmp == false || room_tmp.players.length%2==1){
 				return false;	//error or wrong count
 				}
 			//show select tanks room
 			game_mode = 2;
-			register_tank_action('prepare_game', opened_room_id);
+			host_enemy_name = '';
+			host_team = '';
+			ROOM = get_room_by_id(room_id);
+			for(var i in ROOM.players){
+				if(ROOM.players[i].name == ROOM.host){
+					host_team = ROOM.players[i].team;
+					break;
+					}	
+				}
+			for(var i in ROOM.players){
+				if(ROOM.players[i].team != host_team){
+					host_enemy_name = ROOM.players[i].name;
+					break;
+					}	
+				}
+			register_tank_action('prepare_game', opened_room_id, host_enemy_name);
 			});
 		
 		//text
@@ -380,6 +411,13 @@ function draw_room(room_id){
 		canvas_backround.font = "Bold 13px Helvetica";
 		canvas_backround.fillText(text, x+letter_padding_left, y+(height+font_pixel_to_height(13))/2);
 		}
+		
+	//Waiting players text
+	text = "Waiting Players: "+get_waiting_players_count();
+	canvas_backround.fillStyle = "#000000";
+	canvas_backround.font = "Bold 12px Helvetica";
+	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);		
+		
 	y = y + height+20;	
 	x = x - 80-10;
 	
@@ -537,7 +575,7 @@ function draw_room(room_id){
 				
 				//onkick event
 				register_button(x2+width-50, y, 50, height, PLACE, function(xx, yy, extra){
-					on_kick_player('right', extra, opened_room_id);
+					on_kick_player('right', extra, opened_room_id);	
 					}, right_n-1);
 				}	
 			}
@@ -608,16 +646,17 @@ function draw_room(room_id){
 function on_kick_player(side, index, room_id){
 	left_n = 0;
 	right_n = 0;
-	for(var i in players){
-		if(side=='left' && players[i].team=="B"){
+	ROOM = get_room_by_id(room_id);
+	for(var i in ROOM.players){
+		if(side=='left' &&  ROOM.players[i].team=="B"){
 			if(index==left_n)
-				register_tank_action('kick_player', room_id, players[i].name);
+				register_tank_action('kick_player', room_id,  ROOM.players[i].name);
 			left_n++;
 			}
-		if(side=='right' && players[i].team=="R"){
+		if(side=='right' &&  ROOM.players[i].team=="R"){
 			if(index==right_n)
-				register_tank_action('kick_player', room_id, players[i].name);
-			left_n++;
+				register_tank_action('kick_player', room_id,  ROOM.players[i].name);
+			right_n++;
 			}
 		}
 	}
