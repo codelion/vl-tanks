@@ -22,10 +22,10 @@ function check_path_AI(TANK){
 		}
 	
 	//if in battle
-	if(TANK.attacking != undefined && TANK.attacking != 0){
+	/*if(TANK.attacking != undefined && TANK.attacking != 0){
 		TANK.move = 0; 
 		return false; 
-		}
+		}*/
 	
 	set_random_path_AI(TANK);
 	}

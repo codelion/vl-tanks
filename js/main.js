@@ -9,14 +9,14 @@ function init_game(first_time){
 	PLACE = 'init';
 	if(socket_live == true)
 		room_controller();
-	
-	//check if muted
 	if(getCookie("muted") != '')
 		muted=true;
-		
+	if(DEBUG==true){
+		MAX_SENT_PACKETS = 1000;
+		START_GAME_COUNT_MULTI = 5;
+		}
 	unique_id = 0;
 	level = 1;
-	
 	//set width and height
 	if(first_time==true){
 		prepare_maps();
@@ -425,6 +425,8 @@ function quit_game(init_next_game){
 	mouse_click_controll = false;
 	ABILITIES_POS = [];
 	game_mode = 1;
+	last_selected = -1;
+	my_tank_nr = -1;
 	
 	if(init_next_game!=false){
 		init_game(false);

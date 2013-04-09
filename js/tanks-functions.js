@@ -29,17 +29,6 @@ function Soldiers(TANK, descrition_only){
 	//return reuse
 	return 30*1000;
 	}
-function Suicide(TANK, descrition_only){
-	if(descrition_only != undefined)
-		return 'Your tank explodes and you die.';
-	
-	//action
-	do_damage(MY_TANK, MY_TANK, 999999)
-	TANK.kills = TANK.kills - 1;
-	
-	//return reuse
-	return 1;
-	}
 
 //====== Heavy =================================================================
 
@@ -558,7 +547,6 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = 0;
 	tmp['stun_effect'] = TANK.try_stun[1];
-	tmp['pierce_armor'] = 1;
 	BULLETS.push(tmp);
 	
 	//init reuse

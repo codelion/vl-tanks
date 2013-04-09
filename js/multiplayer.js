@@ -437,6 +437,7 @@ function get_packet(fromClient, message){
 			}
 		
 		TANK_TO.deaths = TANK_TO.deaths + 1;
+		TANK_TO.score = TANK_TO.score + SCORES_INFO[2];
 		
 		if(TYPES[TANK_TO.type].name == "Tower"){
 			//change base stats
@@ -462,8 +463,7 @@ function get_packet(fromClient, message){
 			//player
 			TANK_FROM.kills = TANK_FROM.kills + 1;	
 			//score
-			TANK_FROM.score = TANK_FROM.score + 20;	// +20 for kill
-			
+			TANK_FROM.score = TANK_FROM.score + SCORES_INFO[1];
 			death(TANK_TO);
 			}
 		}
@@ -475,10 +475,40 @@ function get_packet(fromClient, message){
 			return false;
 			}
 		TANK_TO.level = DATA[2];
+		TANK_TO.armor = TANK_TO.armor + TYPES[TANK_TO.type].armor[1];
+		TANK_TO.damage = TANK_TO.damage + TYPES[TANK_TO.type].damage[1];
+		if(TANK_TO.armor > TYPES[TANK_TO.type].armor[2])
+			TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
+		TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
 		}
+	else if(type == 'bullet'){	//tank hit
+		//DATA = [target_id, source_id, angle]
+		TANK_TO = get_tank_by_id(DATA[0]);
+		TANK = get_tank_by_id(DATA[1]);
+		if(TANK_TO===false){	
+			console.log('Error: tank_to "'+DATA[0]+'" was not found on tank_hit.');
+			return false;
+			}
+		if(TANK===false){	
+			console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
+			return false;
+			}
+		//create bullet
+		var tmp = new Array();
+		tmp.x = TANK.x + TYPES[TANK.type].size[1]/2;
+		tmp.y = TANK.y + TYPES[TANK.type].size[1]/2;
+		tmp.bullet_to_target = TANK_TO; 
+		tmp.bullet_from_target = TANK;
+		tmp.angle = DATA[2];
+		BULLETS.push(tmp);
+		
+		//extra updates
+		TANK.fire_angle = DATA[2];
+		draw_fire(TANK, TANK_TO);	
+		}	
 	}
 //sending action to other players
-function register_tank_action(action, room_id, player, data){			//lots of broadcasting
+function register_tank_action(action, room_id, player, data, data2, data3){	//lots of broadcasting
 	if(action=='move')
 		send_packet('tank_move', [room_id, player, data]);
 	else if(action=='skill_up')
@@ -549,6 +579,7 @@ function register_new_room(room_name, mode, type, max_players, map){
 		max: max_players,
 		host: name,
 		players: players,
+		version: VERSION,
 		};
 	ROOMS.push(ROOM);
 	send_packet('new_room', ROOM);						//broadcast it

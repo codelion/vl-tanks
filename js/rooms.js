@@ -119,9 +119,13 @@ function draw_rooms_list(message){	log('draw_rooms_list.....');
 			register_button(x+width-70, y, 70, height, PLACE, function(xx, yy, extra){
 				var ROOM = get_room_by_id(extra); 
 				if(ROOM != false && ROOM.players.length < ROOM.max){
-					draw_room(extra);
-					room_id_to_join = extra;
-					room_controller("room"+room_id_to_join);
+					if(ROOM.version == VERSION){
+						draw_room(extra);
+						room_id_to_join = extra;
+						room_controller("room"+room_id_to_join);
+						}
+					else
+						draw_rooms_list("Error, version mismatch.");
 					}
 				else
 					draw_rooms_list("Error, room does not exists.");

@@ -168,8 +168,6 @@ function redraw_tank_stats(){
 	//fill
 	var hp = round(MY_TANK.hp);
 	var hp_max = TYPES[MY_TANK.type].life[0]+TYPES[MY_TANK.type].life[1]*(MY_TANK.level-1);
-	//canvas_backround.fillStyle = "#47780d";
-	//canvas_backround.fillRect(life_x, life_y, round(life_width*hp/hp_max), life_height);
 	var img = new Image();
 	img.src = '../img/level.png';
 	canvas_backround.drawImage(img, life_x, life_y, round(life_width*hp/hp_max), life_height);
@@ -181,11 +179,17 @@ function redraw_tank_stats(){
 	
 	//players
 	if(game_mode == 2){
+		//clear
+		canvas_backround.fillStyle = "#121f05";
+		canvas_backround.fillRect(status_x+220, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+105, 33, 10);
+		//draw
 		canvas_backround.fillStyle = "#294111";
 		canvas_backround.font = "normal 10px Verdana";
 		ROOM = get_room_by_id(opened_room_id);
 		var text = ROOM.players_on+"/"+ROOM.players_max;
-		canvas_backround.fillText(text, status_x+225, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+110);
+		if(ROOM.players_on<10)	text = " "+text;
+		if(ROOM.players_max<10)	text = " "+text;
+		canvas_backround.fillText(text, status_x+220, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+114);
 		}
 	
 	//show fps
@@ -388,7 +392,9 @@ function redraw_mini_map(){
 	for(var e in MAPS[level-1].elements){
 		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
 		x = MAPS[level-1].elements[e][1];
-		y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+		y = MAPS[level-1].elements[e][2];
+		if(element.size[0]<30)	x = x - round(element.size[0]/2);
+		if(element.size[1]<30)	y = y - round(element.size[1]/2);
 		max_w = element.size[0];
 		if(MAPS[level-1].elements[e][3]!=0)
 			max_w = MAPS[level-1].elements[e][3];

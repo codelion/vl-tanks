@@ -1,4 +1,3 @@
-bugs:
-	sync bullets, accuracy?
-soldiers in multiplayer
-	sync AI actions
+sync AI actions
+	enable soldiers in multiplayer
+counter mode

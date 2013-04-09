@@ -230,11 +230,8 @@ function draw_main(){
 						var bullet_target = get_tank_by_id(BULLETS[b].bullet_to_target.id);
 						//calc damage
 						if(bullet_target !== false){
-							if(BULLETS[b].damage != undefined && BULLETS[b].pierce_armor != undefined)
-								do_damage(TANKS[i], bullet_target, BULLETS[b].damage, BULLETS[b].pierce_armor);
-							else
-								do_damage(TANKS[i], bullet_target);
-								
+							do_damage(TANKS[i], bullet_target, BULLETS[b]);
+									
 							//extra effects for non tower
 							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].type!='tower'){
 								if(BULLETS[b].stun_effect != undefined)
@@ -257,7 +254,7 @@ function draw_main(){
 							if(distance_b > BULLETS[b].aoe_splash_range)	
 								continue;	//too far
 							//do damage
-							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor);
+							do_damage(TANKS[i], TANKS[ii], BULLETS[b]);
 							}
 						}
 					BULLETS.splice(b, 1); b--;	//must be done after splice
@@ -489,7 +486,7 @@ function draw_final_score(live, lost_team){
 		for (var i in TANKS){
 			if(TANKS[i].team == lost_team)
 				continue;
-			TANKS[i].score = TANKS[i].score + 100;	//+100 for win
+			TANKS[i].score = TANKS[i].score + SCORES_INFO[4];
 			}
 	
 		PLACE = 'score';

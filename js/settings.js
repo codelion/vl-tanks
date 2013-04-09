@@ -23,8 +23,9 @@ var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
 var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var DEBUG = false;			//show debug info
-var VERSION = "1.1.14";			//app version
+var DEBUG = true;			//show debug info
+var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
+var VERSION = "1.1.15";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
