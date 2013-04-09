@@ -148,6 +148,6 @@ a img {
 	border:1px solid red;
 	display:none;
 	}
-.ie .alert{
+.ie .alert, .safari .alert{
 	display:block;
 	}

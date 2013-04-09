@@ -1,12 +1,18 @@
 //main drawing
+var frame_time;
+var frame_last_time;
 function draw_main(){
 	if(PLACE != 'game') return false;
+	frame_last_time = frame_time;
+	if(frame_last_time==undefined)
+		frame_last_time = Date.now();
+	frame_time = Date.now();
+	var time_gap = Date.now() - frame_last_time;
+	
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);	//clear layer
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	//clear sight layer
-	
-	//quality
 	if(QUALITY>1){
-		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.4)";
+		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 		}
 	
@@ -37,8 +43,7 @@ function draw_main(){
 			
 			//check for respawn
 			if(TANKS[i].death_respan != undefined){
-				TANKS[i].death_respan = TANKS[i].death_respan - 1/FPS;
-				if(TANKS[i].death_respan<0){
+				if(TANKS[i].death_respan - Date.now() < 0){
 					delete TANKS[i].death_respan;
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i]['x'] = round(WIDTH_SCROLL*2/3);
@@ -57,18 +62,22 @@ function draw_main(){
 			//check for ghost mode
 			if(TANKS[i].respan_time != undefined){
 				speed_multiplier = 0.5;
-				TANKS[i].respan_time = TANKS[i].respan_time - 1/FPS;
-				if(TANKS[i].respan_time<0){	
+				if(TANKS[i].respan_time - Date.now() < 0){	
 					delete TANKS[i].respan_time;
 					delete TANKS[i]['dead'];
 					}
 				}
 			
+			//check stun
+			if(TANKS[i].stun - Date.now() < 0){
+				delete TANKS[i].stun;
+				}
+			
 			if(PLACE != 'game') return false;
 			var tank_size =  TYPES[TANKS[i].type].size[1];
 			
-			//if mini shooting - stop
-			if(TYPES[TANKS[i].type].size[0] == "S"){
+			//if soldiers shooting - stop
+			if(TYPES[TANKS[i].type].type == "human"){
 				for(var b in BULLETS){
 					if(BULLETS[b].bullet_from_target.id == TANKS[i].id)
 						TANKS[i].move = 0;	
@@ -87,19 +96,14 @@ function draw_main(){
 					delete TANKS[i].target_move;
 					}
 				else{
-					//get distance
-					tmp_dist_x = TANKS[i_locked].x+TYPES[TANKS[i_locked].type].size[1]/2-(TANKS[i].x+TYPES[TANKS[i].type].size[1]/2)
-					tmp_dist_y = TANKS[i_locked].y+TYPES[TANKS[i_locked].type].size[1]/2-(TANKS[i].y+TYPES[TANKS[i].type].size[1]/2)
-					tmp_distance = Math.sqrt((tmp_dist_x*tmp_dist_x)+(tmp_dist_y*tmp_dist_y));
-					tmp_distance =  tmp_distance -  TYPES[TANKS[i].type].size[1]/2 - TYPES[TANKS[i_locked].type].size[1]/2;
-					
+					tmp_distance = get_distance_between_tanks(TANKS[i_locked], TANKS[i]);
 					//executing custom function
 					if(TANKS[i].reach_tank_and_execute != undefined && tmp_distance < TANKS[i].reach_tank_and_execute[0]){
 						//executing custom function
 						TANKS[i].move = 0;
 						delete TANKS[i].target_move_lock;
 						delete TANKS[i].move_to;
-						window[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked]);
+						window[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
 						delete TANKS[i].reach_tank_and_execute;
 						}
 					//reached targeted enemy for general attack
@@ -125,14 +129,16 @@ function draw_main(){
 					TANKS[i].move = 0;
 					delete TANKS[i].target_move_lock;
 					delete TANKS[i].move_to;
-					window[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true);
+					window[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true, true);
 					delete TANKS[i].reach_pos_and_execute;
 					}
 				}
+			if(TANKS[i].use_AI == true)
+				check_path_AI(TANKS[i]);
 			
 			//tank waiting
-			if(TANKS[i].sleep != undefined && TANKS[i].sleep > 0){
-				TANKS[i].sleep = TANKS[i].sleep - 1/FPS;
+			if(TANKS[i].sleep != undefined && TANKS[i].sleep - Date.now() > 0){
+				//do nothing - sleep
 				}
 			//move tank
 			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined){
@@ -148,11 +154,10 @@ function draw_main(){
 				radiance = Math.atan2(dist_y, dist_x);
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
-				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle)){
-					if(TANKS[i].hit_reuse == 0)
-						if(body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle)){
-						}
-					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier)){
+				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
+					if(TANKS[i].hit_reuse - Date.now() < 0)
+						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
+					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
 							}
@@ -169,38 +174,50 @@ function draw_main(){
 						TANKS[i].move = 0;
 						}
 					else{
-						TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
-						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier);
+						TANKS[i].x += Math.cos(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
+						TANKS[i].y += Math.sin(radiance)*speed2pixels(TANKS[i].speed*speed_multiplier, time_gap);
 						}	
 					}
+				else if(TANKS[i].hit_reuse - Date.now() < 0)
+						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 				}
 			//map scrolling
-			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false){
+			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
 				auto_scoll_map();
 				}
 			//shooting
-			for (b = 0; b < BULLETS.length; b++) {
+			for (b = 0; b < BULLETS.length; b++){
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
 				if(TANKS[i].stun != undefined) continue; //stun
 				
 				//follows tank
-				var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
-				b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - BULLETS[b].x;
-        			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - BULLETS[b].y; 
-				
+				if(BULLETS[b].bullet_to_target != undefined){
+					var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
+					b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - BULLETS[b].x;
+	        			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - BULLETS[b].y; 
+	        			}
+	        		else if(BULLETS[b].bullet_to_area != undefined){
+	        			//bullet with coordinates instead of target
+					b_dist_x = BULLETS[b].bullet_to_area[0] - BULLETS[b].x;
+	        			b_dist_y = BULLETS[b].bullet_to_area[1] - BULLETS[b].y; 
+	        			}
+	        		else{
+	        			console.log('Error: bullet without target');
+	        			continue;
+	        			}
+				//bullet details
 				b_distance = Math.sqrt((b_dist_x*b_dist_x)+(b_dist_y*b_dist_y));
 				b_radiance = Math.atan2(b_dist_y, b_dist_x); 
-				
 				var bullet = get_bullet(TYPES[TANKS[i].type].bullet);
 				if(BULLETS[b].bullet_icon != undefined)
 					var bullet = get_bullet(BULLETS[b].bullet_icon);
 				if(bullet !== false)
-					bullet_speed_tmp = bullet.speed;
+					bullet_speed_tmp = speed2pixels(bullet.speed, time_gap);
 				else{
 					if(TYPES[TANKS[i].type].aoe != undefined)
-						bullet_speed_tmp = 100;
+						bullet_speed_tmp = 1000;
 					else{
-						log("ERROR: missing bullet stats for "+TANKS[i].id+" in draw_main()");
+						console.log("Error: missing bullet stats for "+TANKS[i].id+" in draw_main()");
 						}
 					}
 				BULLETS[b].x += Math.cos(b_radiance)*bullet_speed_tmp;
@@ -216,11 +233,11 @@ function draw_main(){
 								do_damage(TANKS[i], bullet_target, BULLETS[b].damage, BULLETS[b].pierce_armor);
 							else
 								do_damage(TANKS[i], bullet_target);
-							
+								
 							//extra effects for non tower
-							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].speed>0){
-								if(BULLETS[b]!=undefined && BULLETS[b].stun_effect != undefined)	//stun
-									bullet_target.stun = TANKS[i].id;
+							if(bullet_target.team != TANKS[i].team && TYPES[bullet_target.type].type!='tower'){
+								if(BULLETS[b].stun_effect != undefined)
+									bullet_target.stun = Date.now() + BULLETS[b].stun_effect;
 								}
 							}
 						}
@@ -231,30 +248,15 @@ function draw_main(){
 								continue; //friend
 							
 							//check range
-							var enemy = get_tank_by_id(BULLETS[b].bullet_to_targe);
-							var enemy_x = enemy.x + TYPES[enemy.type].size[1]/2;
-							var enemy_y = enemy.y + TYPES[enemy.type].size[1]/2;
+							var enemy_x = BULLETS[b].bullet_to_area[0];
+							var enemy_y = BULLETS[b].bullet_to_area[1];
 							dist_x_b = TANKS[ii].x+TYPES[TANKS[ii].type].size[1]/2 - enemy_x;
 							dist_y_b = TANKS[ii].y+TYPES[TANKS[ii].type].size[1]/2 - enemy_y;
 							var distance_b = Math.sqrt((dist_x_b*dist_x_b)+(dist_y_b*dist_y_b));
 							if(distance_b > BULLETS[b].aoe_splash_range)	
 								continue;	//too far
 							//do damage
-							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor, 1);
-							
-							//extra effects for non tower
-							if(TYPES[TANKS[ii].type].speed>0){
-								if(BULLETS[b].modify_speed != undefined){	//modify speed in %
-									if(TANKS[ii].debuffs == undefined)
-										TANKS[ii].debuffs = [];
-									TANKS[ii].debuffs.push(['slow', BULLETS[b].modify_speed, TANKS[i].id]);
-									}
-								if(BULLETS[b].modify_dps != undefined){	//modify dps in %
-									if(TANKS[ii].debuffs == undefined)
-										TANKS[ii].debuffs = [];
-									TANKS[ii].debuffs.push(['weak', BULLETS[b].modify_dps, TANKS[i].id]);
-									}
-								}
+							do_damage(TANKS[i], TANKS[ii], BULLETS[b].damage, BULLETS[b].pierce_armor);
 							}
 						}
 					BULLETS.splice(b, 1); b--;	//must be done after splice
@@ -264,12 +266,12 @@ function draw_main(){
 					img_bullet = new Image();
 					if(BULLETS[b].bullet_icon != undefined){	
 						//custom bullet
-						img_bullet.src = 'img/bullets/'+BULLETS[b].bullet_icon;
+						img_bullet.src = '../img/bullets/'+BULLETS[b].bullet_icon;
 						bullet_stats = get_bullet(BULLETS[b].bullet_icon);
 						}
 					else{	
 						//default bullet
-						img_bullet.src = 'img/bullets/'+TYPES[TANKS[i].type].bullet;
+						img_bullet.src = '../img/bullets/'+TYPES[TANKS[i].type].bullet;
 						bullet_stats = get_bullet(TYPES[TANKS[i].type].bullet);
 						}
 					if(TYPES[TANKS[i].type].bullet==undefined) continue;
@@ -309,24 +311,25 @@ function draw_main(){
 						}
 					}
 				}
-			if(TANKS[i] != undefined){	//if tank alive
+			if(TANKS[i] != undefined){
 				check_enemies(TANKS[i]);
 				draw_tank(TANKS[i]);
 				}
 			}
 		catch(err){
-			console.log("ERROR: "+err.message);
+			console.log("Error: "+err.message);
 			}
-		}
+		}		//PLACE = 'sdf';
 	lighten_pixels_all();
-	if(MY_TANK['dead']==1)	
-		draw_message(canvas_main, "You will respan in  "+Math.ceil(MY_TANK.respan_time)+" seconds.");
+	if(MY_TANK.dead == 1)	
+		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
 	//show live scroes?
 	if(tab_scores==true){
 		draw_final_score(true);
 		}
 	
+	//show chat lines
 	show_chat();
 	
 	//fps
@@ -335,7 +338,8 @@ function draw_main(){
 	lastLoop = thisLoop;
 	
 	//request next draw
-	requestAnimationFrame(draw_main);
+	if(render_mode == 'requestAnimationFrame')
+		requestAnimationFrame(draw_main);
 	}
 var settings_positions = [];
 var last_active_tab = -1;
@@ -363,7 +367,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//back image
 	var img = new Image();
-	img.src = 'img/map/moon.jpg';
+	img.src = '../img/map/moon.jpg';
 	canvas_backround.drawImage(img, 0, 0, WIDTH_APP, HEIGHT_APP-27, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//text
 	if(logo_visible==1){
@@ -380,7 +384,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	
 	//logo
 	var img = new Image();
-	img.src = 'img/logo.png';
+	img.src = '../img/logo.png';
 	var left = (WIDTH_APP-598)/2;	
 	canvas_backround.drawImage(img, left, 15);
 	
@@ -414,8 +418,8 @@ function draw_logo_tanks(left, top, change_logo){
 	var max_size = 60;
 	//clear
 	var img = new Image();	
-	img.src = 'img/map/moon.jpg';
-	canvas_backround.drawImage(img, left, top-7, 477, 52+10, left, top-7, 477, 52+10);
+	img.src = '../img/map/moon.jpg';
+	canvas_backround.drawImage(img, left, top-7, 600, 52+10, left, top-7, 600, 52+10);
 	if(change_logo==undefined){
 		if(logo_visible==0){
 			logo_visible=1;
@@ -429,20 +433,23 @@ function draw_logo_tanks(left, top, change_logo){
 			logo_visible=0;
 			}
 		}
+	var n = 0;
+	for(var t in TYPES)
+		if(TYPES[t].type == 'tank') n++;
 	for(var t in TYPES){
-		//if(TYPES[t].size[1] > 60) continue;
+		if(TYPES[t].type != 'tank') continue;
 		var tank_size = TYPES[t].size[1];
 		//base
 		var img = new Image();
-		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
+		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
 		if(TYPES[t].size[1] < max_size)	//normal
-			canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+			canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		else	//resized
-			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/TYPES.length)+(50-max_size)/2, top+52-max_size, max_size, max_size);
-		//turrent
+			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
+		//turret
 		var img = new Image();
-		img.src = 'img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
-		canvas_backround.drawImage(img, left+t*(477/TYPES.length)+(50-tank_size)/2, top+52-tank_size);
+		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
+		canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		}
 	}
 var score_button_pos = new Array();
@@ -461,12 +468,24 @@ function draw_final_score(live, lost_team){
 		canvas = canvas_main;
 	else
 		canvas = canvas_backround;
-	
-	if(live==false){
+		
+	//find tanks count
+	var tanks_n = 0;
+	for (var i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'tank')
+			tanks_n++;
+		}
+	if(live==true && tanks_n > 13 && tanks_n < 17 ){
+		button_height = 12;
+		buttons_gap = 4;
+		}
+	else if(live==true && tanks_n > 16){
+		button_height = 10;
+		buttons_gap = 3;
+		}
+	if(live==false){					//final scores
 		//add some score to winning team
 		for (var i in TANKS){
-			if(TANKS[i].score == undefined)
-				TANKS[i].score = 0;
 			if(TANKS[i].team == lost_team)
 				continue;
 			TANKS[i].score = TANKS[i].score + 100;	//+100 for win
@@ -477,7 +496,6 @@ function draw_final_score(live, lost_team){
 		clearInterval(draw_interval_id);
 		clearInterval(level_interval_id);
 		clearInterval(level_hp_regen_id);
-		clearInterval(bots_interval_id);
 		clearInterval(timed_functions_id);
 		
 		if(audio_main != undefined)
@@ -487,12 +505,12 @@ function draw_final_score(live, lost_team){
 		
 		//background
 		var img = new Image();
-		img.src = 'img/background.jpg';
+		img.src = '../img/background.jpg';
 		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
 		canvas_backround.strokeStyle = "#000000";	
 		canvas_backround.fillStyle = "rgba(255, 255, 255, 0.7)";
-		roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20-25, 0, true);
+		roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_APP-20*2-10, 0, true);
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#382da3";
@@ -525,7 +543,7 @@ function draw_final_score(live, lost_team){
 		canvas_backround.font = "bold 16px Helvetica";
 		canvas_backround.fillText("Quit", Math.round((WIDTH_APP-button_width)/2)+20, 45);
 		}
-	else{
+	else{							//scores in game
 		//background in live stats
 		canvas_main.strokeStyle = "#000000";
 		canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -591,20 +609,12 @@ function draw_final_score(live, lost_team){
 			//kills
 			canvas.font = "bold 12px Helvetica";
 			canvas.fillStyle = "#0669ff";
-			var kills = 0;
-			if(TANKS[i].kills != undefined)
-				kills = TANKS[i].kills;
-			else
-				kills = 0;
+			var kills = TANKS[i].kills;
 			canvas.fillText(kills, Math.round((WIDTH_APP-button_width)/2)+300, text_y);
 			
 			//deaths
 			canvas.fillStyle = "#9c0309";
-			var deaths = 0;
-			if(TANKS[i].deaths != undefined)
-				deaths = TANKS[i].deaths;
-			else
-				deaths = 0;
+			var deaths = TANKS[i].deaths;
 			canvas.fillText(deaths, Math.round((WIDTH_APP-button_width)/2)+350, text_y);
 			
 			//towers
@@ -623,9 +633,7 @@ function draw_final_score(live, lost_team){
 			
 			//score
 			canvas.fillStyle = "#ff3405";
-			var score = 0;
-			if(TANKS[i].score != undefined)
-				score = TANKS[i].score;
+			var score = TANKS[i].score;
 			canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+500, text_y);
 			
 			j++;
@@ -658,6 +666,7 @@ function draw_tank_select_screen(selected_tank){
 	PLACE = 'select';
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+	room_controller();
 	
 	var y = 10;
 	var gap = 5;
@@ -678,8 +687,10 @@ function draw_tank_select_screen(selected_tank){
 		}
 	
 	//background
+	canvas_backround.fillStyle = "#f0f9e4";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//show all possible tanks
@@ -701,7 +712,7 @@ function draw_tank_select_screen(selected_tank){
 		roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
 		
 		var img_tmp2 = new Image();
-		img_tmp2.src = 'img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
+		img_tmp2.src = '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview;
 		var pos1 = 15+j*(preview_xy+gap);
 		var pos2 = y;
 		canvas_backround.drawImage(img_tmp2, pos1, pos2, preview_xy, preview_xy);
@@ -709,7 +720,7 @@ function draw_tank_select_screen(selected_tank){
 		ROOM = get_room_by_id(opened_room_id);
 		if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
 			var img_lock = new Image();
-			img_lock.src = 'img/lock.png';
+			img_lock.src = '../img/lock.png';
 			canvas_backround.drawImage(img_lock, pos1+50, pos2+45);
 			}
 		
@@ -718,7 +729,6 @@ function draw_tank_select_screen(selected_tank){
 				ROOM = get_room_by_id(opened_room_id);
 				if(ROOM.settings[0]=='normal'){
 					if(TYPES[index].bonus != undefined){
-						//alert(TYPES[index].name+" can not be selected in normal mode. \nChoose single player, mirror or random to play this it.");
 						return false;
 						}
 					else{
@@ -738,31 +748,32 @@ function draw_tank_select_screen(selected_tank){
 	
 	//tank info block
 	var info_left = 15;
+	var info_block_height = 100;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.strokeStyle = "#196119";
-	roundRect(canvas_backround, info_left, y, 585, 140, 5, true);
+	roundRect(canvas_backround, info_left, y, 585, info_block_height, 5, true);
 
 	//tank stats
 	if(selected_tank != undefined){
 		var img_tmp3 = new Image();
-		img_tmp3.src = 'img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
+		img_tmp3.src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
-		var pos2 = y+((140-preview_xy)/2);
+		var pos2 = y+((info_block_height-preview_xy)/2);
 		canvas_backround.drawImage(img_tmp3, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
-		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+15+15);
+		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+25);
 		
 		//description
-		var height_space = 15;
+		var height_space = 13;
 		for(var d in TYPES[selected_tank].description){
-			canvas_backround.font = "bold 13px Verdana";
+			canvas_backround.font = "bold 11px Verdana";
 			canvas_backround.fillStyle = "#69a126";
-			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+60+d*height_space);
+			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+50+d*height_space);
 			}
 		}
-	y = y + 140+15;
+	y = y + info_block_height+10;
 	
 	//mini maps
 	if(game_mode == 1){	
@@ -774,7 +785,7 @@ function draw_tank_select_screen(selected_tank){
 	if(game_mode == 2){
 		ROOM = get_room_by_id(opened_room_id);
 		players_n = ROOM.players.length;	
-		var ICON_WIDTH = 63;
+		var ICON_WIDTH = 55;
 		//find my team
 		var my_team;
 		for(var t in ROOM.players){
@@ -801,7 +812,7 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.fillText(text, 15+10, y+1+round(ICON_WIDTH/2));
 			
 			//players
-			for(var p in ROOM.players){	//alert(ROOM.players[p].name);
+			for(var p in ROOM.players){
 				if(ROOM.players[p].team == teams[t]){
 					//background
 					canvas_backround.strokeStyle = "#000000";
@@ -821,7 +832,7 @@ function draw_tank_select_screen(selected_tank){
 					//icon	
 					var img_tmp2 = new Image();
 					tank_i = ROOM.players[p].tank;
-					img_tmp2.src = 'img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
+					img_tmp2.src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
 					canvas_backround.drawImage(img_tmp2, pos1, pos2, ICON_WIDTH, ICON_WIDTH);
@@ -848,7 +859,7 @@ function draw_timer_graph(){
 	
 	//background
 	img = new Image();
-	img.src = 'img/background.jpg';
+	img.src = '../img/background.jpg';
 	canvas_backround.drawImage(img, 15-2, red_line_y-2, graph_width+4, graph_height+4, 15-2, red_line_y-2, graph_width+4, graph_height+4);
 	
 	//red block
@@ -906,7 +917,7 @@ function show_chat(){
 	canvas = canvas_main;
 	
 	canvas.font = "bold 13px Helvetica";
-	for(var i in CHAT_LINES){
+	for(var i = CHAT_LINES.length - 1; i >= 0; i--){
 		var text;
 		if(CHAT_LINES[i].author===false)
 			text = CHAT_LINES[i].text;
@@ -916,11 +927,10 @@ function show_chat(){
 			text = text.substring(0, 100);
 		
 		//background
-		if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select'){
-			canvas.font = "normal 13px Helvetica";
-			canvas.fillStyle = "#dbd9da";
-			roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);
-			}
+		//if(PLACE != 'game'){
+		canvas.font = "normal 13px Helvetica";
+		canvas.fillStyle = "#dbd9da";
+		roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);
 		
 		//text color
 		if(CHAT_LINES[i].author===false)
@@ -936,8 +946,11 @@ function show_chat(){
 		canvas.fillText(text, 10, bottom-i*gap);
 		}
 	}
-function body_rotation(obj,str,speed,rot) {
-	speed = speed*100/FPS;
+//calculate body and turret rotation
+function body_rotation(obj, str, speed, rot, time_diff){
+	if(obj.stun != undefined)	return false; //stun
+	if(obj.speed == 0)	return false; //0 speed
+	speed = speed * 100 * time_diff/1000;
 	var flag = false;
 	if (obj[str] - 180 > rot){
 		rot += 360;
@@ -954,4 +967,4 @@ function body_rotation(obj,str,speed,rot) {
 		flag = true;
 	}
 	return flag;
-}
+	}

@@ -1,45 +1,194 @@
 var socket;
 var socket_live = false;
+var orbiter;
+var Rooms_obj;
+var Room_id_obj;
+var waiting_users = 0;
+var SOCKET_ROOMS = '';
+var SOCKET_ROOM_ID = '';
+
+//===== LIBRARY ================================================================
+
 //connecto to sockets server
 function connect_server(){
-	socket = new WebPush(SOCKET);
-	socket.bind('message', function(data){ get_packet(data);  } );
-	socket.bind('open', function() {  
-		socket_live=true;  
-		try{
-			parent.document.getElementById("connected").innerHTML = 'yes';
-			}catch(error){}
-		register_tank_action('ask_rooms', false, name);
-		});
-	socket.bind('close', function() {  
-		socket_live=false;  
-		try{
-			parent.document.getElementById("connected").innerHTML = 'no';
-			}catch(error){}
-		});
-	add_player_to_stats(name);
+	orbiter = new net.user1.orbiter.Orbiter();
+	orbiter.getConnectionMonitor().setAutoReconnectFrequency(15000);
+	orbiter.getLog().setLevel(net.user1.logger.Logger.FATAL);
+	if (!orbiter.getSystem().isJavaScriptCompatible())
+		return alert("Error: your browser do not support JavaScript.");
+	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.READY, readyListener, this);
+	orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.CLOSE, disconnect_server, this);
+	orbiter.connect(SOCKET[0], SOCKET[1]);
 	}
-//disconnect from server
-function disconnect_server(){
-	quit_game(false);
-	if(socket_live==true)
-		socket.disconnect();
+//on connection ready
+function readyListener(e){
+	SOCKET_ROOMS = SOCKET_ROOM_PREFIX+"rooms";
+	Rooms_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOMS);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+	Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+	Rooms_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner);
+	Rooms_obj.join();
+	//status
+	socket_live = true;
+	try{parent.document.getElementById("connected").innerHTML = 'Yes';}catch(error){}
+	}
+//controlls which rooms to join and leave
+function room_controller(new_room){
+	if(socket_live == false) return false;
+	if((PLACE == 'rooms' || PLACE == 'room' || PLACE == 'create_room') && SOCKET_ROOMS==''){
+		//connect to rooms list
+		SOCKET_ROOMS = SOCKET_ROOM_PREFIX+"rooms";
+		Rooms_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOMS);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+		Rooms_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);  
+		Rooms_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner);
+		Rooms_obj.join();
+		}
+	else if(PLACE == 'select' && SOCKET_ROOMS != ''){
+		//disconnect from all rooms
+		SOCKET_ROOMS = '';
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+		Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
+		Rooms_obj.leave();
+		}
+	else if((PLACE == 'rooms' || PLACE == 'init') && SOCKET_ROOM_ID != ''){
+		//disconnect from last room
+		SOCKET_ROOM_ID = '';
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener_id);
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener_id);
+		Room_id_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);
+		Room_id_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner_id);
+		Room_id_obj.leave();
+		}
+	else if((PLACE == 'room' || PLACE == 'select' || PLACE == 'game') && SOCKET_ROOM_ID==''){
+		//connect to room
+		SOCKET_ROOM_ID = SOCKET_ROOM_PREFIX+new_room;
+		Room_id_obj = orbiter.getRoomManager().createRoom(SOCKET_ROOM_ID);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomListener_id);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener_id);
+		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);  
+		Room_id_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner_id);
+		Room_id_obj.join();
+		}
+	}
+//we joined the room
+function joinRoomsListener(e){
+	//redraw list
+	register_tank_action('ask_rooms', false, name);
+	waiting_users = Rooms_obj.getNumOccupants();
+	if(PLACE=='rooms')
+		draw_rooms_list();
+	else if(PLACE=='room')
+		draw_room(opened_room_id);
+	}
+function joinRoomListener_id(e){
+	if(room_id_to_join != -1){
+		register_tank_action('join_room', room_id_to_join, name);
+		draw_room(room_id_to_join);
+		room_id_to_join = -1;
+		}	
+	}
+//client joins room
+function addOccupantListener (e) {
+	if (Rooms_obj.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
+		waiting_users = Rooms_obj.getNumOccupants();
+		if(PLACE=='rooms')
+			draw_rooms_list();
+		else if(PLACE=='room')
+			draw_room(opened_room_id);
+		}
+	}
+function addOccupantListener_id (e) {}
+//client leaves room
+function removeOccupantListener (e) {
+	waiting_users = Rooms_obj.getNumOccupants();
+	if(PLACE=='rooms')
+		draw_rooms_list();
+	else if(PLACE=='room')
+		draw_room(opened_room_id);
+	}
+function removeOccupantListener_id (e) {}
+//do clean disconnect from server
+function disconnect_server(e){
+	//disconnect
+	if(socket_live == true){
+		if(SOCKET_ROOMS != '')
+			Rooms_obj.leave();
+		if(SOCKET_ROOM_ID != '')	
+			Room_id_obj.leave();
+		orbiter.disconnect();
+		}
+	//update status
+	socket_live = false;
+	try{parent.document.getElementById("connected").innerHTML = 'no';}catch(error){}
+	}
+function get_packet_inner(fromClient, message){
+	get_packet(fromClient, message);
+	}
+function get_packet_inner_id(fromClient, message){
+	get_packet(fromClient, message);
+	}
+
+//===== COMMUNICATION ==========================================================
+
+//send packet to server
+function send_packet(type, message){
+	if(message.length == 0){
+		console.log('Error: empty message, type: '+type);
+		return false;
+		}
+	if(socket_live==false){
+		console.log('Error: trying to send without connection: '+type);
+		return false;
+		}
+	if(NETWORK_PACKETS_LOG)
+		console.log("["+type+"]------->");
+	
+	//log packets count
+	packets_sent = 0;
+	try{
+		packets_sent = parseInt(parent.document.getElementById("messages_out").innerHTML);
+		}catch(error){}
+	if(packets_sent>MAX_SENT_PACKETS){
+		console.log('Error: '+MAX_SENT_PACKETS+' packets reached.');
+		return false;
+		}
+	try{
+		parent.document.getElementById("messages_out").innerHTML = packets_sent+1;
+		}catch(error){}
+	
+	//make and send message
+	message = {
+		type: type,
+		message: message,
+		};
+	message = JSON.stringify(message);
+	if(SOCKET_ROOMS != '')
+		Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
+	else if(SOCKET_ROOM_ID != '')
+		Room_id_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
+	else
+		console.log('Error: we are not joined any room.');
 	}
 //get packets from server
-function get_packet(event){
+function get_packet(fromClient, message){	
 	try{
-		parent.document.getElementById("messages_in").innerHTML = parseInt(document.getElementById("messages_in").innerHTML)+1;
+		parent.document.getElementById("messages_in").innerHTML = parseInt(parent.document.getElementById("messages_in").innerHTML)+1;
 		}catch(error){}
-	DATA = JSON.parse(event);
+	DATA = JSON.parse(message);
 	var type = DATA.type;
 	DATA = DATA.message;
-	console.log("reveived message: "+type);
+	if(NETWORK_PACKETS_LOG)
+		console.log("<-------["+type+"]");
 	
 	if(type == 'new_room'){		//new room was created
 		var n = ROOMS.length;
 		if(get_room_by_id(DATA.id)!= false) return false;
 		ROOMS.push(DATA);
-		add_player_to_stats(DATA.host);
 		if(PLACE=='rooms')
 			draw_rooms_list();
 		}
@@ -62,7 +211,6 @@ function get_packet(event){
 			if(ROOM.host==name)
 				send_packet('new_room', ROOM);	//broadcast it
 			}
-		add_player_to_stats(DATA);
 		}
 	else if(type == 'leave_room'){	//player leaving room
 		//DATA = [room_id, player_name]
@@ -82,7 +230,7 @@ function get_packet(event){
 		//DATA = [room_id, player_name]
 		var ROOM = get_room_by_id(DATA[0]);
 		if(ROOM.host==DATA[1]){
-			console.log('ERROR: attempt to kick host from room...');
+			console.log('Error: attempt to kick host from room...');
 			return false; // host was kicked, this is probably hack from outside
 			}
 		if(ROOM != false){
@@ -126,14 +274,17 @@ function get_packet(event){
 			if(PLACE=='room')
 				draw_room(ROOM.id);
 			}
-		add_player_to_stats(DATA[1]);
 		}
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
-		if(PLACE=="room" && opened_room_id==DATA){
+		//DATA = [room_id, host_enemy_name]
+		if(PLACE=="room" && opened_room_id==DATA[0]){
 			game_mode = 2;
 			start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
 			draw_tank_select_screen();
-			ROOM = get_room_by_id(DATA);
+			ROOM = get_room_by_id(DATA[0]);
+			ROOM.host_enemy_name = DATA[1];
+			ROOM.players_max = ROOM.players.length;
+			ROOM.players_on = ROOM.players.length;
 			if(ROOM.host==name && ROOM.settings[0] != 'normal'){
 				choose_and_register_tanks(ROOM);
 				}
@@ -187,25 +338,26 @@ function get_packet(event){
 	else if(type == 'leave_game'){		//player leaving game
 		//DATA = [room_id, player_name]
 		chat(DATA[1]+" left the game.", false, false);
-		}	
+		ROOM = get_room_by_id(DATA[0]);
+		if(ROOM.host == DATA[1])	//host left game ... we are in trouble, unless we switch host to other person
+			ROOM.host = ROOM.host_enemy_name;
+		ROOM.players_on--;
+		}
 	else if(type == 'tank_move'){		//tank move
 		//DATA = room_id, player, [from_x, from_y, to_x, to_y, lock] 
 		if(DATA[1] == name && muted==false){
 			try{
 				audio_finish = document.createElement('audio');
-				if(Math.floor(Math.random()*10) < 5)
-					audio_finish.setAttribute('src', 'sounds/click1.ogg');
-				else
-					audio_finish.setAttribute('src', 'sounds/click2.ogg');
+				audio_finish.setAttribute('src', '../sounds/click.ogg');
 				audio_finish.play();
 				}
 			catch(error){}
-		}
+			}
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on tank_move.');
-			TANK.x = DATA[2][0];
-			TANK.y = DATA[2][1];
+			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
+			//TANK.x = DATA[2][0];
+			//TANK.y = DATA[2][1];
 			TANK.move = 1;
 			TANK.move_to = [DATA[2][2], DATA[2][3]];
 			delete TANK.target_move_lock;
@@ -218,54 +370,74 @@ function get_packet(event){
 		}
 	else if(type == 'skill_do'){	//tank skill start
 		//DATA = room_id, player, nr=[1,2,3]
-		if(PLACE=="game" && opened_room_id==DATA[0]){
-			TANK = get_tank_by_name(DATA[1]);
-			if(TANK===false) log('ERROR: tank "'+DATA[1]+'" was not found on skill_do.');
-			var nr = DATA[2];	
-			var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
-			//execute
-			var ability_reuse = window[ability_function](TANK);
-			if(ability_reuse != undefined && ability_reuse != 0){
-				TANK['ability_'+nr+'_in_use']=1;
-				if(DATA[1] == name){
-					var tmp = new Array();
-					tmp['function'] = "draw_ability_reuse";
-					tmp['duration'] = ability_reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = ability_reuse;
-					tmp['tank'] = TANK;
-					timed_functions.push(tmp);
-					}
+		if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
+		TANK = get_tank_by_name(DATA[1]);
+		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
+		var nr = DATA[2];	
+		var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
+		//execute
+		var ability_reuse = window[ability_function](TANK);
+		if(ability_reuse != undefined && ability_reuse != 0){
+			TANK['ability_'+nr+'_in_use']=1;
+			if(DATA[1] == name){
+				var tmp = new Array();
+				tmp['function'] = "draw_ability_reuse";
+				tmp['duration'] = ability_reuse;
+				tmp['type'] = 'REPEAT';
+				tmp['nr'] = nr-1;	
+				tmp['max'] = ability_reuse;
+				tmp['tank'] = TANK;
+				timed_functions.push(tmp);
 				}
 			}
 		}
-	else if(type == 'leave_game'){	//player leaving game
-		//DATA = room_id, player
-		}	
 	else if(type == 'chat'){		//chat
 		//DATA = room_id, data, player, team, place
 		if(PLACE != DATA[4]) return false;
 		if(PLACE=='game' && DATA[0] != opened_room_id) return false;
 		if(PLACE=='room' && DATA[0] != opened_room_id) return false;
 		if(PLACE=='select' && DATA[0] != opened_room_id) return false;
+		if(PLACE=='score' && DATA[0] != opened_room_id) return false;
 		if(DATA[2] != name)
 			chat(DATA[1], DATA[2], DATA[3]);
 		}
+	else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
+		/*DATA = room_id, player, {
+				function: 'function_name',
+				fparam: [param1, param2, param3],
+				tank_params: [	{key: 'xxxx', value: 'xxxx'},	]
+				}*/
+		if(PLACE != "game" || opened_room_id != DATA[0]) return false;
+		TANK = get_tank_by_name(DATA[1]);
+		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
+		var skill_data = DATA[2];
+		//adding extra info to tank
+		for(var i in skill_data.tank_params){
+			var key = skill_data.tank_params[i].key;
+			TANK[key] = skill_data.tank_params[i].value
+			}
+		//executing function
+		var function_name = skill_data.function;
+		if(function_name != '')	
+			window[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+		}
 	else if(type == 'tank_kill'){	//tank was killed
 		//DATA = room_id, player, killed_tank_id
-		if(DATA[1]==name) return false; 	//already done
 		TANK_TO = get_tank_by_id(DATA[2]);
-		if(TANK_TO===false) log('ERROR: tank_to "'+DATA[2]+'" was not found on tank_kill.');
-		TANK_FROM = get_tank_by_name(DATA[1]);
-		if(TANK_FROM===false) log('ERROR: tank_to "'+DATA[1]+'" was not found on tank_kill.');
+		if(TANK_TO===false){	
+			console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
+			return false;
+			}
+		TANK_FROM = get_tank_by_id(DATA[1]);
+		if(TANK_FROM===false){
+			console.log('Error: tank_from "'+DATA[1]+'" was not found on tank_kill.');
+			return false;
+			}
 		
-		//actions
-		if(TANK_TO.deaths == undefined)	TANK_TO.deaths = 1;
-		else				TANK_TO.deaths = TANK_TO.deaths + 1;
+		TANK_TO.deaths = TANK_TO.deaths + 1;
 		
-		//tower dead - decreasing base armor
 		if(TYPES[TANK_TO.type].name == "Tower"){
+			//change base stats
 			for(var b in TANKS){
 				if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
 					TANKS[b].armor = TANKS[b].armor - 10;
@@ -273,6 +445,9 @@ function get_packet(event){
 						TANKS[b].armor = 0;	
 					}
 				}
+			}
+		if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			//removing
 			for(var b in TANKS){
 				if(TANKS[b].id==TANK_TO.id){	
 					TANKS.splice(b, 1);  b--;
@@ -280,35 +455,25 @@ function get_packet(event){
 					}
 				}
 			}
+		//adding kill stats
 		if(TYPES[TANK_TO.type].no_repawn == undefined){
 			//player
-			if(TANK_FROM.kills == undefined)	TANK_FROM.kills = 1;
-			else					TANK_FROM.kills = TANK_FROM.kills + 1;
+			TANK_FROM.kills = TANK_FROM.kills + 1;	
 			//score
-			if(TANK_FROM.score == undefined)
-				TANK_FROM.score = 0;
 			TANK_FROM.score = TANK_FROM.score + 20;	// +20 for kill
 			
 			death(TANK_TO);
 			}
 		}
-	}
-//send packet to server
-function send_packet(type, message){
-	if(socket_live==false){
-		console.log('Error: trying to send without connection: '+type);
-		return false;
+	else if(type == 'level_up'){	//tank leveled up
+		//DATA = room_id, player_id, level
+		TANK_TO = get_tank_by_id(DATA[1]);
+		if(TANK_TO===false){	
+			console.log('Error: tank_to "'+DATA[1]+'" was not found on level_up.');
+			return false;
+			}
+		TANK_TO.level = DATA[2];
 		}
-	console.log("send message: "+type);
-	try{
-		parent.document.getElementById("messages_out").innerHTML = parseInt(document.getElementById("messages_out").innerHTML)+1;
-		}catch(error){}
-	message = {
-		type: type,
-		message: message,
-		};
-	message = JSON.stringify(message);
-	socket.send(message);
 	}
 //sending action to other players
 function register_tank_action(action, room_id, player, data){			//lots of broadcasting
@@ -331,13 +496,17 @@ function register_tank_action(action, room_id, player, data){			//lots of broadc
 	else if(action=='ask_rooms')
 		send_packet('ask_rooms', player);
 	else if(action=='prepare_game')
-		send_packet('prepare_game', room_id);
+		send_packet('prepare_game', [room_id, player]);
 	else if(action=='start_game')
 		send_packet('start_game', room_id);
 	else if(action=='change_tank')
 		send_packet('change_tank', [room_id, data, player]);
 	else if(action=='kill')
 		send_packet('tank_kill', [room_id, player, data]);
+	else if(action=='skill_advanced')
+		send_packet('skill_advanced', [room_id, player, data]);
+	else if(action=='level_up')
+		send_packet('level_up', [room_id, player, data]);
 	else if(action=='leave_room'){
 		for(var i in ROOMS){
 			if(ROOMS[i].id == room_id){
@@ -368,19 +537,11 @@ function register_tank_action(action, room_id, player, data){			//lots of broadc
 	}
 //new room was created
 function register_new_room(room_name, mode, type, max_players, map){
-	//find max id
-	var max_id=0;
-	for(var t in ROOMS){
-		if(ROOMS[t].id>max_id)
-			max_id = ROOMS[t].id;
-		}
-	max_id=max_id+1;
-	
 	var players = [];
 	players.push({name: name, team: 'B'});
 	
 	ROOM = {
-		id: max_id,
+		id: Math.floor(Math.random()*9999999),
 		name: room_name,
 		settings: [mode, type, map],
 		max: max_players,
@@ -391,54 +552,23 @@ function register_new_room(room_name, mode, type, max_players, map){
 	send_packet('new_room', ROOM);						//broadcast it
 	return ROOM.id;
 	}
-//register new player for total count
-function add_player_to_stats(new_name){
-	for(var i in PLAYERS){
-		if(PLAYERS[i] == new_name)
-			return false;
-		}
-	//unique name
-	PLAYERS.push(new_name);
-	}
 //sync multiplayer data to local room data
 function sync_multiplayers(){
 	var ROOM = get_room_by_id(opened_room_id);
 	for(var i in ROOM.players){
 		if(ROOM.players[i].name != name){	//if not me
-			var tmp = new Array();
-			tmp['id'] = ROOM.players[i].name;
-			tmp['name'] = ROOM.players[i].name;
-			if(ROOM.players[i].tank != undefined)
-				tmp['type'] = ROOM.players[i].tank;
-			else
-				tmp['type'] = 0;
-			if(ROOM.players[i].team=='B'){
-				//blue top
-				tmp['x'] = round(WIDTH_SCROLL*2/3);
-				tmp['y'] = 20;
-				tmp['angle'] = 180;
-				}
-			else{
-				//red bottom
-				tmp['x'] = round(WIDTH_SCROLL/3);
-				tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-				tmp['angle'] = 0;
-				}
-			tmp['angle'] = 0;
-			tmp['move'] = 0;
-			tmp['hp'] = TYPES[tmp['type']].life[0];
-			tmp['level'] = 1;
-			tmp['sublevel'] = 0;
-			tmp['team'] = ROOM.players[i].team;
-			tmp['abilities_lvl'] = [1,1,1];
-			tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-			tmp['speed'] = TYPES[tmp['type']].speed;
-			tmp['armor'] = TYPES[tmp['type']].armor[0];
-			tmp['damage'] = TYPES[tmp['type']].damage[0];
-			tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-			tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-			TANKS.push(tmp);
+			add_tank(1, ROOM.players[i].name, ROOM.players[i].name, ROOM.players[i].tank, ROOM.players[i].team);
 			}
 		}
 	}
-
+function get_waiting_players_count(){
+	return waiting_users;
+	}
+function disconnect_game(e){
+	if(PLACE=='game' && game_mode == 2){
+		if(confirm("Do you really want to quit game???")==false){
+			return false;
+			}
+		register_tank_action('leave_game', opened_room_id, name);
+		}
+	}

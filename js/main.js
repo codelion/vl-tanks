@@ -1,14 +1,14 @@
 /*
-Name: VL Tanks
-Author: VL
+Name: Moon wars
+Author: Vilius
+Email: www.viliusl@gmail.com
 */
-
-//start
-init_game(true);
 
 //init hello screen
 function init_game(first_time){
 	PLACE = 'init';
+	if(socket_live == true)
+		room_controller();
 	
 	//check if muted
 	if(getCookie("muted") != '')
@@ -32,16 +32,16 @@ function init_game(first_time){
 	canvas_backround.strokeStyle = '#ffffff';
 	canvas_backround.strokeText(text, 160, 340);
 	var img = new Image();
-	img.src = 'img/logo.png';
+	img.src = '../img/logo.png';
 	img.onload = function(){	//wait till background is loaded
-		var img = new Image();	
-		img.src = 'img/logo.png';
+		var img = new Image();
+		img.src = '../img/logo.png';
 		var left = (WIDTH_APP-598)/2;	
 		canvas_backround.drawImage(img, left, 15);
 		if(first_time==true){
 			preload_all_files();
 			if(chat_interval_id==undefined)
-				chat_interval_id = setInterval(controll_chat, 1000);
+				chat_interval_id = setInterval(controll_chat, 500);
 			}
 		if(preloaded==true)
 			add_first_screen_elements();
@@ -57,7 +57,7 @@ function check_canvas_sizes(){
 		WIDTH_SCROLL = 800;
 		if(WIDTH_MAP<800)
 			WIDTH_SCROLL = WIDTH_MAP;
-		HEIGHT_SCROLL = HEIGHT_APP-150-25;
+		HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		}
 	else{
 		//full screen
@@ -72,17 +72,17 @@ function check_canvas_sizes(){
 			WIDTH_APP = WIDTH_MAP;
 		if(WIDTH_APP < APP_SIZE_CACHE[0])
 			WIDTH_APP = APP_SIZE_CACHE[0];	
-		if(HEIGHT_APP > HEIGHT_MAP)
-			HEIGHT_APP = HEIGHT_MAP;
+		if(HEIGHT_APP > HEIGHT_MAP+INFO_HEIGHT+STATUS_HEIGHT)
+			HEIGHT_APP = HEIGHT_MAP+INFO_HEIGHT+STATUS_HEIGHT;
 		if(HEIGHT_APP < APP_SIZE_CACHE[1])
 			HEIGHT_APP = APP_SIZE_CACHE[1];	
 		//scroll
 		WIDTH_SCROLL = dimensions[0];
-		HEIGHT_SCROLL = dimensions[1]-HEIGHT_STATUS_AREA;
+		HEIGHT_SCROLL = HEIGHT_MAP;
 		if(WIDTH_SCROLL > WIDTH_MAP)
 			WIDTH_SCROLL = WIDTH_MAP;
-		if(HEIGHT_SCROLL+HEIGHT_STATUS_AREA > HEIGHT_MAP)
-			HEIGHT_SCROLL = HEIGHT_MAP-HEIGHT_STATUS_AREA;
+		if(HEIGHT_SCROLL+INFO_HEIGHT+STATUS_HEIGHT > HEIGHT_APP)
+			HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		}
 	//background
 	document.getElementById("canvas_backround").width  = WIDTH_APP;
@@ -106,12 +106,17 @@ function check_canvas_sizes(){
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 	}
+var menu_pressed = false;
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
 	
 	name_tmp = getCookie("player_name");
 	if(name_tmp != ''){
 		name = name_tmp+Math.floor(Math.random()*99);
+		}
+	counter_tmp = getCookie("start_count");
+	if(counter_tmp != ''){
+		START_GAME_COUNT_SINGLE = counter_tmp;
 		}
 	if(muted==false){
 		if(audio_main != undefined)
@@ -124,6 +129,8 @@ function add_first_screen_elements(){
 	for (i in settings_positions){
 		//register menu buttons
 		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'init', function(xx, yy, extra){
+			if(menu_pressed == true) return false;
+			menu_pressed = true;
 			if(extra==0){
 				// single player
 				game_mode = 1;
@@ -131,6 +138,7 @@ function add_first_screen_elements(){
 				draw_tank_select_screen();
 				}
 			else if(extra==1){
+				room_id_to_join = -1;
 				//multi player
 				if(socket_live==false)
 					connect_server();
@@ -138,24 +146,37 @@ function add_first_screen_elements(){
 				}
 			else if(extra==2){
 				//settings
+				add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 				PLACE = 'settings';
-				add_settings_buttons(canvas_backround, ["Player name: "+name,"Back"]);
 				}
 			}, i);
 		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'settings', function(xx, yy, extra){
+			if(menu_pressed == true) return false;
+			menu_pressed = true;
 			if(extra==0){
 				//edit name
 				var name_tmp = prompt("Please enter your name", name);
 				if(name_tmp != null){
 					name = name_tmp;
-					add_settings_buttons(canvas_backround, ["Player name: "+name,"Back"]);
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 					setCookie("player_name", name, 30);
 					}
 				}
 			else if(extra==1){
+				//edit start game couter
+				var value_tmp = prompt("Please enter number 1-30", START_GAME_COUNT_SINGLE);
+				if(value_tmp != null){
+					START_GAME_COUNT_SINGLE = parseInt(value_tmp);
+					if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
+					if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+					setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
+					}
+				}
+			else if(extra==2){
 				//back to first screen
-				PLACE = 'init';
 				add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
+				PLACE = 'init';
 				}
 			}, i);
 		}
@@ -163,27 +184,34 @@ function add_first_screen_elements(){
 function preload_all_files(){
 	images_to_preload = [
 		//general
-		'img/background.jpg',
-		'img/favicon.png',
-		'img/lock.png',
-		'img/logo.png',
-		'img/mute.png',
-		'img/repair.png',
-		'img/target.png',
-		'img/unmute.png',
-		'img/button.png',
-		'img/explosion.png',
+		'../img/background.jpg',
+		'../img/map/moon.jpg',
+		'../img/favicon.png',
+		'../img/lock.png',
+		'../img/logo.png',
+		'../img/mute.png',
+		'../img/repair.png',
+		'../img/target.png',
+		'../img/unmute.png',
+		'../img/button.png',
+		'../img/explosion.png',
+		'../img/explosion_big.png',
+		'../img/statusbar.png',
+		'../img/level.png',
+		'../img/skill.png',
+		'../img/map/mine.png',
 		];
 	audio_to_preload = [
-		'sounds/click.ogg',
-		'sounds/main.ogg',
-		'sounds/shoot.ogg',
+		'../sounds/click.ogg',
+		'../sounds/main.ogg',
+		'../sounds/shoot.ogg',
+		'../sounds/metal.ogg',
 		];
 		
 	//calculate files count
 	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS_TYPES.length + ELEMENTS.length;
 	for(i in TYPES){
-		preload_left = preload_left + 5;	
+		preload_left = preload_left + 3;	
 		}
 	preload_total = preload_left;
 	
@@ -192,10 +220,10 @@ function preload_all_files(){
 		preload(images_to_preload[i]);
 		}
 	for(var i in BULLETS_TYPES){
-		preload('img/bullets/'+BULLETS_TYPES[i].file);
+		preload('../img/bullets/'+BULLETS_TYPES[i].file);
 		}
 	for(var i in ELEMENTS){
-		preload('img/map/'+ELEMENTS[i].file);
+		preload('../img/map/'+ELEMENTS[i].file);
 		}
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
@@ -203,31 +231,24 @@ function preload_all_files(){
 	for(i in TYPES){
 		//preview
 		if(TYPES[i].preview != '')
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview);
 		else
 			update_preload(1);
 		//icon_top
 		if(TYPES[i].icon_top[0] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
-		else
-			update_preload(1);
-		if(TYPES[i].icon_top[1] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[1]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
 		else
 			update_preload(1);
 		//icon_base
 		if(TYPES[i].icon_base[0] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
-		else
-			update_preload(1);
-		if(TYPES[i].icon_base[1] != undefined)
-			preload('img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[1]);
+			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
 		else
 			update_preload(1);
 		}
 	}
 //start game
 function init_action(map_nr, my_team){
+	if(PLACE=='game') return false; //already started
 	PLACE = 'game';
 	level = map_nr;
 	
@@ -241,17 +262,18 @@ function init_action(map_nr, my_team){
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 		
-	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+	var requestAnimationFrame = window.requestAnimationFrame 
+				|| window.mozRequestAnimationFrame 
+				|| window.webkitRequestAnimationFrame 
+				|| window.msRequestAnimationFrame
+				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
 	window.requestAnimationFrame = requestAnimationFrame;
-				
-	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-	document.getElementById("canvas_map").style.marginLeft =  map_offset[0]+"px";
 	draw_interval_id = requestAnimationFrame(draw_main);
 
 	//sound
 	if(muted==false){
 		audio_main = document.createElement('audio');
-		audio_main.setAttribute('src', 'sounds/main.ogg');
+		audio_main.setAttribute('src', '../sounds/main.ogg');
 		audio_main.setAttribute('loop', 'loop');
 		try{
 			audio_main.play();
@@ -260,100 +282,54 @@ function init_action(map_nr, my_team){
 		}
 	
 	//create ... me
-	var tmp = new Array();
-	tmp['id'] = name;
-	tmp['name'] = name;
-	tmp['type'] = my_tank_nr;
-	if(my_team=='B'){
-		//blue top
-		tmp['x'] = round(WIDTH_SCROLL*2/3);
-		tmp['y'] = 20;
-		tmp['angle'] = 180;
-		}
-	else{
-		//red bottom 
-		tmp['x'] = WIDTH_SCROLL/3;
-		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-		tmp['angle'] = 0;
-		}
-	tmp['fire_angle'] = 180;
-	tmp['move'] = 0;
-	tmp['hp'] = TYPES[my_tank_nr].life[0];	
-	tmp['level'] = 1;	
-	tmp['sublevel'] = 0;
-	tmp['team'] = my_team;
-	tmp['abilities_lvl'] = [1,1,1];
-	tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-	tmp['speed'] = TYPES[tmp['type']].speed;
-	tmp['armor'] = TYPES[tmp['type']].armor[0];
-	tmp['damage'] = TYPES[tmp['type']].damage[0];
-	tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-	tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-	TANKS.push(tmp);
-	my_tank_id = tmp['id'];
+	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
+
+	auto_scoll_map();
 
 	//add enemy if single player
 	if(game_mode==1){
-		//get possible types
+		//get random type
 		var possible_types = [];
 		for(var t in TYPES){
 			if(TYPES[t].type=="tank")
 				possible_types.push(t);
 			}
-		//get random type
 		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
-				
-		var tmp = new Array();
-		tmp['id'] = get_unique_id();
-		tmp['name'] = "Bot";
-		tmp['type'] = enemy_tank_type;
-		tmp['x'] = round(WIDTH_SCROLL/3);
-		tmp['y'] = HEIGHT_MAP-20-TYPES[tmp['type']].size[1];
-		tmp['angle'] = 0;
-		tmp['angle'] = 0;
-		tmp['move'] = 0;
-		tmp['hp'] = TYPES[tmp['type']].life[0];
-		tmp['level'] = 1;
-		tmp['sublevel'] = 0;
-		tmp['team'] = 'R';
-		tmp['abilities_lvl'] = [1,1,1];
-		tmp['sight'] = TYPES[tmp['type']].scout+TYPES[tmp['type']].size[1]/2;
-		tmp['speed'] = TYPES[tmp['type']].speed;
-		tmp['armor'] = TYPES[tmp['type']].armor[0];
-		tmp['damage'] = TYPES[tmp['type']].damage[0];
-		tmp['attack_delay'] = TYPES[tmp['type']].attack_delay;
-		tmp['turn_speed'] = TYPES[tmp['type']].turn_speed;
-		TANKS.push(tmp);
+		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
+		add_tank(1, get_unique_id(), "Bot", enemy_tank_type, 'R', undefined, undefined, undefined, true);
 		}
-	
+
 	sync_multiplayers();
 	
 	add_towers();
 	
-	//auto add 1 lvl upgrade	disabled
-	/*for(ii in TANKS){
+	//auto add 1 lvl upgrade
+	for(ii in TANKS){
 		if(TYPES[TANKS[ii].type].abilities.length != 0 ){
 			for(jj in TYPES[TANKS[ii].type].abilities){ 
 				var nr = 1+parseInt(jj);
 				var ability_function = TYPES[TANKS[ii].type].abilities[jj].name.replace(/ /g,'_')+"_once";
-				if(ability_function != undefined)
-					window[ability_function](TANKS[ii]);
+				if(ability_function != undefined){
+					try{
+						window[ability_function](TANKS[ii]);
+						}
+					catch(err){	}
+					}
 				}
 			}
-		}*/
+		}
 	
 	//handler for mini map
-	register_button(5, HEIGHT_APP-150-25+5, 120, 138, 'game', function(xx, yy){ 
+	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
 		MAP_SCROLL_CONTROLL=true; 
 		move_to_place(xx, yy);
 		});
 		
 	draw_map(false);
 		
-	level_hp_regen_id = setInterval(level_hp_regen_handler, 2000);
-	level_interval_id = setInterval(tank_level_handler, 2000);
-	bots_interval_id = setInterval(add_bots, 1000*5);
+	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
+	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
 	}
 //get unique id
@@ -362,12 +338,8 @@ function get_unique_id(){
 	return unique_id;
 	}
 //tank moving speed conversion
-function speed2pixels(speed){
-	return speed/14*25/FPS;
-	}
-//ability to change global range
-function range2real_range(range){
-	return range*1;
+function speed2pixels(speed, time_diff){
+	return speed * 1.7 * time_diff/1000;
 	}
 //repeat some functions in time
 function timed_functions_handler(){
@@ -378,6 +350,7 @@ function timed_functions_handler(){
 		if(timed_functions[i].duration<0){
 			if(timed_functions[i].type == 'ON_END')
 				window[timed_functions[i].function](timed_functions[i]);
+			//unregister f-tion
 			timed_functions.splice(i, 1);	i++;
 			}
 		}
@@ -392,16 +365,20 @@ function quit_game(init_next_game){
 	clearInterval(draw_interval_id);
 	clearInterval(level_interval_id);
 	clearInterval(level_hp_regen_id);
-	clearInterval(bots_interval_id);
 	clearInterval(timed_functions_id);	
 	clearInterval(start_game_timer_id);
+	//chrome bugfix
+	clearInterval(chat_interval_id);	
+	chat_interval_id = setInterval(controll_chat, 500);
 	
+	room_id_to_join = -1;
 	starting_timer = -1;
 	ROOMS = [];
 	PLAYERS = [];
+	MINES = [];
+	TANKS = [];
 	
 	if(PLACE=='game'){
-		TANKS = [];
 		timed_functions = [];
 		pre_draw_functions = [];
 		on_click_functions = [];
@@ -413,10 +390,11 @@ function quit_game(init_next_game){
 			audio_main.pause();
 		
 		//leave_game(name, opened_room_id);
-		if(game_mode == 2)
+		if(game_mode == 2){
 			register_tank_action('leave_game', opened_room_id, name);
-		opened_room_id = -1;
-		
+			room_controller();
+			}
+	
 		if(FS==true){
 			fullscreen(false);
 			PLACE = 'init';
@@ -428,7 +406,23 @@ function quit_game(init_next_game){
 			}
 		opened_room_id = -1;
 		}
-		
+	try{
+		parent.document.getElementById("messages_in").innerHTML = 0;
+		parent.document.getElementById("messages_out").innerHTML = 0;
+		}catch(error){}
+	
+	//reset other variables
+	opened_room_id = -1;
+	BULLETS = [];
+	BUTTONS = [];
+	opened_room_id = -1;
+	CHAT_LINES = [];
+	timed_functions = [];
+	pre_draw_functions = [];
+	on_click_functions = [];
+	mouse_move_controll = false;
+	mouse_click_controll = false;
+	
 	if(init_next_game!=false){
 		init_game(false);
 		}
@@ -507,36 +501,38 @@ function chat(text, author, team){
 		else
 			team = '';
 		
-		if(PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game')))
+		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score')))
 			register_tank_action('chat', opened_room_id, name, text);
 		}
 	if(text=='') return false;
 	
 	//save
-	var time = 	new Date();
+	var time = new Date();
 	time = time.getTime();
 	CHAT_LINES.push({
 		text: text,
 		author: author,
 		team: team,
 		time: time,
-		})
+		});
+	if(CHAT_LINES.length > 16)
+		CHAT_LINES.splice(0,1);	//remove first
 	}
 //controlls chat lines
-function controll_chat(){	
+function controll_chat(){
 	if(CHAT_LINES.length==0) return false;
 	
 	//remove old
-	var time = 	new Date();
+	var time = new Date();
 	time = time.getTime();
-	var max_time = 10000;
+	var max_time = 20000;	//20s
 	for(var i in CHAT_LINES){
 		if(time - CHAT_LINES[i].time > max_time){
 			CHAT_LINES.splice(i, 1); i--;
 			}
 		}
 	//show?
-	if(PLACE == 'room' || PLACE == 'select'){
+	if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select' || PLACE == 'score'){
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		show_chat();
 		}

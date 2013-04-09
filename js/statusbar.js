@@ -35,9 +35,9 @@ function draw_mute_button(){
 	//paint
 	sound_img = new Image();
 	if(muted==true)
-		sound_img.src = 'img/mute.png';
+		sound_img.src = '../img/mute.png';
 	else
-		sound_img.src = 'img/unmute.png';
+		sound_img.src = '../img/unmute.png';
 	canvas_backround.drawImage(sound_img, WIDTH_APP-21-5, HEIGHT_APP-23);
 	
 	register_button(WIDTH_APP-21-5, HEIGHT_APP-23, 21, 18, '', 'mute_unmute');
@@ -46,7 +46,7 @@ function draw_mute_button(){
 function draw_quality_button(first_run){
 	PADDING = 145;
 	q_img = new Image();
-	q_img.src = 'img/button.png';
+	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
 	quality_cookie = getCookie("quality");
@@ -74,6 +74,11 @@ function draw_quality_button(first_run){
 			QUALITY = 1;
 		setCookie("quality", QUALITY, 30);
 		draw_quality_button(false);
+		
+		//reset tanks image cache 
+		for(var i in TANKS){
+			TANKS[i].cache_tank_verified = 0;
+			}
 		});
 	}
 //show fullscreen button in statusbar
@@ -81,7 +86,7 @@ function draw_fs_button(){
 	if(PLACE != 'game' ) return false;
 	PADDING = 200;
 	q_img = new Image();
-	q_img.src = 'img/button.png';
+	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
 	fs_text = "Full Scr.";
@@ -97,7 +102,7 @@ function draw_fs_button(){
 function draw_quit_button(){
 	PADDING = 90;
 	quit_img = new Image();
-	quit_img.src = 'img/button.png';
+	quit_img.src = '../img/button.png';
 	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	q_text = "Quit";
 	canvas_backround.fillStyle = "#8A8A8A";
@@ -115,33 +120,23 @@ function draw_version(){
 	}
 //do mute or unmute on user request
 function mute_unmute(){
-	if(muted==false){
+	if(muted==false){	
+		//disable sound
 		muted=true;
 		setCookie("muted", "1", 30);
 		if(audio_main != undefined)	audio_main.pause();
 		}
 	else{
+		//enable sound
 		muted = false;
 		if(getCookie("muted") != '')	
 			delCookie("muted");
 		try{
 			if(PLACE == 'game'){
 				audio_main = document.createElement('audio');
-				audio_main.setAttribute('src', 'sounds/main.ogg');
+				audio_main.setAttribute('src', '../sounds/main.ogg');
 				audio_main.setAttribute('loop', 'loop');
 				audio_main.play();
-				}
-			else if(PLACE == 'select'){
-				audio_prepare = document.createElement('audio');
-				audio_prepare.setAttribute('src', 'sounds/prepare.ogg');
-				audio_prepare.setAttribute('loop', 'loop');
-				audio_prepare.play();
-				}
-			else {
-				audio_begin = document.createElement('audio');
-				audio_begin.setAttribute('src', 'sounds/begin.ogg');
-				audio_begin.setAttribute('loop', 'loop');
-				audio_begin.play();
 				}
 			}
 		catch(error){}

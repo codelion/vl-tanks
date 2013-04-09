@@ -28,7 +28,7 @@ function on_keyboard_action(event){
 		}
 	if(k==13){
 		//enter
-		if(PLACE=='room' || PLACE=='game' || PLACE=='select'){
+		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
 			if(chat_mode==0){
 				//begin write
 				chat_mode=1;
@@ -43,12 +43,18 @@ function on_keyboard_action(event){
 				}
 			}
 		}
+	if(k==83){
+		//s
+		if(MAP_SCROLL_MODE==1) MAP_SCROLL_MODE = 2;
+		else{
+			MAP_SCROLL_MODE = 1;
+			auto_scoll_map();
+			}
+		}
 	
 	//disable some keys
-	//if(k >= 37 && k <= 40)
-	//	return false;	//scroll
-	if(k==9)
-		return false;	//TAB
+	if(k >= 37 && k <= 40)	return false;	//scroll with left, rigth, up and down
+	if(k==9)	return false;	//TAB
 		
 	return true;
 	}
@@ -63,6 +69,11 @@ function on_mousemove_background(event){
 		mouseY = event.layerY;
 		}
 	mouse_pos = [mouseX, mouseY];
+	//full screen fix
+	if(FS==true){
+		mouseX = mouseX - status_x;	
+		mouseY = mouseY + APP_SIZE_CACHE[1] - HEIGHT_APP;
+		}
 	//settings actions
 	if(PLACE == 'init'){
 		if(preloaded==false)
@@ -130,8 +141,9 @@ function on_mousedown(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
-	mouse_click_pos = [mouseX,mouseY];
+	mouse_click_pos = [mouseX, mouseY];
 	if(PLACE != 'game'){
+		menu_pressed = false;	
 		for(var i in BUTTONS){
 			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
@@ -155,7 +167,13 @@ function on_mousedown_back(event){
 	else if(event.layerX) {
 		mouseX = event.layerX;
 		mouseY = event.layerY;
-		}			
+		}
+	menu_pressed = false;
+	//full screen fix
+	if(FS==true){
+		mouseX = mouseX - status_x;	
+		mouseY = mouseY + APP_SIZE_CACHE[1] - HEIGHT_APP;
+		}
 	for(var i in BUTTONS){
 		if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 		if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
@@ -165,36 +183,13 @@ function on_mousedown_back(event){
 		else
 			BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
 		}
-	if(PLACE=='game' && FS==true){
-		//alternative #1 - y coord changes couse of FS screen size change
-		mouseY = mouseY + 175 - HEIGHT_APP + 350;
-		for(var i in BUTTONS){
-			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
-			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
-			if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
-			if(typeof BUTTONS[i].function == 'string')
-				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
-			else
-				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
-			}
-		//alternative #2 - x coord changes couse of statsu bar can be centered
-		mouseX = mouseX - round((WIDTH_APP-700)/2);
-		for(var i in BUTTONS){
-			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
-			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
-			if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
-			if(typeof BUTTONS[i].function == 'string')
-				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
-			else
-				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
-			}
-		}
 	}
 //mouse click release on background
 function on_mouseup_back(event){
 	if(PLACE=='game' && MAP_SCROLL_CONTROLL==true){
 		MAP_SCROLL_CONTROLL=false;
-		move_to_place_reset();
+		if(MAP_SCROLL_MODE==1)
+			move_to_place_reset();
 		}
 	}
 //fullscreen on modern browsers
