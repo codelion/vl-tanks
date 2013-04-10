@@ -444,6 +444,7 @@ function quit_game(init_next_game){
 	last_selected = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
+	packets_used=0;
 	
 	if(init_next_game!=false){
 		init_game(false);

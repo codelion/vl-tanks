@@ -7,6 +7,7 @@ function Soldiers(TANK, descrition_only){
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
+	TANK['ability_2_in_use'] = 1;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -15,7 +16,6 @@ function Soldiers(TANK, descrition_only){
 	var angle = 180;
 	if(TANK.team != 'B')
 		angle = 0;
-	//delete TANK.soldiers_direction
 	
 	//add
 	for(var i=0; i<n; i++){
@@ -39,6 +39,7 @@ function Rest(TANK, descrition_only){
 	var duration = 5000;
 	var power = 15;
 	
+	TANK['ability_1_in_use'] = 1;
 	if(TANK.extra_icon==undefined)
 		TANK.extra_icon = [];
 	TANK.extra_icon.push(['repair.png', 16, 16, TANK.id]);
@@ -83,6 +84,7 @@ function Berserk(TANK, descrition_only){
 	var power_damage = 30;
 	var power_armor = -40;
 	
+	TANK['ability_1_in_use'] = 1;
 	TANK.speed = TANK.speed + power_speed;
 	TANK.damage = round(TANK.damage * (100+power_damage)/100);
 	TANK.armor = TANK.armor + power_armor;
@@ -120,6 +122,7 @@ function Fleet(TANK, descrition_only){
 	var duration = 5000;
 	var power = 10;
 	
+	TANK['ability_1_in_use'] = 1;
 	TANK.speed = TANK.speed + power;
 	//register stop function	
 	var tmp = new Array();
@@ -141,8 +144,8 @@ function Repair(TANK, descrition_only){
 	var power = 20;
 	var range = 80;
 	
+	TANK['ability_1_in_use'] = 1;
 	var tank_size_from = TYPES[TANK.type].size[1]/2;
-	
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
@@ -329,7 +332,7 @@ function Camouflage(TANK, descrition_only){
 	var reuse = 15000;
 	var duration = 7000;
 	
-	//TANK.speed = 0;
+	TANK['ability_1_in_use'] = 1;
 	TANK.invisibility = 1;
 	delete TANK.target_move;
 	delete TANK.target_shoot_lock;
@@ -571,6 +574,35 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 	}
 
 //====== Truck =================================================================
+
+function Help(TANK, descrition_only){
+	var reuse = 30000;
+	var n = 3;
+	if(descrition_only != undefined)
+		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
+	
+	//prepare
+	TANK['ability_1_in_use'] = 1;
+	var type = '0';
+	for(var t in TYPES){
+		if(TYPES[t].name == 'Soldier')
+			type = t;
+		}
+	var angle = 180;
+	if(TANK.team != 'B')
+		angle = 0;
+	
+	//add
+	for(var i=0; i<n; i++){
+		x = round(TANK.x)-30+i*30;
+		y = round(TANK.y);
+		id = 'bot'+TANK.team+get_unique_id()+"."+x+"."+y;
+		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
+		}
+	
+	//return reuse
+	return reuse;
+	}
 
 //====== Helicopter ============================================================
 

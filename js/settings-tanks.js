@@ -200,7 +200,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Help',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],

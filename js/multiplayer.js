@@ -149,16 +149,13 @@ function send_packet(type, message){
 		console.log("["+type+"]------->");
 	
 	//log packets count
-	packets_sent = 0;
-	try{
-		packets_sent = parseInt(parent.document.getElementById("messages_out").innerHTML);
-		}catch(error){}
-	if(packets_sent>MAX_SENT_PACKETS){
+	packets_used++;
+	if(packets_used > MAX_SENT_PACKETS){
 		console.log('Error: '+MAX_SENT_PACKETS+' packets reached.');
 		return false;
 		}
 	try{
-		parent.document.getElementById("messages_out").innerHTML = packets_sent+1;
+		parent.document.getElementById("messages_out").innerHTML = packets_used+1;
 		}catch(error){}
 	
 	//make and send message
