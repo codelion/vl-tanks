@@ -4,16 +4,16 @@ function on_keyboard_action(event){
 	
 	//add shortcuts
 	if(PLACE == 'game'){
-		if(MY_TANK['dead'] != 1){
-			if(k == 49){	
+		if(MY_TANK.dead != 1){
+			if(k == 49 || k == 97 ){	
 				//special 1
 				do_ability(1, MY_TANK);
 				}	
-			else if(k == 50){
+			else if(k == 50 || k == 98 ){
 				//sepcial 2
 				do_ability(2, MY_TANK);
 				}
-			else if(k == 51){
+			else if(k == 51 || k == 99 ){
 				//special 3
 				do_ability(3, MY_TANK);
 				}
@@ -43,7 +43,7 @@ function on_keyboard_action(event){
 				}
 			}
 		}
-	if(k==83){
+	if(k==83 && chat_mode==0){
 		//s
 		if(MAP_SCROLL_MODE==1) MAP_SCROLL_MODE = 2;
 		else{
@@ -175,6 +175,7 @@ function on_mousedown_back(event){
 		mouseY = mouseY + APP_SIZE_CACHE[1] - HEIGHT_APP;
 		}
 	for(var i in BUTTONS){
+		if(BUTTONS[i]==undefined) continue;
 		if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
 		if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
 		if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;

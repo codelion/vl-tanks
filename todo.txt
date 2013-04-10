@@ -1,16 +1,3 @@
-bugs:
-	chat for all in room id
-	on select screen img not loaded
-	more berserk power
-	berserker on high levels decrease dmg
-	/help
-	/name xxx
-	listing rooms...
-	remove random names
-	joining rooms if same name
-	default not scrol, keeps reset
-	infobar img
-	hp regen rate
-	sync bullets, accuracy?
-soldiers in multiplayer
-	sync AI actions
+sync AI actions
+	enable soldiers in multiplayer
+counter mode

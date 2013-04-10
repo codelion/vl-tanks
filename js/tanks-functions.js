@@ -29,17 +29,6 @@ function Soldiers(TANK, descrition_only){
 	//return reuse
 	return 30*1000;
 	}
-function Suicide(TANK, descrition_only){
-	if(descrition_only != undefined)
-		return 'Your tank explodes and you die.';
-	
-	//action
-	do_damage(MY_TANK, MY_TANK, 999999)
-	TANK.kills = TANK.kills - 1;
-	
-	//return reuse
-	return 1;
-	}
 
 //====== Heavy =================================================================
 
@@ -92,13 +81,14 @@ function Berserk(TANK, descrition_only){
 	var reuse = 20000;
 	var duration = 5000;
 	var power_speed = 5;
-	var power_damage = 5;
+	var power_damage = 30;
 	var power_armor = -40;
 	
 	TANK.speed = TANK.speed + power_speed;
-	TANK.damage = TANK.speed + power_damage;
-	TANK.armor = TANK.speed + power_armor;
+	TANK.damage = round(TANK.damage * (100+power_damage)/100);
+	TANK.armor = TANK.armor + power_armor;
 	if(TANK.armor<0) 	TANK.armor = 0;
+	TANK.berserker = 1;
 	
 	//register stop function	
 	var tmp = new Array();
@@ -118,6 +108,7 @@ function Berserk_stop(object){
 	TANK.armor = TYPES[TANK.type].armor[0] + round(TYPES[TANK.type].armor[1]*(TANK.level-1));
 	if(TANK.armor > TYPES[TANK.type].armor[2])
 		TANK.armor = TYPES[TANK.type].armor[2];
+	delete TANK.berserker;
 	}
 
 //====== Cruiser ===============================================================
@@ -404,9 +395,9 @@ function check_mines(tank_id){
 	for(var m in MINES){
 		for(var i in TANKS){
 			if(TYPES[TANKS[i].type].name=='Miner') continue;	//they resist it
-			if(TYPES[TANKS[i].type].type=='human') continue;		//they don't weight enough
-			if(TYPES[TANKS[i].type].no_collisions==1) continue;		//flying units
-			if(TANKS[i].dead == 1) continue;		//tank dead
+			if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
+			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units
+			if(TANKS[i].dead == 1) continue;			//tank dead
 			var size = TYPES[TANKS[i].type].size[1];
 			if(TANKS[i].x+size > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
 				if(TANKS[i].y+size > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){
@@ -556,7 +547,6 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = 0;
 	tmp['stun_effect'] = TANK.try_stun[1];
-	tmp['pierce_armor'] = 1;
 	BULLETS.push(tmp);
 	
 	//init reuse
