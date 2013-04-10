@@ -51,11 +51,11 @@ function draw_tank(tank){
 		if(TYPES[tank.type].icon_top[0] != undefined)
 			cache_id += "SA:"+tank.fire_angle+',';
 		
-		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id && tank.images_loaded > 1){
+		if(tank.cache_tank != undefined && tank.cache_tank.unique == cache_id && tank.cache_tank.time - Date.now() > 0){
 			//read from cache
 			canvas_main.drawImage(tank.cache_tank.object, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
 			}
-		else{
+		else{									if(tank.name==name) log('renew');
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
 			tmp_canvas.width = 105
@@ -109,12 +109,6 @@ function draw_tank(tank){
 			//draw tank base
 			img_me = new Image();
 			img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
-			if(tank.images_loaded<2){
-				img_me.onload = function(){
-					if(tank.images_loaded<2)
-						tank.images_loaded++;
-					}
-				}
 			if(TYPES[tank.type].icon_base[1] == "no-rotate"){
 				//draw without rotation
 				tmp_object.restore();
@@ -136,25 +130,11 @@ function draw_tank(tank){
 					tmp_object.save();
 					img_me = new Image();
 					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
-					if(tank.images_loaded<2){
-						img_me.onload = function(){
-							if(tank.images_loaded<2)
-								tank.images_loaded += 1000;
-							}
-						}
 					tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 					tmp_object.rotate(tank.fire_angle * TO_RADIANS);
 					tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
 					tmp_object.restore();
 					}
-				else{
-					if(tank.images_loaded<2)
-						tank.images_loaded++;
-					}
-				}
-			else{
-				if(tank.images_loaded<2)
-					tank.images_loaded++;
 				}
 
 			//draw extra layer
@@ -177,6 +157,7 @@ function draw_tank(tank){
 			tank.cache_tank = [];
 			tank.cache_tank.object = tmp_canvas;
 			tank.cache_tank.unique = cache_id;
+			tank.cache_tank.time = Date.now()+5000;
 			
 			//show
 			canvas_main.drawImage(tmp_canvas, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
@@ -1157,7 +1138,6 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 		kills: 0,
 		deaths: 0,
 		cache_tank: [],
-		images_loaded: 2,
 		last_bullet_time: Date.now()-5000,
 		};
 	if(AI != undefined)
