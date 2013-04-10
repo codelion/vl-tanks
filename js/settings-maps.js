@@ -110,8 +110,10 @@ MAPS.push({
 	team_size: 2,
 	towers: [
 			//team x%,	 y%, 	name
-			['B',	1,	4,	'Base'],
+			['B',	3,	4,	'Base'],
 			['B',	15,	5,	'Tower'],
+			['B',	5,	42,	'Tower'],
+			['R',	95,	58,	'Tower'],
 			['R',	85,	97,	'Tower'],
 			['R',	100,	100,	'Base'],
 		],

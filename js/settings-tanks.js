@@ -274,8 +274,8 @@ TYPES.push({
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [80, 5],
 	damage: [5, 1],	//5 dps
-	range: 60,
-	scout: 60,
+	range: 70,
+	scout: 70,
 	armor: [0, 0, 0],
 	speed: 25,			//speed: 100,
 	attack_delay: 1,

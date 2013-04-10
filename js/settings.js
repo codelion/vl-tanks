@@ -18,14 +18,14 @@ var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
 var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
-var MAX_SENT_PACKETS = 5000;		//max packets, that we can send to server per game
+var MAX_SENT_PACKETS = 7000;		//max packets, that we can send to server per game
 var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
 var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var DEBUG = true;			//show debug info
+var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
-var VERSION = "1.1.16";			//app version
+var VERSION = "1.2";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array

@@ -348,55 +348,53 @@ function draw_tank_move(mouseX, mouseY){
 		}
 	}
 //check collisions
-function check_collisions(xx, yy, TANK, mode){
+function check_collisions(xx, yy, TANK){
 	if(TYPES[TANK.type].no_collisions != undefined) return false;
 	xx = Math.round(xx);
 	yy = Math.round(yy);
 	var tank_size_half = round(TYPES[TANK.type].size[1]/2);
-	if(TYPES[TANK.type].type == 'human')
-		tank_size_half = round(tank_size_half/2);	//soldiers small
 
+	//borders
+	if(xx < 0 || yy < 0) return true;
+	if(xx > WIDTH_MAP || yy > HEIGHT_MAP) return true;
+	
 	//elements
-	if(mode == undefined || mode == 'elements'){	
-		for(var e in MAPS[level-1].elements){
-			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-			if(element.collission == false) continue;
-			
-			var elem_width = element.size[0];
-			var elem_height = element.size[1];
-			var elem_x = MAPS[level-1].elements[e][1];
-			var elem_y = MAPS[level-1].elements[e][2];
-			if(element.size[0]<30)	elem_x = elem_x - round(element.size[0]/2);
-			if(element.size[1]<30)	elem_y = elem_y - round(element.size[1]/2);
-			if(MAPS[level-1].elements[e][3]!=0 && MAPS[level-1].elements[e][3] < elem_width)
-				elem_width = MAPS[level-1].elements[e][3];
-			if(MAPS[level-1].elements[e][4]!=0 && MAPS[level-1].elements[e][4] < elem_height)
-				elem_height = MAPS[level-1].elements[e][4];
-			//check
-			if(yy > elem_y && yy < elem_y+elem_height){
-				if(xx > elem_x && xx < elem_x+elem_width){
-					return true;
-					}
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		if(element.collission == false) continue;	
+		
+		var elem_width = element.size[0];
+		var elem_height = element.size[1];
+		var elem_x = MAPS[level-1].elements[e][1];
+		var elem_y = MAPS[level-1].elements[e][2];
+		if(element.size[0]<30)	elem_x = elem_x - round(element.size[0]/2);
+		if(element.size[1]<30)	elem_y = elem_y - round(element.size[1]/2);
+		if(MAPS[level-1].elements[e][3]!=0 && MAPS[level-1].elements[e][3] < elem_width)
+			elem_width = MAPS[level-1].elements[e][3];
+		if(MAPS[level-1].elements[e][4]!=0 && MAPS[level-1].elements[e][4] < elem_height)
+			elem_height = MAPS[level-1].elements[e][4];
+		//check
+		if(yy > elem_y && yy < elem_y+elem_height){
+			if(xx > elem_x && xx < elem_x+elem_width){
+				return true;
 				}
 			}
 		}
 
 	//other tanks
-	if(mode == undefined || mode == 'tanks'){	
-		if(TYPES[TANK.type].types != 'tower'){
-			for (i in TANKS){
-				if(TANKS[i].id == TANK.id) continue;			//same tank
-				if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
-				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
-				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
-				if(TANKS[i].dead == 1) continue;		//tank dead
-				var size2 = TYPES[TANKS[i].type].size[1];
-				if(TYPES[TANKS[i].type].type == 'human')	
-					size2 = round(size2/2);	//soldiers small
-				if(xx > TANKS[i].x && xx < TANKS[i].x+size2){
-					if(yy > TANKS[i].y && yy < TANKS[i].y+size2){
-						return true;
-						}
+	if(TYPES[TANK.type].types != 'tower'){
+		for (i in TANKS){
+			if(TANKS[i].id == TANK.id) continue;			//same tank
+			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
+			if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
+			if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
+			if(TANKS[i].dead == 1) continue;		//tank dead
+			var size2 = TYPES[TANKS[i].type].size[1];
+			if(TYPES[TANKS[i].type].type == 'human')	
+				size2 = round(size2/2);	//soldiers small
+			if(xx > TANKS[i].x && xx < TANKS[i].x+size2){
+				if(yy > TANKS[i].y && yy < TANKS[i].y+size2){
+					return true;
 					}
 				}
 			}
@@ -1160,7 +1158,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 		deaths: 0,
 		cache_tank: [],
 		images_loaded: 2,
-		last_bullet_time: Date.now(),
+		last_bullet_time: Date.now()-5000,
 		};
 	if(AI != undefined)
 		TANK.use_AI = AI;

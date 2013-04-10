@@ -34,88 +34,38 @@ function set_random_path_AI(TANK){
 	var max_height = HEIGHT_MAP - tank_size;
 	collision_gap = 5;
 	
-	var direction;
-	if(TANK.master != undefined)
-		direction = TANK.master.soldiers_direction;
-	if(direction == undefined)
-		direction = TANK.soldiers_direction;
+	var direction = TANK.move_direction;
 	
-	if(TANK.move==1 && (direction == 'up' || direction == 'down' || direction == undefined)) return false; 
+	if(TANK.move==1 && (direction == 'up' || direction == 'down')) return false;
 	
 	//try move down
 	if(TANK.team=='B' && TANK.y<max_height && check_collisions(TANK.x+tank_size/2, TANK.y+tank_size+collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, max_height, 'down');
 		return true;
 		}
-		
 	//try move up
-	if(TANK.team!='B' && TANK.y>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
+	else if(TANK.team!='B' && TANK.y>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, 0, 'up');
 		return true;
 		}	
-		
-	if(direction == undefined){
-		if(getRandomInt(1,2)==1) direction = 'left';
+	else if(direction == 'down' || direction == 'up'){
+		if(getRandomInt(1,2)==1) direction = 'left';		
 		else 	direction = 'right';
-		if(TANK.master != undefined)
-			tank_link = TANK.master;
-		else
-			tank_link = TANK;
-		if(game_mode == 1)	
-			tank_link.soldiers_direction = direction;
-		else{
-			var params = [
-				{key: 'soldiers_direction', value: direction},
-				];
-			send_packet('tank_update', [tank_link.id, params]);
-			return false;
-			}
 		}
 	
 	//try move left				
 	if(direction == 'left'){
-		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false){
+		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false)
 			do_ai_move(TANK, 0, TANK.y, 'left');
-			}
-		else{
-			//must turn right
-			do_ai_move(TANK, max_width, TANK.y, 'right');
-			direction = 'right';
-			if(TANK.master != undefined)
-				tank_link = TANK.master;
-			else
-				tank_link = TANK;
-			if(game_mode == 2){
-				var params = [
-					{key: 'soldiers_direction', value: direction},
-					];
-				send_packet('tank_update', [tank_link.id, params]);
-				}
-			else
-				tank_link.soldiers_direction = direction;
-			}			
+		else
+			do_ai_move(TANK, max_width, TANK.y, 'right');	//must turn right
+		
 		}
 	else if(direction == 'right'){	//right
-		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false){
+		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false)
 			do_ai_move(TANK, max_width, TANK.y, 'right');
-			}
-		else{
-			//must turn left
-			do_ai_move(TANK, 0, TANK.y, 'left');
-			direction = 'left';
-			if(TANK.master != undefined)
-				tank_link = TANK.master;
-			else
-				tank_link = TANK;
-			if(game_mode == 2){
-				var params = [
-					{key: 'soldiers_direction', value: direction},
-					];
-				send_packet('tank_update', [tank_link.id, params]);
-				}
-			else
-				tank_link.soldiers_direction = direction;
-			}
+		else
+			do_ai_move(TANK, 0, TANK.y, 'left');	//must turn left
 		}
 	if(game_mode == 1){
 		TANK.move=1;
