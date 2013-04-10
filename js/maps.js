@@ -47,7 +47,9 @@ function draw_map(map_only){
 			for(var e in MAPS[level-1].elements){
 				var element = get_element_by_name(MAPS[level-1].elements[e][0]);
 				x = MAPS[level-1].elements[e][1];
-				y = MAPS[level-1].elements[e][2] - round(element.size[1]/2);
+				y = MAPS[level-1].elements[e][2];
+				if(element.size[0]<30)	x = x - round(element.size[0]/2);
+				if(element.size[1]<30)	y = y - round(element.size[1]/2);
 				max_w = element.size[0];
 				if(MAPS[level-1].elements[e][3]!=0)
 					max_w = MAPS[level-1].elements[e][3];
@@ -190,7 +192,9 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		for(var e in MAPS[i].elements){
 			var element = get_element_by_name(MAPS[i].elements[e][0]);
 			x = MAPS[i].elements[e][1];
-			y = MAPS[i].elements[e][2] - round(element.size[1]/2);
+			y = MAPS[i].elements[e][2];
+			if(element.size[0]<30)	x = x - round(element.size[0]/2);
+			if(element.size[1]<30)	y = y - round(element.size[1]/2);
 			max_w = element.size[0];
 			if(MAPS[i].elements[e][3]!=0)
 				max_w = MAPS[i].elements[e][3];

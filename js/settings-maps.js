@@ -12,6 +12,13 @@ ELEMENTS.push({
 	alt_color: '#4e4b44',	
 	collission: true,	
 	});
+ELEMENTS.push({
+	name: 'vfence',
+	file: 'vfence.png',
+	size: [26, 100], 
+	alt_color: '#4e4b44',	
+	collission: true,	
+	});
 
 //====== Main ==================================================================
 
@@ -32,18 +39,20 @@ MAPS.push({
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
+			['vfence', 	150,	100,	0,	0],
+			['vfence', 	650,	100,	0,	0],
 			['fence', 	150,	200,	0,	0],
 			['fence', 	250,	200,	0,	0],
-			['fence', 	350,	200,	0,	0],
 			['fence', 	450,	200,	0,	0],
 			['fence', 	550,	200,	0,	0],
-			['fence', 	0,	500,	50,	0],
-			['fence', 	750,	500,	50,	0],
+			['fence', 	0,	500,	0,	0],
+			['fence', 	700,	500,	0,	0],
 			['fence', 	150,	800,	0,	0],
 			['fence', 	250,	800,	0,	0],
-			['fence', 	350,	800,	0,	0],
 			['fence', 	450,	800,	0,	0],
 			['fence', 	550,	800,	0,	0],
+			['vfence', 	150,	800,	0,	0],
+			['vfence', 	650,	800,	0,	0],
 		],
 	});
 
