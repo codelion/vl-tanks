@@ -1,13 +1,13 @@
 //====== GENERAL ===============================================================
 
-function Soldiers(TANK, descrition_only){
+function Soldiers(TANK, descrition_only){	
 	var reuse = 30000;
 	var n = 3;
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
-	TANK['ability_2_in_use'] = 1;
+	TANK['ability_2_in_use'] = 1;				return false;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -15,7 +15,7 @@ function Soldiers(TANK, descrition_only){
 		}
 	var angle = 180;
 	if(TANK.team != 'B')
-		angle = 0;
+		angle = 0;	
 	
 	//add
 	for(var i=0; i<n; i++){
@@ -582,7 +582,7 @@ function Help(TANK, descrition_only){
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
-	TANK['ability_1_in_use'] = 1;
+	TANK['ability_1_in_use'] = 1;				return false;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')

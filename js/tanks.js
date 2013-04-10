@@ -55,7 +55,7 @@ function draw_tank(tank){
 			//read from cache
 			canvas_main.drawImage(tank.cache_tank.object, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
 			}
-		else{									if(tank.name==name) log('renew');
+		else{
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
 			tmp_canvas.width = 105
@@ -157,7 +157,7 @@ function draw_tank(tank){
 			tank.cache_tank = [];
 			tank.cache_tank.object = tmp_canvas;
 			tank.cache_tank.unique = cache_id;
-			tank.cache_tank.time = Date.now()+5000;
+			tank.cache_tank.time = Date.now()+2000;
 			
 			//show
 			canvas_main.drawImage(tmp_canvas, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
@@ -364,6 +364,7 @@ function check_collisions(xx, yy, TANK){
 
 	//other tanks
 	if(TYPES[TANK.type].types != 'tower'){
+		if(TANK.use_AI == true) return false;
 		for (i in TANKS){
 			if(TANKS[i].id == TANK.id) continue;			//same tank
 			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers

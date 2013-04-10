@@ -145,8 +145,7 @@ function send_packet(type, message){
 		console.log('Error: trying to send without connection: '+type);
 		return false;
 		}
-	if(DEBUG==true)
-		console.log("["+type+"]------->");
+	//if(DEBUG==true)	console.log("["+type+"]------->");
 	
 	//log packets count
 	packets_used++;
@@ -179,8 +178,7 @@ function get_packet(fromClient, message){
 	DATA = JSON.parse(message);
 	var type = DATA.type;
 	DATA = DATA.message;
-	if(DEBUG==true)
-		console.log("<-------["+type+"]");
+	//if(DEBUG==true) 	console.log("<-------["+type+"]");
 	
 	if(type == 'new_room'){		//new room was created
 		var n = ROOMS.length;
@@ -369,15 +367,15 @@ function get_packet(fromClient, message){
 			}
 		}
 	else if(type == 'skill_do'){	//tank skill start
-		//DATA = room_id, player, nr=[1,2,3]
+		//DATA = room_id, player_name, nr=[1,2,3]
 		if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
-		TANK = get_tank_by_name(DATA[1]);
-		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
+		TANK_FROM = get_tank_by_name(DATA[1]);
+		if(TANK_FROM===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
 		var nr = DATA[2];	
-		var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
+		var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');		
 		//execute
-		var ability_reuse = window[ability_function](TANK);
-		if(ability_reuse != undefined && ability_reuse != 0){
+		var ability_reuse = window[ability_function](TANK_FROM);	
+		if(ability_reuse != undefined && ability_reuse != 0){	
 			TANK['ability_'+nr+'_in_use']=1;
 			if(DATA[1] == name){
 				var tmp = new Array();
@@ -386,7 +384,7 @@ function get_packet(fromClient, message){
 				tmp['type'] = 'REPEAT';
 				tmp['nr'] = nr-1;	
 				tmp['max'] = ability_reuse;
-				tmp['tank'] = TANK;
+				tmp['tank'] = TANK_FROM;
 				timed_functions.push(tmp);
 				}
 			}

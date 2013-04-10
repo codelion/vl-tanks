@@ -1,1 +1,3 @@
+ghost soldiers
+enable soldiers in 2 places
 counter mode

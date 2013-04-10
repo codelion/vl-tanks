@@ -248,8 +248,15 @@ function draw_ability_reuse(object){
 			object.duration=0;	//tank dead
 		
 		var i = object.nr;
-		if(object.duration==0)
-			delete object['tank']['ability_'+(i+1)+'_in_use'];
+		if(object.duration==0){	
+			if(i==0)
+				delete object.tank.ability_1_in_use;
+			else if(i==1){
+				delete object.tank.ability_2_in_use;
+				}
+			else if(i==2)
+				delete object.tank.ability_3_in_use;
+			}
 		
 		//button
 		var img = new Image();
@@ -291,6 +298,8 @@ function draw_ability_reuse(object){
 			canvas_backround.font = "bold 8px Verdana";
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
 		}
+	else
+		log('Error: undefined object in draw_ability_reuse().');
 	}
 var ability_hover_id = '-1';
 var ability_hover_text = '';
