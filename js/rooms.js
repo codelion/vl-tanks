@@ -1,6 +1,8 @@
 //rooms list window
-function draw_rooms_list(message){	log('draw_rooms_list.....');
+function draw_rooms_list(message){
 	PLACE = 'rooms';
+	dynamic_title();
+	
 	room_controller();
 	
 	x = 10;
@@ -39,6 +41,7 @@ function draw_rooms_list(message){	log('draw_rooms_list.....');
 	canvas_backround.fillStyle = "#69a126";
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
+		ROOMS = [];
 		register_tank_action('ask_rooms', false, name);
 		draw_rooms_list();
 		});
@@ -166,9 +169,16 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	if(game_type==undefined)
 		game_type='quick';
 	if(game_map==undefined)
-		game_map='Classic';
+		game_map='Main';
 		
 	PLACE = 'create_room';
+	dynamic_title();
+	
+	//dynamic title
+	try{
+		if(page_title_copy=='') page_title_copy = parent.document.title;
+		parent.document.title = page_title_copy;
+		}catch(err){}
 	
 	//background
 	canvas_backround.fillStyle = "#f0f9e4";
@@ -359,6 +369,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 //room waiting for players
 function draw_room(room_id){
 	PLACE = 'room';
+	dynamic_title(room_id);
 	ROOM = get_room_by_id(room_id);
 	game_mode = 2;
 	opened_room_id = ROOM.id;

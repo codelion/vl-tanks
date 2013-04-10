@@ -1,11 +1,10 @@
 //====== GENERAL ===============================================================
 
 function Soldiers(TANK, descrition_only){
+	var reuse = 30000;
 	var n = 3;
 	if(descrition_only != undefined)
-		return 'Send '+n+' soldiers to the fight. Only in single player.';
-	
-	if(game_mode == 2) return 0;
+		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
 	var type = '0';
@@ -27,7 +26,7 @@ function Soldiers(TANK, descrition_only){
 		}
 	
 	//return reuse
-	return 30*1000;
+	return reuse;
 	}
 
 //====== Heavy =================================================================
@@ -194,7 +193,7 @@ function Mortar(TANK, descrition_only){
 		return 'Launch missile with area damage.';
 		
 	var reuse = 20000;
-	var power = 80;
+	var power = 80;	
 	var range = 120;
 	var splash_range = 70;
 		
@@ -265,15 +264,17 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 				delete TANK.try_mortar;
 				}
 			else{
+				delete TANK.target_move_lock;
 				TANK.move = 1;
-				TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
+				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
 				TANK.reach_pos_and_execute = [TANK.try_mortar[0], 'do_mortar', mouseX, mouseY, tank_id];
 				}
 			return false;
 			}
-		}
+		}								
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
+		TANK['ability_1_in_use']=1;
 		DATA = {
 			function: 'do_mortar',
 			fparam: [tank_id, true, true],
@@ -323,10 +324,10 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 
 function Camouflage(TANK, descrition_only){
 	if(descrition_only != undefined)
-		return 'Slowly become invisible.';
+		return 'Slowly become invisible while not shooting and moving';
 	
 	var reuse = 15000;
-	var duration = 5000;
+	var duration = 7000;
 	
 	//TANK.speed = 0;
 	TANK.invisibility = 1;
@@ -431,9 +432,10 @@ function check_mines(tank_id){
 
 function Virus(TANK, descrition_only){
 	if(descrition_only != undefined)
-		return 'Send virus to deactivate enemy for short period.';
+		return 'Send virus to deactivate enemy and damage it.';
 		
 	var reuse = 20000;
+	var power = 70;
 	var duration = 5000;
 	var range = 70;
 		
@@ -444,7 +446,7 @@ function Virus(TANK, descrition_only){
 		}
 		
 	mouse_click_controll = true;
-	TANK['try_stun'] = [range, duration, reuse];
+	TANK['try_stun'] = [range, duration, reuse, power];
 	
 	//return reuse - later, on use
 	return 0;
@@ -509,6 +511,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 				delete TANK.try_stun;
 				}
 			else{
+				delete TANK.target_move_lock;
 				TANK.target_move_lock = enemy.id;
 				TANK.move = 1;
 				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
@@ -524,6 +527,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 		
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
+		TANK['ability_1_in_use']=1;
 		DATA = {
 			function: 'do_stun',
 			fparam: [tank_id, enemy_id, true],
@@ -545,7 +549,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 	tmp['y'] = TANK.y+tank_size;
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
-	tmp['damage'] = 0;
+	tmp['damage'] = TANK.try_stun[3];
 	tmp['stun_effect'] = TANK.try_stun[1];
 	BULLETS.push(tmp);
 	
@@ -650,6 +654,7 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 				delete TANK.try_airstrike;
 				}
 			else{
+				delete TANK.target_move_lock;
 				TANK.target_move_lock = enemy.id;
 				TANK.move = 1;
 				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
@@ -672,6 +677,7 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 		
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
+		TANK['ability_1_in_use']=1;
 		DATA = {
 			function: 'do_airstrike',
 			fparam: [tank_id, enemy_id, true],
@@ -794,6 +800,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 				delete TANK.try_bomb;
 				}
 			else{
+				delete TANK.target_move_lock;
 				TANK.move = 1;
 				TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
 				TANK.reach_pos_and_execute = [TANK.try_bomb[0], 'do_bomb', mouseX, mouseY, tank_id];
@@ -803,6 +810,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 		}
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
+		TANK['ability_1_in_use']=1;
 		DATA = {
 			function: 'do_bomb',
 			fparam: [tank_id, true, true],

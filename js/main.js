@@ -7,6 +7,7 @@ Email: www.viliusl@gmail.com
 //init hello screen
 function init_game(first_time){
 	PLACE = 'init';
+	dynamic_title();
 	if(socket_live == true)
 		room_controller();
 	if(getCookie("muted") != '')
@@ -252,6 +253,7 @@ function preload_all_files(){
 function init_action(map_nr, my_team){
 	if(PLACE=='game') return false; //already started
 	PLACE = 'game';
+	dynamic_title();
 	level = map_nr;
 	
 	check_canvas_sizes();
@@ -282,24 +284,38 @@ function init_action(map_nr, my_team){
 			}
 		catch(error){}
 		}
-	
+
 	//create ... me
 	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
-
+	
 	auto_scoll_map();
 
 	//add enemy if single player
 	if(game_mode==1){
 		//get random type
 		var possible_types = [];
+		var random_type=0;
 		for(var t in TYPES){
 			if(TYPES[t].type=="tank")
 				possible_types.push(t);
 			}
-		var enemy_tank_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
-		//enemy_tank_type = 1;	//custom enemy type in singleplayer for testing [0,1,2...]
-		add_tank(1, get_unique_id(), "Bot", enemy_tank_type, 'R', undefined, undefined, undefined, true);
+			
+		//friends
+		for(var i=1; i< MAPS[level-1].team_size; i++){
+			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+			if(DEBUG==false)
+				add_tank(1, get_unique_id(), "Bot", random_type, 'B', undefined, undefined, undefined, true);
+			}
+		
+		//enemies
+		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+		add_tank(1, get_unique_id(), "Bot", random_type, 'R', undefined, undefined, undefined, true);
+		for(var i=1; i< MAPS[level-1].team_size; i++){
+			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+			if(DEBUG==false)
+				add_tank(1, get_unique_id(), "Bot", random_type, 'R', undefined, undefined, undefined, true);
+			}
 		}
 
 	sync_multiplayers();
@@ -427,6 +443,7 @@ function quit_game(init_next_game){
 	game_mode = 1;
 	last_selected = -1;
 	my_tank_nr = -1;
+	document.getElementById("chat_write").style.visibility = 'hidden';
 	
 	if(init_next_game!=false){
 		init_game(false);
@@ -540,5 +557,27 @@ function controll_chat(){
 	if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select' || PLACE == 'score'){
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		show_chat();
+		}
+	}
+//dynamic title
+function dynamic_title(data){
+	try{
+		if(page_title_copy=='') page_title_copy = parent.document.title;
+		if(PLACE == 'rooms'){
+			if(ROOMS.length>0)
+				parent.document.title = page_title_copy + " ["+ROOMS.length+"]";
+			else
+				parent.document.title = page_title_copy;
+			}
+		else if(PLACE == 'room'){
+			ROOM = get_room_by_id(data);
+			parent.document.title = page_title_copy + " ["+ROOM.players.length+"]";
+			}
+		else{
+			parent.document.title = page_title_copy;
+			}
+		}
+	catch(err){
+		console.log("Error: "+err.message);
 		}
 	}

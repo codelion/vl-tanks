@@ -346,7 +346,7 @@ function get_packet(fromClient, message){
 		ROOM.players_on--;
 		}
 	else if(type == 'tank_move'){		//tank move
-		//DATA = room_id, player, [from_x, from_y, to_x, to_y, lock] 
+		//DATA = room_id, tank_id, [from_x, from_y, to_x, to_y, lock, direction] 
 		if(DATA[1] == name && muted==false){
 			try{
 				audio_finish = document.createElement('audio');
@@ -356,10 +356,9 @@ function get_packet(fromClient, message){
 			catch(error){}
 			}
 		if(PLACE=="game" && opened_room_id==DATA[0]){
-			TANK = get_tank_by_name(DATA[1]);
+			TANK = get_tank_by_id(DATA[1]);
 			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
-			//TANK.x = DATA[2][0];
-			//TANK.y = DATA[2][1];
+			sync_movement(TANK, DATA[2][0], DATA[2][1]);
 			TANK.move = 1;
 			TANK.move_to = [DATA[2][2], DATA[2][3]];
 			delete TANK.target_move_lock;
@@ -368,6 +367,8 @@ function get_packet(fromClient, message){
 				TANK.target_move_lock = DATA[2][4];
 				TANK.target_shoot_lock = DATA[2][4];
 				}
+			if(DATA[2][5] != undefined)
+				TANK.move_direction = DATA[2][5];
 			}
 		}
 	else if(type == 'skill_do'){	//tank skill start
@@ -413,6 +414,7 @@ function get_packet(fromClient, message){
 		TANK = get_tank_by_name(DATA[1]);
 		if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
 		var skill_data = DATA[2];
+		delete TANK.target_move_lock;
 		//adding extra info to tank
 		for(var i in skill_data.tank_params){
 			var key = skill_data.tank_params[i].key;
@@ -422,6 +424,17 @@ function get_packet(fromClient, message){
 		var function_name = skill_data.function;
 		if(function_name != '')	
 			window[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+		}
+	else if(type == 'tank_update'){		//tank updates 
+		//DATA = [tank_id, params]
+		if(PLACE != "game") return false;
+		TANK = get_tank_by_id(DATA[0]);
+		if(TANK===false) console.log('Error: tank "'+DATA[0]+'" was not found on tank_update.');
+		//adding extra info to tank
+		for(var i in DATA[1]){
+			var key = DATA[1][i].key;
+			TANK[key] = DATA[1][i].value
+			}
 		}
 	else if(type == 'tank_kill'){	//tank was killed
 		//DATA = room_id, player, killed_tank_id
@@ -481,6 +494,15 @@ function get_packet(fromClient, message){
 			TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
 		TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
 		}
+	else if(type == 'del_invisible'){	//remove invisibility
+		//DATA = [player_id]
+		TANK = get_tank_by_id(DATA[0]);
+		if(TANK===false){	
+			console.log('Error: tank "'+DATA[0]+'" was not found on del_invisible.');
+			return false;
+			}
+		delete TANK.invisibility;
+		}	
 	else if(type == 'bullet'){	//tank hit
 		//DATA = [target_id, source_id, angle]
 		TANK_TO = get_tank_by_id(DATA[0]);
@@ -500,6 +522,7 @@ function get_packet(fromClient, message){
 		tmp.bullet_to_target = TANK_TO; 
 		tmp.bullet_from_target = TANK;
 		tmp.angle = DATA[2];
+		tmp.skill = 1;
 		BULLETS.push(tmp);
 		
 		//extra updates

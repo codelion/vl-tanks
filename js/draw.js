@@ -26,7 +26,7 @@ function draw_main(){
 	//tanks actions
 	for (var i in TANKS){
 		if(PLACE != 'game') return false;
-		try{
+		//try{
 			//speed multiplier
 			var speed_multiplier = 1;
 			if(TANKS[i].debuffs != undefined){
@@ -66,6 +66,8 @@ function draw_main(){
 				if(TANKS[i].respan_time - Date.now() < 0){	
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
+					TANKS[i].x -= TYPES[TANKS[i].type].size[1]/4;
+					TANKS[i].y -= TYPES[TANKS[i].type].size[1]/4;
 					}
 				}
 			
@@ -142,7 +144,7 @@ function draw_main(){
 				//do nothing - sleep
 				}
 			//move tank
-			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined){
+			else if(TANKS[i].move == 1 && TANKS[i].stun == undefined && TANKS[i].move_to != undefined){
 				if(TANKS[i].move_to[0].length == undefined){
 					dist_x = TANKS[i].move_to[0] - TANKS[i].x;
 					dist_y = TANKS[i].move_to[1] - TANKS[i].y;
@@ -189,8 +191,9 @@ function draw_main(){
 			//shooting
 			for (b = 0; b < BULLETS.length; b++){
 				if(BULLETS[b].bullet_from_target.id != TANKS[i].id) continue; // bullet from another tank
-				if(TANKS[i].stun != undefined) continue; //stun
+				if(TANKS[i].stun != undefined && BULLETS[b].skill==undefined) continue; //stun
 				
+				TANKS[i].last_bullet_time = Date.now();
 				//follows tank
 				if(BULLETS[b].bullet_to_target != undefined){
 					var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
@@ -313,10 +316,10 @@ function draw_main(){
 				check_enemies(TANKS[i]);
 				draw_tank(TANKS[i]);
 				}
-			}
+			/*}
 		catch(err){
 			console.log("Error: "+err.message);
-			}
+			}*/
 		}		//PLACE = 'sdf';
 	lighten_pixels_all();
 	if(MY_TANK.dead == 1)	
@@ -663,6 +666,7 @@ var red_line_y=0;
 var last_selected = -1;
 function draw_tank_select_screen(selected_tank){
 	PLACE = 'select';
+	dynamic_title();
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 	room_controller();

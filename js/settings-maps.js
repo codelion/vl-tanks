@@ -26,6 +26,7 @@ MAPS.push({
 	name: "Main",
 	width: 800,
 	height: 1000,
+	team_size: 3,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	50,	2,	'Base'],
@@ -62,6 +63,7 @@ MAPS.push({
 	name: "Labyrinth",
 	width: 800,
 	height: 1000,
+	team_size: 3,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	50,	2,	'Base'],
@@ -105,6 +107,7 @@ MAPS.push({
 	name: "Mini",
 	width: 800,
 	height: 370,
+	team_size: 2,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	1,	4,	'Base'],
@@ -127,6 +130,7 @@ MAPS.push({
 	name: "Huge",
 	width: 2000,
 	height: 3000,
+	team_size: 10,
 	towers: [
 			//team x%,	 y%, 	name
 			['B',	19,	1,	'Base'],
