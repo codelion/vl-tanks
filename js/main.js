@@ -42,8 +42,6 @@ function init_game(first_time){
 			}
 		});
 	img.onload = function(){	//wait till background is loaded
-		var img = new Image();
-		img.src = '../img/logo.png';
 		var left = (WIDTH_APP-598)/2;	
 		canvas_backround.drawImage(img, left, 15);
 		if(first_time==true){
@@ -261,6 +259,8 @@ function init_action(map_nr, my_team){
 	if(PLACE=='game') return false; //already started
 	PLACE = 'game';
 	dynamic_title();
+	room_controller();
+	
 	level = map_nr;
 	
 	check_canvas_sizes();
@@ -454,6 +454,8 @@ function quit_game(init_next_game){
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
 	packets_used=0;
+	shift_pressed = false;
+	chat_shifted=false;
 	
 	if(init_next_game!=false){
 		init_game(false);
@@ -521,8 +523,9 @@ function preload(file, type){
 		alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');
 	}
 //save chat data
-function chat(text, author, team){
+function chat(text, author, team, shift){
 	if(text==undefined){
+		//create
 		var text = document.getElementById("chat_text").value;
 		document.getElementById("chat_text").value = '';
 		if(text=='') return false;
@@ -531,10 +534,15 @@ function chat(text, author, team){
 			team = MY_TANK.team;
 			}
 		else
-			team = '';
+			team = '';	//shift
 		
-		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score')))
-			register_tank_action('chat', opened_room_id, name, text);
+		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score'))){
+			if(chat_shifted == false)
+				register_tank_action('chat', opened_room_id, name, text, 0);
+			else
+				register_tank_action('chat', opened_room_id, name, text, 1);
+			return false;
+			}
 		}
 	if(text=='') return false;
 	
@@ -546,6 +554,7 @@ function chat(text, author, team){
 		author: author,
 		team: team,
 		time: time,
+		shift: shift,
 		});
 	if(CHAT_LINES.length > 16)
 		CHAT_LINES.splice(0,1);	//remove first

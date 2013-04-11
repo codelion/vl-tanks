@@ -134,8 +134,6 @@ function drawImage_preloaded(canvas, src, xx, yy, place_last, width, height, bac
 			canvas.fillRect(back_x, back_y, back_w, back_h);
 			}
 		//draw image
-		var img = new Image();
-		img.src = src;
 		if(width==undefined && height==undefined)
 			canvas.drawImage(img, xx, yy);
 		else

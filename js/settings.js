@@ -25,7 +25,7 @@ var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
-var VERSION = "1.2.2";			//app version
+var VERSION = "1.2.3";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -78,6 +78,8 @@ var room_id_to_join=-1;			//id of room, requested to join
 var render_mode = 'requestAnimationFrame';
 var page_title_copy = '';	
 var packets_used = 0;	
+var shift_pressed = false;
+var chat_shifted = false;
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
@@ -95,6 +97,7 @@ document.getElementById("canvas_backround").addEventListener('mouseup', on_mouse
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
 canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.onkeydown = function(e) {return on_keyboard_action(e); }
+document.onkeyup = function(e) {return on_keyboardup_action(e); }
 
 //full screen handlers
 document.addEventListener("fullscreenchange", full_screenchange_handler, false);

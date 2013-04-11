@@ -1,3 +1,4 @@
+skill not working
 counter mode
 	update skill
 	updates stats

@@ -26,6 +26,8 @@ function on_keyboard_action(event){
 				tab_scores=false;
 			}
 		}
+	if(k==16)
+		shift_pressed = true; //shift
 	if(k==13){
 		//enter
 		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
@@ -34,6 +36,10 @@ function on_keyboard_action(event){
 				chat_mode=1;
 				document.getElementById("chat_write").style.visibility = 'visible';
 				document.getElementById("chat_text").focus();
+				if(shift_pressed==true)
+					chat_shifted = true;
+				else
+					chat_shifted = false;
 				}
 			else{
 				//end write
@@ -57,6 +63,11 @@ function on_keyboard_action(event){
 	if(k==9)	return false;	//TAB
 		
 	return true;
+	}
+function on_keyboardup_action(event){
+	k = event.keyCode;
+	if(k==16)
+		shift_pressed = false; //shift
 	}
 //mouse move on background
 function on_mousemove_background(event){

@@ -41,26 +41,20 @@ function draw_map(map_only){
 			}
 		
 		//elements
-		var img_wall = new Image();
-		img_wall.src = '../img/map/fence.png';
-		img_wall.onload = function(){	//on wall load
-			for(var e in MAPS[level-1].elements){
-				var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-				x = MAPS[level-1].elements[e][1];
-				y = MAPS[level-1].elements[e][2];
-				if(element.size[0]<30)	x = x - round(element.size[0]/2);
-				if(element.size[1]<30)	y = y - round(element.size[1]/2);
-				max_w = element.size[0];
-				if(MAPS[level-1].elements[e][3]!=0)
-					max_w = MAPS[level-1].elements[e][3];
-				max_h = element.size[1];
-				if(MAPS[level-1].elements[e][4]!=0)
-					max_h = MAPS[level-1].elements[e][4];
-					
-				var img_element = new Image();
-				img_element.src = '../img/map/'+element.file;
-				canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
-				}
+		for(var e in MAPS[level-1].elements){
+			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+			x = MAPS[level-1].elements[e][1];
+			y = MAPS[level-1].elements[e][2];
+			if(element.size[0]<30)	x = x - round(element.size[0]/2);
+			if(element.size[1]<30)	y = y - round(element.size[1]/2);
+			max_w = element.size[0];
+			if(MAPS[level-1].elements[e][3]!=0)
+				max_w = MAPS[level-1].elements[e][3];
+			max_h = element.size[1];
+			if(MAPS[level-1].elements[e][4]!=0)
+				max_h = MAPS[level-1].elements[e][4];
+			
+			drawImage_preloaded(canvas_map, '../img/map/'+element.file, x, y, PLACE, max_w, max_h);
 			}
 		}
 	

@@ -919,6 +919,7 @@ function do_ability(nr, TANK){
 					}
 				}
 			else if(broadcast_mode==1){
+				TANK['ability_'+nr+'_in_use']=1;
 				register_tank_action('skill_do', opened_room_id, name,  nr, getRandomInt(1, 999999));
 				}
 			else if(broadcast_mode==2){

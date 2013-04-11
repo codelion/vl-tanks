@@ -73,6 +73,15 @@ function room_controller(new_room){
 		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);  
 		Room_id_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner_id);
 		Room_id_obj.join();
+		if(SOCKET_ROOMS != ''){
+			//disconnect from all rooms
+			SOCKET_ROOMS = '';
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+			Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
+			Rooms_obj.leave();
+			}
 		}
 	}
 //we joined the room
@@ -394,7 +403,7 @@ function get_packet(fromClient, message){
 		TANK_FROM = get_tank_by_name(DATA[1]);
 		if(TANK_FROM===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
 		var nr = DATA[2];	
-		var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');		
+		var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
 		//execute
 		TANK_FROM.rand = DATA[3];
 		var ability_reuse = window[ability_function](TANK_FROM);
@@ -414,14 +423,15 @@ function get_packet(fromClient, message){
 			}
 		}
 	else if(type == 'chat'){		//chat
-		//DATA = room_id, data, player, team, place
-		if(PLACE != DATA[4]) return false;
-		if(PLACE=='game' && DATA[0] != opened_room_id) return false;
-		if(PLACE=='room' && DATA[0] != opened_room_id) return false;
-		if(PLACE=='select' && DATA[0] != opened_room_id) return false;
-		if(PLACE=='score' && DATA[0] != opened_room_id) return false;
-		if(DATA[2] != name)
-			chat(DATA[1], DATA[2], DATA[3]);
+		//DATA = room_id, data, player, team, place, shift
+		if(DATA[5] != 1){
+			if(PLACE != DATA[4]) return false;
+			if(PLACE=='game' && DATA[0] != opened_room_id) return false;
+			if(PLACE=='room' && DATA[0] != opened_room_id) return false;
+			if(PLACE=='select' && DATA[0] != opened_room_id) return false;
+			if(PLACE=='score' && DATA[0] != opened_room_id) return false;
+			}
+		chat(DATA[1], DATA[2], DATA[3], DATA[5]);
 		update_players_ping(DATA[2]);
 		}
 	else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
@@ -605,7 +615,11 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 		var team = '';
 		if(PLACE=='game')
 			team = MY_TANK.team;
-		send_packet('chat', [room_id, data, player, team, PLACE]);
+		if(data2 == false)
+			send_packet('chat', [room_id, data, player, team, PLACE]);
+		else
+			//with shift
+			send_packet('chat', [room_id, data, player, team, PLACE, 1]);
 		}
 	
 	//error

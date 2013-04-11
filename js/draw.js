@@ -954,6 +954,12 @@ function show_chat(){
 		else
 			canvas.fillStyle = "#444444";	//default color
 		
+		//shift
+		if(CHAT_LINES[i].shift==1){
+			canvas.font = "bold 13px Helvetica";
+			canvas.fillStyle = "#ff0000";	//default color
+			}
+		
 		//show it
 		canvas.fillText(text, 10, bottom-i*gap);
 		}

@@ -147,7 +147,7 @@ function Repair(TANK, descrition_only){
 	var power = 20;
 	var range = 80;
 	
-	TANK['ability_1_in_use'] = 1;
+	TANK['ability_3_in_use'] = 1;
 	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
@@ -369,6 +369,7 @@ function Mine(TANK, descrition_only){
 	var splash_range = 70;
 	
 	//add
+	TANK['ability_1_in_use'] = 1;
 	var tank_size_half = TYPES[TANK.type].size[1]/2;
 	MINES.push({
 		x: round(TANK.x+tank_size_half),
@@ -403,8 +404,8 @@ function check_mines(tank_id){
 		for(var i in TANKS){
 			if(TYPES[TANKS[i].type].name=='Miner') continue;	//they resist it
 			if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
-			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units
-			if(TANKS[i].dead == 1) continue;			//tank dead
+			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
+			if(TANKS[i].dead == 1) continue;			//ghost
 			var size = TYPES[TANKS[i].type].size[1];
 			if(TANKS[i].x+size > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
 				if(TANKS[i].y+size > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){
