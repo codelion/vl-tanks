@@ -123,11 +123,17 @@ function drawImage_rotated(canvas, file, x, y, width, height, angle){
 function convertToSlug(Text){
 	return Text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
 	}
-function drawImage_preloaded(canvas, src, xx, yy, place_last, width, height){
+function drawImage_preloaded(canvas, src, xx, yy, place_last, width, height, background, back_x, back_y, back_w, back_h){
 	var img = new Image();
 	img.src = src;
 	img.onload = function(){	//wait till img is loaded
 		if(PLACE != place_last) return false;
+		//clear
+		if(background != undefined){
+			canvas.fillStyle = background;
+			canvas.fillRect(back_x, back_y, back_w, back_h);
+			}
+		//draw image
 		var img = new Image();
 		img.src = src;
 		if(width==undefined && height==undefined)

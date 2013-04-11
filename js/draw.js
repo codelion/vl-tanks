@@ -22,11 +22,11 @@ function draw_main(){
 		}
 		
 	redraw_mini_map();	// mini map actions
-	
+
 	//tanks actions
 	for (var i in TANKS){
 		if(PLACE != 'game') return false;
-		//try{
+		try{
 			//speed multiplier
 			var speed_multiplier = 1;
 			if(TANKS[i].debuffs != undefined){
@@ -66,6 +66,7 @@ function draw_main(){
 				if(TANKS[i].respan_time - Date.now() < 0){	
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
+					last_selected_counter = -1;
 					TANKS[i].x -= TYPES[TANKS[i].type].size[1]/4;
 					TANKS[i].y -= TYPES[TANKS[i].type].size[1]/4;
 					}
@@ -316,11 +317,11 @@ function draw_main(){
 				check_enemies(TANKS[i]);
 				draw_tank(TANKS[i]);
 				}
-			/*}
+			}
 		catch(err){
 			console.log("Error: "+err.message);
-			}*/
-		}		//PLACE = 'sdf';
+			}
+		}
 	lighten_pixels_all();
 	if(MY_TANK.dead == 1)	
 		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
@@ -708,21 +709,20 @@ function draw_tank_select_screen(selected_tank){
 			j = 0;
 			}
 		if(i == selected_tank || i == last_selected || last_selected==-1){
-			//reset
-			
-			//background
+			//reset background
+			var back_color = '';
 			if(selected_tank != undefined && selected_tank == i)
-				canvas_backround.fillStyle = "#8fc74c";	//selected
+				back_color = "#8fc74c"; //selected
 			else
-				canvas_backround.fillStyle = "#dbd9da";
-			canvas_backround.fillRect(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy);
+				back_color = "#dbd9da";
+			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
 			roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
 			
 			//logo
 			var pos1 = 15+j*(preview_xy+gap);
 			var pos2 = y;
-			drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE);
+			drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE, 90, 90, back_color, pos1+2, pos2+2, 90-4, 90-4);
 			
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
@@ -736,8 +736,8 @@ function draw_tank_select_screen(selected_tank){
 			register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
 				if(game_mode == 2){
 					ROOM = get_room_by_id(opened_room_id);
-					if(ROOM.settings[0]=='normal'){
-						if(TYPES[index].bonus != undefined){
+					if(ROOM.settings[0]=='normal' || ROOM.settings[0]=='counter'){
+						if(TYPES[index].bonus != undefined && DEBUG == false){
 							return false;
 							}
 						else{
@@ -769,7 +769,7 @@ function draw_tank_select_screen(selected_tank){
 		var src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_xy)/2);
-		drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE);
+		drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, 90, 90, '#ffffff', pos1, pos2, 90, 90);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
@@ -826,10 +826,12 @@ function draw_tank_select_screen(selected_tank){
 				if(ROOM.players[p].team == teams[t]){
 					//background
 					canvas_backround.strokeStyle = "#000000";
+					var back_color;
 					if(ROOM.players[p].name==name)
-						canvas_backround.fillStyle = "#8fc74c";	//me
+						back_color = "#8fc74c";	//me
 					else
-						canvas_backround.fillStyle = "#bebebe";
+						back_color = "#bebebe";
+					canvas_backround.fillStyle = back_color;
 					roundRect(canvas_backround, 122+gap+15+j*(ICON_WIDTH+2+gap)+1, y+1, ICON_WIDTH, ICON_WIDTH, 2, true);
 					
 					if(ROOM.players[p].tank == undefined){
@@ -844,7 +846,7 @@ function draw_tank_select_screen(selected_tank){
 					src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
-					drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH);
+					drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH, back_color, pos1+2, pos2+2, ICON_WIDTH-4, ICON_WIDTH-4);
 					
 					j++;
 					}

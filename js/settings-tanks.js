@@ -34,7 +34,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
 	life: [180, 12],
-	damage: [35, 2],	//35 dps
+	damage: [30, 2],	//30 dps
 	range: 80,
 	scout: 100,
 	armor: [30, 0.3, 40],
@@ -200,7 +200,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Help',	passive: false,		broadcast: 1}, 
+		{name: 'Soldiers ',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
@@ -273,7 +273,7 @@ TYPES.push({
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [80, 5],
-	damage: [5, 1],	//5 dps
+	damage: [8, 1],	//8 dps
 	range: 70,
 	scout: 70,
 	armor: [0, 0, 0],
@@ -296,7 +296,7 @@ TYPES.push({
 	name: 'Tower',
 	type: 'tower',
 	description: ["Tower for defence"],
-	life: [10000,0],
+	life: [1500,0],
 	damage: [30, 0],	//30 dps
 	range: 120,
 	scout: 120,

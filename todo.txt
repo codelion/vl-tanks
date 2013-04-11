@@ -1,3 +1,4 @@
-ghost soldiers
-enable soldiers in 2 places
 counter mode
+	update skill
+	updates stats
+	fix skills _once

@@ -185,7 +185,9 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 				canvas_this.fillStyle = "#0000aa";
 			else
 				canvas_this.fillStyle = "#b12525";
-			canvas_this.fillRect(pos1+1+Math.ceil(MAPS[i].towers[ii][1]*(button_width-2-msize)/100), pos2+1+Math.ceil(MAPS[i].towers[ii][2]*(button_height-2-msize)/100), msize, msize);
+			tank_x = pos1 + round((MAPS[i].towers[ii][1]) * button_width / round(MAPS[i].width));
+			tank_y = pos2 + round((MAPS[i].towers[ii][2]) * button_height /(MAPS[i].height));
+			canvas_this.fillRect(tank_x, tank_y, msize, msize);
 			}
 		
 		//elements

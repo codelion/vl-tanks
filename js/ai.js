@@ -1,4 +1,5 @@
 function check_path_AI(TANK){
+	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
 	if(game_mode == 1)
 		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
@@ -18,10 +19,12 @@ function check_path_AI(TANK){
 		if(game_mode == 1)
 			TANK.move = 0;
 		else{
-			var params = [
-				{key: 'move', value: 0},
-				];
-			send_packet('tank_update', [TANK.id, params]);
+			if(TANK.move == 1){
+				var params = [
+					{key: 'move', value: 0},
+					];
+				send_packet('tank_update', [TANK.id, params]);
+				}
 			}
 		return false; 
 		}
@@ -39,31 +42,45 @@ function set_random_path_AI(TANK){
 	if(TANK.move==1 && (direction == 'up' || direction == 'down')) return false;
 	
 	//try move down
-	if(TANK.team=='B' && TANK.y<max_height && check_collisions(TANK.x+tank_size/2, TANK.y+tank_size+collision_gap, TANK)==false){
+	if(TANK.team=='B' && TANK.y+tank_size/2<max_height && check_collisions(TANK.x+tank_size/2, TANK.y+tank_size+collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, max_height, 'down');
 		return true;
 		}
 	//try move up
-	else if(TANK.team!='B' && TANK.y>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
+	else if(TANK.team!='B' && TANK.y-tank_size/2>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, 0, 'up');
 		return true;
-		}	
-	else if(direction == 'down' || direction == 'up'){
-		if(getRandomInt(1,2)==1) direction = 'left';		
-		else 	direction = 'right';
+		}
+	//no more vertical move	
+	if(direction == 'down' || direction == 'up'){
+		if(TANK.move == 0){
+			if(getRandomInt(1,2)==1) direction = 'left';		
+			else 	direction = 'right';
+			}
+		//map up/bottom borders
+		else if(TANK.team=='B' && TANK.y+tank_size/2>max_height || TANK.team!='B' && TANK.y-tank_size/2<0){
+			if(getRandomInt(1,2)==1) direction = 'left';		
+			else 	direction = 'right';
+			TANK.move = 0;
+			}
 		}
 	
 	//try move left				
 	if(direction == 'left'){
-		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false)
-			do_ai_move(TANK, 0, TANK.y, 'left');
+		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false){
+			if(TANK.move_direction != 'left')
+				do_ai_move(TANK, 0, TANK.y, 'left');
+			}
 		else
 			do_ai_move(TANK, max_width, TANK.y, 'right');	//must turn right
 		
 		}
-	else if(direction == 'right'){	//right
-		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false)
-			do_ai_move(TANK, max_width, TANK.y, 'right');
+	//right
+	else if(direction == 'right'){
+		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false){
+			if(TANK.move_direction != 'right')
+				do_ai_move(TANK, max_width, TANK.y, 'right');
+			}
 		else
 			do_ai_move(TANK, 0, TANK.y, 'left');	//must turn left
 		}
@@ -71,7 +88,7 @@ function set_random_path_AI(TANK){
 		TANK.move=1;
 		}
 	}
-function do_ai_move(TANK, xx, yy, direction){	
+function do_ai_move(TANK, xx, yy, direction){
 	if(game_mode == 2){
 		register_tank_action('move', opened_room_id, TANK.id, [round(TANK.x), round(TANK.y), round(xx), round(yy), undefined, direction]);
 		}

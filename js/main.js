@@ -10,7 +10,7 @@ function init_game(first_time){
 	dynamic_title();
 	if(socket_live == true)
 		room_controller();
-	if(getCookie("muted") != '')
+	if(getCookie("muted") != '0')
 		muted=true;
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;
@@ -34,6 +34,13 @@ function init_game(first_time){
 	canvas_backround.strokeText(text, 160, 340);
 	var img = new Image();
 	img.src = '../img/logo.png';
+	register_button((WIDTH_APP-598)/2, 15, 600, 266, PLACE, function(){
+		if(muted==false){
+			var audio_fire = document.createElement('audio');
+			audio_fire.setAttribute('src', '../sounds/shoot.ogg');
+			audio_fire.play();
+			}
+		});
 	img.onload = function(){	//wait till background is loaded
 		var img = new Image();
 		img.src = '../img/logo.png';
@@ -361,11 +368,12 @@ function speed2pixels(speed, time_diff){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
-	for (i in timed_functions){					
-		timed_functions[i].duration = timed_functions[i].duration - 100;	
+	for (i in timed_functions){			
+		timed_functions[i].duration = timed_functions[i].duration - 100;
+		var duration = 	timed_functions[i].duration				
 		if(timed_functions[i].type == 'REPEAT')
 			window[timed_functions[i].function](timed_functions[i]);
-		if(timed_functions[i].duration<0){
+		if(duration<0){
 			if(timed_functions[i].type == 'ON_END')
 				window[timed_functions[i].function](timed_functions[i]);
 			//unregister f-tion
@@ -442,6 +450,7 @@ function quit_game(init_next_game){
 	ABILITIES_POS = [];
 	game_mode = 1;
 	last_selected = -1;
+	last_selected_counter = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
 	packets_used=0;

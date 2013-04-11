@@ -7,7 +7,7 @@ function Soldiers(TANK, descrition_only){
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
-	TANK['ability_2_in_use'] = 1;				return false;
+	TANK['ability_2_in_use'] = 1;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -21,7 +21,10 @@ function Soldiers(TANK, descrition_only){
 	for(var i=0; i<n; i++){
 		x = round(TANK.x)-30+i*30;
 		y = round(TANK.y);
-		id = 'bot'+TANK.team+get_unique_id()+"."+x+"."+y;
+		rand = TANK.rand;
+		if(rand==undefined)
+			rand = getRandomInt(1, 999999);
+		id = 'bot'+TANK.team+(i+1)+":"+rand+":"+TANK.id;
 		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
 		}
 	
@@ -575,14 +578,14 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 
 //====== Truck =================================================================
 
-function Help(TANK, descrition_only){
+function Soldiers_(TANK, descrition_only){
 	var reuse = 30000;
 	var n = 3;
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
 	
 	//prepare
-	TANK['ability_1_in_use'] = 1;				return false;
+	TANK['ability_1_in_use'] = 1;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -596,7 +599,10 @@ function Help(TANK, descrition_only){
 	for(var i=0; i<n; i++){
 		x = round(TANK.x)-30+i*30;
 		y = round(TANK.y);
-		id = 'bot'+TANK.team+get_unique_id()+"."+x+"."+y;
+		rand = TANK.rand;
+		if(rand==undefined)
+			rand = getRandomInt(1, 999999);
+		id = 'bot'+TANK.team+(i+1)+":"+rand+":"+TANK.id;
 		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
 		}
 	

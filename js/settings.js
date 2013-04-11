@@ -25,7 +25,7 @@ var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
-var VERSION = "1.2.1";			//app version
+var VERSION = "1.2.2";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -83,7 +83,6 @@ var packets_used = 0;
 var draw_interval_id;			//controller for main draw loop
 var level_interval_id;			//controller for level handling function
 var level_hp_regen_id;			//controller for hp regen handling function
-var bots_interval_id;			//controller for adding new bots function
 var timed_functions_id;			//controller for timed functions
 var start_game_timer_id;		//controller for timer in select window
 var chat_interval_id;			//controller for chat

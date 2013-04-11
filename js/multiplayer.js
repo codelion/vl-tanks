@@ -281,7 +281,6 @@ function get_packet(fromClient, message){
 			ROOM = get_room_by_id(DATA[0]);
 			ROOM.host_enemy_name = DATA[1];
 			ROOM.players_max = ROOM.players.length;
-			ROOM.players_on = ROOM.players.length;
 			if(ROOM.host==name && ROOM.settings[0] != 'normal'){
 				choose_and_register_tanks(ROOM);
 				}
@@ -302,6 +301,25 @@ function get_packet(fromClient, message){
 					my_tank_nr = DATA[1];
 				//redraw
 				draw_tank_select_screen();
+				}
+			}
+		else if(PLACE=="game"){
+			var ROOM = get_room_by_id(DATA[0]);
+			if(ROOM != false){
+				//find and update player
+				for(var p in ROOM.players){
+					if(ROOM.players[p].name == DATA[2]){
+						ROOM.players[p].tank = DATA[1];
+						}
+					}
+				for(var i in TANKS){
+					if(TANKS[i].name == DATA[2])
+						TANKS[i].type = DATA[1];
+					}
+				if(DATA[2]==name){
+					my_tank_nr = DATA[1];
+					draw_counter_tank_selection(my_tank_nr);
+					}
 				}
 			}
 		}
@@ -338,7 +356,10 @@ function get_packet(fromClient, message){
 		ROOM = get_room_by_id(DATA[0]);
 		if(ROOM.host == DATA[1])	//host left game ... we are in trouble, unless we switch host to other person
 			ROOM.host = ROOM.host_enemy_name;
-		ROOM.players_on--;
+		for(var p in ROOM.players){
+			if(ROOM.players[p].name == DATA[1])
+				ROOM.players[p].ping = Date.now()-60*1000;
+			}
 		}
 	else if(type == 'tank_move'){		//tank move
 		//DATA = room_id, tank_id, [from_x, from_y, to_x, to_y, lock, direction] 
@@ -353,6 +374,7 @@ function get_packet(fromClient, message){
 		if(PLACE=="game" && opened_room_id==DATA[0]){
 			TANK = get_tank_by_id(DATA[1]);
 			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
+			update_players_ping(TANK.name);
 			sync_movement(TANK, DATA[2][0], DATA[2][1]);
 			TANK.move = 1;
 			TANK.move_to = [DATA[2][2], DATA[2][3]];
@@ -367,14 +389,16 @@ function get_packet(fromClient, message){
 			}
 		}
 	else if(type == 'skill_do'){	//tank skill start
-		//DATA = room_id, player_name, nr=[1,2,3]
+		//DATA = room_id, player_name, nr=[1,2,3], random
 		if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
 		TANK_FROM = get_tank_by_name(DATA[1]);
 		if(TANK_FROM===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
 		var nr = DATA[2];	
 		var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');		
 		//execute
-		var ability_reuse = window[ability_function](TANK_FROM);	
+		TANK_FROM.rand = DATA[3];
+		var ability_reuse = window[ability_function](TANK_FROM);
+		//reuse	
 		if(ability_reuse != undefined && ability_reuse != 0){	
 			TANK['ability_'+nr+'_in_use']=1;
 			if(DATA[1] == name){
@@ -398,6 +422,7 @@ function get_packet(fromClient, message){
 		if(PLACE=='score' && DATA[0] != opened_room_id) return false;
 		if(DATA[2] != name)
 			chat(DATA[1], DATA[2], DATA[3]);
+		update_players_ping(DATA[2]);
 		}
 	else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
 		/*DATA = room_id, player, {
@@ -469,7 +494,8 @@ function get_packet(fromClient, message){
 		//adding kill stats
 		if(TYPES[TANK_TO.type].no_repawn == undefined){
 			//player
-			TANK_FROM.kills = TANK_FROM.kills + 1;	
+			if(TANK_TO.dead != 1)
+				TANK_FROM.kills = TANK_FROM.kills + 1;	
 			//score
 			TANK_FROM.score = TANK_FROM.score + SCORES_INFO[1];
 			death(TANK_TO);
@@ -510,6 +536,7 @@ function get_packet(fromClient, message){
 			console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
 			return false;
 			}
+		update_players_ping(TANK.name);
 		//create bullet
 		var tmp = new Array();
 		tmp.x = TANK.x + TYPES[TANK.type].size[1]/2;
@@ -532,7 +559,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 	else if(action=='skill_up')
 		send_packet('skill_up', [room_id, player, data]);
 	else if(action=='skill_do')
-		send_packet('skill_do', [room_id, player, data]);
+		send_packet('skill_do', [room_id, player, data, data2]);
 	else if(action=='leave_game')
 		send_packet('leave_game', [room_id, player]);
 	else if(action=='kick_player')
@@ -588,7 +615,11 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 //new room was created
 function register_new_room(room_name, mode, type, max_players, map){
 	var players = [];
-	players.push({name: name, team: 'B'});
+	players.push({
+		name: name, 
+		team: 'B',
+		ping: Date.now(),
+		});
 	
 	ROOM = {
 		id: Math.floor(Math.random()*9999999),
@@ -614,6 +645,14 @@ function sync_multiplayers(){
 	}
 function get_waiting_players_count(){
 	return waiting_users;
+	}
+function update_players_ping(name){
+	if(PLACE != 'game') return false;
+	ROOM = get_room_by_id(opened_room_id);
+	for(var p in ROOM.players){
+		if(ROOM.players[p].name == name)
+			ROOM.players[p].ping = Date.now();
+		}
 	}
 function disconnect_game(e){
 	if(PLACE=='room' && game_mode == 2){

@@ -459,7 +459,7 @@ function check_enemies(TANK){
 	if(TANK.stun != undefined) return false;	//stuned
 	if(TANK.hit_reuse == undefined) TANK.hit_reuse = TANK.attack_delay*1000+Date.now();
 	if(TANK.hit_reuse - Date.now() > 0)
-		return false;	//hti reuse
+		return false;	//hit reuse
 	if(TANK.check_enemies_reuse - Date.now() > 0)
 		return false;	//check reuse
 	if(game_mode==2 && check_if_broadcast(TANK)==false) return false; //not our business
@@ -485,10 +485,6 @@ function check_enemies(TANK){
 			&& TANKS[i_locked].dead != 1 
 			&& TANKS[i_locked].invisibility != 1
 			){
-		if(game_mode == 2)
-			send_packet('del_invisible', [TANK.id]);
-		else
-			delete TANK.invisibility;
 		i = i_locked;
 		//exact range
 		dist_x = TANKS[i].x+TYPES[TANKS[i].type].size[1]/2 - (TANK.x+tank_size_from);
@@ -648,8 +644,8 @@ function check_enemies(TANK){
 			shoot_sound(TANK);
 		}
 	//soldiers continue to move if no enemies - was stop for shooting
-	if(found == false && TANK.move == 0 && TYPES[TANK.type].type == 'human')
-		TANK.move = 1;
+	//if(found == false && TANK.move == 0 && TYPES[TANK.type].type == 'human')
+	//	TANK.move = 1;
 	//if not found, do short pause till next search for enemies
 	if(found == false){
 		TANK.check_enemies_reuse = 1000/2+Date.now();	//half second pause
@@ -834,7 +830,7 @@ function check_if_broadcast(KILLER){
 	if(TYPES[KILLER.type].type == 'tower' && ROOM.host == name) return true; 
 	
 	//my soldier - me broadcast
-	if(TANK.master != undefined && TANK.master.name == name) return true; 
+	if(KILLER.master != undefined && KILLER.master.id == MY_TANK.id) return true; 
 	
 	return false;
 	}
@@ -874,8 +870,8 @@ function add_towers(){
 		var team = MAPS[level-1]['towers'][i][0];	
 		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
 		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
-		var x = round(MAPS[level-1]['towers'][i][1]*width_tmp/100);
-		var y = round(MAPS[level-1]['towers'][i][2]*height_tmp/100);
+		var x = MAPS[level-1]['towers'][i][1] - round(TYPES[type].size[1]/2);
+		var y = MAPS[level-1]['towers'][i][2] - round(TYPES[type].size[1]/2);
 		var angle = 180;
 		if(team != 'B')
 			angle = 0;
@@ -923,7 +919,7 @@ function do_ability(nr, TANK){
 					}
 				}
 			else if(broadcast_mode==1){
-				register_tank_action('skill_do', opened_room_id, name,  nr);
+				register_tank_action('skill_do', opened_room_id, name,  nr, getRandomInt(1, 999999));
 				}
 			else if(broadcast_mode==2){
 				//broadcast later
@@ -1112,7 +1108,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 			angle = 0;
 			}
 		}
-	TANK = {
+	TANK_tmp = {
 		id: id,
 		name: name,
 		type: type,
@@ -1142,8 +1138,6 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank){
 		last_bullet_time: Date.now()-5000,
 		};
 	if(AI != undefined)
-		TANK.use_AI = AI;
-	if(master_tank != true)
-		TANK.master = master_tank;	
-	TANKS.push(TANK);
+		TANK_tmp.use_AI = AI;
+	TANKS.push(TANK_tmp);
 	}

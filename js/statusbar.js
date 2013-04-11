@@ -129,8 +129,7 @@ function mute_unmute(){
 	else{
 		//enable sound
 		muted = false;
-		if(getCookie("muted") != '')	
-			delCookie("muted");
+		setCookie("muted", "0", 30);
 		try{
 			if(PLACE == 'game'){
 				audio_main = document.createElement('audio');
