@@ -1,11 +1,13 @@
 //====== GENERAL ===============================================================
 
-function Soldiers(TANK, descrition_only){	
+function Soldiers(TANK, descrition_only, ai){	
 	var reuse = 30000;
 	var n = 3;
+	
+	//description
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
-	
+		
 	//prepare
 	TANK['ability_2_in_use'] = 1;
 	var type = '0';
@@ -34,9 +36,15 @@ function Soldiers(TANK, descrition_only){
 
 //====== Heavy =================================================================
 
-function Rest(TANK, descrition_only){
+function Rest(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Rest and try to repair yourself.';
+	
+	//auto
+	if(ai != undefined){
+		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		if(TANK.hp > max_hp/2) return false;
+		}
 	
 	var reuse = 20000;
 	var duration = 5000;
@@ -77,7 +85,7 @@ function Rest_stop(object){
 
 //====== Tiger =================================================================
 
-function Berserk(TANK, descrition_only){
+function Berserk(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Increase damage, speed, but decrease defence.';
 	
@@ -86,6 +94,12 @@ function Berserk(TANK, descrition_only){
 	var power_speed = 5;
 	var power_damage = 30;
 	var power_armor = -40;
+	
+	//auto
+	if(ai != undefined){
+		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		if(TANK.hp < max_hp/2) return false;
+		}
 	
 	TANK['ability_1_in_use'] = 1;
 	TANK.speed = TANK.speed + power_speed;
@@ -117,13 +131,13 @@ function Berserk_stop(object){
 
 //====== Cruiser ===============================================================
 
-function Fleet(TANK, descrition_only){
+function Fleet(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Increase speed for 5 seconds.';
 	
-	var reuse = 15000;
-	var duration = 5000;
-	var power = 10;
+	var reuse = 20000;
+	var duration = 4000;
+	var power = 8;
 	
 	TANK['ability_1_in_use'] = 1;
 	TANK.speed = TANK.speed + power;
@@ -138,13 +152,19 @@ function Fleet(TANK, descrition_only){
 	//return reuse
 	return reuse;
 	}
-function Repair(TANK, descrition_only){
+function Repair(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Slowly repair yourself and allies';
 		
+	//auto
+	if(ai != undefined){
+		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		if(TANK.hp > max_hp/2) return false;
+		}
+		
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 20;
+	var power = 15;
 	var range = 80;
 	
 	TANK['ability_3_in_use'] = 1;
@@ -194,7 +214,7 @@ function Repair_stop(object){
 
 //====== Launcher ==============================================================
 
-function Mortar(TANK, descrition_only){
+function Mortar(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Launch missile with area damage.';
 		
@@ -216,10 +236,12 @@ function Mortar(TANK, descrition_only){
 	return 0;
 	}
 function Mortar_once(TANK){
+	if(TANK.Mortar_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['draw_mortar_marker', TANK.id]);
 	if(TANK.abilities_lvl[0]==1)
 		on_click_functions.push(['do_mortar', TANK.id]);
+	TANK.Mortar_loaded = 1;
 	}
 function draw_mortar_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
@@ -328,9 +350,14 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 
 //====== Sniper ================================================================
 
-function Camouflage(TANK, descrition_only){
+function Camouflage(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Slowly become invisible while not shooting and moving';
+		
+	//auto
+	if(ai != undefined){
+		TANK.move = 0;
+		}
 	
 	var reuse = 15000;
 	var duration = 7000;
@@ -360,7 +387,7 @@ function Camouflage_stop(object){
 //====== Miner =================================================================
 
 var MINES = [];
-function Mine(TANK, descrition_only){
+function Mine(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Put mine on the ground.';
 		
@@ -384,10 +411,12 @@ function Mine(TANK, descrition_only){
 	return reuse;
 	}
 function Mine_once(TANK){
+	if(TANK.Mine_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['draw_mines', TANK.id]);
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['check_mines', TANK.id]);
+	TANK.Mine_loaded = 1;
 	}
 function draw_mines(tank_id){
 	var tank = get_tank_by_id(tank_id);
@@ -437,7 +466,7 @@ function check_mines(tank_id){
 
 //====== Tech ==================================================================
 
-function Virus(TANK, descrition_only){
+function Virus(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Send virus to deactivate enemy and damage it.';
 		
@@ -459,10 +488,12 @@ function Virus(TANK, descrition_only){
 	return 0;
 	}
 function Virus_once(TANK){
+	if(TANK.Virus_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['draw_virus_marker', TANK.id]);
 	if(TANK.abilities_lvl[0]==1)
 		on_click_functions.push(['do_stun', TANK.id]);
+	TANK.Virus_loaded = 1;
 	}
 function draw_virus_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
@@ -579,7 +610,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 
 //====== Truck =================================================================
 
-function Soldiers_(TANK, descrition_only){
+function Soldiers_(TANK, descrition_only, ai){
 	var reuse = 30000;
 	var n = 3;
 	if(descrition_only != undefined)
@@ -613,7 +644,7 @@ function Soldiers_(TANK, descrition_only){
 
 //====== Helicopter ============================================================
 
-function Airstrike(TANK, descrition_only){
+function Airstrike(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Send 3 missiles to the target.';
 		
@@ -634,10 +665,12 @@ function Airstrike(TANK, descrition_only){
 	return 0;
 	}
 function Airstrike_once(TANK){
+	if(TANK.Airstrike_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['draw_airstrike_marker', TANK.id]);
 	if(TANK.abilities_lvl[0]==1)
 		on_click_functions.push(['do_airstrike', TANK.id]);
+	TANK.Airstrike_loaded = 1;
 	}
 function draw_airstrike_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
@@ -763,7 +796,7 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 
 //====== Bomber ================================================================
 
-function Bomb(TANK, descrition_only){
+function Bomb(TANK, descrition_only, ai){
 	if(descrition_only != undefined)
 		return 'Drop powerfull bomb with area damage.';
 
@@ -785,10 +818,12 @@ function Bomb(TANK, descrition_only){
 	return 0;
 	}
 function Bomb_once(TANK){
+	if(TANK.Bomb_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
 		pre_draw_functions.push(['draw_bomb_marker', TANK.id]);
 	if(TANK.abilities_lvl[0]==1)
 		on_click_functions.push(['do_bomb', TANK.id]);
+	TANK.Bomb_loaded = 1;
 	}
 function draw_bomb_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);

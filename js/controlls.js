@@ -5,18 +5,20 @@ function on_keyboard_action(event){
 	//add shortcuts
 	if(PLACE == 'game'){
 		if(MY_TANK.dead != 1){
-			if(k == 49 || k == 97 ){	
-				//special 1
-				do_ability(1, MY_TANK);
-				}	
-			else if(k == 50 || k == 98 ){
-				//sepcial 2
-				do_ability(2, MY_TANK);
-				}
-			else if(k == 51 || k == 99 ){
-				//special 3
-				do_ability(3, MY_TANK);
-				}
+			if(k == 49 || k == 97 )	
+				do_ability(1, MY_TANK);	//special 1
+			else if(k == 50 || k == 98)
+				do_ability(2, MY_TANK);	//sepcial 2
+			else if(k == 51 || k == 99)
+				do_ability(3, MY_TANK);	//special 3
+			else if(k == 38)
+				scoll_map(0, 1);	//up
+			else if(k == 40)
+				scoll_map(0, -1); 	//down
+			else if(k == 39)
+				scoll_map(-1, 0);	//left
+			else if(k == 37)
+				scoll_map(1, 0); 	//right
 			}
 		if(k==9){				
 			//TAB
@@ -64,10 +66,15 @@ function on_keyboard_action(event){
 		
 	return true;
 	}
+//keyboard release
 function on_keyboardup_action(event){
 	k = event.keyCode;
 	if(k==16)
 		shift_pressed = false; //shift
+	}
+//mouse right click
+function on_mouse_right_release(event){
+	return false;
 	}
 //mouse move on background
 function on_mousemove_background(event){

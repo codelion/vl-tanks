@@ -105,22 +105,32 @@ function draw_rooms_list(message){
 
 			canvas_backround.strokeStyle = "#8fc74c";
 			canvas_backround.fillStyle = "#8fc74c";
-			roundRect(canvas_backround, x+1, y+1, round((70-2)*ROOMS[i].players.length/ROOMS[i].max), height-2, 0, true);
+			if(ROOMS[i].progress == undefined)
+				roundRect(canvas_backround, x+1, y+1, round((70-2)*ROOMS[i].players.length/ROOMS[i].max), height-2, 0, true);
+			else
+				roundRect(canvas_backround, x+1, y+1, 70-2, height-2, 0, true);
 
 			//num text
 			canvas_backround.fillStyle = "#3f3b30";
 			canvas_backround.font = "Bold 14px Helvetica";
-			text = ROOMS[i].players.length+"/"+ROOMS[i].max;
+			if(ROOMS[i].progress == undefined)
+				text = ROOMS[i].players.length+"/"+ROOMS[i].max;
+			else
+				text = ROOMS[i].players.length+"/"+ROOMS[i].players.length;	
 			canvas_backround.fillText(text, x+letter_padding_left, y+(height+font_pixel_to_height(14))/2);
 			
 			//join block
 			canvas_backround.strokeStyle = "#000000";
-			canvas_backround.fillStyle = "#8fc74c";
+			if(ROOMS[i].progress == undefined)
+				canvas_backround.fillStyle = "#8fc74c";
+			else
+				canvas_backround.fillStyle = "#e2f4cd";
 			roundRect(canvas_backround, x+width-70, y, 70, height, 0, true);
 			
 			//on click event
 			register_button(x+width-70, y, 70, height, PLACE, function(xx, yy, extra){
 				var ROOM = get_room_by_id(extra); 
+				if(ROOM.progress != undefined) return false;
 				if(ROOM != false && ROOM.players.length < ROOM.max){
 					if(ROOM.version == VERSION){
 						draw_room(extra);
@@ -137,7 +147,11 @@ function draw_rooms_list(message){
 			//join text
 			canvas_backround.fillStyle = "#196119";
 			canvas_backround.font = "Bold 14px Helvetica";
-			canvas_backround.fillText("Join", x+width+letter_padding_left-70, y+(height+font_pixel_to_height(14))/2);
+			if(ROOMS[i].progress == undefined)
+				var text = "Join";
+			else
+				var text = ROOMS[i].progress+"%";
+			canvas_backround.fillText(text, x+width+letter_padding_left-70, y+(height+font_pixel_to_height(14))/2);
 			
 			//title text
 			canvas_backround.fillStyle = "#3f3b30";
@@ -271,7 +285,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Game Mode:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = ['normal', 'random', 'mirror'/*, 'counter'*/];
+	values = ['normal', 'random', 'mirror', 'counter'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";
@@ -711,4 +725,65 @@ function get_room_by_id(room_id){
 			}
 		}
 	return false;
+	}
+function get_active_room_progress(){
+	ROOM = get_room_by_id(opened_room_id);
+	var progress = 0;
+	var towers_hp = 0;
+	var towers_total_hp = 0;
+	var base_hp = 0;
+	var base_total_hp = 0;
+	var towers_n = 0;
+	var bases_n = 0;
+	var teams = ['B', 'R'];	
+	for(var t in teams){
+		var team = teams[t];
+		var progress_tmp = 0;
+		towers_n = 0;
+		bases_n = 0;
+		towers_hp = 0;
+		towers_total_hp = 0;
+		base_hp = 0;
+		base_total_hp = 0;
+		
+		//find data
+		for(var i in MAPS){
+			if(MAPS[i].name == ROOM.settings[2]){
+				for(var t in MAPS[i].towers){
+					if(MAPS[i].towers[t][0]==team){
+						if(MAPS[i].towers[t][3]=='Tower')
+							towers_n++;
+						else if(MAPS[i].towers[t][3]=='Base')
+							bases_n++;
+						}
+					}
+				}
+			}
+		for(var i in TYPES){
+			if(TYPES[i].name == 'Tower')	
+				towers_total_hp = towers_n * TYPES[i].life[0];
+			else if(TYPES[i].name == 'Base')	
+				base_total_hp = bases_n * TYPES[i].life[0];
+			}
+		for(var i in TANKS){
+			if(TANKS[i].team == team){
+				if(TYPES[TANKS[i].type].name == 'Tower')
+					towers_hp +=  TANKS[i].hp;
+				else if(TYPES[TANKS[i].type].name == 'Base')
+					base_hp +=  TANKS[i].hp;
+				}
+			}
+		//calc
+		if(towers_total_hp == 0)
+			progress_tmp += 30;
+		else
+			progress_tmp += 0.3*((towers_total_hp-towers_hp)*100/towers_total_hp);
+		if(base_total_hp == 0)
+			progress_tmp += 70;
+		else
+			progress_tmp += 0.7*((base_total_hp-base_hp)*100/base_total_hp);
+		if(progress_tmp > progress)
+			progress = progress_tmp;
+		}
+	return round(progress);
 	}

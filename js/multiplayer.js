@@ -31,7 +31,7 @@ function readyListener(e){
 	Rooms_obj.join();
 	//status
 	socket_live = true;
-	try{parent.document.getElementById("connected").innerHTML = 'Yes';}catch(error){}
+	try{parent.document.getElementById("connected").innerHTML = 'single';}catch(error){}
 	}
 //controlls which rooms to join and leave
 function room_controller(new_room){
@@ -47,13 +47,16 @@ function room_controller(new_room){
 		Rooms_obj.join();
 		}
 	else if(PLACE == 'select' && SOCKET_ROOMS != ''){
-		//disconnect from all rooms
-		SOCKET_ROOMS = '';
-		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
-		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
-		Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
-		Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
-		Rooms_obj.leave();
+		ROOM = get_room_by_id(opened_room_id);
+		if(ROOM.host != name){	//let host be connected to all and broadcast game status
+			//disconnect from all rooms
+			SOCKET_ROOMS = '';
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+			Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
+			Rooms_obj.leave();
+			}
 		}
 	else if((PLACE == 'rooms' || PLACE == 'init') && SOCKET_ROOM_ID != ''){
 		//disconnect from last room
@@ -73,16 +76,30 @@ function room_controller(new_room){
 		Room_id_obj.addEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener_id);  
 		Room_id_obj.addMessageListener("CHAT_MESSAGE", get_packet_inner_id);
 		Room_id_obj.join();
-		if(SOCKET_ROOMS != ''){
-			//disconnect from all rooms
-			SOCKET_ROOMS = '';
-			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
-			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
-			Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
-			Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
-			Rooms_obj.leave();
+		if(SOCKET_ROOMS != '' && PLACE != 'room'){
+			ROOM = get_room_by_id(opened_room_id);
+			if(ROOM.host != name){
+				//disconnect from all rooms
+				SOCKET_ROOMS = '';
+				Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.JOIN, joinRoomsListener);
+				Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.ADD_OCCUPANT, addOccupantListener);
+				Rooms_obj.removeEventListener(net.user1.orbiter.RoomEvent.REMOVE_OCCUPANT, removeOccupantListener);
+				Rooms_obj.removeMessageListener("CHAT_MESSAGE", get_packet_inner);
+				Rooms_obj.leave();
+				}
 			}
 		}
+	try{
+		if(SOCKET_ROOM_ID != '' && SOCKET_ROOMS != '')
+			parent.document.getElementById("connected").innerHTML = 'dual';
+		else if(SOCKET_ROOMS != '')
+			parent.document.getElementById("connected").innerHTML = 'single';
+		else if(SOCKET_ROOM_ID != '')
+			parent.document.getElementById("connected").innerHTML = 'single-id';
+		else
+			parent.document.getElementById("connected").innerHTML = 'none';
+		}
+	catch(error){}
 	}
 //we joined the room
 function joinRoomsListener(e){
@@ -133,7 +150,7 @@ function disconnect_server(e){
 		}
 	//update status
 	socket_live = false;
-	try{parent.document.getElementById("connected").innerHTML = 'no';}catch(error){}
+	try{parent.document.getElementById("connected").innerHTML = 'none';}catch(error){}
 	}
 function get_packet_inner(fromClient, message){
 	get_packet(fromClient, message);
@@ -145,7 +162,7 @@ function get_packet_inner_id(fromClient, message){
 //===== COMMUNICATION ==========================================================
 
 //send packet to server
-function send_packet(type, message){
+function send_packet(type, message, force_list_connection){
 	if(message.length == 0){
 		console.log('Error: empty message, type: '+type);
 		return false;
@@ -162,8 +179,17 @@ function send_packet(type, message){
 		console.log('Error: '+MAX_SENT_PACKETS+' packets reached.');
 		return false;
 		}
-	try{
-		parent.document.getElementById("messages_out").innerHTML = packets_used+1;
+	try{	
+		var string;
+		if(packets_used>999)
+			string = round(packets_used/1000)+"k/";
+		else
+			string = packets_used+"/";
+		if(packets_all>999)
+			string = string+round(packets_all/1000)+"k";
+		else
+			string = string+packets_all;
+		parent.document.getElementById("packets").innerHTML = string;
 		}catch(error){}
 	
 	//make and send message
@@ -172,17 +198,30 @@ function send_packet(type, message){
 		message: message,
 		};
 	message = JSON.stringify(message);
-	if(SOCKET_ROOMS != '')
-		Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
-	else if(SOCKET_ROOM_ID != '')
-		Room_id_obj.sendMessage("CHAT_MESSAGE", "true", null, message);
+	
+	if(force_list_connection != undefined && SOCKET_ROOMS != '')
+		Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);		//forced to use all rooms
+	else if((PLACE == 'select' || PLACE == 'game' || PLACE == 'score') && SOCKET_ROOM_ID != '')
+		Room_id_obj.sendMessage("CHAT_MESSAGE", "true", null, message);		//use our room
+	else if(SOCKET_ROOMS != '')
+		Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);		//use all rooms
 	else
-		console.log('Error: we are not joined any room.');
+		console.log('Error: we are not joined any room, place: '+PLACE);	//error
 	}
 //get packets from server
-function get_packet(fromClient, message){	
+function get_packet(fromClient, message){
+	packets_all++;	
 	try{
-		parent.document.getElementById("messages_in").innerHTML = parseInt(parent.document.getElementById("messages_in").innerHTML)+1;
+		var string;
+		if(packets_used>999)
+			string = round(packets_used/1000)+"k/";
+		else
+			string = packets_used+"/";
+		if(packets_all>999)
+			string = string+round(packets_all/1000)+"k";
+		else
+			string = string+packets_all;
+		parent.document.getElementById("packets").innerHTML = string;
 		}catch(error){}
 	DATA = JSON.parse(message);
 	var type = DATA.type;
@@ -191,7 +230,7 @@ function get_packet(fromClient, message){
 	
 	if(type == 'new_room'){		//new room was created
 		var n = ROOMS.length;
-		if(get_room_by_id(DATA.id)!= false) return false;
+		if(get_room_by_id(DATA.id) != false) return false;
 		ROOMS.push(DATA);
 		if(PLACE=='rooms')
 			draw_rooms_list();
@@ -214,6 +253,16 @@ function get_packet(fromClient, message){
 			ROOM = get_room_by_id(opened_room_id);
 			if(ROOM.host==name)
 				send_packet('new_room', ROOM);	//broadcast it
+			}
+		else if(PLACE == 'select'){ //i am host and i can broadcast started game status...
+			ROOM = get_room_by_id(opened_room_id);
+			ROOM.progress = 0;
+			send_packet('new_room', ROOM, true);	//broadcast it
+			}
+		else if(PLACE == 'game'){ //i am host and i can broadcast started game status...
+			ROOM = get_room_by_id(opened_room_id);
+			ROOM.progress = get_active_room_progress();
+			send_packet('new_room', ROOM, true);	//broadcast it
 			}
 		}
 	else if(type == 'leave_room'){	//player leaving room
@@ -315,19 +364,44 @@ function get_packet(fromClient, message){
 		else if(PLACE=="game"){
 			var ROOM = get_room_by_id(DATA[0]);
 			if(ROOM != false){
-				//find and update player
+				//update players
 				for(var p in ROOM.players){
 					if(ROOM.players[p].name == DATA[2]){
 						ROOM.players[p].tank = DATA[1];
 						}
 					}
 				for(var i in TANKS){
-					if(TANKS[i].name == DATA[2])
-						TANKS[i].type = DATA[1];
+					if(TANKS[i].name == DATA[2]){
+						var type = DATA[1];
+						var level = TANKS[i].level;
+						//change stats
+						TANKS[i].type = type;
+						TANKS[i].hp = TYPES[type].life[0]+TYPES[type].life[1]*(level-1);
+						TANKS[i].sight = TYPES[type].scout + round(TYPES[type].size[1]/2);
+						TANKS[i].speed = TYPES[type].speed;
+						TANKS[i].armor = TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1);
+						TANKS[i].damage = TYPES[type].damage[0] + TYPES[type].damage[1]*(level-1);
+						TANKS[i].attack_delay = TYPES[type].attack_delay;
+						TANKS[i].turn_speed = TYPES[type].turn_speed;
+						}
 					}
+				//if me
 				if(DATA[2]==name){
 					my_tank_nr = DATA[1];
 					draw_counter_tank_selection(my_tank_nr);
+					draw_tank_abilities();
+					
+					//auto add 1 lvl upgrade
+					for(jj in TYPES[MY_TANK.type].abilities){ 
+						var nr = 1+parseInt(jj);
+						var ability_function = TYPES[MY_TANK.type].abilities[jj].name.replace(/ /g,'_')+"_once";
+						if(ability_function != undefined){
+							try{
+								window[ability_function](MY_TANK);
+								}
+							catch(err){}
+							}
+						}
 					}
 				}
 			}
@@ -430,6 +504,10 @@ function get_packet(fromClient, message){
 			if(PLACE=='room' && DATA[0] != opened_room_id) return false;
 			if(PLACE=='select' && DATA[0] != opened_room_id) return false;
 			if(PLACE=='score' && DATA[0] != opened_room_id) return false;
+			}
+		else{
+			if(DATA[0]=='game' && PLACE != 'game') return false;
+			if(DATA[0]=='score' && PLACE != 'score') return false;
 			}
 		chat(DATA[1], DATA[2], DATA[3], DATA[5]);
 		update_players_ping(DATA[2]);

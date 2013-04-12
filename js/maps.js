@@ -248,6 +248,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
 	}
+//return map element info by name
 function get_element_by_name(name){
 	for(var i in ELEMENTS){
 		if(ELEMENTS[i].name == name){
@@ -256,7 +257,25 @@ function get_element_by_name(name){
 		}
 	return false;
 	}
-function prepare_maps(){
-	//for(var m in MAPS){
-	//	}
+//scroll map in manual scroll mode
+function scoll_map(xx, yy){
+	if(MAP_SCROLL_MODE==1) return false;
+	
+	var step = 50;
+	
+	//calc
+	map_offset[0] = map_offset[0] + xx * step;
+	map_offset[1] = map_offset[1] + yy * step;
+	
+	//check limits
+	if(map_offset[0]>0)	map_offset[0]=0;
+	if(map_offset[1]>0)	map_offset[1]=0;
+	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
+		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
+	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
+		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
+			
+	//scroll
+	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	}

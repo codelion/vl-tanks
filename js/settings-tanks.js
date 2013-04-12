@@ -4,7 +4,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Sniper and Tiger"],
 	life: [250, 15],				//[tank life in level 0, life increase in each level]
-	damage: [12, 0.6],	//5 dps			//[tank damage in level 0, damage increase in each level]
+	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
@@ -36,7 +36,7 @@ TYPES.push({
 	life: [180, 12],
 	damage: [30, 2],	//30 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [30, 0.3, 40],
 	speed: 25,
 	attack_delay: 1,
@@ -68,7 +68,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 5,
 	abilities: [
-		{name: 'Fleet',	passive: false,		broadcast: 1}, 
+		{name: 'Fleet',	passive: false,			broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Repair',	passive: false,		broadcast: 1}, 
 		],
@@ -89,7 +89,7 @@ TYPES.push({
 	life: [120, 10],
 	damage: [40, 2],	//20 dps
 	range: 120,
-	scout: 110,
+	scout: 100,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 2,
@@ -115,7 +115,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [50, 0.3],	//25 dps
 	range: 120,
-	scout: 110,
+	scout: 100,
 	armor: [10, 0, 10],
 	speed: 23,
 	attack_delay: 2,
@@ -168,7 +168,7 @@ TYPES.push({
 	life: [160, 10],
 	damage: [10, 0.5],	//10 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [30, 0.3, 40],	
 	speed: 30,
 	attack_delay: 1,
@@ -192,7 +192,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Uses many soldiers for attack", "Very low damage"],
 	life: [150, 10],
-	damage: [5, 0.3],	//5 dps
+	damage: [7, 0.3],	//7 dps
 	range: 80,
 	scout: 90,
 	armor: [10, 0, 10],
@@ -245,7 +245,7 @@ TYPES.push({
 	name: 'Bomber',
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
-	life: [130, 10],
+	life: [150, 10],
 	damage: [15, 0.7],	//15 dps
 	range: 80,
 	scout: 110,
@@ -257,6 +257,7 @@ TYPES.push({
 	no_collisions: 1,
 	abilities: [
 		{name: 'Bomb',	passive: false,		broadcast: 2}, 
+		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -273,9 +274,9 @@ TYPES.push({
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [80, 5],
-	damage: [8, 1],	//8 dps
+	damage: [7, 0.4],	//7 dps
 	range: 70,
-	scout: 70,
+	scout: 80,
 	armor: [0, 0, 0],
 	speed: 25,			//speed: 100,
 	attack_delay: 1,
@@ -299,7 +300,7 @@ TYPES.push({
 	life: [1500,0],
 	damage: [30, 0],	//30 dps
 	range: 120,
-	scout: 120,
+	scout: 130,
 	armor: [20,0,20],
 	speed: 0,
 	attack_delay: 1,
@@ -323,7 +324,7 @@ TYPES.push({
 	life: [3000, 0],
 	damage: [45, 0],	//45 dps
 	range: 120,
-	scout: 120,
+	scout: 130,
 	armor: [50,0,50],
 	speed: 0,
 	attack_delay: 1,

@@ -12,8 +12,8 @@ var canvas_main = canvas_base.getContext("2d");						//moving objects layer
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
-var START_GAME_COUNT_SINGLE=10;		//second how much to count in singleplayer
-var START_GAME_COUNT_MULTI=10;		//second how much to count in multiplayer
+var START_GAME_COUNT_SINGLE=15;		//second how much to count in singleplayer
+var START_GAME_COUNT_MULTI=20;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
@@ -25,7 +25,7 @@ var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
-var VERSION = "1.2.3";			//app version
+var VERSION = "1.2.5";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -75,11 +75,12 @@ var TO_RADIANS = Math.PI/180; 		//for rotating
 var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join=-1;			//id of room, requested to join
-var render_mode = 'requestAnimationFrame';
-var page_title_copy = '';	
-var packets_used = 0;	
-var shift_pressed = false;
-var chat_shifted = false;
+var render_mode = 'requestAnimationFrame';	//render mode
+var page_title_copy = '';		//copy of original title
+var packets_used = 0;			//sent packets count in 1 game, there is limit...
+var packets_all = 0;			//received packets count in 1 game
+var shift_pressed = false;		//if shift is pressed
+var chat_shifted = false;		//if chat was activated with shift
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
@@ -92,12 +93,16 @@ var chat_interval_id;			//controller for chat
 //keyboard and mouse capture handlers
 window.onbeforeunload = disconnect_game;
 canvas_base.addEventListener('mousedown', on_mousedown, false);
+document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
+
 canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.onkeydown = function(e) {return on_keyboard_action(e); }
 document.onkeyup = function(e) {return on_keyboardup_action(e); }
+
+
 
 //full screen handlers
 document.addEventListener("fullscreenchange", full_screenchange_handler, false);

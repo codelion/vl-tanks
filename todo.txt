@@ -1,5 +1,1 @@
-skill not working
-counter mode
-	update skill
-	updates stats
-	fix skills _once
+skill activation

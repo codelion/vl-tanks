@@ -16,8 +16,10 @@ function check_path_AI(TANK){
 	
 	//if in battle - stop
 	if(TANK.last_bullet_time + 1000 - Date.now() > 0){
-		if(game_mode == 1)
+		if(game_mode == 1){
 			TANK.move = 0;
+			try_skills(TANK);
+			}
 		else{
 			if(TANK.move == 1){
 				var params = [
@@ -97,5 +99,22 @@ function do_ai_move(TANK, xx, yy, direction){
 		TANK.move = 1;
 		if(direction != undefined)
 			TANK.move_direction = direction;
+		}
+	}
+function try_skills(TANK_AI){
+	for(i in TYPES[TANK_AI.type].abilities){ 
+		var nr = 1+parseInt(i);
+		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
+		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2) continue;
+		if(TANK_AI['ability_'+nr+'_in_use'] == 1) continue;
+		try{
+			//execute
+			window[ability_function](TANK_AI, undefined, true);
+			return false;
+			}
+		catch(err){
+			console.log("AI error: "+err.message);
+			}
+		TANK_AI['ability_'+nr+'_in_use'] = 1;	
 		}
 	}

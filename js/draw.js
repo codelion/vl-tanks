@@ -9,8 +9,9 @@ function draw_main(){
 	frame_time = Date.now();
 	var time_gap = Date.now() - frame_last_time;
 	
-	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);	//clear layer
-	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	//clear sight layer
+	//clear
+	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 	if(QUALITY>1){
 		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
@@ -327,11 +328,9 @@ function draw_main(){
 		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
 	//show live scroes?
-	if(tab_scores==true){
+	if(tab_scores==true)
 		draw_final_score(true);
-		}
 	
-	//show chat lines
 	show_chat();
 	
 	//fps

@@ -213,7 +213,7 @@ function add_player_name(tank){
 	
 	if(tank.cache_name != undefined && tank.cache_name.level == tank.level){
 		//read from cache
-		canvas_main.drawImage(tank.cache_name.object, xx, yy-25);
+		canvas_main.drawImage(tank.cache_name.object, xx, yy-25);	
 		}
 	else{
 		//create tmp
@@ -241,7 +241,7 @@ function add_player_name(tank){
 		tank.cache_name.level = tank.level;
 		
 		//show
-		canvas_main.drawImage(tmp_canvas, xx, yy-2);
+		canvas_main.drawImage(tmp_canvas, xx, yy-25);
 		}
 	}
 //tank move rgistration and graphics
@@ -401,6 +401,7 @@ function tank_level_handler(){	//once per second
 		//calc level
 		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets;
 		time_diff = Math.ceil(time_diff/30);
+		
 		TANKS[i].level = time_diff;
 		if(TANKS[i].level>99) TANKS[i].level = 99;	//max 99
 		
@@ -425,30 +426,28 @@ function tank_level_handler(){	//once per second
 //checks tanks hp regen
 function level_hp_regen_handler(){		//once per 1 second - 1.5%/s
 	for (i in TANKS){
-		if(TANKS[i].dead == 1 || TANKS[i].type == 'tower') continue;
-		if(TYPES[TANKS[i].type].no_repawn == undefined){
-			var max_hp = TYPES[TANKS[i].type].life[0] + TYPES[TANKS[i].type].life[1] * (TANKS[i].level-1);
-			//passive hp regain - 1.5%/s
-			var extra_hp = round(max_hp * 1.5 / 100);
-			if(TANKS[i].hp < max_hp){
-				TANKS[i].hp = TANKS[i].hp + extra_hp;
-				if(TANKS[i].hp > max_hp)
-					TANKS[i].hp = max_hp;
-				}
-			//healing
-			for (j in TANKS[i].extra_hp){
-				if(TANKS[i].hp+TANKS[i].extra_hp[j][0] < max_hp)
-					TANKS[i].hp = TANKS[i].hp + TANKS[i].extra_hp[j][0];
-				else if(TANKS[i].hp+TANKS[i].extra_hp[j][0] >= max_hp)
-					TANKS[i].hp = max_hp;
-				}
-			//check nano_hp_regen
-			if(TANKS[i].nano_hp_regen != undefined){
-				if(TANKS[i].hp+TANKS[i].nano_hp_regen < max_hp)
-					TANKS[i].hp = TANKS[i].hp + TANKS[i].nano_hp_regen;
-				else if(TANKS[i].hp+TANKS[i].nano_hp_regen >= max_hp)
-					TANKS[i].hp = max_hp;
-				}
+		if(TANKS[i].dead == 1 || TYPES[TANKS[i].type].type == 'tower') continue;
+		var max_hp = TYPES[TANKS[i].type].life[0] + TYPES[TANKS[i].type].life[1] * (TANKS[i].level-1);
+		//passive hp regain - 1.5%/s
+		var extra_hp = round(max_hp * 1.5 / 100);
+		if(TANKS[i].hp < max_hp){
+			TANKS[i].hp = TANKS[i].hp + extra_hp;
+			if(TANKS[i].hp > max_hp)
+				TANKS[i].hp = max_hp;
+			}
+		//healing
+		for (j in TANKS[i].extra_hp){
+			if(TANKS[i].hp+TANKS[i].extra_hp[j][0] < max_hp)
+				TANKS[i].hp = TANKS[i].hp + TANKS[i].extra_hp[j][0];
+			else if(TANKS[i].hp+TANKS[i].extra_hp[j][0] >= max_hp)
+				TANKS[i].hp = max_hp;
+			}
+		//check nano_hp_regen
+		if(TANKS[i].nano_hp_regen != undefined){
+			if(TANKS[i].hp+TANKS[i].nano_hp_regen < max_hp)
+				TANKS[i].hp = TANKS[i].hp + TANKS[i].nano_hp_regen;
+			else if(TANKS[i].hp+TANKS[i].nano_hp_regen >= max_hp)
+				TANKS[i].hp = max_hp;
 			}
 		}
 	redraw_tank_stats();
@@ -680,12 +679,13 @@ function do_damage(TANK, TANK_TO, BULLET){
 	if(TANK_TO == undefined) return false;
 	if(TANK_TO.dead == 1) return false;
 	
-	var accuracy = TYPES[TANK.type].accuracy;
+	//accuracy
+	/*var accuracy = TYPES[TANK.type].accuracy;
 	if(TANK.move==1)
 		accuracy = accuracy-10;
 	if(TANK_TO.move==1)
 		accuracy = accuracy-10;
-	if(getRandomInt(1, 10) > accuracy/10) return false;
+	if(getRandomInt(1, 10) > accuracy/10) return false;*/
 	
 	//sound	fire_sound - i was hit
 	if(TANK_TO.id == MY_TANK.id && muted==false){
