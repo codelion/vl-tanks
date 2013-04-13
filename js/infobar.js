@@ -219,8 +219,7 @@ function draw_tank_abilities(){
 	
 	for (var i in TYPES[MY_TANK.type].abilities){
 		//check if abilites not in use
-		if(MY_TANK['ability_'+(1+parseInt(i))+'_in_use'] != undefined)
-			continue;
+		if(MY_TANK.abilities_reuse[i] > Date.now() ) continue;
 		
 		//button
 		var img = new Image();
@@ -263,19 +262,8 @@ function draw_ability_reuse(object){
 	var letter_width = 5.5;
 	
 	if(object != undefined){
-		if(object['tank']['respan_time'] != undefined || object['tank']['ability_'+(object.nr+1)+'_in_use'] != 1)
-			object.duration=0;	//tank dead
-		
 		var i = object.nr;
-		if(object.duration==0){	
-			if(i==0)
-				delete object.tank.ability_1_in_use;
-			else if(i==1){
-				delete object.tank.ability_2_in_use;
-				}
-			else if(i==2)
-				delete object.tank.ability_3_in_use;
-			}
+		var ability_reuse = object.tank.abilities_reuse[i] - Date.now();
 		
 		//button
 		var img = new Image();
@@ -288,12 +276,13 @@ function draw_ability_reuse(object){
 		canvas_backround.fillStyle = "#1d2411";
 		
 		//if active
+		var img_height=0;
 		if(TYPES[MY_TANK.type].abilities[i].passive == false){
 			var img = new Image();
-			var img_height = SKILL_BUTTON * object.duration / object.max;
+			img_height = (SKILL_BUTTON) * ability_reuse / object.max + 5;
 			var img = new Image();
 			img.src = '../img/skill-on.png';
-			if(img_height<1){
+			if(img_height < 6){
 				//available again
 				canvas_backround.drawImage(img, status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 				}
@@ -319,6 +308,14 @@ function draw_ability_reuse(object){
 		if(ability_text.length>9)
 			canvas_backround.font = "bold 8px Verdana";
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
+		
+		//reuse left
+		reuse = Math.ceil(ability_reuse / 1000);
+		if(reuse>0){
+			canvas_backround.font = "normal 10px Verdana";
+			canvas_backround.fillStyle = "#1d2411";
+			canvas_backround.fillText(reuse, status_x_tmp+i*(SKILL_BUTTON+gap)+round(SKILL_BUTTON*7/10), status_y+round(SKILL_BUTTON*9/10));
+			}
 		}
 	else
 		log('Error: undefined object in draw_ability_reuse().');

@@ -1,15 +1,18 @@
 //====== GENERAL ===============================================================
 
-function Soldiers(TANK, descrition_only, ai){	
+function Soldiers(TANK, descrition_only, settings_only, ai){	
 	var reuse = 30000;
 	var n = 3;
 	
 	//description
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
+	//settings
+	if(settings_only != undefined)
+		return {reuse: reuse};
 		
 	//prepare
-	TANK['ability_2_in_use'] = 1;
+	TANK.abilities_reuse[1] = Date.now() + reuse;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -27,30 +30,31 @@ function Soldiers(TANK, descrition_only, ai){
 		if(rand==undefined)
 			rand = getRandomInt(1, 999999);
 		id = 'bot'+TANK.team+(i+1)+":"+rand+":"+TANK.id;
-		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
+		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK, TANK.begin_time);
+		added_tank = get_tank_by_id(id);
+		added_tank.lifetime = Date.now() + reuse;	//will die
 		}
 	
-	//return reuse
 	return reuse;
 	}
 
 //====== Heavy =================================================================
 
-function Rest(TANK, descrition_only, ai){
+function Rest(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var duration = 5000;
+	var power = 15;
+	
 	if(descrition_only != undefined)
 		return 'Rest and try to repair yourself.';
-	
-	//auto
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	if(ai != undefined){
 		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
 		if(TANK.hp > max_hp/2) return false;
 		}
 	
-	var reuse = 20000;
-	var duration = 5000;
-	var power = 15;
-	
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	if(TANK.extra_icon==undefined)
 		TANK.extra_icon = [];
 	TANK.extra_icon.push(['repair.png', 16, 16, TANK.id]);
@@ -67,7 +71,6 @@ function Rest(TANK, descrition_only, ai){
 	tmp['tank'] = TANK;
 	timed_functions.push(tmp);
 	
-	//return reuse
 	return reuse;
 	}
 function Rest_stop(object){
@@ -85,23 +88,23 @@ function Rest_stop(object){
 
 //====== Tiger =================================================================
 
-function Berserk(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Increase damage, speed, but decrease defence.';
-	
+function Berserk(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
 	var power_speed = 5;
 	var power_damage = 30;
 	var power_armor = -40;
 	
-	//auto
+	if(descrition_only != undefined)
+		return 'Increase damage, speed, but decrease defence.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	if(ai != undefined){
 		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
 		if(TANK.hp < max_hp/2) return false;
 		}
 	
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	TANK.speed = TANK.speed + power_speed;
 	TANK.damage = round(TANK.damage * (100+power_damage)/100);
 	TANK.armor = TANK.armor + power_armor;
@@ -116,7 +119,6 @@ function Berserk(TANK, descrition_only, ai){
 	tmp['tank'] = TANK;
 	timed_functions.push(tmp);
 	
-	//return reuse
 	return reuse;
 	}
 function Berserk_stop(object){
@@ -131,15 +133,17 @@ function Berserk_stop(object){
 
 //====== Cruiser ===============================================================
 
-function Fleet(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Increase speed for 5 seconds.';
-	
+function Fleet(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 4000;
 	var power = 8;
+
+	if(descrition_only != undefined)
+		return 'Increase speed for 5 seconds.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	TANK.speed = TANK.speed + power;
 	//register stop function	
 	var tmp = new Array();
@@ -149,25 +153,24 @@ function Fleet(TANK, descrition_only, ai){
 	tmp['tank'] = TANK;
 	timed_functions.push(tmp);
 	
-	//return reuse
 	return reuse;
 	}
-function Repair(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Slowly repair yourself and allies';
-		
-	//auto
-	if(ai != undefined){
-		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
-		if(TANK.hp > max_hp/2) return false;
-		}
-		
+function Repair(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
 	var power = 15;
 	var range = 80;
 	
-	TANK['ability_3_in_use'] = 1;
+	if(descrition_only != undefined)
+		return 'Slowly repair yourself and allies';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+	if(ai != undefined){
+		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		if(TANK.hp > max_hp/2) return false;
+		}
+
+	TANK.abilities_reuse[2] = Date.now() + reuse;
 	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
@@ -190,7 +193,6 @@ function Repair(TANK, descrition_only, ai){
 	tmp['tank'] = TANK;
 	timed_functions.push(tmp);
 	
-	//return reuse
 	return reuse;
 	}	
 function Fleet_stop(object){
@@ -214,14 +216,16 @@ function Repair_stop(object){
 
 //====== Launcher ==============================================================
 
-function Mortar(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Launch missile with area damage.';
-		
+function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var power = 80;	
 	var range = 120;
 	var splash_range = 70;
+	
+	if(descrition_only != undefined)
+		return 'Launch missile with area damage.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 		
 	if(TANK.try_mortar != undefined){
 		delete TANK.try_mortar;
@@ -302,7 +306,7 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 		}								
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_mortar[3];
 		DATA = {
 			function: 'do_mortar',
 			fparam: [tank_id, true, true],
@@ -333,7 +337,7 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 
 	//init reuse
 	if(game_mode == 1 || TANK.name == name){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_mortar[3];
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_mortar[3];
@@ -350,21 +354,22 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 
 //====== Sniper ================================================================
 
-function Camouflage(TANK, descrition_only, ai){
+function Camouflage(TANK, descrition_only, settings_only, ai){
+
+	var reuse = 15000;
+	var duration = 7000;
+	
 	if(descrition_only != undefined)
 		return 'Slowly become invisible while not shooting and moving';
-		
-	//auto
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	if(ai != undefined){
 		TANK.move = 0;
 		}
 	
-	var reuse = 15000;
-	var duration = 7000;
-	
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	TANK.invisibility = 1;
-	delete TANK.target_move;
+	TANK.move = 0;
 	delete TANK.target_shoot_lock;
 	
 	//register stop function	
@@ -375,7 +380,6 @@ function Camouflage(TANK, descrition_only, ai){
 	tmp['tank'] = TANK;
 	timed_functions.push(tmp);
 	
-	//return reuse
 	return reuse;
 	}
 function Camouflage_stop(object){
@@ -387,16 +391,18 @@ function Camouflage_stop(object){
 //====== Miner =================================================================
 
 var MINES = [];
-function Mine(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Put mine on the ground.';
-		
+function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var power = 150;
 	var splash_range = 70;
 	
+	if(descrition_only != undefined)
+		return 'Put mine on the ground.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+	
 	//add
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	var tank_size_half = TYPES[TANK.type].size[1]/2;
 	MINES.push({
 		x: round(TANK.x+tank_size_half),
@@ -407,7 +413,60 @@ function Mine(TANK, descrition_only, ai){
 		tank_id: TANK.id,
 		});
 		
-	//return reuse
+	return reuse;
+	}
+function SAM(TANK, descrition_only, settings_only, ai){
+	var reuse = 10000;
+	var power = 80;
+	var range = 120;
+	
+	if(descrition_only != undefined)
+		return 'Sends surface-to-air missile to nearest enemy.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+	
+	//find nearest enemy
+	var ENEMY_NEAR;
+	for (i in TANKS){				
+		if(TANKS[i].team == TANK.team)	continue;	//same team
+		if(TANKS[i].dead == 1)			continue;	//target dead
+		if(TANKS[i].invisibility==1)		continue;	//blur mode
+		if(TYPES[TANKS[i].type].no_collisions == undefined)	continue;	//not flying unit
+		
+		//check
+		distance = get_distance_between_tanks(TANKS[i], TANK);
+		if(distance > range)			continue;	//target too far
+		
+		//range ok
+		if(ENEMY_NEAR==undefined)
+			ENEMY_NEAR = [range, i];
+		else if(distance < ENEMY_NEAR[0])
+			ENEMY_NEAR = [range, i];
+		}
+	
+	//start missle
+	if(ENEMY_NEAR != undefined){
+		var enemy = TANKS[ENEMY_NEAR[1]];
+		//find angle
+		dist_x = enemy.x - TANK.x;
+		dist_y = enemy.y - TANK.y;
+		var radiance = Math.atan2(dist_y, dist_x);
+		var angle = (radiance*180.0)/Math.PI+90;
+		angle = round(angle);
+			
+		//bullet	
+		var tmp = new Array();
+		tmp['x'] = TANK.x+TYPES[TANK.type].size[1]/2;
+		tmp['y'] = TANK.y+TYPES[TANK.type].size[1]/2;
+		tmp['bullet_to_target'] = enemy;
+		tmp['bullet_from_target'] = TANK;
+		tmp['damage'] = power;
+		tmp['pierce_armor'] = 1;
+		tmp['angle'] = angle;
+		tmp['bullet_icon'] = 'missle.png';
+		BULLETS.push(tmp);
+		}
+
 	return reuse;
 	}
 function Mine_once(TANK){
@@ -450,11 +509,6 @@ function check_mines(tank_id){
 					tmp['damage'] =  MINES[m].damage;
 					BULLETS.push(tmp);
 		
-					//draw it
-					img = new Image();
-					img.src = '../img/explosion_big.png';
-					canvas_main.drawImage(img, MINES[m].x-25+map_offset[0], MINES[m].y-25+map_offset[1]);
-					
 					//delete mine
 					MINES.splice(m, 1); m--;
 					break;
@@ -466,14 +520,16 @@ function check_mines(tank_id){
 
 //====== Tech ==================================================================
 
-function Virus(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Send virus to deactivate enemy and damage it.';
-		
+function Virus(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var power = 70;
 	var duration = 5000;
 	var range = 70;
+
+	if(descrition_only != undefined)
+		return 'Send virus to deactivate enemy and damage it.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 		
 	if(TANK.try_stun != undefined){
 		delete TANK.try_stun;
@@ -565,7 +621,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 		
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_stun[2];
 		DATA = {
 			function: 'do_stun',
 			fparam: [tank_id, enemy_id, true],
@@ -593,7 +649,7 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 	
 	//init reuse
 	if(game_mode == 1 || TANK.name == name){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_stun[2];
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_stun[2];
@@ -610,14 +666,17 @@ function do_stun(tank_id, enemy_id, skip_broadcast){
 
 //====== Truck =================================================================
 
-function Soldiers_(TANK, descrition_only, ai){
+function Soldiers_(TANK, descrition_only, settings_only, ai){
 	var reuse = 30000;
 	var n = 3;
+	
 	if(descrition_only != undefined)
 		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
-	
+	if(settings_only != undefined)
+		return {reuse: reuse};
+		
 	//prepare
-	TANK['ability_1_in_use'] = 1;
+	TANK.abilities_reuse[0] = Date.now() + reuse;
 	var type = '0';
 	for(var t in TYPES){
 		if(TYPES[t].name == 'Soldier')
@@ -638,19 +697,20 @@ function Soldiers_(TANK, descrition_only, ai){
 		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, true, TANK);
 		}
 	
-	//return reuse
 	return reuse;
 	}
 
 //====== Helicopter ============================================================
 
-function Airstrike(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Send 3 missiles to the target.';
-		
+function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var power = 70;
 	var range = 120;
+	
+	if(descrition_only != undefined)
+		return 'Send 3 missiles to the target.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	
 	if(TANK.try_airstrike != undefined){
 		delete TANK.try_airstrike;
@@ -663,6 +723,32 @@ function Airstrike(TANK, descrition_only, ai){
 	
 	//return reuse - later, on use
 	return 0;
+	}
+function Sight(TANK, descrition_only, settings_only, ai){
+	var reuse = 15000;
+	var duration = 3000;
+	var power = 40;
+	
+	if(descrition_only != undefined)
+		return 'Increase sight for short period.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+	
+	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2) + power;
+	
+	//register stop function	
+	var tmp = new Array();
+	tmp['function'] = "Sight_stop";
+	tmp['duration'] = duration;
+	tmp['type'] = 'ON_END';
+	tmp['tank'] = TANK;
+	timed_functions.push(tmp);
+	
+	return reuse;
+	}
+function Sight_stop(object){
+	var TANK = object.tank;
+	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2);
 	}
 function Airstrike_once(TANK){
 	if(TANK.Airstrike_loaded == 1) return false;
@@ -749,7 +835,7 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 		
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_airstrike[2];
 		DATA = {
 			function: 'do_airstrike',
 			fparam: [tank_id, enemy_id, true],
@@ -779,7 +865,7 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 	
 	//init reuse
 	if(game_mode == 1 || TANK.name == name){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_airstrike[2];
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_airstrike[2];
@@ -796,14 +882,16 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 
 //====== Bomber ================================================================
 
-function Bomb(TANK, descrition_only, ai){
-	if(descrition_only != undefined)
-		return 'Drop powerfull bomb with area damage.';
-
+function Bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
 	var power = 110;
 	var range = 60;
 	var splash_range = 70;
+
+	if(descrition_only != undefined)
+		return 'Drop powerfull bomb with area damage.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
 	
 	if(TANK.try_bomb != undefined){
 		delete TANK.try_bomb;
@@ -816,6 +904,27 @@ function Bomb(TANK, descrition_only, ai){
 		
 	//return reuse - later, on use
 	return 0;
+	}
+function Autopilot(TANK, descrition_only, settings_only, ai){
+	var reuse = 500;
+		
+	if(descrition_only != undefined)
+		return 'Turn autopilot on/off.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+		
+	//auto
+	if(ai != undefined)
+		return false;
+	
+	if(TANK.use_AI == true){
+		TANK.use_AI = false;
+		TANK.move = 0;
+		}
+	else
+		TANK.use_AI = true;
+	
+	return reuse;
 	}
 function Bomb_once(TANK){
 	if(TANK.Bomb_loaded == 1) return false;
@@ -884,7 +993,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 		}
 	//broadcast
 	if(game_mode == 2 && skip_broadcast !== true){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_bomb[3];
 		DATA = {
 			function: 'do_bomb',
 			fparam: [tank_id, true, true],
@@ -915,7 +1024,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	
 	//init reuse
 	if(game_mode == 1 || TANK.name == name){
-		TANK['ability_1_in_use']=1;
+		TANK.abilities_reuse[0] = Date.now() + TANK.try_bomb[3];
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_bomb[3];

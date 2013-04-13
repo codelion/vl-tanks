@@ -106,15 +106,17 @@ function try_skills(TANK_AI){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
 		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2) continue;
-		if(TANK_AI['ability_'+nr+'_in_use'] == 1) continue;
+		if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
+		var reuse = 0;
 		try{
 			//execute
-			window[ability_function](TANK_AI, undefined, true);
+			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
 			return false;
 			}
 		catch(err){
 			console.log("AI error: "+err.message);
 			}
-		TANK_AI['ability_'+nr+'_in_use'] = 1;	
+		if(reuse != 0)
+			TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
 		}
 	}

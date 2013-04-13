@@ -25,7 +25,7 @@ var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
-var VERSION = "1.2.5";			//app version
+var VERSION = "1.2.6";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -90,19 +90,23 @@ var timed_functions_id;			//controller for timed functions
 var start_game_timer_id;		//controller for timer in select window
 var chat_interval_id;			//controller for chat
 
-//keyboard and mouse capture handlers
+//on exit
 window.onbeforeunload = disconnect_game;
-canvas_base.addEventListener('mousedown', on_mousedown, false);
-document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
-document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
-document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
+
+//mouse move handlers
+canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
 
-canvas_base.addEventListener('mousemove', on_mousemove, false);
+//mouse click handlers
+document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
+document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
+canvas_base.addEventListener('mousedown', on_mousedown, false);
+canvas_base.addEventListener('mouseup', on_mouse_up, false);
+document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
+
+//keyboard handlers
 document.onkeydown = function(e) {return on_keyboard_action(e); }
 document.onkeyup = function(e) {return on_keyboardup_action(e); }
-
-
 
 //full screen handlers
 document.addEventListener("fullscreenchange", full_screenchange_handler, false);

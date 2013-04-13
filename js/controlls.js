@@ -72,10 +72,6 @@ function on_keyboardup_action(event){
 	if(k==16)
 		shift_pressed = false; //shift
 	}
-//mouse right click
-function on_mouse_right_release(event){
-	return false;
-	}
 //mouse move on background
 function on_mousemove_background(event){
 	if(event.offsetX) {
@@ -148,6 +144,11 @@ function on_mousemove(event){
 		}
 	mouse_pos = [mouseX, mouseY];
 	}	
+//mouse right click
+function on_mouse_right_click(event){
+
+	return false;
+	}
 //mouse click 
 function on_mousedown(event){
 	//mouse position
@@ -175,6 +176,9 @@ function on_mousedown(event){
 	//move tank
 	if(PLACE == 'game')
 		draw_tank_move(mouseX, mouseY);
+	}
+function on_mouse_up(event){
+	
 	}
 //mouse click on background
 function on_mousedown_back(event){

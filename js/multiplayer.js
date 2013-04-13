@@ -483,7 +483,7 @@ function get_packet(fromClient, message){
 		var ability_reuse = window[ability_function](TANK_FROM);
 		//reuse	
 		if(ability_reuse != undefined && ability_reuse != 0){	
-			TANK['ability_'+nr+'_in_use']=1;
+			TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 			if(DATA[1] == name){
 				var tmp = new Array();
 				tmp['function'] = "draw_ability_reuse";
