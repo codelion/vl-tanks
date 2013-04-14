@@ -146,11 +146,23 @@ function on_mousemove(event){
 	}	
 //mouse right click
 function on_mouse_right_click(event){
-
+	//mouse position
+	if(event.offsetX) {
+		mouseX = event.offsetX-map_offset[0];
+		mouseY = event.offsetY-map_offset[1];
+		}
+	else if(event.layerX) {
+		mouseX = event.layerX-map_offset[0];
+		mouseY = event.layerY-map_offset[1];
+		}
+	if(PLACE == 'game')
+		soldiers_move(mouseX, mouseY);	
+	
 	return false;
 	}
 //mouse click 
 function on_mousedown(event){
+	if(event.which == 3) return false;
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX-map_offset[0];

@@ -121,3 +121,76 @@ function try_skills(TANK_AI){
 			TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
 		}
 	}
+//ai move rgistration and graphics
+function soldiers_move(mouseX, mouseY){
+	if(MY_TANK.death_respan != undefined || MY_TANK.dead == 1) return false;
+	
+	for(var i in TANKS){
+		if(TYPES[TANKS[i].type].type != 'human')	continue	//wrong type
+		if(TANKS[i].use_AI == false)	continue;	//not ai
+		if(TANKS[i].team != MY_TANK.team)	continue;	//wrong team
+		if(game_mode == 2 && TANKS[i].master.id != MY_TANK.id) continue;	//not under my controll
+		
+		if(MY_TANK.invisibility != undefined){
+			if(game_mode == 2)
+				send_packet('del_invisible', [MY_TANK.id]);
+			else
+				delete MY_TANK.invisibility;
+			}
+			
+		//check clicks
+		var found_something = false;
+		target_lock_id=0;
+		if(TANKS[i].target_move_lock != undefined)
+			delete TANKS[i].target_move_lock;
+
+		for(var j in TANKS){
+			var tank_size =  0.9*TYPES[TANKS[j].type].size[1];
+			if(Math.abs(TANKS[j].x+tank_size/2 - mouseX) < tank_size/2 && Math.abs(TANKS[j].y+tank_size/2 - mouseY) < tank_size/2){
+				if(TANKS[j].team == TANKS[i].team){
+					if(TANKS[j].name != name)
+						return false; //clicked on allies, but not youself
+					}
+				else{
+					//clicked on enemy
+					TANKS[j].clicked_on = 10;	// will draw circle on enemies
+					TANKS[i].target_move_lock = TANKS[j].id;
+					TANKS[i].target_shoot_lock = TANKS[j].id;
+					target_lock_id = TANKS[j].id;
+					found_something = true;
+					break;
+					}
+				}
+			}
+
+		//ok, lets show where was clicked
+		if(found_something == false)
+			TANKS[i].clicked = [mouseX,mouseY,8];
+	
+		var tank_size = TYPES[TANKS[i].type].size[1];
+		mouseX_tmp = mouseX-tank_size/2;	
+		mouseY_tmp = mouseY-tank_size/2;
+		mouseX_tmp = Math.floor(mouseX_tmp);
+		mouseY_tmp = Math.floor(mouseY_tmp);
+		
+		//register
+		if(game_mode == 2){
+			if(found_something==true)
+				register_tank_action('move', opened_room_id, TANKS[i].id, [round(TANKS[i].x), round(TANKS[i].y), round(mouseX_tmp), round(mouseY_tmp), target_lock_id]);
+			else
+				register_tank_action('move', opened_room_id, TANKS[i].id, [round(TANKS[i].x), round(TANKS[i].y), round(mouseX_tmp), round(mouseY_tmp)]);
+			}
+		else{
+			TANKS[i].move = 1;
+			TANKS[i].move_to = [mouseX_tmp, mouseY_tmp];
+			if(muted==false){
+				try{
+					audio_finish = document.createElement('audio');
+					audio_finish.setAttribute('src', 'sounds/click.ogg');
+					audio_finish.play();
+					}
+				catch(error){}
+				}
+			}
+		}
+	}
