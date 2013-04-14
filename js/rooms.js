@@ -162,7 +162,7 @@ function draw_rooms_list(message){
 			//more info text
 			canvas_backround.fillStyle = "#69a126";
 			canvas_backround.font = "Normal 10px Helvetica";
-			text = ucfirst(ROOMS[i].settings[0])+", "+ucfirst(ROOMS[i].settings[1]+", "+ROOMS[i].settings[2]);
+			text = ucfirst(ROOMS[i].settings[0])+", "+ROOMS[i].settings[2];
 			canvas_backround.fillText(text, x+70+letter_padding_left, y+20+10);
 			}
 		else{
@@ -181,7 +181,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	if(game_mode==undefined)
 		game_mode='normal';	
 	if(game_type==undefined)
-		game_type='quick';
+		game_type='';
 	if(game_map==undefined)
 		game_map='Main';
 		
@@ -668,7 +668,7 @@ function draw_room(room_id){
 	canvas_backround.font = "Bold 12px Helvetica";
 	canvas_backround.fillText(text, x1, y+15);
 	
-	text = ucfirst(ROOM.settings[0])+", "+ucfirst(ROOM.settings[1]+", "+ROOM.settings[2]);
+	text = ucfirst(ROOM.settings[0])+", "+ucfirst(ROOM.settings[2]);
 	canvas_backround.fillStyle = "#69a126";
 	canvas_backround.font = "Normal 12px Helvetica";
 	canvas_backround.fillText(text, x1+90, y+15);
