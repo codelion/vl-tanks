@@ -26,7 +26,8 @@ var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXP = '.ogg';			//default sound files extension
-var VERSION = "1.2.7";			//app version
+var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
+var VERSION = "1.2.8";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array

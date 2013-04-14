@@ -6,7 +6,7 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 	
 	//description
 	if(descrition_only != undefined)
-		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s';
+		return 'Send '+n+' soldiers to the fight once per '+round(reuse/1000)+'s.';
 	//settings
 	if(settings_only != undefined)
 		return {reuse: reuse};
@@ -43,10 +43,10 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 function Rest(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 15;
+	var power = 15 + 1 * (TANK.level-1);
 	
 	if(descrition_only != undefined)
-		return 'Rest and try to repair yourself.';
+		return 'Rest and try to repair yourself with '+(power*duration/1000)+' power.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	if(ai != undefined){
@@ -96,7 +96,7 @@ function Berserk(TANK, descrition_only, settings_only, ai){
 	var power_armor = -40;
 	
 	if(descrition_only != undefined)
-		return 'Increase damage, speed, but decrease defence.';
+		return 'Increase damage by '+power_damage+'%, speed by '+power_speed+', but disable armor.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	if(ai != undefined){
@@ -139,7 +139,7 @@ function Fleet(TANK, descrition_only, settings_only, ai){
 	var power = 8;
 
 	if(descrition_only != undefined)
-		return 'Increase speed for 5 seconds.';
+		return 'Increase speed by '+power+' for 5s.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
@@ -158,11 +158,11 @@ function Fleet(TANK, descrition_only, settings_only, ai){
 function Repair(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 15;
+	var power = 12 + 1 * (TANK.level-1);
 	var range = 80;
 	
 	if(descrition_only != undefined)
-		return 'Slowly repair yourself and allies';
+		return 'Slowly repair yourself and allies with '+(power*duration/1000)+' power.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	if(ai != undefined){
@@ -218,12 +218,12 @@ function Repair_stop(object){
 
 function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 80;	
+	var power = 80 + 5 * (TANK.level-1);	
 	var range = 120;
 	var splash_range = 70;
 	
 	if(descrition_only != undefined)
-		return 'Launch missile with area damage.';
+		return 'Launch missile with area damage of '+power+'.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 		
@@ -360,7 +360,7 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	var duration = 7000;
 	
 	if(descrition_only != undefined)
-		return 'Slowly become invisible while not shooting and moving';
+		return 'Slowly become invisible for '+(duration/1000)+'s while not shooting and moving.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	if(ai != undefined){
@@ -393,11 +393,11 @@ function Camouflage_stop(object){
 var MINES = [];
 function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 150;
+	var power = 150 + 9 * (TANK.level-1);	
 	var splash_range = 70;
 	
 	if(descrition_only != undefined)
-		return 'Put mine on the ground.';
+		return 'Put mine with '+power+' power on the ground.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
@@ -417,11 +417,11 @@ function Mine(TANK, descrition_only, settings_only, ai){
 	}
 function SAM(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 80;
+	var power = 80 + 5 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
-		return 'Sends surface-to-air missile to nearest enemy.';
+		return 'Sends SAM missile with '+power+' power to nearest enemy.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
@@ -522,12 +522,12 @@ function check_mines(tank_id){
 
 function Virus(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 70;
+	var power = 70 + 4 * (TANK.level-1);	
 	var duration = 5000;
 	var range = 70;
 
 	if(descrition_only != undefined)
-		return 'Send virus to deactivate enemy and damage it.';
+		return 'Send virus to deactivate enemy and damage it with '+power+' power.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 		
@@ -704,11 +704,11 @@ function Soldiers_(TANK, descrition_only, settings_only, ai){
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 70;
+	var power = 70 + 4 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
-		return 'Send 3 missiles to the target.';
+		return 'Send 3 missiles with '+power+' power to the target.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
@@ -727,10 +727,10 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 function Sight(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
 	var duration = 3000;
-	var power = 40;
+	var power = 50;
 	
 	if(descrition_only != undefined)
-		return 'Increase sight for short period.';
+		return 'Increase sight by '+power+' for '+(duration/1000)+'s.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
@@ -884,12 +884,12 @@ function do_airstrike(tank_id, enemy_id, skip_broadcast){
 
 function Bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
-	var power = 110;
+	var power = 110 + 7 * (TANK.level-1);
 	var range = 60;
 	var splash_range = 70;
 
 	if(descrition_only != undefined)
-		return 'Drop powerfull bomb with area damage.';
+		return 'Drop powerfull bomb with area damage of '+power+'.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	

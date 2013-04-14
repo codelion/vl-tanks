@@ -389,7 +389,7 @@ function tank_level_handler(){	//once per second
 		
 		//calc level
 		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets;
-		time_diff = Math.ceil(time_diff/30);		
+		time_diff = Math.ceil(time_diff/LEVEl_UP_TIME);		
 		
 		TANKS[i].level = time_diff;
 		
@@ -903,6 +903,7 @@ function do_ability(nr, TANK){
 				}
 			else if(broadcast_mode==1){
 				var ability_reuse = window[ability_function](TANK, undefined, true);
+				if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
 				TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 				register_tank_action('skill_do', opened_room_id, name,  nr, getRandomInt(1, 999999));
 				}
@@ -910,6 +911,7 @@ function do_ability(nr, TANK){
 				//broadcast later
 				var ability_reuse = window[ability_function](TANK);
 				if(ability_reuse != undefined && ability_reuse != 0){
+					if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
 					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 					var tmp = new Array();
 					tmp['function'] = "draw_ability_reuse";

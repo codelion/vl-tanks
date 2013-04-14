@@ -332,7 +332,7 @@ function show_skill_description(){
 	canvas_backround.fillStyle = "#17200b";
 	canvas_backround.fillRect(status_x_tmp, status_y, 205, 35);
 	
-	var limit = 35;
+	var limit = 33;
 	var ability_hover_text_more = '';
 	if(ability_hover_text.length > limit){
 		var words = ability_hover_text.split(" ");
@@ -350,11 +350,11 @@ function show_skill_description(){
 	
 	//show description
 	canvas_backround.fillStyle = "#8f947d";
-	canvas_backround.font = "bold 10px Verdana";
+	canvas_backround.font = "normal 10px Verdana";
 	canvas_backround.fillText(ability_hover_text, status_x_tmp+5, status_y+13);
 	
 	canvas_backround.fillStyle = "#8f947d";
-	canvas_backround.font = "bold 10px Verdana";
+	canvas_backround.font = "normal 10px Verdana";
 	canvas_backround.fillText(ability_hover_text_more, status_x_tmp+5, status_y+13+13);
 	}
 //move map by user mouse coordinates on mini map
