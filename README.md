@@ -1,6 +1,6 @@
 # Moon wars
 
-HTML5 based tank game. Requires Firefox, Chrome or Opera. IE10 and Safari does not support HTML5 sound.
+HTML5 based tank game. Requires Firefox, Chrome, Internet explorer 10 or Opera. Old IE and Safari does not support all HTML5 features.
 
 ## Features:
 * 8 tanks and 2 air units
@@ -15,6 +15,7 @@ HTML5 based tank game. Requires Firefox, Chrome or Opera. IE10 and Safari does n
 * or download and open index.html in modern browser to play dev version
 
 ## Latest News
+* added IE10 support.
 * added started room progress
 * improved AI
 * new game mode

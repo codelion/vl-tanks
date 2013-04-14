@@ -22,6 +22,10 @@ function init_game(first_time){
 	if(first_time==true)
 		check_canvas_sizes();
 	
+	//check sound support
+	if(isIE()==true)
+		SOUND_EXP = '.mp3';
+	
 	//logo backround color
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
@@ -35,7 +39,7 @@ function init_game(first_time){
 	register_button((WIDTH_APP-598)/2, 15, 600, 266, PLACE, function(){
 		if(muted==false){
 			var audio_fire = document.createElement('audio');
-			audio_fire.setAttribute('src', '../sounds/shoot.ogg');
+			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXP);
 			audio_fire.play();
 			}
 		});
@@ -208,10 +212,10 @@ function preload_all_files(){
 		'../img/map/mine.png',
 		];
 	audio_to_preload = [
-		'../sounds/click.ogg',
-		'../sounds/main.ogg',
-		'../sounds/shoot.ogg',
-		'../sounds/metal.ogg',
+		'../sounds/click'+SOUND_EXP,
+		'../sounds/main'+SOUND_EXP,
+		'../sounds/shoot'+SOUND_EXP,
+		'../sounds/metal'+SOUND_EXP,
 		];
 		
 	//calculate files count
@@ -282,7 +286,7 @@ function init_action(map_nr, my_team){
 	//sound
 	if(muted==false){
 		audio_main = document.createElement('audio');
-		audio_main.setAttribute('src', '../sounds/main.ogg');
+		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
 		audio_main.setAttribute('loop', 'loop');
 		try{
 			audio_main.play();
@@ -513,7 +517,7 @@ function preload(file, type){
 			audio_object.addEventListener('canplaythrough', function(){update_preload(1);}, false);
 			audio_object.src = file;
 			}
-		catch(error){
+		catch(err){
 			update_preload(1);
 			}
 		}	

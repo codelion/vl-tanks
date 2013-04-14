@@ -24,7 +24,7 @@ TYPES.push({
 	icon_base: ['base1.png'],			//tank top images
 	preview: 'preview.png',				//tank preview image
 	bullet: 'bullet.png',				//bullet_image
-	fire_sound: 'shoot.ogg',			//shooting sound
+	fire_sound: 'shoot',				//shooting sound
 	accuracy: 90,					//chance to hit target, %
 	});
 
@@ -50,7 +50,7 @@ TYPES.push({
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -77,7 +77,7 @@ TYPES.push({
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -103,7 +103,7 @@ TYPES.push({
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
 	bullet: 'missle.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 100,
 	});
 
@@ -130,7 +130,7 @@ TYPES.push({
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 80,
 	});
 
@@ -157,7 +157,7 @@ TYPES.push({
 	icon_base: ['base1.png'],
 	preview: 'preview.png',
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -183,7 +183,7 @@ TYPES.push({
 	icon_base: ['base1.png'],
 	preview: 'preview.png',
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -209,7 +209,7 @@ TYPES.push({
 	icon_base: ['base1.png'],
 	preview: 'preview.png',
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -238,7 +238,7 @@ TYPES.push({
 	icon_base: ['base1.png'],
 	preview: 'preview.png',
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -267,7 +267,7 @@ TYPES.push({
 	icon_base: ['base1.png'],
 	preview: 'preview.png',
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -276,8 +276,8 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [80, 5],
-	damage: [7, 0.4],	//7 dps
+	life: [70, 0],
+	damage: [5, 0.3],	//5 dps
 	range: 70,
 	scout: 80,
 	armor: [0, 0, 0],
@@ -291,7 +291,7 @@ TYPES.push({
 	icon_top: [],
 	icon_base: ['base1.png'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -315,7 +315,7 @@ TYPES.push({
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
@@ -339,6 +339,6 @@ TYPES.push({
 	icon_top: [],
 	icon_base: ['base1.png', 'no-rotate'],
 	bullet: 'bullet.png',
-	fire_sound: 'shoot.ogg',
+	fire_sound: 'shoot',
 	accuracy: 90,
 	});

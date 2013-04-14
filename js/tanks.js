@@ -650,7 +650,7 @@ function shoot_sound(TANK){
 	if(TYPES[TANK.type].fire_sound == undefined) return false;
 	try{
 		var audio_fire = document.createElement('audio');
-		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound);
+		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound+SOUND_EXP);
 		audio_fire.play();
 		}
 	catch(error){}
@@ -672,7 +672,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 	if(TANK_TO.id == MY_TANK.id && muted==false){
 		try{
 			var audio_fire = document.createElement('audio');
-			audio_fire.setAttribute('src', '../sounds/metal.ogg');
+			audio_fire.setAttribute('src', '../sounds/metal'+SOUND_EXP);
 			audio_fire.play();
 			}
 		catch(error){}

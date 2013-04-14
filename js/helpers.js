@@ -140,3 +140,6 @@ function drawImage_preloaded(canvas, src, xx, yy, place_last, width, height, bac
 			canvas.drawImage(img, xx, yy, width, height);
 		}
 	}
+function isIE () {
+	return !!navigator.userAgent.match(/MSIE 10/);
+	}

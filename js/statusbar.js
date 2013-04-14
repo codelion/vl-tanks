@@ -133,7 +133,7 @@ function mute_unmute(){
 		try{
 			if(PLACE == 'game'){
 				audio_main = document.createElement('audio');
-				audio_main.setAttribute('src', '../sounds/main.ogg');
+				audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
 				audio_main.setAttribute('loop', 'loop');
 				audio_main.play();
 				}

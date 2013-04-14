@@ -449,7 +449,7 @@ function get_packet(fromClient, message){
 		if(DATA[1] == name && muted==false){
 			try{
 				audio_finish = document.createElement('audio');
-				audio_finish.setAttribute('src', '../sounds/click.ogg');
+				audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXP);
 				audio_finish.play();
 				}
 			catch(error){}

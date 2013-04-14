@@ -144,10 +144,23 @@ a img {
 /*========== CLASSES =========================================================*/
 .alert{
 	padding:10px;
-	margin:5px;
+	margin-bottom:5px;
+	width:780px;
 	border:1px solid red;
 	display:none;
 	}
-.ie .alert, .safari .alert{
+.safari .alert{
+	display:block;
+	}
+.ie6 .alert{
+	display:block;
+	}
+.ie7 .alertt{
+	display:block;
+	}
+.ie8 .alert{
+	display:block;
+	}
+.ie9 .alert{
 	display:block;
 	}

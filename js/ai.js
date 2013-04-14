@@ -111,7 +111,8 @@ function try_skills(TANK_AI){
 		try{
 			//execute
 			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
-			return false;
+			if(reuse !== false)
+				return false;
 			}
 		catch(err){
 			console.log("AI error: "+err.message);
