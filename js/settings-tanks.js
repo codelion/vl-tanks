@@ -18,6 +18,7 @@ TYPES.push({
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Shield',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: ['top1.png'],				//tank base images
@@ -44,6 +45,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Berserk',	passive: false,		broadcast: 1},
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Damage',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -68,7 +70,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 5,
 	abilities: [
-		{name: 'Fleet',	passive: false,			broadcast: 1}, 
+		{name: 'Escape',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Repair',	passive: false,		broadcast: 1}, 
 		],
@@ -88,7 +90,7 @@ TYPES.push({
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [120, 10],
 	damage: [40, 2],	//20 dps
-	range: 120,
+	range: 135,
 	scout: 100,
 	armor: [10, 0, 10],
 	speed: 25,
@@ -97,6 +99,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Mortar',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -123,6 +126,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	ignore_armor: 1,
@@ -177,6 +181,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Virus',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Mass virus',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: ['top1.png'],

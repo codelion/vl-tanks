@@ -319,6 +319,7 @@ function init_action(map_nr, my_team){
 		
 		//enemies
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+			//random_type = 4;
 		add_tank(1, get_unique_id(), "Bot", random_type, 'R', undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
@@ -458,6 +459,7 @@ function quit_game(init_next_game){
 	packets_all=0;
 	shift_pressed = false;
 	chat_shifted=false;
+	frame_time = undefined;
 	
 	if(init_next_game!=false){
 		init_game(false);

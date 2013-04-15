@@ -1,7 +1,7 @@
 ELEMENTS.push({
 	name: 'background',
 	file: 'moon.jpg',	
-	size: [1264, 632], 
+	size: [400, 400], 
 	alt_color: '#8d8d8d',	
 	collission: false,	
 	});

@@ -210,12 +210,33 @@ function redraw_tank_stats(){
 	//show fps
 	update_fps();
 	}
+function get_ability_test_length(text){
+	var thin_letter_width = 4;	//tfjilr
+	var average_letter_width = 7;
+	var fat_letter_width = 11;	//mw
+	
+	var length = 2;	//2 for first cap letter
+	for(var i = 0; i < text.length; i++){
+		//thin
+		if(text[i] == 't')	length += thin_letter_width;
+		else if(text[i] == 'f')	length += thin_letter_width;
+		else if(text[i] == 'j')	length += thin_letter_width;
+		else if(text[i] == 'i')	length += thin_letter_width;
+		else if(text[i] == 'l')	length += thin_letter_width;
+		else if(text[i] == 'r')	length += thin_letter_width;
+		//fat
+		else if(text[i] == 'm')	length += fat_letter_width;
+		else if(text[i] == 'w')	length += fat_letter_width;
+		//average
+		else 	length += average_letter_width;
+		}
+	return length;
+	}
 //redraw tank skills
 function draw_tank_abilities(){
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
-	var letter_width = 5.5;
 	
 	for (var i in TYPES[MY_TANK.type].abilities){
 		//check if abilites not in use
@@ -235,8 +256,10 @@ function draw_tank_abilities(){
 		canvas_backround.fillStyle = "#1d2411";
 		canvas_backround.font = "bold 10px Verdana";
 		if(ability_text.length>9)
-			canvas_backround.font = "bold 8px Verdana";
-		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
+			canvas_backround.font = "bold 9px Verdana";
+		letter_padding = Math.floor((SKILL_BUTTON-get_ability_test_length(ability_text))/2);
+		if(letter_padding<0) letter_padding = 0;
+		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 	
 		//save position
 		if(ABILITIES_POS.length < TYPES[MY_TANK.type].abilities.length){
@@ -259,7 +282,6 @@ function draw_ability_reuse(object){
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
-	var letter_width = 5.5;
 	
 	if(object != undefined){
 		var i = object.nr;
@@ -307,7 +329,9 @@ function draw_ability_reuse(object){
 		var ability_text = TYPES[MY_TANK.type].abilities[i].name;
 		if(ability_text.length>9)
 			canvas_backround.font = "bold 8px Verdana";
-		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+Math.floor((SKILL_BUTTON-ability_text.length*letter_width)/2), status_y+SKILL_BUTTON/2+3);
+		letter_padding = Math.floor((SKILL_BUTTON-get_ability_test_length(ability_text))/2);
+		if(letter_padding<0) letter_padding = 0;
+		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//reuse left
 		reuse = Math.ceil(ability_reuse / 1000);

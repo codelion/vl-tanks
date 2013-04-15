@@ -30,12 +30,12 @@ function draw_map(map_only){
 	backround_width = background_elem.size[0];
 	backround_height = background_elem.size[1];
 	var img_texture = new Image();
-	img_texture.src = '../img/map/moon.jpg';
+	img_texture.src = '../img/map/'+background_elem.file;
 	img_texture.onload = function(){	//on background load
 		for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
 			for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
 				var img_texture = new Image();
-				img_texture.src = '../img/map/moon.jpg';
+				img_texture.src = '../img/map/'+background_elem.file;
 				canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
 				}
 			}

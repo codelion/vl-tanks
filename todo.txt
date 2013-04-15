@@ -1,0 +1,20 @@
+let blur move, but reduce speed
+switch
+scroll with mouse
+	esc to stop
+aoe missiles kills mines
+BALANCE
+	more skills
+		heavy - Sacrafice
+		tiger - frenzy
+		Launcher - strong missile
+		Sniper - reuse
+		Truck - spirit/boost/reuse/heal soldiers
+	ideas
+		sieger - explosive bullets/dig+range+armor/range
+		sam - let target, mines? sap tower
+		virus - controll instead stun.
+	soldiers
+		big battles
+		spam from base?
+	truck weak, APC instead?

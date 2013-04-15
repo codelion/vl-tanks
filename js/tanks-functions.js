@@ -37,6 +37,10 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
+function Range(TANK, descrition_only, settings_only, ai){
+	if(descrition_only != undefined)
+		return 'Tank range is increased. Passive ability.';
+	}
 
 //====== Heavy =================================================================
 
@@ -72,6 +76,10 @@ function Rest(TANK, descrition_only, settings_only, ai){
 	timed_functions.push(tmp);
 	
 	return reuse;
+	}
+function Shield(TANK, descrition_only, settings_only, ai){
+	if(descrition_only != undefined)
+		return 'Tank use heavy armor. Passive ability.';
 	}
 function Rest_stop(object){
 	var TANK = object.tank;
@@ -121,6 +129,10 @@ function Berserk(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
+function Damage(TANK, descrition_only, settings_only, ai){
+	if(descrition_only != undefined)
+		return 'Tank do huge damage. Passive ability.';
+	}
 function Berserk_stop(object){
 	var TANK = object.tank;
 	TANK.speed = TYPES[TANK.type].speed;
@@ -133,7 +145,7 @@ function Berserk_stop(object){
 
 //====== Cruiser ===============================================================
 
-function Fleet(TANK, descrition_only, settings_only, ai){
+function Escape(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 4000;
 	var power = 8;
@@ -147,7 +159,7 @@ function Fleet(TANK, descrition_only, settings_only, ai){
 	TANK.speed = TANK.speed + power;
 	//register stop function	
 	var tmp = new Array();
-	tmp['function'] = "Fleet_stop";
+	tmp['function'] = "Escape_stop";
 	tmp['duration'] = duration;
 	tmp['type'] = 'ON_END';
 	tmp['tank'] = TANK;
@@ -195,7 +207,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}	
-function Fleet_stop(object){
+function Escape_stop(object){
 	var TANK = object.tank;
 	TANK.speed = TYPES[TANK.type].speed;
 	}
@@ -218,7 +230,7 @@ function Repair_stop(object){
 
 function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 80 + 5 * (TANK.level-1);	
+	var power = 80 + 5 * (TANK.level-1);
 	var range = 120;
 	var splash_range = 70;
 	
@@ -250,10 +262,18 @@ function Mortar_once(TANK){
 function draw_mortar_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_mortar'] != undefined && TANK.name == name){
+	if(TANK.try_mortar != undefined && TANK.name == name){
+		//TARGET
 		img = new Image();
 		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
+		
+		//circle
+		canvas_main.beginPath();
+		canvas_main.arc(mouse_pos[0], mouse_pos[1], TANK.try_mortar[1], 0 ,2*Math.PI, false);	
+		canvas_main.lineWidth = 1;
+		canvas_main.strokeStyle = "#c10000";
+		canvas_main.stroke();
 		}
 	}
 function do_mortar(tank_id, distance_ok, skip_broadcast){
@@ -444,7 +464,7 @@ function SAM(TANK, descrition_only, settings_only, ai){
 			ENEMY_NEAR = [range, i];
 		}
 	
-	//start missle
+	//start missile
 	if(ENEMY_NEAR != undefined){
 		var enemy = TANKS[ENEMY_NEAR[1]];
 		//find angle
@@ -490,8 +510,8 @@ function check_mines(tank_id){
 	var mine_size_half = 8;
 	for(var m in MINES){
 		for(var i in TANKS){
-			if(TYPES[TANKS[i].type].name=='Miner') continue;	//they resist it
-			if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
+			if(TYPES[TANKS[i].type].name=='Miner') continue;	//they ignore it
+			//if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
 			var size = TYPES[TANKS[i].type].size[1];
@@ -543,6 +563,40 @@ function Virus(TANK, descrition_only, settings_only, ai){
 	//return reuse - later, on use
 	return 0;
 	}
+function Mass_virus(TANK, descrition_only, settings_only, ai){
+	var reuse = 40000;
+	var power = 35 + 2 * (TANK.level-1);	
+	var duration = 2000;
+	var range = 40;
+
+	if(descrition_only != undefined)
+		return 'Send virus to all near enemies and damage it with '+power+' power.';
+	if(settings_only != undefined)
+		return {reuse: reuse};
+	
+	var tank_size = TYPES[TANK.type].size[1]/2;	
+	for (i in TANKS){				
+		if(TANKS[i].team == TANK.team)	continue;	//same team
+		if(TANKS[i].dead == 1)			continue;	//target dead
+		
+		//check
+		distance = get_distance_between_tanks(TANKS[i], TANK);
+		if(distance > range)			continue;	//target too far
+		
+		//bullet	
+		var tmp = new Array();
+		tmp['x'] = TANK.x+tank_size;
+		tmp['y'] = TANK.y+tank_size;
+		tmp['bullet_to_target'] = TANKS[i];
+		tmp['bullet_from_target'] = TANK;
+		tmp['damage'] = power;
+		tmp['stun_effect'] = duration;
+		BULLETS.push(tmp);
+		}
+		
+	return reuse;
+	}	
+	
 function Virus_once(TANK){
 	if(TANK.Virus_loaded == 1) return false;
 	if(TANK.abilities_lvl[0]==1)
@@ -937,10 +991,18 @@ function Bomb_once(TANK){
 function draw_bomb_marker(tank_id){
 	TANK = get_tank_by_id(tank_id);
 	//some drawings
-	if(TANK['try_bomb'] != undefined && TANK.name == name){
+	if(TANK.try_bomb != undefined && TANK.name == name){
+		//target
 		img = new Image();
 		img.src = '../img/target.png';
 		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
+		
+		//circle
+		canvas_main.beginPath();
+		canvas_main.arc(mouse_pos[0], mouse_pos[1], TANK.try_bomb[1], 0 ,2*Math.PI, false);	
+		canvas_main.lineWidth = 1;
+		canvas_main.strokeStyle = "#c10000";
+		canvas_main.stroke();
 		}
 	}
 function do_bomb(tank_id, distance_ok, skip_broadcast){

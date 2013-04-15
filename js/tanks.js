@@ -442,6 +442,7 @@ function level_hp_regen_handler(){		//once per 1 second - 1.5%/s
 	}
 //actions on enemies
 function check_enemies(TANK){
+	if(TANK.invisibility==1) return false;
 	if(TANK.dead == 1) return false;	//dead
 	if(TANK.stun != undefined) return false;	//stuned
 	if(TANK.hit_reuse == undefined) TANK.hit_reuse = TANK.attack_delay*1000+Date.now();
@@ -509,7 +510,6 @@ function check_enemies(TANK){
 			draw_fire(TANK, TANKS[i]);
 			}
 		}
-	if(TANK.invisibility==1) return false;
 	
 	//no target lock - closest enemy
 	if(found==false){
@@ -710,6 +710,13 @@ function do_damage(TANK, TANK_TO, BULLET){
 		armor = 0;	//pierce armor
 	damage = round( damage*(100-armor)/100 );		//log(damage+", target armor="+armor+", type="+TYPES[TANK_TO.type].name);
 	
+	if(TANK_TO.invisibility != undefined){
+		if(BULLET.aoe_effect != undefined)
+			delete TANK_TO.invisibility;
+		else
+			return false;
+		}
+	
 	//stats
 	if(TYPES[TANK_TO.type].name=="Tower" || TYPES[TANK_TO.type].name=="Base"){
 		if(TANK.towers == undefined)
@@ -770,7 +777,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 				for(var j in TANKS){
 					if(TANKS[j].id == TANK_TO.id){
 						TANKS.splice(j, 1);
-						break;
+						return true;
 						}
 					}
 				}
@@ -799,6 +806,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 				death(TANK_TO);	
 			}
 		}
+	return false;
 	}
 //check if broadcast other tank shooting, kill
 function check_if_broadcast(KILLER){
@@ -866,6 +874,7 @@ function do_ability(nr, TANK){
 	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;
 	if(TANK.dead == 1) return false;
 	if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;
+	if(TYPES[TANK.type].abilities[nr-1].passive == true) return false;
 	
 	var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
 	var broadcast_mode = TYPES[TANK.type].abilities[nr-1].broadcast;
@@ -1137,7 +1146,7 @@ function draw_bullets(TANK, time_gap){
 				}								
 			//aoe hit
 			if(BULLETS[b].aoe_effect != undefined){
-				for (var ii in TANKS){
+				for (var ii=0; ii < TANKS.length; ii++){
 					if(TANKS[ii].team == TANK.team)
 						continue; //friend
 					
@@ -1147,10 +1156,15 @@ function draw_bullets(TANK, time_gap){
 					dist_x_b = TANKS[ii].x+TYPES[TANKS[ii].type].size[1]/2 - enemy_x;
 					dist_y_b = TANKS[ii].y+TYPES[TANKS[ii].type].size[1]/2 - enemy_y;
 					var distance_b = Math.sqrt((dist_x_b*dist_x_b)+(dist_y_b*dist_y_b));
-					if(distance_b > BULLETS[b].aoe_splash_range)	
-						continue;	//too far
+					distance_b = distance_b - TYPES[TANKS[ii].type].size[1]/2;
+							
+					if(distance_b > BULLETS[b].aoe_splash_range)
+						continue;	//too far}
+					
 					//do damage
-					do_damage(TANK, TANKS[ii], BULLETS[b]);
+					var response = do_damage(TANK, TANKS[ii], BULLETS[b]);	
+					if(response === true)
+						ii--;	//tank dead and removed from array, must repeat	
 					}
 				//draw aoe explosion
 				img = new Image();

@@ -1,5 +1,6 @@
 function check_path_AI(TANK){
 	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
+	if(TANK.invisibility != undefined) return false;	//invisibility
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
 	if(game_mode == 1)
 		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
@@ -106,6 +107,7 @@ function try_skills(TANK_AI){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
 		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2) continue;
+		if(TYPES[TANK_AI.type].abilities[i].passive == true) continue;
 		if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
 		var reuse = 0;
 		try{
