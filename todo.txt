@@ -3,13 +3,16 @@ switch
 scroll with mouse
 	esc to stop
 aoe missiles kills mines
+heli - apache
+heli - 2 missiles?
+bomber, 2 more bombs? for single armored and for non armored aoe.
 BALANCE
 	more skills
 		heavy - Sacrafice
 		tiger - frenzy
 		Launcher - strong missile
 		Sniper - reuse
-		Truck - spirit/boost/reuse/heal soldiers
+		Truck - boost 3 soldiers, heal, adrenaline to soldiers
 	ideas
 		sieger - explosive bullets/dig+range+armor/range
 		sam - let target, mines? sap tower

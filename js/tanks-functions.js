@@ -445,6 +445,7 @@ function SAM(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
+	TANK.abilities_reuse[2] = Date.now() + reuse;
 	//find nearest enemy
 	var ENEMY_NEAR;
 	for (i in TANKS){				
@@ -550,7 +551,7 @@ function Virus(TANK, descrition_only, settings_only, ai){
 		return 'Send virus to deactivate enemy and damage it with '+power+' power.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
-		
+	
 	if(TANK.try_stun != undefined){
 		delete TANK.try_stun;
 		mouse_click_controll = false;
@@ -574,6 +575,7 @@ function Mass_virus(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	
+	TANK.abilities_reuse[2] = Date.now() + reuse;
 	var tank_size = TYPES[TANK.type].size[1]/2;	
 	for (i in TANKS){				
 		if(TANKS[i].team == TANK.team)	continue;	//same team
@@ -966,7 +968,10 @@ function Autopilot(TANK, descrition_only, settings_only, ai){
 		return 'Turn autopilot on/off.';
 	if(settings_only != undefined)
 		return {reuse: reuse};
+	if(ai != undefined)
+		return false;
 		
+	TANK.abilities_reuse[3] = Date.now() + reuse;
 	//auto
 	if(ai != undefined)
 		return false;
