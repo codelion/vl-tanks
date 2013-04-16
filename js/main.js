@@ -10,8 +10,10 @@ function init_game(first_time){
 	dynamic_title();
 	if(socket_live == true)
 		room_controller();
-	if(getCookie("muted") != '0')
-		muted=true;
+	if(getCookie("mute_fx") != '0')
+		MUTE_FX=true;
+	if(getCookie("mute_music") != '0')
+		MUTE_MUSIC=true;
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;
 		START_GAME_COUNT_MULTI = 5;
@@ -37,7 +39,7 @@ function init_game(first_time){
 	var img = new Image();
 	img.src = '../img/logo.png';
 	register_button((WIDTH_APP-598)/2, 15, 600, 266, PLACE, function(){
-		if(muted==false){
+		if(MUTE_FX==false){
 			var audio_fire = document.createElement('audio');
 			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXP);
 			audio_fire.play();
@@ -128,10 +130,8 @@ function add_first_screen_elements(){
 	if(counter_tmp != ''){
 		START_GAME_COUNT_SINGLE = counter_tmp;
 		}
-	if(muted==false){
-		if(audio_main != undefined)
-			audio_main.pause();
-		}
+	if(MUTE_MUSIC==false && audio_main != undefined)
+		audio_main.pause();
 	
 	draw_status_bar();
 	PLACE == 'init';
@@ -284,7 +284,7 @@ function init_action(map_nr, my_team){
 	draw_interval_id = requestAnimationFrame(draw_main);
 
 	//sound
-	if(muted==false){
+	if(MUTE_MUSIC==false){
 		audio_main = document.createElement('audio');
 		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
 		audio_main.setAttribute('loop', 'loop');
@@ -314,17 +314,20 @@ function init_action(map_nr, my_team){
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 			if(DEBUG==false)
-				add_tank(1, get_unique_id(), "Bot", random_type, 'B', undefined, undefined, undefined, true);
+				add_tank(1, get_unique_id(), "Bot", random_type, my_team, undefined, undefined, undefined, true);
 			}
 		
 		//enemies
+		enemy_team = 'B';
+		if(enemy_team == my_team)
+			enemy_team = 'R';	
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			//random_type = 4;
-		add_tank(1, get_unique_id(), "Bot", random_type, 'R', undefined, undefined, undefined, true);
+			//random_type = 5;
+		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 			if(DEBUG==false)
-				add_tank(1, get_unique_id(), "Bot", random_type, 'R', undefined, undefined, undefined, true);
+				add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 			}
 		}
 
@@ -482,6 +485,13 @@ function register_button(x, y, width, height, place, myfunction, extra){
 		extra: extra
 		});
 	}
+function unregister_buttons(button_place){
+	for(var i=0; i<BUTTONS.length; i++){
+		if(BUTTONS[i].place == button_place){
+			BUTTONS.splice(i, 1); i--;
+			}
+		}
+	}
 var starting_timer=-1;
 //timer in select screen
 function starting_game_timer_handler(){
@@ -493,7 +503,7 @@ function starting_game_timer_handler(){
 		starting_timer = -1;
 		clearInterval(start_game_timer_id);
 		if(game_mode == 1)
-			init_action(level, 'B');
+			init_action(level, 'R');
 		else
 			register_tank_action('start_game', opened_room_id);
 		}

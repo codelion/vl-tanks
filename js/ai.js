@@ -185,7 +185,7 @@ function soldiers_move(mouseX, mouseY){
 		else{
 			TANKS[i].move = 1;
 			TANKS[i].move_to = [mouseX_tmp, mouseY_tmp];
-			if(muted==false){
+			if(MUTE_FX==false){
 				try{
 					audio_finish = document.createElement('audio');
 					audio_finish.setAttribute('src', 'sounds/click.ogg');

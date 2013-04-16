@@ -20,31 +20,52 @@ function draw_status_bar(){
 	canvas_backround.stroke();
 	
 	//buttons
-	draw_mute_button();
+	draw_mute_music_button();
+	draw_mute_fx_button();
 	draw_quality_button(true);
-	draw_fs_button();
 	draw_quit_button();
+	draw_fs_button();
 	draw_version();
 	}
-//show mute button in statusbar
-function draw_mute_button(){
-	//clean
-	canvas_backround.fillStyle = "#dbd9da";
-	canvas_backround.fillRect(WIDTH_APP-21-5, HEIGHT_APP-23, 20, 17);
+//show mute music button in statusbar
+function draw_mute_music_button(){
+	PADDING = 55;
 	
-	//paint
-	sound_img = new Image();
-	if(muted==true)
-		sound_img.src = '../img/mute.png';
+	q_img = new Image();
+	q_img.src = '../img/button.png';
+	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
+	
+	fs_text = "Music";
+	if(MUTE_MUSIC == true)
+		canvas_backround.fillStyle = "#8A8A8A";
 	else
-		sound_img.src = '../img/unmute.png';
-	canvas_backround.drawImage(sound_img, WIDTH_APP-21-5, HEIGHT_APP-23);
+		canvas_backround.fillStyle = "#196119";
+	canvas_backround.font = "Normal 11px Arial";
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+9, HEIGHT_APP-18-5+14);
 	
-	register_button(WIDTH_APP-21-5, HEIGHT_APP-23, 21, 18, '', 'mute_unmute');
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music');
+	}
+//draw mute effects button in statusbar
+function draw_mute_fx_button(){
+	PADDING = 108;
+	
+	q_img = new Image();
+	q_img.src = '../img/button.png';
+	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
+	
+	fs_text = "FX";
+	if(MUTE_FX == true)
+		canvas_backround.fillStyle = "#8A8A8A";
+	else
+		canvas_backround.fillStyle = "#196119";
+	canvas_backround.font = "Normal 11px Arial";
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+18, HEIGHT_APP-18-5+14);
+	
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx');
 	}
 //show quality button in statusbar
 function draw_quality_button(first_run){
-	PADDING = 145;
+	PADDING = 161;
 	q_img = new Image();
 	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
@@ -81,10 +102,24 @@ function draw_quality_button(first_run){
 			}
 		});
 	}
+//quit button in statusbar
+function draw_quit_button(){
+	PADDING = 214;
+	quit_img = new Image();
+	quit_img.src = '../img/button.png';
+	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
+	q_text = "Quit";
+	canvas_backround.fillStyle = "#8A8A8A";
+	canvas_backround.font = "Bold 11px Helvetica";
+	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+12, HEIGHT_APP-18-5+14);
+	
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game');
+	}
 //show fullscreen button in statusbar
 function draw_fs_button(){
 	if(PLACE != 'game' ) return false;
-	PADDING = 200;
+	PADDING = 267;
+	
 	q_img = new Image();
 	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
@@ -98,19 +133,6 @@ function draw_fs_button(){
 		fullscreen('canvas_area');
 		});
 	}
-//quit button in statusbar
-function draw_quit_button(){
-	PADDING = 90;
-	quit_img = new Image();
-	quit_img.src = '../img/button.png';
-	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
-	q_text = "Quit";
-	canvas_backround.fillStyle = "#8A8A8A";
-	canvas_backround.font = "Bold 11px Helvetica";
-	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+12, HEIGHT_APP-18-5+14);
-	
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game');
-	}
 //show version instatus bar
 function draw_version(){
 	PADDING = 10;
@@ -118,18 +140,18 @@ function draw_version(){
 	canvas_backround.font = "Normal 11px Helvetica";
 	canvas_backround.fillText("v"+VERSION, PADDING, HEIGHT_APP-18-5+14);
 	}
-//do mute or unmute on user request
-function mute_unmute(){
-	if(muted==false){	
+//do mute or unmute music
+function mute_unmute_music(){
+	if(MUTE_MUSIC==false){	
 		//disable sound
-		muted=true;
-		setCookie("muted", "1", 30);
-		if(audio_main != undefined)	audio_main.pause();
+		MUTE_MUSIC = true;
+		setCookie("mute_music", "1", 30);
+		if(audio_main != undefined) audio_main.pause();
 		}
 	else{
 		//enable sound
-		muted = false;
-		setCookie("muted", "0", 30);
+		MUTE_MUSIC = false;
+		setCookie("mute_music", "0", 30);
 		try{
 			if(PLACE == 'game'){
 				audio_main = document.createElement('audio');
@@ -140,5 +162,19 @@ function mute_unmute(){
 			}
 		catch(error){}
 		}
-	draw_mute_button();
+	draw_mute_music_button();
+	}
+//do mute or unmute effects
+function mute_unmute_fx(){
+	if(MUTE_FX==false){		
+		//disable sound
+		MUTE_FX = true;
+		setCookie("mute_fx", "1", 30);
+		}
+	else{			
+		//enable sound
+		MUTE_FX = false;
+		setCookie("mute_fx", "0", 30);
+		}
+	draw_mute_fx_button();
 	}

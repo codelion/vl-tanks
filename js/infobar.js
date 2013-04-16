@@ -430,13 +430,16 @@ function redraw_mini_map(){
 	canvas_backround.fillRect(pos1, pos2, button_width, button_height);
 	
 	//active zone
-	canvas_backround.fillStyle = "#97998c";
-	canvas_backround.fillRect(
-		pos1-map_offset[0]*button_width/WIDTH_MAP, 
-		pos2-map_offset[1]*button_height/HEIGHT_MAP, 
-		WIDTH_SCROLL*button_width/WIDTH_MAP, 
-		HEIGHT_SCROLL*button_height/HEIGHT_MAP
-		);
+	var zheight = HEIGHT_SCROLL*button_height/HEIGHT_MAP;
+	if(pos2-map_offset[1]*button_height/HEIGHT_MAP + zheight < HEIGHT_SCROLL+INFO_HEIGHT){
+		canvas_backround.fillStyle = "#97998c";
+		canvas_backround.fillRect(
+			pos1-map_offset[0]*button_width/WIDTH_MAP, 
+			pos2-map_offset[1]*button_height/HEIGHT_MAP, 
+			WIDTH_SCROLL*button_width/WIDTH_MAP, 
+			zheight
+			);
+		}
 		
 	//elements
 	var mini_w = (button_width-2)/MAPS[level-1].width;

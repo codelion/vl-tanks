@@ -330,6 +330,38 @@ function get_packet(fromClient, message){
 				draw_room(ROOM.id);
 			}
 		}
+	else if(type == 'switch_side'){	//player switch sides
+		//DATA = [room_id, player_name]
+		if(PLACE != 'room') return false;
+		if(DATA[0] != opened_room_id) return false;
+		var ROOM = get_room_by_id(DATA[0]);
+		if(ROOM != false){
+			//find team
+			player_team = 'R';
+			team_r_n=0;
+			team_b_n=0;
+			for(var j in ROOM.players){
+				if(ROOM.players[j].team=='R') team_r_n++;
+				else 	if(ROOM.players[j].team=='B') team_b_n++;
+				}
+			if(team_b_n<team_r_n)
+				player_team = 'B';
+			
+			//try to switch
+			for(var j in ROOM.players){
+				if(ROOM.players[j].name==DATA[1]){
+					if(ROOM.players[j].team == 'R' && ROOM.max/2 > team_b_n)
+						ROOM.players[j].team = 'B';
+					else if(ROOM.players[j].team == 'B' && ROOM.max/2 > team_r_n)
+						ROOM.players[j].team = 'R';
+					}
+				}
+						
+			//repaint
+			if(PLACE=='room')
+				draw_room(ROOM.id);
+			}
+		}
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
 		//DATA = [room_id, host_enemy_name]
 		if(PLACE=="room" && opened_room_id==DATA[0]){
@@ -446,7 +478,7 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'tank_move'){		//tank move
 		//DATA = room_id, tank_id, [from_x, from_y, to_x, to_y, lock, direction] 
-		if(DATA[1] == name && muted==false){
+		if(DATA[1] == name && MUTE_FX==false){
 			try{
 				audio_finish = document.createElement('audio');
 				audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXP);

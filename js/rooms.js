@@ -2,6 +2,7 @@
 function draw_rooms_list(message){
 	PLACE = 'rooms';
 	dynamic_title();
+	unregister_buttons('rooms');
 	
 	room_controller();
 	
@@ -384,6 +385,8 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 function draw_room(room_id){
 	PLACE = 'room';
 	dynamic_title(room_id);
+	unregister_buttons('room');
+	
 	ROOM = get_room_by_id(room_id);
 	game_mode = 2;
 	opened_room_id = ROOM.id;
@@ -395,6 +398,14 @@ function draw_room(room_id){
 	height = 35;
 	gap = 10;
 	letter_padding_left = 15;
+	
+	//count players
+	var team_r_n=0;
+	var team_b_n=0;
+	for(var j in ROOM.players){
+		if(ROOM.players[j].team=='R') team_r_n++;
+		else 	if(ROOM.players[j].team=='B') team_b_n++;
+		}
 	
 	//background
 	canvas_backround.fillStyle = "#f0f9e4";
@@ -424,57 +435,76 @@ function draw_room(room_id){
 	x = x + 80+10;
 	
 	//start button
+	width = 130;
 	if(ROOM.host==name){
-		width = 130;
 		canvas_backround.strokeStyle = "#000000";
-		if(ROOM.players.length%2==0)
+		if(ROOM.players.length%2==0 && team_r_n == team_b_n)
 			canvas_backround.fillStyle = "#69a126";	//active
 		else
 			canvas_backround.fillStyle = "#e2e2e2";	//inactive
 		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
-			//check if room has correct player number
-			var room_tmp = get_room_by_id(opened_room_id);
-			if(room_tmp == false || room_tmp.players.length%2==1){
-				if(DEBUG==false) 
-					return false;	//error or wrong count
-				}
-			//show select tanks room
-			game_mode = 2;
-			host_enemy_name = '';
-			host_team = '';
-			ROOM = get_room_by_id(room_id);
-			for(var i in ROOM.players){
-				if(ROOM.players[i].name == ROOM.host){
-					host_team = ROOM.players[i].team;
-					break;
-					}	
-				}
-			for(var i in ROOM.players){
-				if(ROOM.players[i].team != host_team){
-					host_enemy_name = ROOM.players[i].name;
-					break;
-					}	
-				}
-			register_tank_action('prepare_game', opened_room_id, host_enemy_name);
-			});
-		
+		if(ROOM.players.length%2==0 && team_r_n == team_b_n || DEBUG==true){
+			register_button(x, y, width, height, PLACE, function(xx, yy){
+				//check if room has correct player number
+				var room_tmp = get_room_by_id(opened_room_id);
+				if(room_tmp == false || room_tmp.players.length%2==1){
+					if(DEBUG==false) 
+						return false;	//error or wrong count
+					}
+				//count teams
+				//show select tanks room
+				game_mode = 2;
+				host_enemy_name = '';
+				host_team = '';
+				ROOM = get_room_by_id(room_id);
+				for(var i in ROOM.players){
+					if(ROOM.players[i].name == ROOM.host){
+						host_team = ROOM.players[i].team;
+						break;
+						}	
+					}
+				for(var i in ROOM.players){
+					if(ROOM.players[i].team != host_team){
+						host_enemy_name = ROOM.players[i].name;
+						break;
+						}	
+					}
+				register_tank_action('prepare_game', opened_room_id, host_enemy_name);
+				});
+			}
+	
 		//text
 		text = "Start this game";
-		if(ROOM.players.length%2==0)
-			canvas_backround.fillStyle = "#ffffff";
+		if(ROOM.players.length%2==0 && team_r_n == team_b_n)
+			canvas_backround.fillStyle = "#ffffff";	//enabled
 		else
-			canvas_backround.fillStyle = "#000000";
+			canvas_backround.fillStyle = "#000000";	//disabled
 		canvas_backround.font = "Bold 13px Helvetica";
 		canvas_backround.fillText(text, x+letter_padding_left, y+(height+font_pixel_to_height(13))/2);
 		}
+	x = x + width+10;
 		
+	//switch block	
+	width = 60;
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#8fc74c";
+	roundRect(canvas_backround, x, y, width, height, 3, true);
+	register_button(x, y, width, height, PLACE, function(xx, yy){
+		send_packet('switch_side', [opened_room_id, name]);
+		});
+	//text
+	text = "Switch";
+	canvas_backround.fillStyle = "#000000";
+	canvas_backround.font = "Bold 12px Arial";
+	canvas_backround.fillText(text, x+letter_padding_left-5, y+(height+font_pixel_to_height(14))/2);
+	x = x + width+10;	
+	
 	//Waiting players text
 	text = "Waiting Soldiers: "+get_waiting_players_count();
 	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x+width+gap*2, y+(height+font_pixel_to_height(14))/2);		
-		
+	canvas_backround.font = "Bold 11px Helvetica";
+	canvas_backround.fillText(text, x, y+(height+font_pixel_to_height(14))/2);	
+
 	y = y + height+20;	
 	x = x - 80-10;
 	
@@ -485,48 +515,6 @@ function draw_room(room_id){
 	letter_padding_left = 10;
 	x1 = 10;
 	x2 = 10+gap+width;
-	
-	//team 1 text
-	/*text = "Team 1";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 14px Helvetica";
-	canvas_backround.fillText(text, x1, y+15);
-	
-	//switch1 block
-	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#afdefe";
-	roundRect(canvas_backround, x1+70, y, 90, 20, 2, true);
-	register_button(x1+70, y, 90, 20, PLACE, function(xx, yy, team){
-		alert('Stay in team '+team);
-		}, 'B');
-	
-	//switch1 text
-	text = "Switch team";
-	canvas_backround.fillStyle = "#02395d";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x1+70+5, y+15);
-	
-	//team 2 text
-	text = "Team 2";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 14px Helvetica";
-	canvas_backround.fillText(text, x2, y+15);
-	
-	//switch2 block
-	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#e2e2e2";
-	roundRect(canvas_backround, x2+70, y, 90, 20, 2, true);
-	register_button(x2+70, y, 90, 20, PLACE, function(xx, yy, team){
-		alert('Stay in team '+team);
-		}, 'R');
-	
-	//switch2 text
-	text = "Switch team";
-	canvas_backround.fillStyle = "#9a9a9a";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x2+70+5, y+15);
-	
-	y = y + 20+gap;*/
 	
 	y_begin = y;
 	icon_width = height;
@@ -618,7 +606,7 @@ function draw_room(room_id){
 			canvas_backround.font = "Bold 13px Helvetica";
 			canvas_backround.fillText(text, x2+icon_width+letter_padding_left, y+(height+font_pixel_to_height(13))/2);
 			
-			if(ROOM.host==name){
+			if(ROOM.host==name && players[i].name != name){
 				//kick block
 				canvas_backround.strokeStyle = "#000000";
 				canvas_backround.fillStyle = "#c50000";

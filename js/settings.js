@@ -27,7 +27,8 @@ var DEBUG = true;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXP = '.ogg';			//default sound files extension
 var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
-var VERSION = "1.2.8";			//app version
+var TOWER_HP_DAMAGE_IN_1VS1 = [0.5, 0.9];	//towers modifiers in multiplayer 1vs1
+var VERSION = "1.2.9";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -36,6 +37,7 @@ var BULLETS_TYPES = new Array();	//bullets types config
 var BULLETS = new Array();		//tanks bullets
 var MAPS = new Array();			//maps config
 var ELEMENTS = new Array();		//maps elements
+var MINES = [];				//mines
 var BUTTONS = new Array();		//buttons array
 var ROOMS = new Array();		//rooms array
 var PLAYERS = new Array();		//players list
@@ -45,7 +47,8 @@ var HEIGHT_MAP;				//map height, if big, offset start to work (works as scroll)
 var WIDTH_SCROLL;			//visible map part width, similar to WIDTH_APP
 var HEIGHT_SCROLL;			//visible map part height, = HEIGHT_APP - status bar height
 var APP_SIZE_CACHE = [WIDTH_APP, HEIGHT_APP]; //original app dimensions cache
-var muted=false;			//if sound muted
+var MUTE_FX=false;			//if effects muted
+var MUTE_MUSIC=false;			//if backgrond music muted
 var level = 1;				//map index
 var name="user-"+Math.floor(Math.random()*9999);	//user name
 var my_tank_nr = -1;			//my tank type: [0,1...n]
@@ -98,6 +101,8 @@ window.onbeforeunload = disconnect_game;
 //mouse move handlers
 canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
+canvas_base.addEventListener("mousewheel", MouseWheelHandler, false);
+canvas_base.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
 
 //mouse click handlers
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);

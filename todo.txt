@@ -1,23 +1,18 @@
-let blur move, but reduce speed
-switch
-scroll with mouse
-	esc to stop
-aoe missiles kills mines
-heli - apache
-heli - 2 missiles?
-bomber, 2 more bombs? for single armored and for non armored aoe.
 BALANCE
 	more skills
 		heavy - Sacrafice
-		tiger - frenzy
-		Launcher - strong missile
+		tiger - frenzy, dmg/speed stance, berserker -> Blitz like Blitzkrieg
+		Launcher - strong missile or gravity bomb
 		Sniper - reuse
-		Truck - boost 3 soldiers, heal, adrenaline to soldiers
+		miner - sap tower instead soldiers
+		Truck - LAV, boost 3 soldiers, skills: adrenaline, soldiers, heal
+		bomber - repair, 2 more bombs? for single armored and for non armored aoe.
+		apache - 2 missiles?
 	ideas
 		sieger - explosive bullets/dig+range+armor/range
 		sam - let target, mines? sap tower
-		virus - controll instead stun.
-	soldiers
-		big battles
-		spam from base?
-	truck weak, APC instead?
+		sniper - stealth
+		truck -> APC instead?
+		spam soldiers from base or random		
+Helium3
+	base, mines generates, spawn takes, on 0 - team dies.

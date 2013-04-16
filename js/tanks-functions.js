@@ -145,7 +145,7 @@ function Berserk_stop(object){
 
 //====== Cruiser ===============================================================
 
-function Escape(TANK, descrition_only, settings_only, ai){
+function Turbo(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 4000;
 	var power = 8;
@@ -159,7 +159,7 @@ function Escape(TANK, descrition_only, settings_only, ai){
 	TANK.speed = TANK.speed + power;
 	//register stop function	
 	var tmp = new Array();
-	tmp['function'] = "Escape_stop";
+	tmp['function'] = "Turbo_stop";
 	tmp['duration'] = duration;
 	tmp['type'] = 'ON_END';
 	tmp['tank'] = TANK;
@@ -207,7 +207,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}	
-function Escape_stop(object){
+function Turbo_stop(object){
 	var TANK = object.tank;
 	TANK.speed = TYPES[TANK.type].speed;
 	}
@@ -231,7 +231,7 @@ function Repair_stop(object){
 function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var power = 80 + 5 * (TANK.level-1);
-	var range = 120;
+	var range = 130;
 	var splash_range = 70;
 	
 	if(descrition_only != undefined)
@@ -375,12 +375,12 @@ function do_mortar(tank_id, distance_ok, skip_broadcast){
 //====== Sniper ================================================================
 
 function Camouflage(TANK, descrition_only, settings_only, ai){
-
-	var reuse = 15000;
-	var duration = 7000;
+	var reuse = 20000;
+	var duration = 5000;
+	var power_speed = 0.8;
 	
 	if(descrition_only != undefined)
-		return 'Slowly become invisible for '+(duration/1000)+'s while not shooting and moving.';
+		return 'Become invisible for '+(duration/1000)+'s. Speed is reduced by '+(100-power_speed*100)+'%';
 	if(settings_only != undefined)
 		return {reuse: reuse};
 	if(ai != undefined){
@@ -389,6 +389,7 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	
 	TANK.abilities_reuse[0] = Date.now() + reuse;
 	TANK.invisibility = 1;
+	TANK.speed = round(TANK.speed * power_speed);
 	TANK.move = 0;
 	delete TANK.target_shoot_lock;
 	
@@ -404,13 +405,12 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	}
 function Camouflage_stop(object){
 	var TANK = object.tank;
-	//TANK.speed = TYPES[TANK.type].speed;
+	TANK.speed = TYPES[TANK.type].speed;
 	delete TANK.invisibility;
 	}
 
 //====== Miner =================================================================
 
-var MINES = [];
 function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var power = 150 + 9 * (TANK.level-1);	
@@ -512,7 +512,7 @@ function check_mines(tank_id){
 	for(var m in MINES){
 		for(var i in TANKS){
 			if(TYPES[TANKS[i].type].name=='Miner') continue;	//they ignore it
-			//if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
+			if(TYPES[TANKS[i].type].type=='human') continue;	//they don't weight enough
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
 			var size = TYPES[TANKS[i].type].size[1];
@@ -526,6 +526,7 @@ function check_mines(tank_id){
 					tmp['bullet_to_area'] = [MINES[m].x, MINES[m].y];
 					tmp['bullet_from_target'] = tank;
 					tmp['aoe_effect'] = 1;
+					tmp['damage_all_teams'] = 1;
 					tmp['aoe_splash_range'] = MINES[m].splash_range;
 					tmp['damage'] =  MINES[m].damage;
 					BULLETS.push(tmp);

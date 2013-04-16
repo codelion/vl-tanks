@@ -37,7 +37,7 @@ TYPES.push({
 	life: [180, 12],
 	damage: [30, 2],	//30 dps
 	range: 80,
-	scout: 90,
+	scout: 100,
 	armor: [30, 0.3, 40],
 	speed: 25,
 	attack_delay: 1,
@@ -63,14 +63,14 @@ TYPES.push({
 	description: ["Fast scout", "Repair for allies", "Light armor"],
 	life: [200, 12],
 	damage: [10, 0.5],	//10 dps
-	range: 90,
-	scout: 110,
+	range: 80,
+	scout: 100,
 	armor: [20, 0.3, 30],
 	speed: 32,
 	attack_delay: 1,
 	turn_speed: 5,
 	abilities: [
-		{name: 'Escape',	passive: false,		broadcast: 1}, 
+		{name: 'Turbo',		passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Repair',	passive: false,		broadcast: 1}, 
 		],
@@ -90,7 +90,7 @@ TYPES.push({
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [120, 10],
 	damage: [40, 2],	//20 dps
-	range: 135,
+	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
 	speed: 25,
@@ -146,7 +146,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [10, 0.5],	//10 dps
 	range: 80,
-	scout: 90,
+	scout: 100,
 	armor: [20, 0.3, 30],
 	speed: 30,
 	attack_delay: 1,
@@ -173,7 +173,7 @@ TYPES.push({
 	life: [160, 10],
 	damage: [10, 0.5],	//10 dps
 	range: 80,
-	scout: 90,
+	scout: 100,
 	armor: [30, 0.3, 40],	
 	speed: 30,
 	attack_delay: 1,
@@ -198,9 +198,9 @@ TYPES.push({
 	type: 'tank',
 	description: ["Uses many soldiers for attack", "Very low damage"],
 	life: [150, 10],
-	damage: [7, 0.3],	//7 dps
+	damage: [10, 0.5],	//10 dps
 	range: 80,
-	scout: 90,
+	scout: 100,
 	armor: [10, 0, 10],
 	speed: 30,
 	attack_delay: 1,
@@ -218,15 +218,15 @@ TYPES.push({
 	accuracy: 90,
 	});
 
-//Helicopter
+//Apache
 TYPES.push({
-	name: 'Helicopter',
+	name: 'Apache',
 	type: 'tank',
 	description: ["Missiles", "Medium armor", "Strong against all"],
 	life: [150, 10],
 	damage: [20, 1],	//20 dps
 	range: 80,
-	scout: 100,
+	scout: 120,
 	armor: [40, 0.5, 50],	
 	speed: 30,
 	attack_delay: 1,
@@ -255,7 +255,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 0.7],	//15 dps
 	range: 80,
-	scout: 110,
+	scout: 120,
 	armor: [10, 0, 10],
 	speed: 35,
 	attack_delay: 1,
