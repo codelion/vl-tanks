@@ -7,7 +7,7 @@ TYPES.push({
 	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 30,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
@@ -222,12 +222,12 @@ TYPES.push({
 TYPES.push({
 	name: 'Apache',
 	type: 'tank',
-	description: ["Missiles", "Medium armor", "Strong against all"],
+	description: ["Missiles", "Light armor", "Strong against all"],
 	life: [150, 10],
 	damage: [20, 1],	//20 dps
 	range: 80,
 	scout: 120,
-	armor: [40, 0.5, 50],	
+	armor: [30, 0.5, 40],	
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 6,

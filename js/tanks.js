@@ -923,6 +923,7 @@ function do_ability(nr, TANK){
 				}
 			else if(broadcast_mode==1){
 				var ability_reuse = window[ability_function](TANK, undefined, true);
+				ability_reuse = ability_reuse.reuse;
 				if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
 				TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 				register_tank_action('skill_do', opened_room_id, name,  nr, getRandomInt(1, 999999));
@@ -1262,6 +1263,42 @@ function draw_bullets(TANK, time_gap){
 				//simple - no rotate
 				canvas_main.drawImage(img_bullet, bullet_x, bullet_y);
 				}
+			}
+		}
+	}
+//add auto bots to map		['B',	30,	1,	'Soldier',	[[5, 15],[20,41],[20,50],[20,59],[5,85], [45,99]]	],
+function add_bots(){
+	for (i in MAPS[level-1].bots){
+		//get type
+		var type = '0';
+		for(var t in TYPES){
+			if(TYPES[t].name == MAPS[level-1].bots[i][3])
+				type = t;
+			}
+		if(TYPES[type].no_repawn != 1)	continue;
+		
+		
+		id = 'bot'+MAPS[level-1].bots[i][0]+":"+getRandomInt(1, 999999);
+		team = MAPS[level-1].bots[i][0];
+		
+		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
+		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
+		xx = Math.floor(MAPS[level-1].bots[i][1]*width_tmp/100);
+		yy = Math.floor(MAPS[level-1].bots[i][2]*height_tmp/100);
+		angle = 0;
+		if(team == 'B')
+			angle = 180;
+		//add
+		add_tank(1, id, '', type, MAPS[level-1].bots[i][0], xx, yy, angle);
+		//change
+		TANK_added = get_tank_by_id(id);
+		TANK_added.move = 1;
+		TANK_added.move_to = [];
+		for (j in MAPS[level-1].bots[i][4]){
+			var move_to_tmp = new Array();
+			move_to_tmp[0] = Math.floor(MAPS[level-1].bots[i][4][j][0]*width_tmp/100);
+			move_to_tmp[1] = Math.floor(MAPS[level-1].bots[i][4][j][1]*height_tmp/100);
+			TANK_added.move_to.push(move_to_tmp);
 			}
 		}
 	}

@@ -199,10 +199,8 @@ function preload_all_files(){
 		'../img/favicon.png',
 		'../img/lock.png',
 		'../img/logo.png',
-		'../img/mute.png',
 		'../img/repair.png',
 		'../img/target.png',
-		'../img/unmute.png',
 		'../img/button.png',
 		'../img/explosion.png',
 		'../img/explosion_big.png',
@@ -356,7 +354,8 @@ function init_action(map_nr, my_team){
 		});
 		
 	draw_map(false);
-		
+	
+	bots_interval_id = setInterval(add_bots, 1000*10);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
@@ -392,6 +391,7 @@ function quit_game(init_next_game){
 			return false;
 		}
 	
+	clearInterval(bots_interval_id);
 	clearInterval(draw_interval_id);
 	clearInterval(level_interval_id);
 	clearInterval(level_hp_regen_id);

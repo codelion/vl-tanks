@@ -1,6 +1,6 @@
 //====== GENERAL ===============================================================
 
-function Soldiers(TANK, descrition_only, settings_only, ai){	
+function Soldiers(TANK, descrition_only, settings_only, ai){	return false;	
 	var reuse = 30000;
 	var n = 3;
 	
@@ -437,7 +437,7 @@ function Mine(TANK, descrition_only, settings_only, ai){
 	}
 function SAM(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 80 + 5 * (TANK.level-1);
+	var power = 70 + 5 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)

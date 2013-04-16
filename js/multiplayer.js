@@ -514,7 +514,7 @@ function get_packet(fromClient, message){
 		TANK_FROM.rand = DATA[3];
 		var ability_reuse = window[ability_function](TANK_FROM);
 		//reuse	
-		if(ability_reuse != undefined && ability_reuse != 0){	
+		if(ability_reuse != undefined && ability_reuse != 0){		
 			TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 			if(DATA[1] == name){
 				var tmp = new Array();
@@ -530,16 +530,17 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'chat'){		//chat
 		//DATA = room_id, data, player, team, place, shift
-		if(DATA[5] != 1){
+		if(DATA[5] != 1){				
 			if(PLACE != DATA[4]) return false;
 			if(PLACE=='game' && DATA[0] != opened_room_id) return false;
 			if(PLACE=='room' && DATA[0] != opened_room_id) return false;
 			if(PLACE=='select' && DATA[0] != opened_room_id) return false;
 			if(PLACE=='score' && DATA[0] != opened_room_id) return false;
 			}
-		else{
-			if(DATA[0]=='game' && PLACE != 'game') return false;
-			if(DATA[0]=='score' && PLACE != 'score') return false;
+		else{		
+			if((PLACE == 'game' || PLACE == 'score') && (DATA[4] != 'game' && DATA[4] != 'score') ) return false;
+			if(DATA[4]=='game' && PLACE != 'game') return false;
+			if(DATA[4]=='score' && PLACE != 'score') return false;
 			}
 		chat(DATA[1], DATA[2], DATA[3], DATA[5]);
 		update_players_ping(DATA[2]);

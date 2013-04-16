@@ -855,7 +855,6 @@ function show_chat(){
 			text = text.substring(0, 100);
 		
 		//background
-		//if(PLACE != 'game'){
 		canvas.font = "normal 13px Helvetica";
 		canvas.fillStyle = "#dbd9da";
 		roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);

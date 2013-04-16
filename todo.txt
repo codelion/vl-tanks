@@ -1,3 +1,5 @@
+1vs1 progress 50%
+autokill started room in end
 BALANCE
 	more skills
 		heavy - Sacrafice
@@ -13,6 +15,6 @@ BALANCE
 		sam - let target, mines? sap tower
 		sniper - stealth
 		truck -> APC instead?
-		spam soldiers from base or random		
+		spam soldiers from base or random	
 Helium3
 	base, mines generates, spawn takes, on 0 - team dies.

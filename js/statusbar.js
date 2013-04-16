@@ -40,7 +40,7 @@ function draw_mute_music_button(){
 		canvas_backround.fillStyle = "#8A8A8A";
 	else
 		canvas_backround.fillStyle = "#196119";
-	canvas_backround.font = "Normal 11px Arial";
+	canvas_backround.font = "Bold 11px Arial";
 	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+9, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music');
@@ -53,13 +53,13 @@ function draw_mute_fx_button(){
 	q_img.src = '../img/button.png';
 	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
-	fs_text = "FX";
+	fs_text = "Sound";
 	if(MUTE_FX == true)
 		canvas_backround.fillStyle = "#8A8A8A";
 	else
 		canvas_backround.fillStyle = "#196119";
-	canvas_backround.font = "Normal 11px Arial";
-	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+18, HEIGHT_APP-18-5+14);
+	canvas_backround.font = "Bold 11px Arial";
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+5, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx');
 	}
