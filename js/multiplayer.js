@@ -587,7 +587,10 @@ function get_packet(fromClient, message){
 		//adding extra info to tank
 		for(var i in DATA[1]){
 			var key = DATA[1][i].key;
-			TANK[key] = DATA[1][i].value
+			if(key == 'buffs')
+				TANK.buffs.push(DATA[1][i].value);
+			else
+				TANK[key] = DATA[1][i].value;
 			}
 		}
 	else if(type == 'tank_kill'){	//tank was killed

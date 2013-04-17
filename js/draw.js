@@ -42,6 +42,13 @@ function draw_main(){
 						}
 					}
 				}
+				
+			//check buffs
+			for (x in TANKS[i].buffs){
+				if(TANKS[i].buffs[x].lifetime != undefined && TANKS[i].buffs[x].lifetime < Date.now()){
+					TANKS[i].buffs.splice(x, 1);
+					}
+				}	
 			
 			//lifetime
 			if(TANKS[i].lifetime != undefined && TANKS[i].lifetime < Date.now()){

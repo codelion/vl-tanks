@@ -65,7 +65,7 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#182605";
 	canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
 	//draw
-	canvas_backround.fillStyle = "#939b84";
+	canvas_backround.fillStyle = "#c10000";
 	canvas_backround.font = "normal 18px Verdana";
 	var text = Math.floor(MY_TANK.level);
 	canvas_backround.fillText(text, status_x+195, status_y+28);

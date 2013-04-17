@@ -24,8 +24,8 @@ function draw_tank(tank){
 		cache_id += "T:"+tank.type+',';
 		cache_id += "A:"+tank.angle+',';
 		cache_id += "Si:"+tank_size+',';
-		for (i in tank.extra_icon)
-			cache_id += "E:"+tank.extra_icon[i][0]+',';
+		for (i in tank.buffs)
+			cache_id += "E:"+tank.buffs[i].name+',';
 		if(tank.stun != undefined)	
 			cache_id += 'ST,';
 		if(tank.berserker != undefined)	
@@ -53,26 +53,6 @@ function draw_tank(tank){
 			//start adding data
 			tmp_object.save();
 		
-			//draw extra layer
-			for (i in tank.extra_icon){
-				if(tank.extra_icon[i][0]=='_SHIELD_'){
-					//shield
-					tmp_object.beginPath();
-					tmp_object.arc(tank_size/2+padding, tank_size/2+padding, tank_size/2, 0 , 2 * Math.PI, false);	
-					tmp_object.lineWidth = 5;
-					tmp_object.strokeStyle = "#575757";
-					tmp_object.stroke();
-					}
-				else if(tank.extra_icon[i][0]=='_SLOW_'){
-					//glue bomb
-					tmp_object.beginPath();
-					tmp_object.arc(tank_size/2+padding, tank_size/2+padding, tank_size/2, 0 , 2 * Math.PI, false);	
-					tmp_object.lineWidth = 5;
-					tmp_object.strokeStyle = "#C0C0C0";
-					tmp_object.stroke();
-					}
-				}
-				
 			//draw berserker
 			if(tank.berserker != undefined){
 				tmp_object.beginPath();
@@ -126,10 +106,12 @@ function draw_tank(tank){
 				}
 
 			//draw extra layer
-			for (i in tank.extra_icon){
-				img_me = new Image();
-				img_me.src = '../img/'+tank.extra_icon[i][0];
-				tmp_object.drawImage(img_me, padding+tank_size/2-tank.extra_icon[i][1]/2, padding+tank_size/2-tank.extra_icon[i][2]/2);
+			for (i in tank.buffs){
+				if(tank.buffs[i].icon != ''){
+					img_me = new Image();
+					img_me.src = '../img/'+tank.buffs[i].icon;
+					tmp_object.drawImage(img_me, padding+tank_size/2-tank.buffs[i].icon_size[0]/2, padding+tank_size/2-tank.buffs[i].icon_size[1]/2);
+					}
 				}
 
 			//enemy checked
@@ -323,6 +305,7 @@ function draw_tank_move(mouseX, mouseY){
 //check collisions
 function check_collisions(xx, yy, TANK){
 	if(TYPES[TANK.type].no_collisions != undefined) return false;
+	if(TANK.automove != undefined) return false;
 	xx = Math.round(xx);
 	yy = Math.round(yy);
 	var tank_size_half = round(TYPES[TANK.type].size[1]/2);
@@ -441,18 +424,13 @@ function level_hp_regen_handler(){		//once per 1 second - 1.5%/s
 				TANKS[i].hp = max_hp;
 			}
 		//healing
-		for (j in TANKS[i].extra_hp){
-			if(TANKS[i].hp+TANKS[i].extra_hp[j][0] < max_hp)
-				TANKS[i].hp = TANKS[i].hp + TANKS[i].extra_hp[j][0];
-			else if(TANKS[i].hp+TANKS[i].extra_hp[j][0] >= max_hp)
-				TANKS[i].hp = max_hp;
-			}
-		//check nano_hp_regen
-		if(TANKS[i].nano_hp_regen != undefined){
-			if(TANKS[i].hp+TANKS[i].nano_hp_regen < max_hp)
-				TANKS[i].hp = TANKS[i].hp + TANKS[i].nano_hp_regen;
-			else if(TANKS[i].hp+TANKS[i].nano_hp_regen >= max_hp)
-				TANKS[i].hp = max_hp;
+		for (j in TANKS[i].buffs){
+			if(TANKS[i].buffs[j].name == 'repair'){
+				if(TANKS[i].hp+TANKS[i].buffs[j].power < max_hp)
+					TANKS[i].hp = TANKS[i].hp + TANKS[i].buffs[j].power;
+				else if(TANKS[i].hp+TANKS[i].buffs[j].power >= max_hp)
+					TANKS[i].hp = max_hp;
+				}
 			}
 		}
 	redraw_tank_stats();
@@ -892,7 +870,7 @@ function death(tank){
 	delete tank.target_shoot_lock;
 	
 	//removing buffs/debuffs
-	tank.extra_icon = [];
+	tank.buffs = [];
 	tank.extra_hp = [];
 
 	if(tank.level < 3)
@@ -975,25 +953,13 @@ function do_ability(nr, TANK){
 			else if(broadcast_mode==2){
 				//broadcast later
 				var ability_reuse = window[ability_function](TANK);
-				if(ability_reuse != undefined && ability_reuse != 0){
-					if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
-					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-					var tmp = new Array();
-					tmp['function'] = "draw_ability_reuse";
-					tmp['duration'] = ability_reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = ability_reuse;
-					tmp['tank'] = TANK;
-					timed_functions.push(tmp);
-					}
 				}
 			}
 		}
 	}
 //check if enemy visible
 function check_enemy_visibility(tank){		
-	if(TYPES[tank.type].no_repawn != undefined)
+	if(TYPES[tank.type].type == 'tower')
 		return true;	//tower
 	if(tank.team==MY_TANK.team)
 		return true;	//friend
@@ -1410,6 +1376,8 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		kills: 0,
 		deaths: 0,
 		cache_tank: [],
+		buffs: [],
+		extra_hp: [],
 		last_bullet_time: Date.now()-5000,
 		};
 	if(AI != undefined)

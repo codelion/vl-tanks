@@ -28,7 +28,7 @@ var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, wi
 var SOUND_EXP = '.ogg';			//default sound files extension
 var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
 var TOWER_HP_DAMAGE_IN_1VS1 = [0.5, 0.9];	//towers modifiers in multiplayer 1vs1
-var SOLDIERS_INTERVAl = 10;		//pause between soldiers spawn, seconds, best at 30
+var SOLDIERS_INTERVAl = 25;		//pause between soldiers spawn, seconds
 var VERSION = "1.3";			//app version
 
 //other global variables

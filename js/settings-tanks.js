@@ -2,7 +2,7 @@
 TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
-	description: ["Heavy armor, high defence", "Low damage", "Weak only against Sniper and Tiger"],
+	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
 	life: [250, 15],				//[tank life in level 0, life increase in each level]
 	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
@@ -71,7 +71,7 @@ TYPES.push({
 	turn_speed: 5,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
-		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		{name: 'Repair',		passive: false,		broadcast: 0}, 
 		{name: 'Sight',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -110,9 +110,9 @@ TYPES.push({
 	accuracy: 100,
 	});
 
-//Sniper
+//Stealth
 TYPES.push({
-	name: 'Sniper',
+	name: 'Stealth',
 	type: 'tank',
 	description: ["Camouflage", "Long range and huge damage", "Penetrates armor", "Slow speed and attack"],
 	life: [150, 10],
@@ -206,7 +206,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Adrenaline',	passive: false,		broadcast: 1}, 
+		{name: 'Fire bomb',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Medicine',	passive: false,		broadcast: 1}, 
 		],
@@ -266,7 +266,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
 		{name: 'AA bomb',	passive: false,		broadcast: 2}, 
-		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		{name: 'Rest',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -284,10 +284,10 @@ TYPES.push({
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [150, 0],
 	damage: [15, 1],	//15 dps
-	range: 70,		damage: [150, 1],
+	range: 70,
 	scout: 80,
 	armor: [0, 0, 0],
-	speed: 25,			speed: 100,
+	speed: 25,
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
