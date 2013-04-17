@@ -8,6 +8,8 @@ Email: www.viliusl@gmail.com
 function init_game(first_time){
 	PLACE = 'init';
 	dynamic_title();
+	CHAT_LINES = [];
+	
 	if(socket_live == true)
 		room_controller();
 	if(getCookie("mute_fx") != '0')
@@ -260,6 +262,7 @@ function init_action(map_nr, my_team){
 	PLACE = 'game';
 	dynamic_title();
 	room_controller();
+	CHAT_LINES = [];
 	
 	level = map_nr;
 	
@@ -355,7 +358,7 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 	
-	bots_interval_id = setInterval(add_bots, 1000*10);
+	bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);

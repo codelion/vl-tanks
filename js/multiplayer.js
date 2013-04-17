@@ -236,7 +236,7 @@ function get_packet(fromClient, message){
 			draw_rooms_list();
 		}
 	else if(type == 'delete_room'){	//room was deleted
-		for(var i in ROOMS){
+		for(var i in ROOMS){	
 			if(ROOMS[i].id == DATA){
 				ROOMS.splice(i, 1); i--;
 				if(PLACE=='rooms')
@@ -375,6 +375,14 @@ function get_packet(fromClient, message){
 				choose_and_register_tanks(ROOM);
 				}
 			}
+		else if(PLACE=="rooms"){
+			for(var i in ROOMS){	
+				if(ROOMS[i].id == DATA[0]){
+					ROOMS.splice(i, 1); i--;
+					}
+				}
+			draw_rooms_list();
+			}
 		}
 	else if(type == 'change_tank'){		//change map in selecting screen
 		//DATA = room_id, tank_index, player_name]
@@ -461,9 +469,14 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'end_game'){		//game ends
 		//DATA = [game_id, lost_team]
-		if(PLACE=="game" && opened_room_id==DATA[0]){
-			draw_final_score(false, DATA[1]);
+		//if me host, broadcast game end
+		ROOM = get_room_by_id(opened_room_id);
+		if(ROOM.host == name){	log('deleting...' );
+			send_packet('delete_room', ROOM.id, true);
 			}
+		//draw scores
+		if(PLACE=="game" && opened_room_id==DATA[0])
+			draw_final_score(false, DATA[1]);
 		}
 	else if(type == 'leave_game'){		//player leaving game
 		//DATA = [room_id, player_name]
@@ -644,6 +657,7 @@ function get_packet(fromClient, message){
 			return false;
 			}
 		delete TANK.invisibility;
+		TANK.speed = TYPES[TANK.type].speed;
 		}	
 	else if(type == 'bullet'){	//tank hit
 		//DATA = [target_id, source_id, angle]

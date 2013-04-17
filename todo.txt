@@ -1,20 +1,22 @@
-1vs1 progress 50%
-autokill started room in end
-BALANCE
-	more skills
-		heavy - Sacrafice
-		tiger - frenzy, dmg/speed stance, berserker -> Blitz like Blitzkrieg
-		Launcher - strong missile or gravity bomb
-		Sniper - reuse
-		miner - sap tower instead soldiers
-		Truck - LAV, boost 3 soldiers, skills: adrenaline, soldiers, heal
-		bomber - repair, 2 more bombs? for single armored and for non armored aoe.
-		apache - 2 missiles?
-	ideas
-		sieger - explosive bullets/dig+range+armor/range
-		sam - let target, mines? sap tower
-		sniper - stealth
-		truck -> APC instead?
-		spam soldiers from base or random	
-Helium3
-	base, mines generates, spawn takes, on 0 - team dies.
+spam soldiers from base or random
+	enemies visible
+	finish maps
+SYNC
+	aoe heal
+	aoe bombs
+skills
+	SAP
+	Frenzy
+	Missile
+	Strike
+	Explode
+	Adrenaline
+	Medicine
+	Fire bomb
+	AA bomb
+IDEAS
+	sniper - stealth
+	truck -> APC instead or LAV?
+	sieger - explosive bullets/dig+range+armor/range	
+	Helium3 - base, mines generates, spawn takes, on 0 - team dies.
+combine sprites

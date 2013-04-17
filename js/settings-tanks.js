@@ -7,8 +7,8 @@ TYPES.push({
 	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
-	speed: 30,					//speed
+	armor: [40, 0.3, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
 	//no_repawn: 1,					//if tank dies - he will not respawn
@@ -17,7 +17,7 @@ TYPES.push({
 	//ignore_armor: 1,				//tank will ignore armor
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'SAP',		passive: false,		broadcast: 1}, 
 		{name: 'Shield',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
@@ -35,16 +35,16 @@ TYPES.push({
 	type: 'tank',
 	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
 	life: [180, 12],
-	damage: [30, 2],	//30 dps
+	damage: [30, 1.5],	//30 dps
 	range: 80,
 	scout: 100,
 	armor: [30, 0.3, 40],
-	speed: 25,
+	speed: 30,
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
-		{name: 'Berserk',	passive: false,		broadcast: 1},
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
+		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
 		{name: 'Damage',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -71,8 +71,8 @@ TYPES.push({
 	turn_speed: 5,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Repair',	passive: false,		broadcast: 1}, 
+		{name: 'Sight',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -89,7 +89,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [120, 10],
-	damage: [40, 2],	//20 dps
+	damage: [30, 1.5],	//15 dps
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
@@ -98,7 +98,7 @@ TYPES.push({
 	turn_speed: 2,
 	abilities: [
 		{name: 'Mortar',	passive: false,		broadcast: 2}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Missile',	passive: false,		broadcast: 2}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -116,16 +116,16 @@ TYPES.push({
 	type: 'tank',
 	description: ["Camouflage", "Long range and huge damage", "Penetrates armor", "Slow speed and attack"],
 	life: [150, 10],
-	damage: [50, 0.3],	//25 dps
+	damage: [40, 2],	//20 dps
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
-	speed: 23,
+	speed: 25,
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Strike',	passive: false,		broadcast: 2}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -152,9 +152,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Mine',	passive: false,		broadcast: 1}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		{name: 'SAM',	passive: false,		broadcast: 1}, 
+		{name: 'Mine',		passive: false,		broadcast: 1}, 
+		{name: 'Explode',	passive: false,		broadcast: 1}, 
+		{name: 'SAM',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: ['top1.png'],
@@ -174,14 +174,14 @@ TYPES.push({
 	damage: [10, 0.5],	//10 dps
 	range: 80,
 	scout: 100,
-	armor: [30, 0.3, 40],	
+	armor: [20, 0.3, 30],	
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Virus',	passive: false,		broadcast: 2}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Virus',		passive: false,		broadcast: 2}, 
 		{name: 'Mass virus',	passive: false,		broadcast: 1}, 
+		{name: 'Advanced',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	icon_top: ['top1.png'],
@@ -206,8 +206,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Soldiers ',	passive: false,		broadcast: 1}, 
+		{name: 'Adrenaline',	passive: false,		broadcast: 1}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
+		{name: 'Medicine',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -227,16 +228,16 @@ TYPES.push({
 	damage: [20, 1],	//20 dps
 	range: 80,
 	scout: 120,
-	armor: [30, 0.5, 40],	
-	speed: 30,
+	armor: [20, 0.3, 30],	
+	speed: 32,
 	attack_delay: 1,
 	turn_speed: 6,
 	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		{name: 'Sight',	passive: false,		broadcast: 0}, 
+		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
+		{name: 'Scout',		passive: false,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -253,7 +254,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
 	life: [150, 10],
-	damage: [15, 0.7],	//15 dps
+	damage: [15, 0.8],	//15 dps
 	range: 80,
 	scout: 120,
 	armor: [10, 0, 10],
@@ -263,9 +264,9 @@ TYPES.push({
 	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
-		{name: 'Bomb',	passive: false,		broadcast: 2}, 
-		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		{name: 'Autopilot',	passive: false,		broadcast: 0}, 
+		{name: 'Bomb',		passive: false,		broadcast: 2}, 
+		{name: 'AA bomb',	passive: false,		broadcast: 2}, 
+		{name: 'Repair',	passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -281,12 +282,12 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [70, 0],
-	damage: [5, 0.3],	//5 dps
-	range: 70,
+	life: [150, 0],
+	damage: [15, 1],	//15 dps
+	range: 70,		damage: [150, 1],
 	scout: 80,
 	armor: [0, 0, 0],
-	speed: 25,			//speed: 100,
+	speed: 25,			speed: 100,
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,

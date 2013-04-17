@@ -748,10 +748,18 @@ function get_active_room_progress(){
 				}
 			}
 		for(var i in TYPES){
-			if(TYPES[i].name == 'Tower')	
-				towers_total_hp = towers_n * TYPES[i].life[0];
-			else if(TYPES[i].name == 'Base')	
-				base_total_hp = bases_n * TYPES[i].life[0];
+			if(TYPES[i].name == 'Tower'){
+				if(ROOM.players.length > 2)
+					towers_total_hp = towers_n * TYPES[i].life[0];
+				else
+					towers_total_hp = towers_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+				}
+			else if(TYPES[i].name == 'Base'){
+				if(ROOM.players.length > 2)
+					base_total_hp = bases_n * TYPES[i].life[0];
+				else
+					base_total_hp = bases_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+				}
 			}
 		for(var i in TANKS){
 			if(TANKS[i].team == team){

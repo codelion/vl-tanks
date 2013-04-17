@@ -28,7 +28,8 @@ var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, wi
 var SOUND_EXP = '.ogg';			//default sound files extension
 var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
 var TOWER_HP_DAMAGE_IN_1VS1 = [0.5, 0.9];	//towers modifiers in multiplayer 1vs1
-var VERSION = "1.2.10";			//app version
+var SOLDIERS_INTERVAl = 10;		//pause between soldiers spawn, seconds, best at 30
+var VERSION = "1.3";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -86,6 +87,7 @@ var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
+var autobots_added = 0;			//how much bots was added, used to generate id
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

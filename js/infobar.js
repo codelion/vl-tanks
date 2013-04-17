@@ -211,8 +211,8 @@ function redraw_tank_stats(){
 	update_fps();
 	}
 function get_ability_test_length(text){
-	var thin_letter_width = 4;	//tfjilr
-	var average_letter_width = 7;
+	var thin_letter_width = 4;	//tfjilrt
+	var average_letter_width = 6;
 	var fat_letter_width = 11;	//mw
 	
 	var length = 2;	//2 for first cap letter
@@ -224,6 +224,7 @@ function get_ability_test_length(text){
 		else if(text[i] == 'i')	length += thin_letter_width;
 		else if(text[i] == 'l')	length += thin_letter_width;
 		else if(text[i] == 'r')	length += thin_letter_width;
+		else if(text[i] == 't')	length += thin_letter_width;
 		//fat
 		else if(text[i] == 'm')	length += fat_letter_width;
 		else if(text[i] == 'w')	length += fat_letter_width;
@@ -255,7 +256,7 @@ function draw_tank_abilities(){
 		ability_text = TYPES[MY_TANK.type].abilities[i].name;
 		canvas_backround.fillStyle = "#1d2411";
 		canvas_backround.font = "bold 10px Verdana";
-		if(ability_text.length>9)
+		if(ability_text.length>6)
 			canvas_backround.font = "bold 9px Verdana";
 		letter_padding = Math.floor((SKILL_BUTTON-get_ability_test_length(ability_text))/2);
 		if(letter_padding<0) letter_padding = 0;
@@ -327,8 +328,8 @@ function draw_ability_reuse(object){
 		//text
 		canvas_backround.font = "bold 10px Verdana";
 		var ability_text = TYPES[MY_TANK.type].abilities[i].name;
-		if(ability_text.length>9)
-			canvas_backround.font = "bold 8px Verdana";
+		if(ability_text.length>6)
+			canvas_backround.font = "bold 9px Verdana";
 		letter_padding = Math.floor((SKILL_BUTTON-get_ability_test_length(ability_text))/2);
 		if(letter_padding<0) letter_padding = 0;
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);

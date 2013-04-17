@@ -109,7 +109,7 @@ function draw_quit_button(){
 	quit_img.src = '../img/button.png';
 	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	q_text = "Quit";
-	canvas_backround.fillStyle = "#8A8A8A";
+	canvas_backround.fillStyle = "#c10000";
 	canvas_backround.font = "Bold 11px Helvetica";
 	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+12, HEIGHT_APP-18-5+14);
 	
