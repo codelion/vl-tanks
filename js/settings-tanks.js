@@ -7,7 +7,7 @@ TYPES.push({
 	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [40, 0.3, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
@@ -17,7 +17,7 @@ TYPES.push({
 	//ignore_armor: 1,				//tank will ignore armor
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
-		{name: 'SAP',		passive: false,		broadcast: 1}, 
+		{name: 'Rage',		passive: false,		broadcast: 1}, 
 		{name: 'Shield',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
@@ -71,8 +71,8 @@ TYPES.push({
 	turn_speed: 5,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
-		{name: 'Repair',		passive: false,		broadcast: 0}, 
-		{name: 'Sight',		passive: true,		broadcast: 0}, 
+		{name: 'Repair',	passive: false,		broadcast: 0}, 
+		{name: 'Boost',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -89,23 +89,23 @@ TYPES.push({
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [120, 10],
-	damage: [30, 1.5],	//15 dps
+	damage: [10, 0.5],	//10 dps
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 2,
+	attack_delay: 1,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Mortar',	passive: false,		broadcast: 2}, 
 		{name: 'Missile',	passive: false,		broadcast: 2}, 
+		{name: 'Mortar',	passive: false,		broadcast: 2}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
 	icon_top: ['top1.png'],
 	icon_base: ['base1.png'],
-	bullet: 'missle.png',
+	bullet: 'bullet.png',
 	fire_sound: 'shoot',
 	accuracy: 100,
 	});
@@ -124,8 +124,8 @@ TYPES.push({
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Strike',	passive: false,		broadcast: 2}, 
+		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -206,9 +206,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
-		{name: 'Fire bomb',	passive: false,		broadcast: 1}, 
+		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
-		{name: 'Medicine',	passive: false,		broadcast: 1}, 
+		{name: 'Medicine',	passive: false,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -266,7 +266,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
 		{name: 'AA bomb',	passive: false,		broadcast: 2}, 
-		{name: 'Rest',	passive: false,		broadcast: 1}, 
+		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
 	icon_top: [],

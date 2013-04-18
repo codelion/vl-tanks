@@ -1,15 +1,5 @@
 SYNC
 	aoe bombs
-skills
-	SAP
-	Frenzy
-	Missile
-	Strike
-	Explode
-	Adrenaline
-	Medicine
-	Fire bomb
-	AA bomb
 IDEAS
 	truck -> APC instead or LAV?
 	sieger - explosive bullets/dig+range+armor/range	
@@ -20,7 +10,7 @@ IDEAS
 			1. MIRV - drops bombs on multiple sited targets, including towers
 			2. SPAWN - speeds up spawn time. each upgrade brings faster respawn
 			3. DROP - drops soldiers deep into enemy territory
-			4. SAT - opens up a portion of the enemy map for a limited time so you can see what they are doing. 
+			4. SAT - opens up a portion of the enemy map for a limited time.
 			5. FUSION - increases energy accrual
 			6. TORSION - teleports a targeted area to another place on the map
 		H3 should be deposited randomly across the map

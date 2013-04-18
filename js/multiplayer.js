@@ -236,7 +236,7 @@ function get_packet(fromClient, message){
 			draw_rooms_list();
 		}
 	else if(type == 'delete_room'){	//room was deleted
-		for(var i in ROOMS){	
+		for(var i=0; i < ROOMS.length; i++){	
 			if(ROOMS[i].id == DATA){
 				ROOMS.splice(i, 1); i--;
 				if(PLACE=='rooms')
@@ -269,7 +269,7 @@ function get_packet(fromClient, message){
 		//DATA = [room_id, player_name]
 		var ROOM = get_room_by_id(DATA[0]);
 		if(ROOM != false){
-			for(var j in ROOM.players){
+			for(var j=0; j < ROOM.players.length; j++){
 				if(ROOM.players[j].name == DATA[1]){
 					ROOM.players.splice(j, 1); j--;
 					if(PLACE=='room')
@@ -289,7 +289,7 @@ function get_packet(fromClient, message){
 			return false; // host was kicked, this is probably hack from outside
 			}
 		if(ROOM != false){
-			for(var j in ROOM.players){
+			for(var j=0; j < ROOM.players.length; j++){
 				if(ROOM.players[j].name == DATA[1]){
 					ROOM.players.splice(j, 1);  j--;
 					if(DATA[1]==name){
@@ -376,7 +376,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		else if(PLACE=="rooms"){
-			for(var i in ROOMS){	
+			for(var i=0; i < ROOMS.length; i++){	
 				if(ROOMS[i].id == DATA[0]){
 					ROOMS.splice(i, 1); i--;
 					}
@@ -621,7 +621,7 @@ function get_packet(fromClient, message){
 			}
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	
 			//removing
-			for(var b in TANKS){
+			for(var b=0; b < TANKS.length; b++){
 				if(TANKS[b].id==TANK_TO.id){	
 					TANKS.splice(b, 1);  b--;
 					break;
@@ -723,7 +723,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 	else if(action=='level_up')
 		send_packet('level_up', [room_id, player, data]);
 	else if(action=='leave_room'){
-		for(var i in ROOMS){
+		for(var i=0; i < ROOMS.length; i++){
 			if(ROOMS[i].id == room_id){
 				if(ROOM.host == player){
 					//host leaving room

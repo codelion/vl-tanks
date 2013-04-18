@@ -21,32 +21,30 @@ function draw_main(){
 	for (i in pre_draw_functions){
 		window[pre_draw_functions[i][0]](pre_draw_functions[i][1]);
 		}
-		
+	
 	redraw_mini_map();	// mini map actions
 
 	//tanks actions
-	for (var i in TANKS){
+	for(var i=0; i < TANKS.length; i++){
 		if(PLACE != 'game') return false;
 		var tank_size =  TYPES[TANKS[i].type].size[1];
 		try{
 			//speed multiplier
 			var speed_multiplier = 1;
-			if(TANKS[i].debuffs != undefined){
-				speed_first = speed_multiplier;
-				for(var dd in TANKS[i].debuffs){
-					if(TANKS[i].debuffs[dd][0]=='slow'){
-						var diff = speed_first * TANKS[i].debuffs[dd][1] / 100;
-						speed_multiplier = speed_multiplier - diff;
-						if(speed_multiplier < 0) 
-							speed_multiplier = 0;
-						}
+			speed_first = speed_multiplier;
+			for(var dd in TANKS[i].buffs){
+				if(TANKS[i].buffs[dd].name == 'slow'){
+					var diff = speed_first * TANKS[i].buffs[dd].power / 100;
+					speed_multiplier = speed_multiplier - diff;
+					if(speed_multiplier < 0) 
+						speed_multiplier = 0;
 					}
 				}
 				
 			//check buffs
-			for (x in TANKS[i].buffs){
+			for(var x=0; x < TANKS[i].buffs.length; x++){
 				if(TANKS[i].buffs[x].lifetime != undefined && TANKS[i].buffs[x].lifetime < Date.now()){
-					TANKS[i].buffs.splice(x, 1);
+					TANKS[i].buffs.splice(x, 1); x--;
 					}
 				}	
 			
@@ -90,6 +88,22 @@ function draw_main(){
 			//check stun
 			if(TANKS[i].stun - Date.now() < 0)
 				delete TANKS[i].stun;
+				
+			if(mouse_click_controll==true && TANKS[i].name == name){
+				//target
+				img = new Image();
+				img.src = '../img/target.png';
+				canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
+				
+				if(target_range != 0){
+					//circle
+					canvas_main.beginPath();
+					canvas_main.arc(mouse_pos[0], mouse_pos[1], target_range, 0 ,2*Math.PI, false);	
+					canvas_main.lineWidth = 1;
+					canvas_main.strokeStyle = "#c10000";
+					canvas_main.stroke();
+					}
+				}
 			
 			//move lock
 			if(TANKS[i].target_move_lock != undefined){

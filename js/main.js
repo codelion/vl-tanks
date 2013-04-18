@@ -374,7 +374,7 @@ function speed2pixels(speed, time_diff){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
-	for (i in timed_functions){			
+	for(var i=0; i<timed_functions.length; i++){		
 		timed_functions[i].duration = timed_functions[i].duration - 100;
 		var duration = 	timed_functions[i].duration				
 		if(timed_functions[i].type == 'REPEAT')
@@ -383,7 +383,7 @@ function timed_functions_handler(){
 			if(timed_functions[i].type == 'ON_END')
 				window[timed_functions[i].function](timed_functions[i]);
 			//unregister f-tion
-			timed_functions.splice(i, 1);	i++;
+			timed_functions.splice(i, 1);	i--;
 			}
 		}
 	}
@@ -415,7 +415,6 @@ function quit_game(init_next_game){
 		on_click_functions = [];
 		
 		canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
-		canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 				
 		if(audio_main != undefined)
 			audio_main.pause();
@@ -441,6 +440,7 @@ function quit_game(init_next_game){
 		parent.document.getElementById("fps").innerHTML = "";	
 
 		}catch(error){}
+	canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 	
 	//reset other variables
 	ROOMS = [];
@@ -455,6 +455,7 @@ function quit_game(init_next_game){
 	on_click_functions = [];
 	mouse_move_controll = false;
 	mouse_click_controll = false;
+	target_range = 0;
 	ABILITIES_POS = [];
 	game_mode = 1;
 	last_selected = -1;
@@ -584,7 +585,7 @@ function controll_chat(){
 	var time = new Date();
 	time = time.getTime();
 	var max_time = 20000;	//20s
-	for(var i in CHAT_LINES){
+	for(var i=0; i < CHAT_LINES.length; i++){
 		if(time - CHAT_LINES[i].time > max_time){
 			CHAT_LINES.splice(i, 1); i--;
 			}

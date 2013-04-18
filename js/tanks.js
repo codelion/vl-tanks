@@ -13,7 +13,6 @@ function draw_tank(tank){
 		visibility = 1;
 		
 		if(tank.dead == 1)		tank_size = tank_size/2; //dead
-		if(tank.invisibility == 1)	tank_size = tank_size*0.8; //invisibility
 		if(check_enemy_visibility(tank)==false)	return false; //out of sight
 		
 		lighten_pixels(tank);
@@ -28,8 +27,8 @@ function draw_tank(tank){
 			cache_id += "E:"+tank.buffs[i].name+',';
 		if(tank.stun != undefined)	
 			cache_id += 'ST,';
-		if(tank.berserker != undefined)	
-			cache_id += 'B,';
+		if(tank.invisibility == 1)
+			cache_id += 'NV,';
 		if(tank.clicked_on != undefined){
 			cache_id += 'EC,';
 			tank.clicked_on = tank.clicked_on - 1;
@@ -49,26 +48,29 @@ function draw_tank(tank){
 			tmp_canvas.width = 105
 			tmp_canvas.height = 105;
 			var tmp_object = tmp_canvas.getContext("2d");
-		
+			var radius_extra = 0;
+			
 			//start adding data
 			tmp_object.save();
-		
-			//draw berserker
-			if(tank.berserker != undefined){
+			
+			//draw invisibility	
+			if(tank.invisibility == 1){
 				tmp_object.beginPath();
 				var radius = tank_size/2;
-				if(radius>35)
-				radius=35;
+				if(radius>35) radius=35;
+				radius = radius + radius_extra;
 				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 3;
-				tmp_object.strokeStyle = "#c10000";
+				tmp_object.strokeStyle = "#000000";
 				tmp_object.stroke();
+				radius_extra = radius_extra + 3;
 				}
-			
+		
 			//draw stun
 			if(tank.stun != undefined){
 				tmp_object.beginPath();
-				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, tank_size/2+4, 0 , 2 * Math.PI, false);	
+				radius = tank_size/2 + radius_extra;
+				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 1;
 				tmp_object.fillStyle = "#545454";
 				tmp_object.fill();
@@ -107,20 +109,33 @@ function draw_tank(tank){
 
 			//draw extra layer
 			for (i in tank.buffs){
-				if(tank.buffs[i].icon != ''){
+				if(tank.buffs[i].icon != undefined){
 					img_me = new Image();
 					img_me.src = '../img/'+tank.buffs[i].icon;
 					tmp_object.drawImage(img_me, padding+tank_size/2-tank.buffs[i].icon_size[0]/2, padding+tank_size/2-tank.buffs[i].icon_size[1]/2);
 					}
+				if(tank.buffs[i].circle != undefined){
+					tmp_object.beginPath();
+					var radius = tank_size/2;
+					if(radius>35) radius=35;
+					radius = radius + radius_extra;
+					tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
+					tmp_object.lineWidth = 3;
+					tmp_object.strokeStyle = tank.buffs[i].circle;
+					tmp_object.stroke();
+					radius_extra = radius_extra + 3;
+					}	
 				}
 
 			//enemy checked
 			if(tank.clicked_on != undefined){
 				tmp_object.beginPath();
-				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, tank_size/2, 0 , 2 * Math.PI, false);	
+				radius = tank_size/2 + radius_extra;
+				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 3;
 				tmp_object.strokeStyle = "#d9d900";
 				tmp_object.stroke();
+				radius_extra = radius_extra + 3;
 				}
 			
 			//save to cache
@@ -227,17 +242,17 @@ function add_player_name(tank){
 //tank move rgistration and graphics
 function draw_tank_move(mouseX, mouseY){
 	if(mouse_click_controll==true){
+		do_missile(MY_TANK.id);
+		do_bomb(MY_TANK.id);
+		
 		//external click functions
 		for (i in on_click_functions)
 			window[on_click_functions[i][0]](on_click_functions[i][1]);
 		}
 	else{
 		//delete other handlers
-		delete MY_TANK.try_missle;
-		delete MY_TANK.try_stun;
-		delete MY_TANK.try_mortar;
+		delete MY_TANK.try_missile;
 		delete MY_TANK.try_bomb;
-		delete MY_TANK.try_airstrike;
 		
 		if(MY_TANK.death_respan != undefined) return false;
 			
@@ -364,7 +379,7 @@ function check_collisions(xx, yy, TANK){
 function tank_level_handler(){	//once per second
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tower') 	return false;
-		//if(TYPES[TANKS[i].type].type == 'human') 	return false;
+		if(TYPES[TANKS[i].type].type == 'human') 	return false;
 		if(game_mode == 2 && TANKS[i].id != MY_TANK.id)	continue;	//not our business
 		if(TANKS[i].dead == 1) {
 			TANKS[i].death_time++;
@@ -481,15 +496,6 @@ function check_enemies(TANK){
 			var tank_size_to = TYPES[TANKS[i].type].size[1];
 			var radiance = Math.atan2(dist_y, dist_x);
 			f_angle = (radiance*180.0)/Math.PI+90;
-			
-			if(TANK.invisibility==1){
-				if(game_mode == 1){
-					delete TANK.invisibility;
-					TANK.speed = TYPES[TANK.type].speed;
-					}
-				else
-					send_packet('del_invisible', [TANK.id]);
-				}			
 			
 			if(game_mode == 1){
 				var tmp = new Array();
@@ -710,15 +716,13 @@ function do_damage(TANK, TANK_TO, BULLET){
 		}	
 	
 	damage = TANK.damage;
-	if(TANK.debuffs != undefined){
-		damage_first = damage;
-		for(var dd in TANK.debuffs){
-			if(TANK.debuffs[dd][0]=='weak'){
-				var diff = damage_first * TANK.debuffs[dd][1] / 100;
-				damage = damage - diff;
-				if(damage < 0)
-					damage = 0;
-				}
+	for(var dd in TANK.buffs){
+		if(TANK.buffs[dd].name == 'weak'){
+			damage = damage * TANK.buffs[dd].power;
+			if(damage < 0) damage = 0;
+			}
+		if(TANK.buffs[dd].name == 'damage'){
+			damage = damage * TANK.buffs[dd].power;
 			}
 		}
 	
@@ -741,13 +745,26 @@ function do_damage(TANK, TANK_TO, BULLET){
 		armor = 0;	//pierce armor
 	damage = round( damage*(100-armor)/100 );		//log(damage+", target armor="+armor+", type="+TYPES[TANK_TO.type].name);
 	
+	//check invisibility
 	if(TANK_TO.invisibility != undefined){
 		if(BULLET.aoe_effect != undefined){
-			delete TANK_TO.invisibility;
-			TANK_TO.speed = TYPES[TANK_TO.type].speed;
+			if(game_mode == 1){
+				delete TANK_TO.invisibility;
+				TANK_TO.speed = TYPES[TANK_TO.type].speed;
+				}
+			else
+				send_packet('del_invisible', [TANK_TO.id]);
 			}
 		else
 			return false;
+		}
+	if(TANK.invisibility==1){
+		if(game_mode == 1){
+			delete TANK.invisibility;
+			TANK.speed = TYPES[TANK.type].speed;
+			}
+		else
+			send_packet('del_invisible', [TANK.id]);
 		}
 	
 	//stats
@@ -807,9 +824,9 @@ function do_damage(TANK, TANK_TO, BULLET){
 			else{
 				//remove tank
 				var del_index = false;
-				for(var j in TANKS){
+				for(var j=0; j < TANKS.length; j++){
 					if(TANKS[j].id == TANK_TO.id){
-						TANKS.splice(j, 1);
+						TANKS.splice(j, 1); j--;
 						return true;
 						}
 					}
@@ -868,7 +885,8 @@ function death(tank){
 	tank.abilities_reuse = [0, 0, 0];
 	delete tank.target_move_lock;
 	delete tank.target_shoot_lock;
-	
+	mouse_click_controll = false;
+	target_range=0;	
 	//removing buffs/debuffs
 	tank.buffs = [];
 	tank.extra_hp = [];
@@ -905,7 +923,7 @@ function add_towers(){
 //tank special ability activated	
 function do_ability(nr, TANK){
 	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;
-	if(TANK.dead == 1) return false;
+	if(TANK.dead == 1 || TANK.stun != undefined) return false; //dead or stuned
 	if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;
 	if(TYPES[TANK.type].abilities[nr-1].passive == true) return false;
 	
@@ -1172,6 +1190,8 @@ function draw_bullets(TANK, time_gap){
 				for (var ii=0; ii < TANKS.length; ii++){
 					if(TANKS[ii].team == TANK.team && BULLETS[b].damage_all_teams == undefined)
 						continue; //friend
+					if(BULLETS[b].ignore_planes != undefined && TYPES[TANKS[ii].type].no_collisions != undefined)
+						continue;	//flying units
 					
 					//check range
 					var enemy_x = BULLETS[b].bullet_to_area[0];
@@ -1181,8 +1201,7 @@ function draw_bullets(TANK, time_gap){
 					var distance_b = Math.sqrt((dist_x_b*dist_x_b)+(dist_y_b*dist_y_b));
 					distance_b = distance_b - TYPES[TANKS[ii].type].size[1]/2;
 							
-					if(distance_b > BULLETS[b].aoe_splash_range)
-						continue;	//too far}
+					if(distance_b > BULLETS[b].aoe_splash_range)	continue;	//too far}
 					
 					//do damage
 					var response = do_damage(TANK, TANKS[ii], BULLETS[b]);	
@@ -1192,7 +1211,7 @@ function draw_bullets(TANK, time_gap){
 				
 				//check mines
 				var mine_size_half = 8;
-				for(var m in MINES){
+				for(var m=0; m < MINES.length; m++){
 					var size = BULLETS[b].aoe_splash_range;
 					if(BULLETS[b].x + size > MINES[m].x-mine_size_half && BULLETS[b].x - size < MINES[m].x+mine_size_half){
 						if(BULLETS[b].y + size > MINES[m].y-mine_size_half && BULLETS[b].y - size < MINES[m].y+mine_size_half){
@@ -1205,6 +1224,7 @@ function draw_bullets(TANK, time_gap){
 							tmp['bullet_from_target'] = TANK;
 							tmp['aoe_effect'] = 1;
 							tmp['damage_all_teams'] = 1;
+							tmp['ignore_planes'] = 1;
 							tmp['aoe_splash_range'] = MINES[m].splash_range;
 							tmp['damage'] =  MINES[m].damage;
 							BULLETS.push(tmp);

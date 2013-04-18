@@ -126,6 +126,9 @@ function try_skills(TANK_AI){
 //ai move rgistration and graphics
 function soldiers_move(mouseX, mouseY){
 	if(MY_TANK.death_respan != undefined || MY_TANK.dead == 1) return false;
+	var gap_rand = 10;
+	mouseX_copy = mouseX;
+	mouseY_copy = mouseY;
 	
 	for(var i in TANKS){
 		if(TANKS[i].master == undefined) continue;	//not under controll
@@ -137,6 +140,10 @@ function soldiers_move(mouseX, mouseY){
 			else
 				delete MY_TANK.invisibility;
 			}
+		
+		//randomize
+		mouseX = mouseX_copy + getRandomInt(-gap_rand, gap_rand);
+		mouseY = mouseY_copy + getRandomInt(-gap_rand, gap_rand);
 			
 		//check clicks
 		var found_something = false;

@@ -78,15 +78,13 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
 	var damage_string = MY_TANK.damage;
-	if(MY_TANK.debuffs != undefined){
-		damage_first = damage_string;
-		for(var dd in MY_TANK.debuffs){
-			if(MY_TANK.debuffs[dd][0]=='weak'){
-				var diff = damage_first * MY_TANK.debuffs[dd][1] / 100;
-				damage_string = damage_string - diff;
-				if(damage_string < 0)
-					damage_string = 0;
-				}
+	for(var dd in MY_TANK.buffs){
+		if(MY_TANK.buffs[dd].name == 'weak'){
+			damage_string = damage_string * MY_TANK.buffs[dd].power;
+			if(damage_first < 0) damage_first = 0;
+			}
+		if(MY_TANK.buffs[dd].name == 'damage'){
+			damage_string = damage_string * MY_TANK.buffs[dd].power;
 			}
 		}
 	damage_string = Math.floor(damage_string);
@@ -287,7 +285,6 @@ function draw_ability_reuse(object){
 	if(object != undefined){
 		var i = object.nr;
 		var ability_reuse = object.tank.abilities_reuse[i] - Date.now();
-		
 		//button
 		var img = new Image();
 		if(TYPES[MY_TANK.type].abilities[i].passive == false)	
@@ -303,6 +300,8 @@ function draw_ability_reuse(object){
 		if(TYPES[MY_TANK.type].abilities[i].passive == false){
 			var img = new Image();
 			img_height = (SKILL_BUTTON) * ability_reuse / object.max + 5;
+			if(img_height > 65)
+				img_height = 65;	//error here
 			var img = new Image();
 			img.src = '../img/skill-on.png';
 			if(img_height < 6){
