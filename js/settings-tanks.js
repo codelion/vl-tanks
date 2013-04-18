@@ -88,7 +88,7 @@ TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
-	life: [120, 10],
+	life: [130, 10],
 	damage: [10, 0.5],	//10 dps
 	range: 120,
 	scout: 100,
@@ -282,8 +282,8 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [150, 0],
-	damage: [15, 1],	//15 dps
+	life: [130, 0],
+	damage: [11, 1],	//11 dps
 	range: 70,
 	scout: 80,
 	armor: [0, 0, 0],

@@ -181,7 +181,7 @@ function Turbo(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
-function Repair(TANK, descrition_only, settings_only, ai){
+function Repair(TANK, descrition_only, settings_only, ai){	log('+');
 	var reuse = 20000;
 	var duration = 5000;
 	var power = 12 + 1 * (TANK.level-1);
@@ -243,7 +243,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 	
-	TANK.abilities_reuse[2] = Date.now() + reuse;
+	TANK.abilities_reuse[2] = Date.now() + reuse; 		log('123');
 	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
@@ -285,7 +285,7 @@ function Turbo_stop(object){
 
 function Missile(TANK, descrition_only, settings_only, ai){
 	var reuse = 6000;
-	var power = 60 + 4 * (TANK.level-1);
+	var power = 40 + 4 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -316,7 +316,7 @@ function Missile(TANK, descrition_only, settings_only, ai){
 	}
 function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 70 + 5 * (TANK.level-1);
+	var power = 50 + 5 * (TANK.level-1);
 	var range = 130;
 	var splash_range = 65;
 	
@@ -356,7 +356,7 @@ function Range(TANK, descrition_only, settings_only, ai){
 
 function Strike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 60 + 4 * (TANK.level-1);
+	var power = 40 + 4 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -422,7 +422,7 @@ function Camouflage_stop(object){
 
 function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 150 + 9 * (TANK.level-1);	
+	var power = 120 + 10 * (TANK.level-1);	
 	var splash_range = 70;
 	
 	if(descrition_only != undefined)
@@ -489,11 +489,11 @@ function Explode(TANK, descrition_only, settings_only, ai){
 	}
 function SAM(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 70 + 5 * (TANK.level-1);
+	var power = 50 + 5 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
-		return 'Send SAM missile with '+power+' power to nearest enemy.';
+		return 'Send SAM missile with '+power+' power to nearest flying enemy.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	TANK.abilities_reuse[2] = Date.now() + reuse;
@@ -601,7 +601,7 @@ function check_mines(tank_id){
 
 function Virus(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 70 + 4 * (TANK.level-1);	
+	var power = 60 + 6 * (TANK.level-1);	
 	var duration = 4000;
 	var range = 70;
 
@@ -631,8 +631,8 @@ function Virus(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 function Mass_virus(TANK, descrition_only, settings_only, ai){
-	var reuse = 40000;	reuse = 1000;
-	var power = 35 + 2 * (TANK.level-1);	
+	var reuse = 40000;
+	var power = 30 + 3 * (TANK.level-1);	
 	var duration = 2000;
 	var range = 40;
 
@@ -769,7 +769,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 70 + 4 * (TANK.level-1);
+	var power = 50 + 5 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -801,7 +801,7 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 	}
 function Fire_bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 60 + 4 * (TANK.level-1);
+	var power = 50 + 5 * (TANK.level-1);
 	var range = 80;
 	var splash_range = 65;
 	
@@ -865,7 +865,7 @@ function Scout_stop(object){
 
 function Bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
-	var power = 80 + 7 * (TANK.level-1);
+	var power = 60 + 6 * (TANK.level-1);
 	var range = 60;
 	var splash_range = 70;
 
@@ -897,7 +897,7 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 	}
 function AA_bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 60 + 4 * (TANK.level-1);
+	var power = 50 + 5 * (TANK.level-1);
 	var range = 120;
 
 	if(descrition_only != undefined)
