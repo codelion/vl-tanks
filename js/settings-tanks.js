@@ -3,8 +3,8 @@ TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
-	life: [250, 15],				//[tank life in level 0, life increase in each level]
-	damage: [12, 0.6],	//12 dps		//[tank damage in level 0, damage increase in each level]
+	life: [230, 13],				//[tank life in level 0, life increase in each level]
+	damage: [15, 0.75],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
@@ -34,7 +34,7 @@ TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
 	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
-	life: [180, 12],
+	life: [200, 12],
 	damage: [30, 1.5],	//30 dps
 	range: 80,
 	scout: 100,
@@ -61,8 +61,8 @@ TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
 	description: ["Fast scout", "Repair for allies", "Light armor"],
-	life: [200, 12],
-	damage: [10, 0.5],	//10 dps
+	life: [180, 11],
+	damage: [20, 1],	//20 dps
 	range: 80,
 	scout: 100,
 	armor: [20, 0.3, 30],
@@ -88,8 +88,8 @@ TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
-	life: [130, 10],
-	damage: [10, 0.5],	//10 dps
+	life: [150, 10],
+	damage: [15, 0.75],	//15 dps
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
@@ -143,7 +143,7 @@ TYPES.push({
 	name: 'Miner',
 	type: 'tank',
 	description: ["Lands mines", "Light armor", "Low damage", "Very weak agains air units"],
-	life: [150, 10],
+	life: [170, 11],
 	damage: [10, 0.5],	//10 dps
 	range: 80,
 	scout: 100,
@@ -171,7 +171,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Can send virus to deactivate enemy", "Light armor", "Low damage"],
 	life: [160, 10],
-	damage: [10, 0.5],	//10 dps
+	damage: [15, 0.75],	//15 dps
 	range: 80,
 	scout: 100,
 	armor: [20, 0.3, 30],	
@@ -224,9 +224,9 @@ TYPES.push({
 	name: 'Apache',
 	type: 'tank',
 	description: ["Missiles", "Light armor", "Strong against all"],
-	life: [150, 10],
+	life: [180, 11],
 	damage: [20, 1],	//20 dps
-	range: 80,
+	range: 100,
 	scout: 120,
 	armor: [20, 0.3, 30],	
 	speed: 32,
@@ -236,8 +236,8 @@ TYPES.push({
 	no_collisions: 1,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
-		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
+		{name: 'Defence',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -254,7 +254,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
 	life: [150, 10],
-	damage: [15, 0.8],	//15 dps
+	damage: [15, 0.75],	//15 dps
 	range: 80,
 	scout: 120,
 	armor: [10, 0, 10],
@@ -283,7 +283,7 @@ TYPES.push({
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
 	life: [130, 0],
-	damage: [11, 1],	//11 dps
+	damage: [12, 0.7],	//12 dps
 	range: 70,
 	scout: 80,
 	armor: [0, 0, 0],
@@ -306,7 +306,7 @@ TYPES.push({
 	name: 'Tower',
 	type: 'tower',
 	description: ["Tower for defence"],
-	life: [1500,0],
+	life: [1200,0],
 	damage: [30, 0],	//30 dps
 	range: 120,
 	scout: 130,
@@ -330,7 +330,7 @@ TYPES.push({
 	name: 'Base',
 	type: 'tower',
 	description: ["Main base"],
-	life: [3000, 0],
+	life: [2500, 0],
 	damage: [45, 0],	//45 dps
 	range: 120,
 	scout: 130,

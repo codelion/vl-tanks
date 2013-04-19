@@ -57,6 +57,62 @@ function init_game(first_time){
 			}
 		if(preloaded==true)
 			add_first_screen_elements();
+		
+		//intro();
+		}
+	}
+//show intro
+function intro(){
+	PLACE = 'intro';
+	DATA = [
+		{image: '1.jpg', text: ["No more oil left on Earth..."],},
+		{image: '2.jpg', text: ["But but researchers found huge amount of non-radioactive isotope",  "helium on the moon..."],},
+		{image: '3.jpg', text: ["Helium-3 gives a chance to build ZPM", "which means unlimited energy..."],},
+		{image: '4.jpg', text: ["Protect your base, push enemies away and save you country.", "Moon needs you!"],},
+		];
+	var text_gap = 20;
+	
+	if(intro_page+1 > DATA.length){
+		PLACE = 'init';
+		add_first_screen_elements();
+		return false;
+		}
+	
+	//draw
+	var img = new Image();
+	img.src = '../img/intro/'+DATA[intro_page].image;
+	img.onload = function(){	//wait till img is loaded
+		canvas_backround.drawImage(img, 0, 0);
+		//draw text
+		var text = DATA[intro_page].text[0];
+		canvas_backround.font = "Bold 21px Arial";
+		canvas_backround.strokeStyle = '#ffffff';
+		canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40);
+		//more text
+		if(DATA[intro_page].text[1] != undefined){
+			var text = DATA[intro_page].text[1];
+			canvas_backround.font = "Bold 21px Arial";
+			canvas_backround.strokeStyle = '#ffffff';
+			canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40+text_gap);
+			}
+		//draw skip
+		canvas_backround.font = "Bold 22px Arial";
+		canvas_backround.strokeStyle = '#ffffff';
+		canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
+		}
+	
+	if(intro_page==0){
+		//register skip button
+		register_button(WIDTH_APP-70, HEIGHT_APP-STATUS_HEIGHT-45, 70, 45, PLACE, function(){
+			intro_page=0;
+			PLACE = 'init';
+			add_first_screen_elements();
+			});
+		//register next slide
+		register_button(0, 0, WIDTH_APP, HEIGHT_APP-STATUS_HEIGHT, PLACE, function(){
+			intro_page++;
+			intro();
+			});
 		}
 	}
 //checks and resizes all canvas layers
@@ -323,7 +379,7 @@ function init_action(map_nr, my_team){
 		if(enemy_team == my_team)
 			enemy_team = 'R';	
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			//random_type = 5;
+			random_type = 8;
 		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
@@ -467,6 +523,7 @@ function quit_game(init_next_game){
 	shift_pressed = false;
 	chat_shifted=false;
 	frame_time = undefined;
+	intro_page = 0;
 	
 	if(init_next_game!=false){
 		init_game(false);

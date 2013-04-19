@@ -1303,6 +1303,7 @@ function add_bots(){
 	var gap = 15;	//gap beween units in group
 
 	//prepare
+	if(DEBUG == true && game_mode == 2) return false;	//no need here
 	var type = 0;
 	for(var t in TYPES){
 		if(TYPES[t].name == type_name)

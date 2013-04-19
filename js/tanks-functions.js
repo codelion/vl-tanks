@@ -133,7 +133,10 @@ function Frenzy(TANK, descrition_only, settings_only, ai){
 	
 	//check
 	var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
-	if(TANK.hp > max_hp*hp_level/100) return false;
+	if(TANK.hp > max_hp*hp_level/100){ 
+		TANK.abilities_reuse[1] = Date.now();
+		return false;
+		}						
 
 	//do
 	TANK.abilities_reuse[1] = Date.now() + reuse;
@@ -239,11 +242,11 @@ function Boost(TANK, descrition_only, settings_only, ai){
 	var range = 80;
 	
 	if(descrition_only != undefined)
-		return 'Inrease sight by '+power+'.';
+		return 'Inrease nearby allies damage by '+power+'.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 	
-	TANK.abilities_reuse[2] = Date.now() + reuse; 		log('123');
+	TANK.abilities_reuse[2] = Date.now() + reuse; 
 	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
@@ -422,7 +425,7 @@ function Camouflage_stop(object){
 
 function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 120 + 10 * (TANK.level-1);	
+	var power = 130 + 10 * (TANK.level-1);	
 	var splash_range = 70;
 	
 	if(descrition_only != undefined)
@@ -450,10 +453,7 @@ function Explode(TANK, descrition_only, settings_only, ai){
 	if(descrition_only != undefined)
 		return 'Detonate nearby mines. Are you ready?';
 	if(settings_only != undefined) return {reuse: reuse};
-	if(ai != undefined){
-		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
-		if(TANK.hp > max_hp/4) return false;
-		}
+	if(ai != undefined) return false;
 	
 	TANK.abilities_reuse[1] = Date.now() + reuse;
 	var mine_size_half = 8;
@@ -715,6 +715,42 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
+function Fire_bomb(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var power = 50 + 5 * (TANK.level-1);
+	var range = 80;
+	var splash_range = 65;
+	
+	if(descrition_only != undefined)
+		return 'Drop Fire bomb with damage of '+power+'.';
+	if(settings_only != undefined) return {reuse: reuse};
+		
+	if(TANK.try_bomb != undefined){
+		delete TANK.try_bomb;
+ 		mouse_click_controll = false;
+ 		target_range=0;
+		return 0;
+		}
+	
+	ability_nr = 0;
+	if(TYPES[TANK.type].name == 'Apache')
+		ability_nr = 1;	
+	
+	mouse_click_controll = true;
+	target_range = splash_range;
+	//init
+	TANK.try_bomb = {
+		range: range,
+		aoe: splash_range,
+		power: power,
+		reuse: reuse,
+		icon: 'bomb.png',
+		ability_nr: ability_nr,
+		};
+		
+	//return reuse - later, on use
+	return 0;
+	}
 function Medicine(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
@@ -769,7 +805,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 50 + 5 * (TANK.level-1);
+	var power = 60 + 5 * (TANK.level-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -799,42 +835,6 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 	//return reuse - later, on use
 	return 0;
 	}
-function Fire_bomb(TANK, descrition_only, settings_only, ai){
-	var reuse = 20000;
-	var power = 50 + 5 * (TANK.level-1);
-	var range = 80;
-	var splash_range = 65;
-	
-	if(descrition_only != undefined)
-		return 'Drop Fire bomb with damage of '+power+'. No armor pierce.';
-	if(settings_only != undefined) return {reuse: reuse};
-		
-	if(TANK.try_bomb != undefined){
-		delete TANK.try_bomb;
- 		mouse_click_controll = false;
- 		target_range=0;
-		return 0;
-		}
-	
-	ability_nr = 0;
-	if(TYPES[TANK.type].name == 'Apache')
-		ability_nr = 1;	
-	
-	mouse_click_controll = true;
-	target_range = splash_range;
-	//init
-	TANK.try_bomb = {
-		range: range,
-		aoe: splash_range,
-		power: power,
-		reuse: reuse,
-		icon: 'bomb.png',
-		ability_nr: ability_nr,
-		};
-		
-	//return reuse - later, on use
-	return 0;
-	}
 function Scout(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
 	var duration = 3000;
@@ -845,6 +845,8 @@ function Scout(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2) + power;
+	
+	TANK.abilities_reuse[1] = Date.now() + reuse;
 	
 	//register stop function	
 	var tmp = new Array();

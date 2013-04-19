@@ -842,7 +842,8 @@ function update_preload(images_loaded){
 	
 	if(preload_left==0 || preload_left < 3){
 		preloaded=true;
-		add_first_screen_elements();
+		//add_first_screen_elements();
+		intro();
 		return false;
 		}
 	

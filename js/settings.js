@@ -27,9 +27,9 @@ var DEBUG = true;				//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXP = '.ogg';			//default sound files extension
 var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
-var TOWER_HP_DAMAGE_IN_1VS1 = [0.5, 0.9];	//towers modifiers in multiplayer 1vs1
+var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
 var SOLDIERS_INTERVAl = 25;		//pause between soldiers spawn, seconds
-var VERSION = "1.3.1";			//app version
+var VERSION = "1.3.2";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -67,7 +67,7 @@ var pre_draw_functions = [];		//extra functions executed before main draw loop
 var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
 var game_mode = 0;			//1=single player, 2=multi player
 var QUALITY = 3;				//1=low, 2=mid, 3=high
-var PLACE = '';				//init, settings, select, game, score, rooms, room, create_room
+var PLACE = '';				//init, intro, settings, select, game, score, rooms, room, create_room
 var preloaded=false;			//if all images preloaded
 var preload_total=0;			//total images for preload
 var preload_left=0;			//total images left for preload
@@ -89,6 +89,7 @@ var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
 var autobots_added = 0;			//how much bots was added, used to generate id
+var intro_page = 0;			//intro page
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

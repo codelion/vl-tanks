@@ -4,7 +4,7 @@ function on_keyboard_action(event){
 	
 	//add shortcuts
 	if(PLACE == 'game'){
-		if(MY_TANK.dead != 1){
+		if(MY_TANK.dead != 1 && chat_mode==0){
 			if(k == 49 || k == 97 )	
 				do_ability(1, MY_TANK);	//special 1
 			else if(k == 50 || k == 98)

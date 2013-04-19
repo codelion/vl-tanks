@@ -1,13 +1,18 @@
-bugs
-	if host dc .. check it again
-	on minis reach end, kill it
-	invivisbility do not work
-	minis do not attack and stop
+boost in multi animation	
+text
+	scroll text in lobby, below list
+	ingame chat by color of team, system - grey
+	double kill, tripple kill, mega kill
+SYNC
+	aoe bombs sync
 	wrong team
 		wrong team nick colors
 		respawn wrong place
-SYNC
-	aoe bombs
+	soldiers
+		do not attack and stop
+		on minis reach end, kill it
+	if host dc .. check it again
+	invivisbility do not work
 IDEAS
 	truck -> APC instead or LAV?
 	sieger - explosive bullets/dig+range+armor/range	
