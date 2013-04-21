@@ -10,6 +10,7 @@ function draw_rooms_list(message){
 	y = 10;
 	gap = 10;
 	letter_padding_left = 15;
+	document.getElementById("chat_box").style.display = 'none';
 	
 	//background
 	canvas_backround.fillStyle = "#f0f9e4";
@@ -398,6 +399,8 @@ function draw_room(room_id){
 	height = 35;
 	gap = 10;
 	letter_padding_left = 15;
+	document.getElementById("chat_box").style.display = 'block';
+	document.getElementById("chat_box").innerHTML = "";
 	
 	//count players
 	var team_r_n=0;
@@ -504,13 +507,29 @@ function draw_room(room_id){
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Bold 11px Helvetica";
 	canvas_backround.fillText(text, x, y+(height+font_pixel_to_height(14))/2);	
+	
+	x = WIDTH_APP - 350;
+
+	//game name
+	text = ROOM.name;
+	canvas_backround.fillStyle = "#196119";
+	canvas_backround.font = "Bold 12px Helvetica";
+	canvas_backround.fillText(text, x+60, y+15);
+	y = y + 20;
+	
+	//game settings
+	text = ucfirst(ROOM.settings[0])+", "+ucfirst(ROOM.settings[2])+", max "+ROOM.max+" players, by "+ROOM.host;
+	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.font = "Normal 12px Helvetica";
+	canvas_backround.fillText(text, x+60, y+15);
+	y = y - 20;	
 
 	y = y + height+20;	
 	x = x - 80-10;
 	
 	//show players
-	height = 25;
-	gap = 10;
+	height = 21;
+	gap = 7;
 	width = (WIDTH_APP-20-gap)/2;
 	letter_padding_left = 10;
 	x1 = 10;
@@ -538,7 +557,7 @@ function draw_room(room_id){
 			text = "B";
 			canvas_backround.fillStyle = "#000000";
 			canvas_backround.font = "Bold 15px Arial";
-			canvas_backround.fillText(text, x1+letter_padding_left-2, y+(height+font_pixel_to_height(15))/2);
+			canvas_backround.fillText(text, x1+letter_padding_left-5, y+(height+font_pixel_to_height(15))/2);
 			
 			//name
 			text = players[i].name;
@@ -597,7 +616,7 @@ function draw_room(room_id){
 			text = "R";
 			canvas_backround.fillStyle = "#000000";
 			canvas_backround.font = "Bold 15px Arial";
-			canvas_backround.fillText(text, x2+letter_padding_left, y+(height+font_pixel_to_height(15))/2);
+			canvas_backround.fillText(text, x2+letter_padding_left-5, y+(height+font_pixel_to_height(15))/2);
 
 			
 			//name
@@ -636,56 +655,6 @@ function draw_room(room_id){
 		
 		y = y + height+gap;
 		}
-	
-	//game name
-	text = "Game Name:";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x1, y+15);
-	
-	text = ROOM.name;
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Normal 12px Helvetica";
-	canvas_backround.fillText(text, x1+90, y+15);
-	
-	y = y + 18;
-	
-	//game settings
-	text = "Settings:";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x1, y+15);
-	
-	text = ucfirst(ROOM.settings[0])+", "+ucfirst(ROOM.settings[2]);
-	canvas_backround.fillStyle = "#69a126";
-	canvas_backround.font = "Normal 12px Helvetica";
-	canvas_backround.fillText(text, x1+90, y+15);
-	
-	y = y + 18;
-	
-	//max players
-	text = "Max Players:";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x1, y+15);
-	
-	text = ROOM.max;
-	canvas_backround.fillStyle = "#69a126";
-	canvas_backround.font = "Normal 12px Helvetica";
-	canvas_backround.fillText(text, x1+90, y+15);
-	
-	y = y + 18;
-	
-	//host
-	text = "Room leader:";
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Bold 12px Helvetica";
-	canvas_backround.fillText(text, x1, y+15);
-	
-	text = ROOM.host;
-	canvas_backround.fillStyle = "#69a126";
-	canvas_backround.font = "Normal 12px Helvetica";
-	canvas_backround.fillText(text, x1+90, y+15);
 	}
 //kick button was pressed - find player
 function on_kick_player(side, index, room_id){

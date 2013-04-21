@@ -103,10 +103,10 @@ function do_ai_move(TANK, xx, yy, direction){
 		}
 	}
 function try_skills(TANK_AI){
-	for(i in TYPES[TANK_AI.type].abilities){ 
+	for(i in TYPES[TANK_AI.type].abilities){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
-		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2) continue;
+		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && game_mode == 2) continue;
 		if(TYPES[TANK_AI.type].abilities[i].passive == true) continue;
 		if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
 		var reuse = 0;
@@ -114,7 +114,7 @@ function try_skills(TANK_AI){
 			//execute
 			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
 			if(reuse !== false)
-				return false;
+				break;
 			}
 		catch(err){
 			console.log("AI error: "+err.message);
@@ -122,8 +122,13 @@ function try_skills(TANK_AI){
 		if(reuse != 0)
 			TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
 		}
+	//check if missle or bomb ready
+	if(game_mode != 2){	
+		do_auto_missile(TANK_AI.id);
+		do_auto_bomb(TANK_AI.id);
+		}
 	}
-//ai move rgistration and graphics
+//ai move registration and graphics
 function soldiers_move(mouseX, mouseY){
 	if(MY_TANK.death_respan != undefined || MY_TANK.dead == 1) return false;
 	var gap_rand = 10;
@@ -200,4 +205,111 @@ function soldiers_move(mouseX, mouseY){
 				}
 			}
 		}
+	}
+function do_auto_missile(tank_id){			
+	TANK = get_tank_by_id(tank_id);
+	if(TANK.try_missile == undefined) return false;
+	var tank_size = TYPES[TANK.type].size[1]/2;
+	
+	//find enemy with min hp
+	var ENEMY_NEAR;
+	for (i in TANKS){				
+		if(TANKS[i].team == TANK.team)	continue;	//same team
+		if(TANKS[i].dead == 1)			continue;	//target dead
+		if(TANKS[i].invisibility==1)		continue;	//blur mode
+		if(TYPES[TANKS[i].type].type == "human")	continue;	//dont waste specials on soldiers
+		
+		//check
+		distance = get_distance_between_tanks(TANKS[i], TANK);
+		if(distance > TANK.try_missile.range) continue;	//target too far
+		
+		//range ok
+		if(ENEMY_NEAR==undefined)
+			ENEMY_NEAR = [TANKS[i].hp, i];
+		else if(TANKS[i].hp < ENEMY_NEAR[0])
+			ENEMY_NEAR = [TANKS[i].hp, i];
+		}
+	if(ENEMY_NEAR == undefined) return false;
+	var enemy = TANKS[ENEMY_NEAR[1]];
+	
+	if(TANK.try_missile.angle == true){
+		//find angle
+		dist_x = enemy.x - TANK.x;
+		dist_y = enemy.y - TANK.y;
+		var radiance = Math.atan2(dist_y, dist_x);
+		var angle = (radiance*180.0)/Math.PI+90;
+		angle = round(angle);
+		}
+		
+	//control
+	nr = TANK.try_missile.ability_nr;
+	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
+	TANK.abilities_reuse[nr] = Date.now() + TANK.try_missile.reuse;
+		
+	//bullet	
+	var tmp = new Array();
+	tmp['x'] = TANK.x+tank_size;
+	tmp['y'] = TANK.y+tank_size;
+	tmp['bullet_to_target'] = enemy;
+	tmp['bullet_from_target'] = TANK;
+	tmp['damage'] = TANK.try_missile.power;
+	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_missile.angle == true)		tmp['angle'] = angle;
+	if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
+	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
+	BULLETS.push(tmp);
+	
+	delete TANK.try_missile;
+	}
+function do_auto_bomb(tank_id){	
+	TANK = get_tank_by_id(tank_id);
+	if(TANK.try_bomb == undefined) return false;
+	var tank_size = TYPES[TANK.type].size[1]/2;
+	
+	//find enemy with min hp
+	var ENEMY_NEAR;
+	var total_range = TANK.try_bomb.range + TANK.try_bomb.aoe*8/10;
+	for (i in TANKS){				
+		if(TANKS[i].team == TANK.team)	continue;	//same team
+		if(TANKS[i].dead == 1)			continue;	//target dead
+		if(TANKS[i].invisibility==1)		continue;	//blur mode
+		if(TYPES[TANKS[i].type].type == "human")	continue;	//dont waste specials on soldiers
+		
+		//check
+		distance = get_distance_between_tanks(TANKS[i], TANK);
+		if(distance > total_range) continue;	//target too far
+		
+		//range ok
+		if(ENEMY_NEAR==undefined)
+			ENEMY_NEAR = [TANKS[i].hp, i];
+		else if(TANKS[i].hp < ENEMY_NEAR[0])
+			ENEMY_NEAR = [TANKS[i].hp, i];
+		}
+	if(ENEMY_NEAR == undefined) return false;
+	var enemy = TANKS[ENEMY_NEAR[1]];
+	var mouseX = enemy.x + TYPES[enemy.type].size[1]/2;
+	var mouseY = enemy.y + TYPES[enemy.type].size[1]/2;
+
+	//control
+	nr = TANK.try_bomb.ability_nr;
+	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
+	TANK.abilities_reuse[nr] = Date.now() + TANK.try_bomb.reuse;
+	
+	//bullet	
+	var tmp = new Array();
+	tmp['x'] = TANK.x+tank_size;
+	tmp['y'] = TANK.y+tank_size;
+	tmp['bullet_to_area'] = [mouseX, mouseY];
+	tmp['bullet_from_target'] = TANK;
+	tmp['damage'] = TANK.try_bomb.power;
+	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
+	if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
+	if(TANK.try_bomb.aoe != undefined){
+		tmp['aoe_effect'] = 1;
+		tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
+		}
+	BULLETS.push(tmp);
+	
+	delete TANK.try_bomb;
 	}

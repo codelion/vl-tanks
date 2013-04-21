@@ -20,6 +20,8 @@ function init_game(first_time){
 		MAX_SENT_PACKETS = 1000;
 		START_GAME_COUNT_MULTI = 5;
 		}
+	if(getCookie("disable_intro") == '1')
+		intro_enabled = 0;
 	unique_id = 0;
 	level = 1;
 	//set width and height
@@ -58,11 +60,10 @@ function init_game(first_time){
 		if(preloaded==true)
 			add_first_screen_elements();
 		
-		//intro();
 		}
 	}
 //show intro
-function intro(){
+function intro(force){
 	PLACE = 'intro';
 	DATA = [
 		{image: '1.jpg', text: ["No more oil left on Earth..."],},
@@ -72,7 +73,7 @@ function intro(){
 		];
 	var text_gap = 20;
 	
-	if(intro_page+1 > DATA.length){
+	if(intro_page+1 > DATA.length || (intro_enabled == 0 && force == undefined)){
 		PLACE = 'init';
 		add_first_screen_elements();
 		return false;
@@ -86,7 +87,7 @@ function intro(){
 		//draw text
 		var text = DATA[intro_page].text[0];
 		canvas_backround.font = "Bold 21px Arial";
-		canvas_backround.strokeStyle = '#ffffff';
+		canvas_backround.fillStyle = '#ffffff';
 		canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40);
 		//more text
 		if(DATA[intro_page].text[1] != undefined){
@@ -104,6 +105,7 @@ function intro(){
 	if(intro_page==0){
 		//register skip button
 		register_button(WIDTH_APP-70, HEIGHT_APP-STATUS_HEIGHT-45, 70, 45, PLACE, function(){
+			setCookie("disable_intro", 1, 30);
 			intro_page=0;
 			PLACE = 'init';
 			add_first_screen_elements();
@@ -111,7 +113,7 @@ function intro(){
 		//register next slide
 		register_button(0, 0, WIDTH_APP, HEIGHT_APP-STATUS_HEIGHT, PLACE, function(){
 			intro_page++;
-			intro();
+			intro(force);
 			});
 		}
 	}
@@ -129,7 +131,7 @@ function check_canvas_sizes(){
 		}
 	else{
 		//full screen
-		var dimensions = get_fimensions();
+		var dimensions = get_dimensions();
 		//map
 		WIDTH_MAP = MAPS[level-1].width;
 		HEIGHT_MAP = MAPS[level-1].height;
@@ -173,6 +175,7 @@ function check_canvas_sizes(){
 		}catch(error){}
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
+	document.getElementById("chat_box").style.top = (HEIGHT_APP-175)+"px";
 	}
 var menu_pressed = false;
 function add_first_screen_elements(){
@@ -184,6 +187,9 @@ function add_first_screen_elements(){
 		if(DEBUG==true)
 			name = name_tmp+Math.floor(Math.random()*99);
 		}
+	name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+	name = name[0].toUpperCase() + name.slice(1);
+	
 	counter_tmp = getCookie("start_count");
 	if(counter_tmp != ''){
 		START_GAME_COUNT_SINGLE = counter_tmp;
@@ -226,6 +232,8 @@ function add_first_screen_elements(){
 				var name_tmp = prompt("Please enter your name", name);
 				if(name_tmp != null){
 					name = name_tmp;
+					name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+					name = name[0].toUpperCase() + name.slice(1);
 					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 					setCookie("player_name", name, 30);
 					}
@@ -351,12 +359,14 @@ function init_action(map_nr, my_team){
 		catch(error){}
 		}
 
+	add_towers();
+
 	//create ... me
 	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
 	auto_scoll_map();
-
+	
 	//add enemy if single player
 	if(game_mode==1){
 		//get random type
@@ -379,7 +389,7 @@ function init_action(map_nr, my_team){
 		if(enemy_team == my_team)
 			enemy_team = 'R';	
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			random_type = 8;
+			//random_type = 5;
 		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
@@ -389,8 +399,6 @@ function init_action(map_nr, my_team){
 		}
 
 	sync_multiplayers();
-	
-	add_towers();
 	
 	//auto add 1 lvl upgrade
 	for(ii in TANKS){
@@ -426,7 +434,7 @@ function get_unique_id(){
 	}
 //tank moving speed conversion
 function speed2pixels(speed, time_diff){
-	return speed * 1.7 * time_diff/1000;
+	return speed * 1.3 * time_diff/1000;
 	}
 //repeat some functions in time
 function timed_functions_handler(){
@@ -518,6 +526,7 @@ function quit_game(init_next_game){
 	last_selected_counter = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
+	document.getElementById("chat_box").style.display = 'none';
 	packets_used=0;
 	packets_all=0;
 	shift_pressed = false;
@@ -624,15 +633,19 @@ function chat(text, author, team, shift){
 	//save
 	var time = new Date();
 	time = time.getTime();
-	CHAT_LINES.push({
+	
+	var new_chat = {
 		text: text,
 		author: author,
 		team: team,
 		time: time,
 		shift: shift,
-		});
-	if(CHAT_LINES.length > 16)
+		};
+	CHAT_LINES.push(new_chat);
+	if(CHAT_LINES.length > 17)
 		CHAT_LINES.splice(0,1);	//remove first
+	if(PLACE == 'room')
+		update_scrolling_chat(new_chat);
 	}
 //controlls chat lines
 function controll_chat(){
@@ -642,9 +655,11 @@ function controll_chat(){
 	var time = new Date();
 	time = time.getTime();
 	var max_time = 20000;	//20s
-	for(var i=0; i < CHAT_LINES.length; i++){
-		if(time - CHAT_LINES[i].time > max_time){
-			CHAT_LINES.splice(i, 1); i--;
+	if(PLACE != 'room'){
+		for(var i=0; i < CHAT_LINES.length; i++){
+			if(time - CHAT_LINES[i].time > max_time){
+				CHAT_LINES.splice(i, 1); i--;
+				}
 			}
 		}
 	//show?

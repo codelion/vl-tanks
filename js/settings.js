@@ -23,12 +23,12 @@ var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
 var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var DEBUG = true;				//show debug info
+var DEBUG = false;				//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXP = '.ogg';			//default sound files extension
 var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
 var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
-var SOLDIERS_INTERVAl = 25;		//pause between soldiers spawn, seconds
+var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
 var VERSION = "1.3.2";			//app version
 
 //other global variables
@@ -88,8 +88,8 @@ var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
-var autobots_added = 0;			//how much bots was added, used to generate id
 var intro_page = 0;			//intro page
+var intro_enabled = 1;			//if show intro
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

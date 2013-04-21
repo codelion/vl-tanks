@@ -84,7 +84,7 @@ function font_pixel_to_height(px){
 function ucfirst(string){
 	return string.charAt(0).toUpperCase() + string.slice(1);
 	}
-function get_fimensions(){
+function get_dimensions(){
 	var theWidth, theHeight;
 	if (window.innerWidth) {
 		theWidth=window.innerWidth;

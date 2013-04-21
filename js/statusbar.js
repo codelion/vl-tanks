@@ -152,15 +152,15 @@ function mute_unmute_music(){
 		//enable sound
 		MUTE_MUSIC = false;
 		setCookie("mute_music", "0", 30);
-		try{
+		//try{
 			if(PLACE == 'game'){
-				audio_main = document.createElement('audio');
-				audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
-				audio_main.setAttribute('loop', 'loop');
+				//audio_main = document.createElement('audio');
+				var audio_main = document.getElementById("audio-main");
+				//audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
+				//audio_main.setAttribute('loop', 'loop');
 				audio_main.play();
 				}
-			}
-		catch(error){}
+			//}catch(error){}
 		}
 	draw_mute_music_button();
 	}

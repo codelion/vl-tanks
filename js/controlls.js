@@ -211,6 +211,7 @@ function on_mousedown(event){
 				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 			else
 				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
+			break;
 			}
 		}
 	//move tank
@@ -249,6 +250,7 @@ function on_mousedown_back(event){
 			window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 		else
 			BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
+		break;
 		}
 	}
 //mouse click release on background

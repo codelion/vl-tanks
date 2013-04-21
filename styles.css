@@ -141,6 +141,22 @@ a img {
 	left:10px;
 	visibility:hidden;
 	}
+#chat_box{
+	position:absolute;
+	border:1px solid #cdd1c7;
+	background-color:#ffffff;
+	padding:5px;
+	left:10px;
+	width:770px;
+	height:125px;
+	display: none;
+	overflow:scroll;
+	overflow-x:hidden;
+	font-size:11px;
+	}
+#chat_box div{
+	margin-bottom:3px;
+	}
 /*========== CLASSES =========================================================*/
 .alert{
 	padding:10px;

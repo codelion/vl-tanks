@@ -151,7 +151,6 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	var button_height = 81;
 	var gap = 10;
 	var letter_height = 8;
-	var letter_width = 9;
 	var selected_block_padding=0;
 	
 	maps_positions = [];
@@ -208,12 +207,14 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			}
 			
 		//name
-		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
 		if(level - 1==i)
 			canvas_this.fillStyle = "#c10000";
 		else
 			canvas_this.fillStyle = "#196119";
 		canvas_this.font = "bold 14px Helvetica";
+		var letters_width = canvas_this.measureText(MAPS[i].name).width;
+		var padding_left = Math.round((button_width-letters_width)/2);
+		if(padding_left<0) padding_left=0;
 		canvas_this.fillText(MAPS[i].name, 15+i*(button_width+gap)+padding_left, top_height+1+button_height+gap+10);
 		
 		if(can_select_map==true){

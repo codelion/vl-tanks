@@ -1,21 +1,11 @@
-boost in multi animation	
-text
-	scroll text in lobby, below list
-	ingame chat by color of team, system - grey
-	double kill, tripple kill, mega kill
 SYNC
-	aoe bombs sync
-	wrong team
-		wrong team nick colors
-		respawn wrong place
-	soldiers
-		do not attack and stop
-		on minis reach end, kill it
-	if host dc .. check it again
-	invivisbility do not work
+	wrong team respawn place
 IDEAS
+	new units
+		Drone: medium hp, medium armor, high dps, but extremely low range. Skills: blink, glue, steal essence.
+		sieger - explosive bullets/dig+range+armor/range
+		vampire - steal energy, % of dmg is returned as hp
 	truck -> APC instead or LAV?
-	sieger - explosive bullets/dig+range+armor/range	
 	Helium3
 		base, mines generates, spawn takes, on 0 - team dies.
 		H3 mines give your base more energy and your towers more attacking power. 
@@ -27,4 +17,13 @@ IDEAS
 			5. FUSION - increases energy accrual
 			6. TORSION - teleports a targeted area to another place on the map
 		H3 should be deposited randomly across the map
+	new skills:
+		traps: root, slow
+		Phoenix - Upon death, you are revived with 1 HP.
+		block skills
+		Chain Lightning
+		medusa
+		Nanobots to bomber?
+		destruction
+		glue
 combine sprites

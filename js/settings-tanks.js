@@ -4,7 +4,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
 	life: [230, 13],				//[tank life in level 0, life increase in each level]
-	damage: [15, 0.75],	//15 dps		//[tank damage in level 0, damage increase in each level]
+	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
 	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
@@ -18,7 +18,7 @@ TYPES.push({
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
-		{name: 'Shield',	passive: true,		broadcast: 0}, 
+		{name: 'Shield',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: ['top1.png'],				//tank base images
@@ -39,13 +39,13 @@ TYPES.push({
 	range: 80,
 	scout: 100,
 	armor: [30, 0.3, 40],
-	speed: 30,
+	speed: 28,
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
-		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
-		{name: 'Damage',	passive: true,		broadcast: 0}, 
+		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
+		{name: 'Damage',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -62,17 +62,17 @@ TYPES.push({
 	type: 'tank',
 	description: ["Fast scout", "Repair for allies", "Light armor"],
 	life: [180, 11],
-	damage: [20, 1],	//20 dps
+	damage: [18, 1.3],	//18 dps
 	range: 80,
 	scout: 100,
 	armor: [20, 0.3, 30],
-	speed: 32,
+	speed: 30,
 	attack_delay: 1,
 	turn_speed: 5,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
-		{name: 'Repair',	passive: false,		broadcast: 0}, 
-		{name: 'Boost',		passive: false,		broadcast: 1}, 
+		{name: 'Repair',		passive: false,		broadcast: 0}, 
+		{name: 'Boost',		passive: false,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: 'preview.png',
@@ -89,7 +89,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [150, 10],
-	damage: [15, 0.75],	//15 dps
+	damage: [15, 1.1],	//15 dps
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
@@ -97,8 +97,8 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Missile',	passive: false,		broadcast: 2}, 
-		{name: 'Mortar',	passive: false,		broadcast: 2}, 
+		{name: 'Missile',		passive: false,		broadcast: 2}, 
+		{name: 'Mortar',		passive: false,		broadcast: 2}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
@@ -120,11 +120,11 @@ TYPES.push({
 	range: 120,
 	scout: 100,
 	armor: [10, 0, 10],
-	speed: 25,
+	speed: 28,
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Strike',	passive: false,		broadcast: 2}, 
+		{name: 'Strike',		passive: false,		broadcast: 2}, 
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
@@ -143,17 +143,17 @@ TYPES.push({
 	name: 'Miner',
 	type: 'tank',
 	description: ["Lands mines", "Light armor", "Low damage", "Very weak agains air units"],
-	life: [170, 11],
-	damage: [10, 0.5],	//10 dps
+	life: [180, 11],
+	damage: [15, 1],	//15 dps
 	range: 80,
 	scout: 100,
 	armor: [20, 0.3, 30],
-	speed: 30,
+	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
 		{name: 'Mine',		passive: false,		broadcast: 1}, 
-		{name: 'Explode',	passive: false,		broadcast: 1}, 
+		{name: 'Explode',		passive: false,		broadcast: 1}, 
 		{name: 'SAM',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
@@ -170,12 +170,12 @@ TYPES.push({
 	name: 'Tech',
 	type: 'tank',
 	description: ["Can send virus to deactivate enemy", "Light armor", "Low damage"],
-	life: [160, 10],
-	damage: [15, 0.75],	//15 dps
+	life: [150, 10],
+	damage: [15, 1.1],	//15 dps
 	range: 80,
 	scout: 100,
 	armor: [20, 0.3, 30],	
-	speed: 30,
+	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
@@ -198,11 +198,11 @@ TYPES.push({
 	type: 'tank',
 	description: ["Uses many soldiers for attack", "Very low damage"],
 	life: [150, 10],
-	damage: [10, 0.5],	//10 dps
+	damage: [15, 1],	//15 dps
 	range: 80,
 	scout: 100,
 	armor: [10, 0, 10],
-	speed: 30,
+	speed: 25,
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
@@ -225,7 +225,7 @@ TYPES.push({
 	type: 'tank',
 	description: ["Missiles", "Light armor", "Strong against all"],
 	life: [180, 11],
-	damage: [20, 1],	//20 dps
+	damage: [20, 1.3],	//20 dps
 	range: 100,
 	scout: 120,
 	armor: [20, 0.3, 30],	
@@ -237,7 +237,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
-		{name: 'Defence',	passive: true,		broadcast: 0}, 
+		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	icon_top: [],
@@ -254,8 +254,8 @@ TYPES.push({
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
 	life: [150, 10],
-	damage: [15, 0.75],	//15 dps
-	range: 80,
+	damage: [15, 1.1],	//15 dps
+	range: 90,
 	scout: 120,
 	armor: [10, 0, 10],
 	speed: 35,
@@ -265,7 +265,7 @@ TYPES.push({
 	no_collisions: 1,
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
-		{name: 'AA bomb',	passive: false,		broadcast: 2}, 
+		{name: 'AA bomb',		passive: false,		broadcast: 2}, 
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
