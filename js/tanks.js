@@ -1370,13 +1370,13 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 	//default coordinates
 	if(x==undefined && y==undefined && angle==undefined){
 		if(team=='B'){	//blue top
-			x = round(WIDTH_SCROLL*5.5/10);
+			x = round(APP_SIZE_CACHE[0]*5.5/10);
 			x = x + get_team_tanks_count(team)*space;
 			y = 20;
 			angle = 180;
 			}
 		else{		//red bottom 
-			x = WIDTH_SCROLL*4/10;
+			x = round(APP_SIZE_CACHE[0]*4/10);
 			x = x - get_team_tanks_count(team)*space;
 			y = HEIGHT_MAP-20-TYPES[type].size[1];
 			angle = 0;

@@ -59,12 +59,12 @@ function draw_main(){
 				if(TANKS[i].death_respan - Date.now() < 0){
 					delete TANKS[i].death_respan;
 					if(TANKS[i].team == 'B'){	//top
-						TANKS[i].x = round(WIDTH_SCROLL*2/3);
+						TANKS[i].x = round(APP_SIZE_CACHE[0]*2/3);
 						TANKS[i].y = 20;
 						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
 					else{	//bottom
-						TANKS[i].x = round(WIDTH_SCROLL/3);
+						TANKS[i].x = round(APP_SIZE_CACHE[0]/3);
 						TANKS[i].y = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
 						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
 						}
