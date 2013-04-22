@@ -51,7 +51,7 @@ TYPES.push({
 	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
 	life: [200, 12],
 	damage: [30, 1.5],		//30 dps
-	range: 80,			damage: [3000, 1.5],
+	range: 80,
 	scout: 100,
 	armor: [30, 0.3, 40],
 	speed: 28,
