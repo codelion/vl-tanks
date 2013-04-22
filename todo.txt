@@ -1,7 +1,6 @@
-SYNC
-	wrong team respawn place
 IDEAS
 	new units
+		sniper
 		Drone: medium hp, medium armor, high dps, but extremely low range. Skills: blink, glue, steal essence.
 		sieger - explosive bullets/dig+range+armor/range
 		vampire - steal energy, % of dmg is returned as hp
@@ -9,13 +8,6 @@ IDEAS
 	Helium3
 		base, mines generates, spawn takes, on 0 - team dies.
 		H3 mines give your base more energy and your towers more attacking power. 
-		Base energy. you can either upgrade base specials or use them. 
-			1. MIRV - drops bombs on multiple sited targets, including towers
-			2. SPAWN - speeds up spawn time. each upgrade brings faster respawn
-			3. DROP - drops soldiers deep into enemy territory
-			4. SAT - opens up a portion of the enemy map for a limited time.
-			5. FUSION - increases energy accrual
-			6. TORSION - teleports a targeted area to another place on the map
 		H3 should be deposited randomly across the map
 	new skills:
 		traps: root, slow

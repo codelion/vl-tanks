@@ -413,6 +413,7 @@ function draw_final_score(live, lost_team){
 	var top_margin = 60;
 	var letter_height = 9;
 	var text_y = 70;
+	var flag_space = (button_height-flag_height)/2;
 	
 	//find canvas
 	if(live==true)
@@ -483,11 +484,11 @@ function draw_final_score(live, lost_team){
 		//title
 		if(lost_team=='R'){
 			canvas_backround.fillStyle = "#3c81ff";
-			var tex = "Team Blue won the game";
+			var tex = "United States won the game";
 			}
 		else if(lost_team=='B'){
 			canvas_backround.fillStyle = "#9c0309";
-			var tex = "Team Red won the game";
+			var tex = "Russia won the game";
 			}
 		else if(lost_team === false){
 			canvas_backround.fillStyle = "#9c0309";
@@ -551,6 +552,19 @@ function draw_final_score(live, lost_team){
 			//#
 			canvas.fillStyle = "#6b6b6e";
 			canvas.fillText(j, Math.round((WIDTH_APP-button_width)/2)+10, text_y);
+			
+			//flag
+			flag_index = 1;
+			for(var c in COUNTRIES){
+				if(TANKS[i].team == COUNTRIES[c].color)
+					flag_index = c;	
+				}
+			var flag = new Image();
+			flag.src = '../img/flags.png';
+			canvas.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, 
+				Math.round((WIDTH_SCROLL-button_width)/2)+30, 
+				top_margin+(button_height+buttons_gap)*j+flag_space, 
+				flag_width, flag_height);
 	
 			//name
 			canvas.fillStyle = "#000000";
@@ -562,7 +576,7 @@ function draw_final_score(live, lost_team){
 				if(ROOM.host == TANKS[i].name)
 					name_tmp = name_tmp+"*";
 				}
-			canvas.fillText(name_tmp, Math.round((WIDTH_APP-button_width)/2)+40, text_y);
+			canvas.fillText(name_tmp, Math.round((WIDTH_APP-button_width)/2)+50, text_y);
 			
 			//type
 			canvas.fillStyle = "#000000";
@@ -702,7 +716,7 @@ function draw_tank_select_screen(selected_tank){
 							return false;
 							}
 						else{
-							register_tank_action('change_tank', opened_room_id, name, index);
+							register_tank_action('change_tank', opened_room_id, name, index, false);
 							return false;
 							}
 						}
@@ -885,7 +899,7 @@ function update_preload(images_loaded){
 	}
 //shows chat lines
 function show_chat(){
-	if(PLACE == 'room') return false;
+	if(PLACE == 'room' || PLACE == 'rooms') return false;
 	var gap = 20;
 	var bottom = HEIGHT_APP - INFO_HEIGHT - STATUS_HEIGHT - 10;
 

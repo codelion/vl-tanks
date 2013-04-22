@@ -55,7 +55,7 @@ function Rage(TANK, descrition_only, settings_only, ai){
 		name: 'damage',
 		power: power_damage,
 		lifetime: Date.now()+duration,
-		circle: '#c10000',
+		circle: '#ffff00',
 		});
 	
 	//register stop function	
@@ -107,7 +107,7 @@ function Blitzkrieg(TANK, descrition_only, settings_only, ai){
 		name: 'damage',
 		power: power_damage,
 		lifetime: Date.now()+duration,
-		circle: '#c10000',
+		circle: '#ffff00',
 		});
 	TANK.armor = power_armor;
 	
@@ -144,7 +144,7 @@ function Frenzy(TANK, descrition_only, settings_only, ai){
 		name: 'damage',
 		power: power,
 		lifetime: Date.now()+duration,
-		circle: '#196119',
+		circle: '#c10000',
 		});
 	
 	return reuse;
@@ -258,7 +258,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 				name: 'damage',
 				power: power,
 				lifetime: Date.now()+duration,
-				circle: '#8fc74c',
+				circle: '#ffff00',
 				});
 			}
 		else{
@@ -412,6 +412,14 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	TANK.speed = round(TANK.speed * power_speed);
 	delete TANK.target_shoot_lock;
 	
+	//register stop function	
+	var tmp = new Array();
+	tmp['function'] = "Camouflage_stop";
+	tmp['duration'] = duration;
+	tmp['type'] = 'ON_END';
+	tmp['tank'] = TANK;
+	timed_functions.push(tmp);
+	
 	//remove all bullets from it, same for his own bullets
 	for (b = 0; b < BULLETS.length; b++){
 		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
@@ -421,14 +429,6 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 			BULLETS.splice(b, 1); b--;
 			}
 		}
-	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Camouflage_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
 	
 	return reuse;
 	}
@@ -590,6 +590,7 @@ function check_mines(tank_id){
 			if(TYPES[TANKS[i].type].type != 'tank') continue;	//must be tank
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
+			if(game_mode == 1 && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
 			var size = TYPES[TANKS[i].type].size[1];
 			if(TANKS[i].x+size > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
 				if(TANKS[i].y+size > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){

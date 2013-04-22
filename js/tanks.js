@@ -63,13 +63,13 @@ function draw_tank(tank){
 				tmp_object.lineWidth = 3;
 				tmp_object.strokeStyle = "#000000";
 				tmp_object.stroke();
-				radius_extra = radius_extra + 3;
+				radius_extra = radius_extra + 5;
 				}
 		
 			//draw stun
 			if(tank.stun != undefined){
 				tmp_object.beginPath();
-				radius = tank_size/2 + radius_extra;
+				radius = tank_size/2;
 				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 1;
 				tmp_object.fillStyle = "#545454";
@@ -123,7 +123,7 @@ function draw_tank(tank){
 					tmp_object.lineWidth = 3;
 					tmp_object.strokeStyle = tank.buffs[i].circle;
 					tmp_object.stroke();
-					radius_extra = radius_extra + 3;
+					radius_extra = radius_extra + 5;
 					}	
 				}
 
@@ -135,7 +135,7 @@ function draw_tank(tank){
 				tmp_object.lineWidth = 3;
 				tmp_object.strokeStyle = "#d9d900";
 				tmp_object.stroke();
-				radius_extra = radius_extra + 3;
+				radius_extra = radius_extra + 5;
 				}
 			
 			//save to cache
@@ -201,12 +201,14 @@ function add_player_name(tank){
 	if(TYPES[tank.type].type != 'tank') return false;
 	var xx = round(tank.x+map_offset[0]);
 	var yy = round(tank.y+map_offset[1]);
-	var player_name = ""+tank.name+" "+tank.level+"";
-	player_name = player_name.substring(0, 15);
+	var name_padding = 20;
+	var player_name = tank.name.substring(0, 10);
+	player_name = player_name+" "+tank.level;
+	
 	
 	if(tank.cache_name != undefined && tank.cache_name.level == tank.level){
 		//read from cache
-		canvas_main.drawImage(tank.cache_name.object, xx, yy-25);	
+		canvas_main.drawImage(tank.cache_name.object, xx-name_padding, yy-25);	
 		}
 	else{	
 		//create tmp
@@ -215,17 +217,26 @@ function add_player_name(tank){
 		tmp_canvas.height = 100;
 		var tmp_object = tmp_canvas.getContext("2d");
 	
-		//add data
-		if(tank.team=='B')		tmp_object.fillStyle = "#0000ff";
-		else if(tank.team=='R')		tmp_object.fillStyle = "#ffff00";	//#b12525 ugly
-		else if(tank.team=='G')		tmp_object.fillStyle = "#196119";
-		else if(tank.team=='Y')		tmp_object.fillStyle = "#ffff00";
-		else 					tmp_object.fillStyle = "#ffffff";
+		//find flag
+		var flag_index = 0;
+		for(var c in COUNTRIES){
+			if(tank.team == COUNTRIES[c].color)
+				flag_index = c;	
+			}
+				
+		//flag
+		var flag_gap = 4;
+		var total_width = flag_width + flag_gap + tmp_object.measureText(player_name).width;
+		var name_pos_x = round(TYPES[tank.type].size[1]/2 + name_padding - total_width/2);
+		if(name_pos_x < 0) name_pos_x = 0;
+		var flag = new Image();
+		flag.src = '../img/flags.png';
+		tmp_object.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, name_pos_x, 4, flag_width, flag_height);
 		
+		//name
+		tmp_object.fillStyle = "#000000";
 		tmp_object.font = "normal 9px Verdana";
-		var name_padding = round((TYPES[tank.type].size[1] - tmp_object.measureText(player_name).width )/2)
-		if(name_padding<0) name_padding = 0;
-		tmp_object.fillText(player_name, 0+name_padding, 12);
+		tmp_object.fillText(player_name, name_pos_x+flag_width+flag_gap, 12);
 		
 		//save to cache
 		tank.cache_name = [];
@@ -233,7 +244,7 @@ function add_player_name(tank){
 		tank.cache_name.level = tank.level;
 		
 		//show
-		canvas_main.drawImage(tmp_canvas, xx, yy-25);
+		canvas_main.drawImage(tmp_canvas, xx-name_padding, yy-25);
 		}
 	}
 //controlls bullet
@@ -527,8 +538,8 @@ function check_collisions(xx, yy, TANK){
 
 	//other tanks
 	if(TYPES[TANK.type].types != 'tower'){
-		if(TANK.use_AI == true) return false;
 		for (i in TANKS){
+			if(TANK.use_AI == true && TANK.team == TANKS[i].team) continue;
 			if(TANKS[i].id == TANK.id) continue;			//same tank
 			if(TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
 			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
@@ -1200,7 +1211,7 @@ function choose_and_register_tanks(ROOM){
 		for(var p in ROOM.players){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 			//register
-			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type);
+			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
 			}
 		}
 	else if(ROOM.settings[0]=='mirror'){
@@ -1212,7 +1223,7 @@ function choose_and_register_tanks(ROOM){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
 			selected_types.push(random_type);
 			//register
-			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type);
+			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
 			}
 		//second team
 		for(var p in ROOM.players){
@@ -1220,7 +1231,7 @@ function choose_and_register_tanks(ROOM){
 			//get index
 			random_type_i = getRandomInt(0, selected_types.length-1);
 			//register
-			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i]);
+			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i], false);
 
 			//remove selected type
 			selected_types.splice(i, 1);  i--;

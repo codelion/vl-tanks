@@ -10,7 +10,8 @@ function draw_rooms_list(message){
 	y = 10;
 	gap = 10;
 	letter_padding_left = 15;
-	document.getElementById("chat_box").style.display = 'none';
+	document.getElementById("chat_box").style.display = 'block';
+	document.getElementById("chat_box").innerHTML = "";
 	
 	//background
 	canvas_backround.fillStyle = "#f0f9e4";
@@ -60,6 +61,7 @@ function draw_rooms_list(message){
 	canvas_backround.fillStyle = "#c50000";
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
+		document.getElementById("chat_box").style.display = 'none';
 		init_game(false);
 		});
 	//text
@@ -91,8 +93,8 @@ function draw_rooms_list(message){
 	x = 10;
 	y = 50;
 	width = WIDTH_APP-20;
-	height = 34;
-	gap = 10;
+	height = 22.5;
+	gap = 7;
 	letter_padding_left = 15;
 	for (var i=0; i<10; i++){
 		if(ROOMS[i] != undefined){
@@ -157,15 +159,15 @@ function draw_rooms_list(message){
 			
 			//title text
 			canvas_backround.fillStyle = "#3f3b30";
-			canvas_backround.font = "Bold 13px Helvetica";
+			canvas_backround.font = "Bold 12px Helvetica";
 			text = ROOMS[i].name;
-			canvas_backround.fillText(text, x+70+letter_padding_left,y+18);
+			canvas_backround.fillText(text, x+70+letter_padding_left,y+15);
 			
 			//more info text
 			canvas_backround.fillStyle = "#69a126";
-			canvas_backround.font = "Normal 10px Helvetica";
+			canvas_backround.font = "Normal 12px Helvetica";
 			text = ucfirst(ROOMS[i].settings[0])+", "+ROOMS[i].settings[2];
-			canvas_backround.fillText(text, x+70+letter_padding_left, y+20+10);
+			canvas_backround.fillText(text, x-70+10+width-130, y+15);
 			}
 		else{
 			//empty
@@ -195,7 +197,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		if(page_title_copy=='') page_title_copy = parent.document.title;
 		parent.document.title = page_title_copy;
 		}catch(err){}
-	
+	document.getElementById("chat_box").style.display = 'none';
 	//background
 	canvas_backround.fillStyle = "#f0f9e4";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
@@ -534,7 +536,7 @@ function draw_room(room_id){
 	letter_padding_left = 10;
 	x1 = 10;
 	x2 = 10+gap+width;
-	
+	flag_space = (height-flag_height)/2;
 	y_begin = y;
 	icon_width = height;
 	
@@ -548,16 +550,11 @@ function draw_room(room_id){
 			canvas_backround.fillStyle = "#8fc74c";
 			roundRect(canvas_backround, x1, y, width, height, 0, true);
 			
-			//icon block
-			canvas_backround.strokeStyle = "#000000";
-			canvas_backround.fillStyle = "#e2f4cd";
-			roundRect(canvas_backround, x1, y, icon_width, height, 0, true);
-			
-			//icon
-			text = "B";
-			canvas_backround.fillStyle = "#000000";
-			canvas_backround.font = "Bold 15px Arial";
-			canvas_backround.fillText(text, x1+letter_padding_left-5, y+(height+font_pixel_to_height(15))/2);
+			//flag
+			flag_index = 0;	
+			var flag = new Image();
+			flag.src = '../img/flags.png';
+			canvas_backround.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, x1+flag_space, y+flag_space, flag_width, flag_height);
 			
 			//name
 			text = players[i].name;
@@ -607,17 +604,11 @@ function draw_room(room_id){
 			canvas_backround.fillStyle = "#8fc74c";
 			roundRect(canvas_backround, x2, y, width, height, 0, true);
 			
-			//icon block
-			canvas_backround.strokeStyle = "#000000";
-			canvas_backround.fillStyle = "#e2f4cd";
-			roundRect(canvas_backround, x2, y, icon_width, height, 0, true);
-			
-			//icon
-			text = "R";
-			canvas_backround.fillStyle = "#000000";
-			canvas_backround.font = "Bold 15px Arial";
-			canvas_backround.fillText(text, x2+letter_padding_left-5, y+(height+font_pixel_to_height(15))/2);
-
+			//flag
+			flag_index = 1;	
+			var flag = new Image();
+			flag.src = '../img/flags.png';
+			canvas_backround.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, x2+flag_space, y+flag_space, flag_width, flag_height);
 			
 			//name
 			text = players[i].name;

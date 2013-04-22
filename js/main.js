@@ -189,6 +189,7 @@ function add_first_screen_elements(){
 		}
 	name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
 	name = name[0].toUpperCase() + name.slice(1);
+	name = name.substring(0, 10);
 	
 	counter_tmp = getCookie("start_count");
 	if(counter_tmp != ''){
@@ -234,6 +235,7 @@ function add_first_screen_elements(){
 					name = name_tmp;
 					name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
 					name = name[0].toUpperCase() + name.slice(1);
+					name = name.substring(0, 10);
 					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 					setCookie("player_name", name, 30);
 					}
@@ -273,6 +275,7 @@ function preload_all_files(){
 		'../img/statusbar.png',
 		'../img/level.png',
 		'../img/logo-small.png',
+		'../img/flags.png',
 		'../img/map/mine.png',
 		];
 	audio_to_preload = [
@@ -389,7 +392,7 @@ function init_action(map_nr, my_team){
 		if(enemy_team == my_team)
 			enemy_team = 'R';	
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			//random_type = 5;
+			random_type = 1;
 		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
@@ -574,8 +577,13 @@ function starting_game_timer_handler(){
 		clearInterval(start_game_timer_id);
 		if(game_mode == 1)
 			init_action(level, 'R');
-		else
-			register_tank_action('start_game', opened_room_id);
+		else{
+			ROOM = get_room_by_id(opened_room_id);
+			if(ROOM.host == name){
+				ROOM = get_room_by_id(opened_room_id);
+				register_tank_action('start_game', opened_room_id, false, ROOM.players);
+				}
+			}
 		}
 	}
 //preloading files	
@@ -644,7 +652,7 @@ function chat(text, author, team, shift){
 	CHAT_LINES.push(new_chat);
 	if(CHAT_LINES.length > 17)
 		CHAT_LINES.splice(0,1);	//remove first
-	if(PLACE == 'room')
+	if(PLACE == 'room' || PLACE == 'rooms')
 		update_scrolling_chat(new_chat);
 	}
 //controlls chat lines

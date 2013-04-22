@@ -542,7 +542,7 @@ function draw_counter_tank_selection(selected_tank){
 				if(game_mode == 2 && MY_TANK.dead == 1){
 					ROOM = get_room_by_id(opened_room_id);
 					if(ROOM.settings[0]=='counter'){
-						register_tank_action('change_tank', opened_room_id, name, index);
+						register_tank_action('change_tank', opened_room_id, name, index, true);
 						return true;
 						}
 					else

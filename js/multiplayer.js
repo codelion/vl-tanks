@@ -310,6 +310,13 @@ function get_packet(fromClient, message){
 		}
 	else if(type == 'join_room'){	//player joining room
 		//DATA = [room_id, player_name]
+		if(PLACE != 'room'){ //game started
+			if(DATA[1] == MY_TANK.name){	//if me
+				room_id_to_join = -1;
+				draw_rooms_list();
+				}
+			return false;
+			}	
 		var ROOM = get_room_by_id(DATA[0]);
 		if(ROOM != false){
 			//find team
@@ -334,6 +341,7 @@ function get_packet(fromClient, message){
 		//DATA = [room_id, player_name]
 		if(PLACE != 'room') return false;
 		if(DATA[0] != opened_room_id) return false;
+		if(PLACE != 'room') return false; //game started
 		var ROOM = get_room_by_id(DATA[0]);
 		if(ROOM != false){
 			//find team
@@ -385,7 +393,7 @@ function get_packet(fromClient, message){
 			}
 		}
 	else if(type == 'change_tank'){		//change map in selecting screen
-		//DATA = room_id, tank_index, player_name]
+		//DATA = room_id, tank_index, player_name, in_game]
 		if(PLACE=="select"){
 			var ROOM = get_room_by_id(DATA[0]);
 			if(ROOM != false){
@@ -401,7 +409,7 @@ function get_packet(fromClient, message){
 				draw_tank_select_screen();
 				}
 			}
-		else if(PLACE=="game"){
+		else if(PLACE=="game" && DATA[3] == true){
 			var ROOM = get_room_by_id(DATA[0]);
 			if(ROOM != false){
 				//update players
@@ -447,9 +455,21 @@ function get_packet(fromClient, message){
 			}
 		}
 	else if(type == 'start_game'){	//start game
-		//DATA = game_id
-		if(PLACE=="select" && opened_room_id==DATA){
-			ROOM = get_room_by_id(DATA);
+		//DATA = game_id, players_data
+		if(PLACE=="select" && opened_room_id==DATA[0]){
+			ROOM = get_room_by_id(DATA[0]);
+			var players_data = DATA[1];
+			//sync players
+			for(var p in players_data){
+				for(var i in ROOM.players){
+					if(ROOM.players[i].name == players_data[p].name){
+						ROOM.players[i].team = players_data[p].team;
+						ROOM.players[i].tank = players_data[p].tank; 
+						break;
+						}
+					}
+				}
+			
 			//find level
 			current_level = 1;
 			for(var m in MAPS){
@@ -734,15 +754,15 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 	else if(action=='prepare_game')
 		send_packet('prepare_game', [room_id, player]);
 	else if(action=='start_game')
-		send_packet('start_game', room_id);
-	else if(action=='change_tank')
-		send_packet('change_tank', [room_id, data, player]);
+		send_packet('start_game', [room_id, data]);
 	else if(action=='kill')
 		send_packet('tank_kill', [room_id, player, data]);
 	else if(action=='skill_advanced')
 		send_packet('skill_advanced', [room_id, player, data]);
 	else if(action=='level_up')
 		send_packet('level_up', [room_id, player, data]);
+	else if(action=='change_tank')
+		send_packet('change_tank', [room_id, data, player, data2]);
 	else if(action=='leave_room'){
 		for(var i=0; i < ROOMS.length; i++){
 			if(ROOMS[i].id == room_id){
