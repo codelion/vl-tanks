@@ -493,7 +493,7 @@ function draw_tank_move(mouseX, mouseY){
 			if(MUTE_FX==false){
 				try{
 					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXP);
+					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
 					audio_finish.play();
 					}
 				catch(error){}
@@ -871,7 +871,7 @@ function shoot_sound(TANK){
 	if(TYPES[TANK.type].fire_sound == undefined) return false;
 	try{
 		var audio_fire = document.createElement('audio');
-		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound+SOUND_EXP);
+		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound+SOUND_EXT);
 		audio_fire.play();
 		}
 	catch(error){}
@@ -893,7 +893,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 	if(TANK_TO.id == MY_TANK.id && MUTE_FX==false){
 		try{
 			var audio_fire = document.createElement('audio');
-			audio_fire.setAttribute('src', '../sounds/metal'+SOUND_EXP);
+			audio_fire.setAttribute('src', '../sounds/metal'+SOUND_EXT);
 			audio_fire.play();
 			}
 		catch(error){}

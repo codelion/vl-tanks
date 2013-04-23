@@ -30,7 +30,7 @@ function init_game(first_time){
 	
 	//check sound support
 	if(isIE()==true)
-		SOUND_EXP = '.mp3';
+		SOUND_EXT = '.mp3';
 	
 	//logo backround color
 	canvas_backround.fillStyle = "#676767";
@@ -40,31 +40,27 @@ function init_game(first_time){
 	canvas_backround.font = "Bold 70px Arial";
 	canvas_backround.strokeStyle = '#ffffff';
 	canvas_backround.strokeText(text, 160, 340);
-	var img = new Image();
-	img.src = '../img/logo.png';
+	
+	//button on logo
 	register_button((WIDTH_APP-598)/2, 15, 600, 266, PLACE, function(){
 		if(MUTE_FX==false){
 			var audio_fire = document.createElement('audio');
-			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXP);
+			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXT);
 			audio_fire.play();
 			}
 		});
-	img.onload = function(){	//wait till background is loaded
-		var left = (WIDTH_APP-598)/2;	
-		canvas_backround.drawImage(img, left, 15);
-		if(first_time==true){
-			preload_all_files();
-			if(chat_interval_id==undefined)
-				chat_interval_id = setInterval(controll_chat, 500);
-			}
-		if(preloaded==true)
-			add_first_screen_elements();
-		
+			
+	if(first_time==true){
+		preload_all_files();
+		if(chat_interval_id==undefined)
+			chat_interval_id = setInterval(controll_chat, 500);
 		}
 	}
 //show intro
 function intro(force){
 	PLACE = 'intro';
+	var intro_w = 800;
+	var intro_h = 500;
 	DATA = [
 		{image: '1.jpg', text: ["No more oil left on Earth..."],},
 		{image: '2.jpg', text: ["But but researchers found huge amount of non-radioactive isotope",  "helium on the moon..."],},
@@ -78,12 +74,10 @@ function intro(force){
 		add_first_screen_elements();
 		return false;
 		}
-	
 	//draw
-	var img = new Image();
-	img.src = '../img/intro/'+DATA[intro_page].image;
-	img.onload = function(){	//wait till img is loaded
-		canvas_backround.drawImage(img, 0, 0);
+	IMAGES_INRO.src = '../img/intro.jpg';
+	IMAGES_INRO.onload = function(){
+		canvas_backround.drawImage(IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 		//draw text
 		var text = DATA[intro_page].text[0];
 		canvas_backround.font = "Bold 21px Arial";
@@ -177,160 +171,6 @@ function check_canvas_sizes(){
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 	document.getElementById("chat_box").style.top = (HEIGHT_APP-175)+"px";
 	}
-var menu_pressed = false;
-function add_first_screen_elements(){
-	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
-	
-	name_tmp = getCookie("name");
-	if(name_tmp != ''){
-		name = name_tmp;
-		if(DEBUG==true)
-			name = name_tmp+Math.floor(Math.random()*99);
-		}
-	name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
-	name = name[0].toUpperCase() + name.slice(1);
-	name = name.substring(0, 10);
-	
-	counter_tmp = getCookie("start_count");
-	if(counter_tmp != ''){
-		START_GAME_COUNT_SINGLE = counter_tmp;
-		}
-	if(MUTE_MUSIC==false && audio_main != undefined)
-		audio_main.pause();
-	
-	draw_status_bar();
-	PLACE == 'init';
-	
-	for (i in settings_positions){
-		//register menu buttons
-		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'init', function(xx, yy, extra){
-			if(menu_pressed == true) return false;
-			menu_pressed = true;
-			if(extra==0){
-				// single player
-				game_mode = 1;
-				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
-				draw_tank_select_screen();
-				}
-			else if(extra==1){
-				room_id_to_join = -1;
-				//multi player
-				if(socket_live==false)
-					connect_server();
-				draw_rooms_list();
-				}
-			else if(extra==2){
-				//settings
-				add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
-				PLACE = 'settings';
-				}
-			}, i);
-		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'settings', function(xx, yy, extra){
-			if(menu_pressed == true) return false;
-			menu_pressed = true;
-			if(extra==0){
-				//edit name
-				var name_tmp = prompt("Please enter your name", name);
-				if(name_tmp != null){
-					name = name_tmp;
-					name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
-					name = name[0].toUpperCase() + name.slice(1);
-					name = name.substring(0, 10);
-					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
-					setCookie("name", name, 30);
-					}
-				}
-			else if(extra==1){
-				//edit start game couter
-				var value_tmp = prompt("Please enter number 1-30", START_GAME_COUNT_SINGLE);
-				if(value_tmp != null){
-					START_GAME_COUNT_SINGLE = parseInt(value_tmp);
-					if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
-					if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
-					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
-					setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
-					}
-				}
-			else if(extra==2){
-				//back to first screen
-				add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
-				PLACE = 'init';
-				}
-			}, i);
-		}
-	}
-/*var IMAGE_BACK = new Image();
-var IMAGE_LOGO = new Image();
-var IMAGE_MOON = new Image();
-var IMAGES_ALL = new Image();
-var IMAGES_TANKS = new Image();
-var IMAGES_BULLETS = new Image();
-var IMAGES_INRO = new Image();
-var IMAGES_ELEMENTS = new Image();*/
-function preload_all_files(){
-	images_to_preload = [
-		//general
-		'../img/background.jpg',
-		'../img/map/moon.jpg',
-		'../img/favicon.png',
-		'../img/lock.png',
-		'../img/logo.png',
-		'../img/repair.png',
-		'../img/target.png',
-		'../img/button.png',
-		'../img/explosion.png',
-		'../img/explosion_big.png',
-		'../img/statusbar.png',
-		'../img/level.png',
-		'../img/logo-small.png',
-		'../img/flags.png',
-		'../img/map/mine.png',
-		];
-	audio_to_preload = [
-		'../sounds/click'+SOUND_EXP,
-		'../sounds/main'+SOUND_EXP,
-		'../sounds/shoot'+SOUND_EXP,
-		'../sounds/metal'+SOUND_EXP,
-		];
-		
-	//calculate files count
-	preload_left = images_to_preload.length + audio_to_preload.length + BULLETS_TYPES.length + ELEMENTS.length;
-	for(i in TYPES){
-		preload_left = preload_left + 3;	
-		}
-	preload_total = preload_left;
-	
-	//start preloading
-	for(var i in images_to_preload){
-		preload(images_to_preload[i]);
-		}
-	for(var i in BULLETS_TYPES){
-		preload('../img/bullets/'+BULLETS_TYPES[i].file);
-		}
-	for(var i in ELEMENTS){
-		preload('../img/map/'+ELEMENTS[i].file);
-		}
-	for(var i in audio_to_preload){
-		preload(audio_to_preload[i], 'audio');
-		}
-	for(i in TYPES){
-		//preview
-		if(TYPES[i].preview != '')
-			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview);
-		else
-			update_preload(1);
-		//icon_top
-		if(TYPES[i].icon_top[0] != undefined)
-			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_top[0]);
-		else
-			update_preload(1);
-		//icon_base
-		if(TYPES[i].icon_base[0] != undefined)
-			preload('../img/tanks/'+TYPES[i].name+'/'+TYPES[i].icon_base[0]);
-		else
-			update_preload(1);
-		}
-	}
 //start game
 function init_action(map_nr, my_team){
 	if(PLACE=='game') return false; //already started
@@ -362,7 +202,7 @@ function init_action(map_nr, my_team){
 	//sound
 	if(MUTE_MUSIC==false){
 		audio_main = document.createElement('audio');
-		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXP);
+		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
 		audio_main.setAttribute('loop', 'loop');
 		try{
 			audio_main.play();
@@ -437,6 +277,77 @@ function init_action(map_nr, my_team){
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
+	}
+var images_src_n = 7;	//skip intro
+var IMAGE_BACK = new Image();
+var IMAGE_LOGO = new Image();
+var IMAGE_MOON = new Image();
+
+var IMAGES_ALL = new Image();
+var IMAGES_TANKS = new Image();
+var IMAGES_BULLETS = new Image();
+var IMAGES_ELEMENTS = new Image();
+var IMAGES_INRO = new Image();
+
+var IMAGES_SETTINGS = {
+	general: {},
+	tanks: {},
+	bullets: {
+		bullet: { x:0,	y:0,	w:6,	h:6 }, 
+		missle: { x:0,	y:50,	w:8,	h:23 }, 
+		airstrike: { x:0,	y:100,	w:38,	h:15 }, 
+		bomb: { x:0,	y:150,	w:12,	h:12 },
+		},
+	elements: {},
+	}
+	
+function preload_all_files(){
+	audio_to_preload = [
+		'../sounds/click'+SOUND_EXT,
+		'../sounds/main'+SOUND_EXT,
+		'../sounds/shoot'+SOUND_EXT,
+		'../sounds/metal'+SOUND_EXT,
+		];
+		
+	//calculate files count
+	preload_left = images_src_n + audio_to_preload.length;
+	preload_total = preload_left;
+	
+	//preload images
+	IMAGE_BACK.src = '../img/background.jpg';	IMAGE_BACK.onload = function(){ update_preload(1); }
+	IMAGE_LOGO.src = '../img/logo.png';	IMAGE_LOGO.onload = function(){ update_preload(1); }
+	IMAGE_MOON.src = '../img/moon.jpg';	IMAGE_MOON.onload = function(){ update_preload(1); }
+	IMAGES_ALL.src = '../img/images-all.png';	IMAGES_ALL.onload = function(){ update_preload(1); }
+	IMAGES_TANKS.src = '../img/tanks.png';	IMAGES_TANKS.onload = function(){ update_preload(1); }
+	IMAGES_BULLETS.src = '../img/bullets.png';	IMAGES_BULLETS.onload = function(){ update_preload(1); }
+	IMAGES_ELEMENTS.src = '../img/elements.png';	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
+	
+	//prelaod sound
+	for(var i in audio_to_preload){
+		preload(audio_to_preload[i], 'audio');
+		}
+	}
+//preloading files	
+function preload(file, type){
+	if(type=='image' || type==undefined){
+		var imageObj = new Image();
+		imageObj.src=file;
+		imageObj.onload = function(){
+			update_preload(1);
+			}
+		}
+	else if(type=="audio"){
+		try{
+			var audio_object = new Audio();
+			audio_object.addEventListener('canplaythrough', function(){update_preload(1);}, false);
+			audio_object.src = file;
+			}
+		catch(err){
+			update_preload(1);
+			}
+		}	
+	else
+		alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');
 	}
 //get unique id
 function get_unique_id(){
@@ -592,34 +503,6 @@ function starting_game_timer_handler(){
 				}
 			}
 		}
-	}
-//preloading files	
-function preload(file, type){
-	if(type==undefined)
-		type = 'image';
-	if(file==undefined){
-		update_preload(1);
-		return false;
-		}
-	if(type=='image'){
-		var imageObj = new Image();
-		imageObj.src=file;
-		imageObj.onload = function(){
-			update_preload(1);
-			}
-		}
-	else if(type=="audio"){
-		try{
-			var audio_object = new Audio();
-			audio_object.addEventListener('canplaythrough', function(){update_preload(1);}, false);
-			audio_object.src = file;
-			}
-		catch(err){
-			update_preload(1);
-			}
-		}	
-	else
-		alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');
 	}
 //save chat data
 function chat(text, author, team, shift){

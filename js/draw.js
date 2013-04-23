@@ -253,6 +253,83 @@ function draw_main(){
 	if(render_mode == 'requestAnimationFrame')
 		requestAnimationFrame(draw_main);
 	}
+function add_first_screen_elements(){
+	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
+	
+	name_tmp = getCookie("name");
+	if(name_tmp != ''){
+		name = name_tmp;
+		if(DEBUG==true)
+			name = name_tmp+Math.floor(Math.random()*99);
+		}
+	name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+	name = name[0].toUpperCase() + name.slice(1);
+	name = name.substring(0, 10);
+	
+	counter_tmp = getCookie("start_count");
+	if(counter_tmp != ''){
+		START_GAME_COUNT_SINGLE = counter_tmp;
+		}
+	if(MUTE_MUSIC==false && audio_main != undefined)
+		audio_main.pause();
+	
+	draw_status_bar();
+	PLACE == 'init';
+	
+	for (i in settings_positions){
+		//register menu buttons
+		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'init', function(xx, yy, extra){
+			if(extra==0){
+				// single player
+				game_mode = 1;
+				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
+				draw_tank_select_screen();
+				}
+			else if(extra==1){
+				room_id_to_join = -1;
+				//multi player
+				if(socket_live==false)
+					connect_server();
+				draw_rooms_list();
+				}
+			else if(extra==2){
+				//settings
+				add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+				PLACE = 'settings';
+				}
+			}, i);
+		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'settings', function(xx, yy, extra){
+			if(extra==0){
+				//edit name
+				var name_tmp = prompt("Please enter your name", name);
+				if(name_tmp != null){
+					name = name_tmp;
+					name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+					name = name[0].toUpperCase() + name.slice(1);
+					name = name.substring(0, 10);
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+					setCookie("name", name, 30);
+					}
+				}
+			else if(extra==1){
+				//edit start game couter
+				var value_tmp = prompt("Please enter number 1-30", START_GAME_COUNT_SINGLE);
+				if(value_tmp != null){
+					START_GAME_COUNT_SINGLE = parseInt(value_tmp);
+					if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
+					if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
+					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+					setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
+					}
+				}
+			else if(extra==2){
+				//back to first screen
+				add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
+				PLACE = 'init';
+				}
+			}, i);
+		}
+	}
 var settings_positions = [];
 var last_active_tab = -1;
 var logo_visible = 1;
@@ -278,14 +355,8 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
 	//back image
-	var background_elem = get_element_by_name('background');
-	if(background_elem==false)
-		alert("ERROR: missing element 'background' config in draw_map().");
-	backround_width = background_elem.size[0];
-	backround_height = background_elem.size[1];
-	var img_texture = new Image();
-	img_texture.src = '../img/map/'+background_elem.file;	
-	
+	backround_width = 400;
+	backround_height = 400;
 	for(var i=0; i<Math.ceil((HEIGHT_APP-27)/backround_height); i++){ 
 		for(var j=0; j<Math.ceil(WIDTH_APP/backround_width); j++){
 			var xx = j*backround_width;
@@ -296,7 +367,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 				bwidth = WIDTH_APP-xx;
 			if(yy+bheight > HEIGHT_APP-27)
 				bheight = HEIGHT_APP-27-yy;
-			canvas_backround.drawImage(img_texture, 0, 0, backround_width, backround_height, xx, yy, bwidth, bheight);
+			canvas_backround.drawImage(IMAGE_MOON, 0, 0, backround_width, backround_height, xx, yy, bwidth, bheight);
 			}
 		}
 	
@@ -314,10 +385,8 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
 	
 	//logo
-	var img = new Image();
-	img.src = '../img/logo.png';
 	var left = (WIDTH_APP-598)/2;	
-	canvas_backround.drawImage(img, left, 15);
+	canvas_backround.drawImage(IMAGE_LOGO, left, 15);
 	
 	//intro text
 	canvas_backround.font = "Normal 18px Arial";
@@ -362,15 +431,12 @@ function draw_logo_tanks(left, top, change_logo){
 	var block_width = 600;
 	var block_height = 62;
 	//clear
-	var background_elem = get_element_by_name('background');
-	var backround_width = background_elem.size[0];
-	var backround_height = background_elem.size[1];
-	var img = new Image();	 
-	img.src = '../img/map/'+background_elem.file;
+	var backround_width = 400;
+	var backround_height = 400;
 	var btop = top-7;
-	canvas_backround.drawImage(img, 0, btop, backround_width, block_height, 0, btop, backround_width, block_height);
+	canvas_backround.drawImage(IMAGE_MOON, 0, btop, backround_width, block_height, 0, btop, backround_width, block_height);
 	if(left+block_width>backround_width)
-		canvas_backround.drawImage(img, 0, btop, backround_width, block_height, backround_width, btop, backround_width, block_height);
+		canvas_backround.drawImage(IMAGE_MOON, 0, btop, backround_width, block_height, backround_width, btop, backround_width, block_height);
 
 	if(change_logo==undefined){
 		if(logo_visible==0){
@@ -458,9 +524,7 @@ function draw_final_score(live, lost_team){
 		canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		
 		//background
-		var img = new Image();
-		img.src = '../img/background.jpg';
-		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
 		canvas_backround.strokeStyle = "#000000";	
 		canvas_backround.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -666,13 +730,8 @@ function draw_tank_select_screen(selected_tank){
 		}
 	
 	//background
-	if(last_selected == -1){
-		canvas_backround.fillStyle = "#f0f9e4";
-		canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-		img = new Image();
-		img.src = '../img/background.jpg';
-		canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
-		}
+	if(last_selected == -1)
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//show all possible tanks
 	j = 0;
@@ -845,9 +904,7 @@ function draw_timer_graph(){
 	graph_height=40;
 	
 	//background
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 15-2, red_line_y-2, graph_width+4, graph_height+4, 15-2, red_line_y-2, graph_width+4, graph_height+4);
+	canvas_backround.drawImage(IMAGE_BACK, 15-2, red_line_y-2, graph_width+4, graph_height+4, 15-2, red_line_y-2, graph_width+4, graph_height+4);
 	
 	//red block
 	canvas_backround.strokeStyle = "#c10000";
@@ -878,7 +935,7 @@ function update_preload(images_loaded){
 	canvas_backround.fillStyle = "#dbd9da";
 	roundRect(canvas_backround, 0, HEIGHT_APP-24, WIDTH_APP, 23, 0, true);
 	
-	if(preload_left==0 || preload_left < 3){
+	if(preload_left==0){
 		preloaded=true;
 		//add_first_screen_elements();
 		intro();
@@ -918,11 +975,6 @@ function show_chat(){
 		if(CHAT_LINES[i].shift==1 && PLACE == 'game' && CHAT_LINES[i].team == MY_TANK.team && CHAT_LINES[i].author !== false)
 			text = "[Team] "+text;
 			
-		//background
-		/*canvas.font = "normal 13px Helvetica";
-		canvas.fillStyle = "#dbd9da";
-		roundRect(canvas, 5, bottom-i*gap-13, text.length*7+10, 17, 3, true);*/
-		
 		//text color
 		if(CHAT_LINES[i].author===false)		canvas.fillStyle = "#222222";	//system chat
 		else if(CHAT_LINES[i].team == 'R')		canvas.fillStyle = "#8f0c12";	//team red

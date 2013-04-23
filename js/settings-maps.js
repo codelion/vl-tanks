@@ -1,11 +1,4 @@
 ELEMENTS.push({
-	name: 'background',
-	file: 'moon.jpg',	
-	size: [400, 400], 
-	alt_color: '#8d8d8d',	
-	collission: false,	
-	});
-ELEMENTS.push({
 	name: 'fence',
 	file: 'fence.png',
 	size: [100, 26],

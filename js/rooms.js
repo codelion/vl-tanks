@@ -14,11 +14,7 @@ function draw_rooms_list(message){
 	document.getElementById("chat_box").innerHTML = "";
 	
 	//background
-	canvas_backround.fillStyle = "#f0f9e4";
-	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//create button
 	width = 100;
@@ -199,11 +195,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		}catch(err){}
 	document.getElementById("chat_box").style.display = 'none';
 	//background
-	canvas_backround.fillStyle = "#f0f9e4";
-	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	game_name = name+"'s room";
 	button_width = 80;
@@ -413,11 +405,7 @@ function draw_room(room_id){
 		}
 	
 	//background
-	canvas_backround.fillStyle = "#f0f9e4";
-	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 	
 	//back button
 	width = 80;

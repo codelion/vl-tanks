@@ -23,39 +23,28 @@ function draw_map(map_only){
 		}
 	
 	//background
-	var backround_height;
-	var background_elem = get_element_by_name('background');
-	if(background_elem==false)
-		alert("ERROR: missing element 'background' config in draw_map().");
-	backround_width = background_elem.size[0];
-	backround_height = background_elem.size[1];
-	var img_texture = new Image();
-	img_texture.src = '../img/map/'+background_elem.file;
-	img_texture.onload = function(){	//on background load
-		for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
-			for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
-				var img_texture = new Image();
-				img_texture.src = '../img/map/'+background_elem.file;
-				canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
-				}
-			}
+	backround_width = 400;
+	backround_height = 400;
+	for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
+		for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++)
+			canvas_map.drawImage(IMAGE_MOON, 0+j*backround_width, 0+i*backround_height);
+		}
+	
+	//elements
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		x = MAPS[level-1].elements[e][1];
+		y = MAPS[level-1].elements[e][2];
+		if(element.size[0]<30)	x = x - round(element.size[0]/2);
+		if(element.size[1]<30)	y = y - round(element.size[1]/2);
+		max_w = element.size[0];
+		if(MAPS[level-1].elements[e][3]!=0)
+			max_w = MAPS[level-1].elements[e][3];
+		max_h = element.size[1];
+		if(MAPS[level-1].elements[e][4]!=0)
+			max_h = MAPS[level-1].elements[e][4];
 		
-		//elements
-		for(var e in MAPS[level-1].elements){
-			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-			x = MAPS[level-1].elements[e][1];
-			y = MAPS[level-1].elements[e][2];
-			if(element.size[0]<30)	x = x - round(element.size[0]/2);
-			if(element.size[1]<30)	y = y - round(element.size[1]/2);
-			max_w = element.size[0];
-			if(MAPS[level-1].elements[e][3]!=0)
-				max_w = MAPS[level-1].elements[e][3];
-			max_h = element.size[1];
-			if(MAPS[level-1].elements[e][4]!=0)
-				max_h = MAPS[level-1].elements[e][4];
-			
-			drawImage_preloaded(canvas_map, '../img/map/'+element.file, x, y, PLACE, max_w, max_h);
-			}
+		drawImage_preloaded(canvas_map, '../img/map/'+element.file, x, y, PLACE, max_w, max_h);
 		}
 	
 	if(map_only==false)
@@ -156,9 +145,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	maps_positions = [];
 	
 	//clear name ara
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
+	canvas_backround.drawImage(IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){
 		//background
