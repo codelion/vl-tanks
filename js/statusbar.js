@@ -31,10 +31,7 @@ function draw_status_bar(){
 function draw_mute_music_button(){
 	PADDING = 55;
 	
-	q_img = new Image();
-	q_img.src = '../img/button.png';
-	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
-	
+	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Music";
 	if(MUTE_MUSIC == true)
 		canvas_backround.fillStyle = "#8A8A8A";
@@ -49,10 +46,7 @@ function draw_mute_music_button(){
 function draw_mute_fx_button(){
 	PADDING = 108;
 	
-	q_img = new Image();
-	q_img.src = '../img/button.png';
-	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
-	
+	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Sound";
 	if(MUTE_FX == true)
 		canvas_backround.fillStyle = "#8A8A8A";
@@ -66,10 +60,8 @@ function draw_mute_fx_button(){
 //show quality button in statusbar
 function draw_quality_button(first_run){
 	PADDING = 161;
-	q_img = new Image();
-	q_img.src = '../img/button.png';
-	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
 	
+	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	quality_cookie = getCookie("quality");
 	if(quality_cookie != '')
 		QUALITY = quality_cookie;
@@ -105,9 +97,8 @@ function draw_quality_button(first_run){
 //quit button in statusbar
 function draw_quit_button(){
 	PADDING = 214;
-	quit_img = new Image();
-	quit_img.src = '../img/button.png';
-	canvas_backround.drawImage(quit_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
+	
+	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	q_text = "Quit";
 	canvas_backround.fillStyle = "#c10000";
 	canvas_backround.font = "Bold 11px Helvetica";
@@ -120,10 +111,7 @@ function draw_fs_button(){
 	if(PLACE != 'game' ) return false;
 	PADDING = 267;
 	
-	q_img = new Image();
-	q_img.src = '../img/button.png';
-	canvas_backround.drawImage(q_img, WIDTH_APP-PADDING, HEIGHT_APP-23);
-	
+	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Full Scr.";
 	canvas_backround.fillStyle = "#8A8A8A";
 	canvas_backround.font = "Normal 11px Arial";

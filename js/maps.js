@@ -43,8 +43,7 @@ function draw_map(map_only){
 		max_h = element.size[1];
 		if(MAPS[level-1].elements[e][4]!=0)
 			max_h = MAPS[level-1].elements[e][4];
-		
-		drawImage_preloaded(canvas_map, '../img/map/'+element.file, x, y, PLACE, max_w, max_h);
+		draw_image(canvas_map, element.name, x, y, max_w, max_h);
 		}
 	
 	if(map_only==false)

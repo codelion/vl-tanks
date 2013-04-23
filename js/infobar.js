@@ -6,38 +6,29 @@ function draw_infobar(){
 	canvas_backround.fillRect(0, status_y, WIDTH_APP, INFO_HEIGHT);
 	
 	//image
-	var img = new Image();
-	img.src = '../img/statusbar.png';
-	img.onload = function(){
-		var img = new Image();
-		img.src = '../img/statusbar.png';
-		canvas_backround.drawImage(img, status_x, status_y);
+	draw_image(canvas_backround, 'statusbar', status_x, status_y);
+	
+	//tank icon
+	var icon_x = status_x+140;
+	if(TYPES[MY_TANK.type].preview != false)
+		draw_image(canvas_backround, TYPES[MY_TANK.type].name, icon_x, status_y+37, 100, 100);
 		
-		//tank icon
-		var icon_x = status_x+140;
-		if(TYPES[MY_TANK.type].preview != undefined){
-			var img = new Image();
-			img.src = "../img/tanks/"+TYPES[MY_TANK.type].name+'/'+TYPES[MY_TANK.type].preview;
-			canvas_backround.drawImage(img, icon_x, status_y+37);
-			}
-			
-		//tank name
-		canvas_backround.fillStyle = "#a3ad16";
-		canvas_backround.font = "bold 10px Verdana";	
-		canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x-5, status_y+25);
-			
-		redraw_tank_stats();
+	//tank name
+	canvas_backround.fillStyle = "#a3ad16";
+	canvas_backround.font = "bold 10px Verdana";	
+	canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x-5, status_y+25);
 		
-		//abilities skills
-		draw_tank_abilities();
-		
-		for(var i=0; i<ABILITIES_POS.length; i++){
-			//register skill button
-			register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
-				do_ability(ABILITIES_POS[i].nr, MY_TANK);
-				}, i);
-			}	
-		}
+	redraw_tank_stats();
+	
+	//abilities skills
+	draw_tank_abilities();
+	
+	for(var i=0; i<ABILITIES_POS.length; i++){
+		//register skill button
+		register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
+			do_ability(ABILITIES_POS[i].nr, MY_TANK);
+			}, i);
+		}	
 	draw_status_bar();
 	}
 //redrwar tanks stats in status bar
@@ -57,9 +48,8 @@ function redraw_tank_stats(){
 		}
 	
 	//clear
-	var img = new Image();	
-	img.src = '../img/statusbar.png';
-	canvas_backround.drawImage(img, 245, 10, 330, 83, status_x+245, top_y-40+10, 330, 83);
+	canvas_backround.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general.statusbar.x+245, IMAGES_SETTINGS.general.statusbar.y+10, 330, 83, 
+		status_x+245, top_y-40+10, 330, 83); 
 	
 	//level
 	canvas_backround.fillStyle = "#182605";
@@ -182,9 +172,7 @@ function redraw_tank_stats(){
 		}
 	
 	//logo
-	var img = new Image();
-	img.src = '../img/logo-small.png';
-	canvas_backround.drawImage(img, status_x+490, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+95);
+	draw_image(canvas_backround, 'logo_small', status_x+490, HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+95);
 	
 	//life
 	life_x = status_x+315;
@@ -197,9 +185,8 @@ function redraw_tank_stats(){
 	//fill
 	var hp = round(MY_TANK.hp);
 	var hp_max = TYPES[MY_TANK.type].life[0]+TYPES[MY_TANK.type].life[1]*(MY_TANK.level-1);
-	var img = new Image();
-	img.src = '../img/level.png';
-	canvas_backround.drawImage(img, life_x, life_y, round(life_width*hp/hp_max), life_height);
+	draw_image(canvas_backround, 'level', life_x, life_y, round(life_width*hp/hp_max), life_height);
+		
 	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "normal 9px Verdana";
@@ -214,18 +201,15 @@ function draw_tank_abilities(){
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
 	
-	for (var i in TYPES[MY_TANK.type].abilities){
+	for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
 		//check if abilites not in use
 		if(MY_TANK.abilities_reuse[i] > Date.now() ) continue;
 		
 		//button
-		var img = new Image();
 		if(TYPES[MY_TANK.type].abilities[i].passive == false)	
-			image_src = '../img/skill-on.png';	//active
+			draw_image(canvas_backround, 'skill_on', status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 		else
-			image_src = '../img/skill-off.png';	//passive
-		img.src = image_src;
-		canvas_backround.drawImage(img, status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
+			draw_image(canvas_backround, 'skill_off', status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 			
 		//text
 		ability_text = TYPES[MY_TANK.type].abilities[i].name;
@@ -249,8 +233,8 @@ function draw_tank_abilities(){
 			}
 		}
 	//clear areas if less then 3 skills
-	for(j=i+1; j<3; j++){
-		drawImage_preloaded(canvas_backround, '../img/skill-off.png', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5, PLACE);
+	for(j=i; j<3; j++){
+		draw_image(canvas_backround, 'skill_off', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5);
 		}
 	}
 //draw tanks skills reuse animation
@@ -262,14 +246,12 @@ function draw_ability_reuse(object){
 	if(object != undefined){
 		var i = object.nr;
 		var ability_reuse = object.tank.abilities_reuse[i] - Date.now();
+		if(TYPES[MY_TANK.type].abilities[i] == undefined) return false;
 		//button
-		var img = new Image();
 		if(TYPES[MY_TANK.type].abilities[i].passive == false)	
-			image_src = '../img/skill-on.png';	//active
+			draw_image(canvas_backround, 'skill_on', status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 		else
-			image_src = '../img/skill-off.png';	//passive
-		img.src = image_src;
-		canvas_backround.drawImage(img, status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
+			draw_image(canvas_backround, 'skill_off', status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 		canvas_backround.fillStyle = "#1d2411";
 		
 		//if active
@@ -279,25 +261,21 @@ function draw_ability_reuse(object){
 			img_height = (SKILL_BUTTON) * ability_reuse / object.max + 5;
 			if(img_height > 65)
 				img_height = 65;	//error here
-			var img = new Image();
-			img.src = '../img/skill-on.png';
 			if(img_height < 6){
 				//available again
-				canvas_backround.drawImage(img, status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
+				draw_image(canvas_backround, 'skill_on', status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
 				}
 			else{
 				//reuse on
-				canvas_backround.fillStyle = "#4b6125";
-				img.src = '../img/skill-off.png';
-				canvas_backround.drawImage(img, 
-					0, 
-					0, 
+				canvas_backround.drawImage(IMAGES_GENERAL, 
+					IMAGES_SETTINGS.general.skill_off.x, IMAGES_SETTINGS.general.skill_off.y, 
 					SKILL_BUTTON+10, 
-					img_height,
+					img_height, 
 					status_x_tmp+i*(SKILL_BUTTON+gap)-5, 
 					status_y-5, 
 					SKILL_BUTTON+10, 
-					img_height);
+					img_height); 
+				canvas_backround.fillStyle = "#4b6125";
 				}
 			}
 	
@@ -506,9 +484,8 @@ function draw_counter_tank_selection(selected_tank){
 		
 	if(first_time == true){
 		//clear
-		var img = new Image();	
-		img.src = '../img/statusbar.png';
-		canvas_backround.drawImage(img, padding_left-10, padding_top-5, max_width, max_height, pos1-10, pos2-5, max_width, max_height);
+		canvas_backround.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general.statusbar.x+padding_left-10, IMAGES_SETTINGS.general.statusbar.y+padding_top-5, max_width, max_height, 
+			pos1-10, pos2-5, max_width, max_height);
 		}
 	
 	var j=0;
@@ -527,15 +504,8 @@ function draw_counter_tank_selection(selected_tank){
 			roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
 			
 			//logo
-			drawImage_preloaded(
-				canvas_backround, 
-				'../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, 
-				pos1+j*(msize+gap), 
-				pos2+row*(msize+gap), 
-				PLACE, msize, msize, back_color, 
-				pos1+j*(msize+gap)+2, 
-				pos2+2+row*(msize+gap), 
-				msize-4, msize-4);
+			canvas_backround.drawImage(IMAGES_TANKS, IMAGES_SETTINGS.tanks[TYPES[i].name].x, IMAGES_SETTINGS.tanks[TYPES[i].name].y, 90, 90, 
+				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), msize, msize); 
 			
 			//register button
 			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){

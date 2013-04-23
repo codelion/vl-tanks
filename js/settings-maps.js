@@ -1,13 +1,11 @@
 ELEMENTS.push({
 	name: 'fence',
-	file: 'fence.png',
 	size: [100, 26],
 	alt_color: '#4e4b44',	
 	collission: true,	
 	});
 ELEMENTS.push({
 	name: 'vfence',
-	file: 'vfence.png',
 	size: [26, 100], 
 	alt_color: '#4e4b44',	
 	collission: true,	

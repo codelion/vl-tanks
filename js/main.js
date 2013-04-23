@@ -55,6 +55,8 @@ function init_game(first_time){
 		if(chat_interval_id==undefined)
 			chat_interval_id = setInterval(controll_chat, 500);
 		}
+	if(preloaded==true)
+		add_first_screen_elements();
 	}
 //show intro
 function intro(force){
@@ -282,23 +284,57 @@ var images_src_n = 7;	//skip intro
 var IMAGE_BACK = new Image();
 var IMAGE_LOGO = new Image();
 var IMAGE_MOON = new Image();
-
-var IMAGES_ALL = new Image();
+//image groups
+var IMAGES_GENERAL = new Image();
 var IMAGES_TANKS = new Image();
 var IMAGES_BULLETS = new Image();
 var IMAGES_ELEMENTS = new Image();
 var IMAGES_INRO = new Image();
-
+//images positions
 var IMAGES_SETTINGS = {
-	general: {},
-	tanks: {},
-	bullets: {
-		bullet: { x:0,	y:0,	w:6,	h:6 }, 
-		missle: { x:0,	y:50,	w:8,	h:23 }, 
-		airstrike: { x:0,	y:100,	w:38,	h:15 }, 
-		bomb: { x:0,	y:150,	w:12,	h:12 },
+	general: {
+		target:	{ x:0,	y:0,	w:30,	h:30 },
+		repair:	{ x:50,	y:0,	w:16,	h:16 },
+		lock:		{ x:100,	y:0,	w:14,	h:20 },
+		fire:		{ x:150,	y:0,	w:24,	h:32 },
+		button:	{ x:200,	y:0,	w:48,	h:20 },
+		explosion:	{ x:250,	y:0,	w:50,	h:50 },
+		us:		{ x:300,	y:0,	w:15,	h:9 },
+		ru:		{ x:350,	y:0,	w:15,	h:9 },
+		ch:		{ x:400,	y:0,	w:15,	h:9 },
+		level:	{ x:0,	y:50,	w:150,h:15 },
+		logo_small:	{ x:0,	y:100,w:76,	h:25 },
+		skill_off:	{ x:0,	y:150,w:65,	h:65 },
+		skill_on:	{ x:0,	y:250,w:65,	h:65 },
+		statusbar:	{ x:0,	y:350,w:800,h:130 },
 		},
-	elements: {},
+	tanks: {
+		Heavy:	{ x:0,	y:0,		w:100,	h:100 },
+		Tiger:	{ x:0,	y:100,	w:100,	h:100 },
+		Cruiser:	{ x:0,	y:200,	w:100,	h:100 },
+		Launcher:	{ x:0,	y:300,	w:100,	h:100 },
+		Stealth:	{ x:0,	y:400,	w:100,	h:100 },
+		Miner:	{ x:0,	y:500,	w:100,	h:100 },
+		Tech:		{ x:0,	y:600,	w:100,	h:100 },
+		Truck:	{ x:0,	y:700,	w:100,	h:100 },
+		Apache:	{ x:0,	y:800,	w:100,	h:100 },
+		Bomber:	{ x:0,	y:900,	w:100,	h:100 },
+		Soldier:	{ x:0,	y:1000,	w:100,	h:100 },
+		Tower:	{ x:0,	y:1100,	w:100,	h:100 },
+		Base:		{ x:0,	y:1200,	w:100,	h:100 },
+		},
+	bullets: {
+		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
+		missle:	{ x:0,	y:50,		w:8,	h:23 }, 
+		airstrike:	{ x:0,	y:100,	w:38,	h:15 }, 
+		bomb: 	{ x:0,	y:150,	w:12,	h:12 },
+		},
+	elements: {
+		fence:	{ x:0,	y:0,		w:100,h:26 }, 
+		vfence:	{ x:0,	y:100,	w:26,	h:100 }, 
+		mine:		{ x:0,	y:200,	w:15,	h:15 }, 
+		block:	{ x:0,	y:300,	w:21,	h:21 },
+		},
 	}
 	
 function preload_all_files(){
@@ -317,7 +353,7 @@ function preload_all_files(){
 	IMAGE_BACK.src = '../img/background.jpg';	IMAGE_BACK.onload = function(){ update_preload(1); }
 	IMAGE_LOGO.src = '../img/logo.png';	IMAGE_LOGO.onload = function(){ update_preload(1); }
 	IMAGE_MOON.src = '../img/moon.jpg';	IMAGE_MOON.onload = function(){ update_preload(1); }
-	IMAGES_ALL.src = '../img/images-all.png';	IMAGES_ALL.onload = function(){ update_preload(1); }
+	IMAGES_GENERAL.src = '../img/general.png';	IMAGES_GENERAL.onload = function(){ update_preload(1); }
 	IMAGES_TANKS.src = '../img/tanks.png';	IMAGES_TANKS.onload = function(){ update_preload(1); }
 	IMAGES_BULLETS.src = '../img/bullets.png';	IMAGES_BULLETS.onload = function(){ update_preload(1); }
 	IMAGES_ELEMENTS.src = '../img/elements.png';	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }

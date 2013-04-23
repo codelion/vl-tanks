@@ -1,15 +1,8 @@
-COUNTRIES.push({
-	name: 'United States',
-	color: 'B',	
-	});
-COUNTRIES.push({
-	name: 'Russia',
-	color: 'R',
-	});
-COUNTRIES.push({
-	name: 'China',
-	color: 'Y',
-	});
+COUNTRIES = {
+	B: {name: 'United States', file: 'us'},
+	R: {name: 'Russia', file: 'ru'},
+	Y: {name: 'China', file: 'ch'},
+	}
 
 //====== TANKS =================================================================
 
@@ -36,10 +29,10 @@ TYPES.push({
 		{name: 'Shield',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
-	icon_top: ['top1.png'],				//tank base images
-	icon_base: ['base1.png'],			//tank top images
-	preview: 'preview.png',				//tank preview image
-	bullet: 'bullet.png',				//bullet_image
+	icon_top: true,				//tank base images
+	icon_base: true,			//tank top images
+	preview: true,				//tank preview image
+	bullet: 'bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	accuracy: 90,					//chance to hit target, %
 	});
@@ -60,13 +53,13 @@ TYPES.push({
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
-		{name: 'Damage',		passive: true,		broadcast: 0}, 
+		//{name: 'Damage',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	preview: 'preview.png',
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -90,10 +83,10 @@ TYPES.push({
 		{name: 'Boost',		passive: false,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	preview: 'preview.png',
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -117,10 +110,10 @@ TYPES.push({
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	preview: 'preview.png',
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 100,
 	});
@@ -145,10 +138,10 @@ TYPES.push({
 		],
 	size: ['M', 50],
 	ignore_armor: 1,
-	preview: 'preview.png',
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 80,
 	});
@@ -172,10 +165,10 @@ TYPES.push({
 		{name: 'SAM',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	preview: 'preview.png',
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -199,10 +192,10 @@ TYPES.push({
 		{name: 'Advanced',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	preview: 'preview.png',
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -226,10 +219,10 @@ TYPES.push({
 		{name: 'Medicine',	passive: false,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	icon_top: [],
-	icon_base: ['base1.png'],
-	preview: 'preview.png',
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -255,10 +248,10 @@ TYPES.push({
 		{name: 'Range',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
-	icon_top: [],
-	icon_base: ['base1.png'],
-	preview: 'preview.png',
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -284,10 +277,10 @@ TYPES.push({
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		],
 	size: ['M', 50],
-	icon_top: [],
-	icon_base: ['base1.png'],
-	preview: 'preview.png',
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -308,15 +301,15 @@ TYPES.push({
 	no_repawn: 1,
 	abilities: [],
 	size: ['S', 30],
-	preview: 'preview.png',
-	icon_top: [],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
-//TOWER
+//Tower
 TYPES.push({
 	name: 'Tower',
 	type: 'tower',
@@ -332,15 +325,15 @@ TYPES.push({
 	no_repawn: 1,
 	abilities: [],
 	size: ['L', 50],
-	preview: '',
-	icon_top: ['top1.png'],
-	icon_base: ['base1.png'],
-	bullet: 'bullet.png',
+	preview: false,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
 
-//BASE
+//Base
 TYPES.push({
 	name: 'Base',
 	type: 'tower',
@@ -356,10 +349,11 @@ TYPES.push({
 	no_repawn: 1,
 	abilities: [],
 	size: ['L', 90],
-	preview: '',
-	icon_top: [],
-	icon_base: ['base1.png', 'no-rotate'],
-	bullet: 'bullet.png',
+	preview: false,
+	icon_top: false,
+	icon_base: true,
+	no_rotate: true,
+	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});

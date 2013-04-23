@@ -220,9 +220,7 @@ function draw_main(){
 	//target	
 	if(mouse_click_controll==true){
 		//target
-		img = new Image();
-		img.src = '../img/target.png';
-		canvas_main.drawImage(img, mouse_pos[0]-15, mouse_pos[1]-15);
+		draw_image(canvas_main, 'target', mouse_pos[0]-15, mouse_pos[1]-15);
 		
 		if(target_range != 0){
 			//circle
@@ -458,12 +456,22 @@ function draw_logo_tanks(left, top, change_logo){
 		if(TYPES[t].type != 'tank') continue;
 		var tank_size = TYPES[t].size[1];
 		//base
+		
+		
+		
+		
 		var img = new Image();
 		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
 		if(TYPES[t].size[1] < max_size)	//normal
-			canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
+			canvas_backround.drawImage(IMAGES_TANKS, 
+				IMAGES_SETTINGS.tanks[TYPES[t].name].x, IMAGES_SETTINGS.tanks[TYPES[t].name].y, max_w, max_h, 
+				x, y, max_w, max_h); 
+			//canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
 		else	//resized
-			canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
+			canvas_backround.drawImage(IMAGES_TANKS, 
+				IMAGES_SETTINGS.tanks[TYPES[t].name].x, IMAGES_SETTINGS.tanks[TYPES[t].name].y, max_w, max_h, 
+				x, y, max_w, max_h); 
+			//canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
 		//turret
 		var img = new Image();
 		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
@@ -503,7 +511,7 @@ function draw_final_score(live, lost_team){
 		}
 	if(live==false){					//final scores
 		//add some score to winning team
-		if(lost_team != false){									log('adding scores');
+		if(lost_team != false){
 			for (var i in TANKS){
 				if(TANKS[i].team == lost_team)
 					continue;
@@ -624,7 +632,7 @@ function draw_final_score(live, lost_team){
 					flag_index = c;	
 				}
 			var flag = new Image();
-			flag.src = '../img/flags.png';
+			flag.src = 'flags';
 			canvas.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, 
 				Math.round((WIDTH_SCROLL-button_width)/2)+30, 
 				top_margin+(button_height+buttons_gap)*j+flag_space, 
@@ -755,16 +763,13 @@ function draw_tank_select_screen(selected_tank){
 			
 			//logo
 			var pos1 = 15+j*(preview_xy+gap);
-			var pos2 = y;
-			drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE, 90, 90, back_color, pos1+2, pos2+2, 90-4, 90-4);
+			var pos2 = y;	//.src
+			//drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE, 90, 90, back_color, pos1+2, pos2+2, 90-4, 90-4);
 			
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
-			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined){
-				var img_lock = new Image();
-				img_lock.src = '../img/lock.png';
-				canvas_backround.drawImage(img_lock, pos1+90-14-5, pos2+90-20-5);
-				}
+			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
+				draw_image(canvas_backround, 'lock', pos1+90-14-5, pos2+90-20-5);
 			
 			//register button
 			register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
@@ -803,7 +808,8 @@ function draw_tank_select_screen(selected_tank){
 		var src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_xy)/2);
-		drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, 90, 90, '#ffffff', pos1, pos2, 90, 90);
+			//.src
+		//drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, 90, 90, '#ffffff', pos1, pos2, 90, 90);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
@@ -880,7 +886,8 @@ function draw_tank_select_screen(selected_tank){
 					src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
-					drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH, back_color, pos1+2, pos2+2, ICON_WIDTH-4, ICON_WIDTH-4);
+						//.src
+					//drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH, back_color, pos1+2, pos2+2, ICON_WIDTH-4, ICON_WIDTH-4);
 					
 					j++;
 					}
@@ -1032,4 +1039,33 @@ function body_rotation(obj, str, speed, rot, time_diff){
 		flag = true;
 	}
 	return flag;
+	}
+function draw_image(canvas, name, x, y, max_w, max_h){
+	//check general
+	if(IMAGES_SETTINGS.general[name] != undefined){
+		if(max_w == undefined)	max_w = IMAGES_SETTINGS.general[name].w;
+		if(max_h == undefined)	max_h = IMAGES_SETTINGS.general[name].h;
+		canvas.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general[name].x, IMAGES_SETTINGS.general[name].y, max_w, max_h, x, y, max_w, max_h); 
+		}
+	
+	//chec bullets
+	if(IMAGES_SETTINGS.bullets[name] != undefined){
+		if(max_w == undefined)	max_w = IMAGES_SETTINGS.bullets[name].w;
+		if(max_h == undefined)	max_h = IMAGES_SETTINGS.bullets[name].h;
+		canvas.drawImage(IMAGES_BULLETS, IMAGES_SETTINGS.bullets[name].x, IMAGES_SETTINGS.bullets[name].y, max_w, max_h, x, y, max_w, max_h); 
+		}
+	
+	//check elements
+	if(IMAGES_SETTINGS.elements[name] != undefined){
+		if(max_w == undefined)	max_w = IMAGES_SETTINGS.elements[name].w;
+		if(max_h == undefined)	max_h = IMAGES_SETTINGS.elements[name].h;
+		canvas.drawImage(IMAGES_ELEMENTS, IMAGES_SETTINGS.elements[name].x, IMAGES_SETTINGS.elements[name].y, max_w, max_h, x, y, max_w, max_h); 
+		}
+		
+	//check tanks
+	if(IMAGES_SETTINGS.tanks[name] != undefined){
+		if(max_w == undefined)	max_w = IMAGES_SETTINGS.tanks[name].w;
+		if(max_h == undefined)	max_h = IMAGES_SETTINGS.tanks[name].h;
+		canvas.drawImage(IMAGES_TANKS, IMAGES_SETTINGS.tanks[name].x, IMAGES_SETTINGS.tanks[name].y, max_w, max_h, x, y, max_w, max_h); 
+		}
 	}

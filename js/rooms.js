@@ -539,10 +539,7 @@ function draw_room(room_id){
 			roundRect(canvas_backround, x1, y, width, height, 0, true);
 			
 			//flag
-			flag_index = 0;	
-			var flag = new Image();
-			flag.src = '../img/flags.png';
-			canvas_backround.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, x1+flag_space, y+flag_space, flag_width, flag_height);
+			draw_image(canvas_backround, COUNTRIES.B.file, x1+flag_space, y+flag_space);
 			
 			//name
 			text = players[i].name;
@@ -593,10 +590,7 @@ function draw_room(room_id){
 			roundRect(canvas_backround, x2, y, width, height, 0, true);
 			
 			//flag
-			flag_index = 1;	
-			var flag = new Image();
-			flag.src = '../img/flags.png';
-			canvas_backround.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, x2+flag_space, y+flag_space, flag_width, flag_height);
+			draw_image(canvas_backround, COUNTRIES.R.file, x2+flag_space, y+flag_space);
 			
 			//name
 			text = players[i].name;

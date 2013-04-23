@@ -217,21 +217,12 @@ function add_player_name(tank){
 		tmp_canvas.height = 100;
 		var tmp_object = tmp_canvas.getContext("2d");
 	
-		//find flag
-		var flag_index = 0;
-		for(var c in COUNTRIES){
-			if(tank.team == COUNTRIES[c].color)
-				flag_index = c;	
-			}
-				
 		//flag
 		var flag_gap = 4;
 		var total_width = flag_width + flag_gap + tmp_object.measureText(player_name).width;
 		var name_pos_x = round(TYPES[tank.type].size[1]/2 + name_padding - total_width/2);
-		if(name_pos_x < 0) name_pos_x = 0;
-		var flag = new Image();
-		flag.src = '../img/flags.png';
-		tmp_object.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, name_pos_x, 4, flag_width, flag_height);
+		if(name_pos_x < 0) name_pos_x = 0;		
+		draw_image(tmp_object, COUNTRIES[tank.team].file, name_pos_x, 4);
 		
 		//name
 		tmp_object.fillStyle = "#000000";
@@ -364,25 +355,22 @@ function draw_bullets(TANK, time_gap){
 					}
 				
 				//draw aoe explosion
-				img = new Image();
-				img.src = '../img/explosion_big.png';
-				canvas_main.drawImage(img, BULLETS[b].x-25+map_offset[0], BULLETS[b].y-25+map_offset[1]);
+				draw_image(canvas_main, 'explosion', BULLETS[b].x-25+map_offset[0], BULLETS[b].y-25+map_offset[1]);
 				}
 			
 			//remove bullet
 			BULLETS.splice(b, 1); b--;	//must be done after splice
 			}
-		else{											
+		else{
 			//draw bullet
-			img_bullet = new Image();
 			if(BULLETS[b].bullet_icon != undefined){	
 				//custom bullet
-				img_bullet.src = '../img/bullets/'+BULLETS[b].bullet_icon;
+				var bullet_img = BULLETS[b].bullet_icon;
 				bullet_stats = get_bullet(BULLETS[b].bullet_icon);
 				}
 			else{	
 				//default bullet
-				img_bullet.src = '../img/bullets/'+TYPES[TANK.type].bullet;
+				var bullet_img = TYPES[TANK.type].bullet;
 				bullet_stats = get_bullet(TYPES[TANK.type].bullet);
 				}
 			if(TYPES[TANK.type].bullet==undefined) continue;
@@ -407,7 +395,10 @@ function draw_bullets(TANK, time_gap){
 					//add data
 					tmp_object.translate(round(bullet_stats.size[0]/2)+padding, round(bullet_stats.size[1]/2)+padding);
 					tmp_object.rotate((BULLETS[b].angle) * TO_RADIANS);
-					tmp_object.drawImage(img_bullet, -(bullet_stats.size[0]/2), -(bullet_stats.size[1]/2), bullet_stats.size[0], bullet_stats.size[1]);
+					tmp_object.drawImage(IMAGES_BULLETS, 
+						IMAGES_SETTINGS.bullets[bullet_img].x, IMAGES_SETTINGS.bullets[bullet_img].y, 
+						IMAGES_SETTINGS.bullets[bullet_img].w, IMAGES_SETTINGS.bullets[bullet_img].h,
+						-(bullet_stats.size[0]/2), -(bullet_stats.size[1]/2), bullet_stats.size[0], bullet_stats.size[1]);
 					
 					//save to cache
 					BULLETS[b].bullet_cache = tmp_canvas;
@@ -418,7 +409,7 @@ function draw_bullets(TANK, time_gap){
 				}
 			else{
 				//simple - no rotate
-				canvas_main.drawImage(img_bullet, bullet_x, bullet_y);
+				draw_image(canvas_main, bullet_img, bullet_x, bullet_y);
 				}
 			}
 		}
@@ -862,7 +853,7 @@ function draw_fire(TANK, TANK_TO){
 	radiance = Math.atan2(dist_y, dist_x);
 	explode_x = explode_x + Math.cos(radiance)*(TYPES[TANK.type].size[1]/2+10);
 	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);			
-	drawImage_rotated(canvas_main, '../img/explosion.png', explode_x+map_offset[0], explode_y+map_offset[1], 24, 32, TANK.fire_angle);
+	drawImage_rotated(canvas_main, 'explosion', explode_x+map_offset[0], explode_y+map_offset[1], 24, 32, TANK.fire_angle);
 	}
 //shooting
 function shoot_sound(TANK){

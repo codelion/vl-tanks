@@ -22,7 +22,7 @@ function Rest(TANK, descrition_only, settings_only, ai){
 		name: 'repair',
 		power: power,
 		lifetime: Date.now()+duration,
-		icon: 'repair.png',
+		icon: 'repair',
 		icon_size: [16,16],
 		id: TANK.id,
 		});
@@ -211,7 +211,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 				name: 'repair',
 				power: power,
 				lifetime: Date.now()+duration,
-				icon: 'repair.png',
+				icon: 'repair',
 				icon_size: [16,16],
 				id: TANK.id,
 				});
@@ -223,7 +223,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 						name: 'repair',
 						power: power,
 						lifetime: Date.now()+duration,
-						icon: 'repair.png',
+						icon: 'repair',
 						icon_size: [16,16],
 						id: TANK.id,
 						}
@@ -311,7 +311,7 @@ function Missile(TANK, descrition_only, settings_only, ai){
 		range: range,
 		power: power,
 		reuse: reuse,
-		icon: 'missle.png',
+		icon: 'missle',
 		angle: true,
 		ability_nr: 0,
 		};
@@ -349,7 +349,7 @@ function Mortar(TANK, descrition_only, settings_only, ai){
 		power: power,
 		reuse: reuse,
 		pierce: 1,
-		icon: 'bomb.png',
+		icon: 'bomb',
 		ability_nr: 1,
 		};
 		
@@ -554,7 +554,7 @@ function SAM(TANK, descrition_only, settings_only, ai){
 		tmp['damage'] = power;
 		tmp['pierce_armor'] = 1;
 		tmp['angle'] = angle;
-		tmp['bullet_icon'] = 'missle.png';
+		tmp['bullet_icon'] = 'missle';
 		BULLETS.push(tmp);
 		}
 
@@ -572,9 +572,7 @@ function draw_mines(tank_id){
 	var tank = get_tank_by_id(tank_id);
 	for(var i in MINES){
 		if(MINES[i].team != MY_TANK.team) continue;	//enemy dont see it
-		img = new Image();
-		img.src = '../img/map/mine.png';
-		canvas_main.drawImage(img, MINES[i].x-7+map_offset[0], MINES[i].y-7+map_offset[1]);
+		draw_image(canvas_main, 'mine', MINES[i].x-7+map_offset[0], MINES[i].y-7+map_offset[1]);
 		}
 	}
 var mines_check_reuse;
@@ -772,7 +770,7 @@ function Fire_bomb(TANK, descrition_only, settings_only, ai){
 		aoe: splash_range,
 		power: power,
 		reuse: reuse,
-		icon: 'bomb.png',
+		icon: 'bomb',
 		ability_nr: ability_nr,
 		};
 		
@@ -804,7 +802,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 				name: 'repair',
 				power: power,
 				lifetime: Date.now()+duration,
-				icon: 'repair.png',
+				icon: 'repair',
 				icon_size: [16,16],
 				id: TANK.id,
 				});
@@ -816,7 +814,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 						name: 'repair',
 						power: power,
 						lifetime: Date.now()+duration,
-						icon: 'repair.png',
+						icon: 'repair',
 						icon_size: [16,16],
 						id: TANK.id,
 						}
@@ -858,7 +856,7 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 		power: power,
 		reuse: reuse,
 		pierce: 1,
-		icon: 'airstrike.png',
+		icon: 'airstrike',
 		angle: true,
 		ability_nr: 0,
 		};
@@ -925,7 +923,7 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 		aoe: splash_range,
 		power: power,
 		reuse: reuse,
-		icon: 'bomb.png',
+		icon: 'bomb',
 		ability_nr: 0,
 		};
 		
@@ -959,7 +957,7 @@ function AA_bomb(TANK, descrition_only, settings_only, ai){
 		power: power,
 		reuse: reuse,
 		pierce: 1,
-		icon: 'bomb.png',
+		icon: 'bomb',
 		ability_nr: 1,
 		};
 	
