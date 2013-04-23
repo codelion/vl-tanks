@@ -8,7 +8,7 @@ ELEMENTS.push({
 ELEMENTS.push({
 	name: 'fence',
 	file: 'fence.png',
-	size: [100, 26], 
+	size: [100, 26],
 	alt_color: '#4e4b44',	
 	collission: true,	
 	});

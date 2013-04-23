@@ -1,3 +1,5 @@
+implement sprites
+	do not load images on main loop
 IDEAS
 	new units
 		sniper
@@ -18,4 +20,3 @@ IDEAS
 		Nanobots to bomber?
 		destruction
 		glue
-combine sprites

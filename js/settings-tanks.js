@@ -22,7 +22,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [50, 0.3, 60],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.35, 70],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
@@ -53,7 +53,7 @@ TYPES.push({
 	damage: [30, 1.5],		//30 dps
 	range: 80,
 	scout: 100,
-	armor: [30, 0.3, 40],
+	armor: [30, 0.35, 50],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 3,
@@ -80,7 +80,7 @@ TYPES.push({
 	damage: [18, 1.3],	//18 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.3, 30],
+	armor: [20, 0.35, 40],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 5,
@@ -162,7 +162,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.3, 30],
+	armor: [20, 0.35, 40],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -189,7 +189,7 @@ TYPES.push({
 	damage: [15, 1.1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.3, 30],	
+	armor: [20, 0.35, 40],	
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -243,7 +243,7 @@ TYPES.push({
 	damage: [20, 1.3],	//20 dps
 	range: 100,
 	scout: 120,
-	armor: [20, 0.3, 30],	
+	armor: [20, 0.35, 40],	
 	speed: 32,
 	attack_delay: 1,
 	turn_speed: 6,
@@ -325,7 +325,7 @@ TYPES.push({
 	damage: [30, 0],	//30 dps
 	range: 120,
 	scout: 130,
-	armor: [20,0,20],
+	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
 	turn_speed: 4,
@@ -349,7 +349,7 @@ TYPES.push({
 	damage: [45, 0],	//45 dps
 	range: 120,
 	scout: 130,
-	armor: [50,0,50],
+	armor: [50, 0, 50],
 	speed: 0,
 	attack_delay: 1.1,
 	turn_speed: 4,

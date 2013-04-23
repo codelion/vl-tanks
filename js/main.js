@@ -20,7 +20,7 @@ function init_game(first_time){
 		MAX_SENT_PACKETS = 1000;
 		START_GAME_COUNT_MULTI = 5;
 		}
-	if(getCookie("disable_intro") == '1')
+	if(getCookie("nointro") == '1')
 		intro_enabled = 0;
 	unique_id = 0;
 	level = 1;
@@ -69,7 +69,7 @@ function intro(force){
 		{image: '1.jpg', text: ["No more oil left on Earth..."],},
 		{image: '2.jpg', text: ["But but researchers found huge amount of non-radioactive isotope",  "helium on the moon..."],},
 		{image: '3.jpg', text: ["Helium-3 gives a chance to build ZPM", "which means unlimited energy..."],},
-		{image: '4.jpg', text: ["Protect your base, push enemies away and save you country.", "Moon needs you!"],},
+		{image: '4.jpg', text: ["Protect your base, push enemies away and save your country.", "Moon needs you!"],},
 		];
 	var text_gap = 20;
 	
@@ -105,7 +105,7 @@ function intro(force){
 	if(intro_page==0){
 		//register skip button
 		register_button(WIDTH_APP-70, HEIGHT_APP-STATUS_HEIGHT-45, 70, 45, PLACE, function(){
-			setCookie("disable_intro", 1, 30);
+			setCookie("nointro", 1, 30);
 			intro_page=0;
 			PLACE = 'init';
 			add_first_screen_elements();
@@ -181,7 +181,7 @@ var menu_pressed = false;
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
 	
-	name_tmp = getCookie("player_name");
+	name_tmp = getCookie("name");
 	if(name_tmp != ''){
 		name = name_tmp;
 		if(DEBUG==true)
@@ -237,7 +237,7 @@ function add_first_screen_elements(){
 					name = name[0].toUpperCase() + name.slice(1);
 					name = name.substring(0, 10);
 					add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
-					setCookie("player_name", name, 30);
+					setCookie("name", name, 30);
 					}
 				}
 			else if(extra==1){
@@ -259,6 +259,14 @@ function add_first_screen_elements(){
 			}, i);
 		}
 	}
+/*var IMAGE_BACK = new Image();
+var IMAGE_LOGO = new Image();
+var IMAGE_MOON = new Image();
+var IMAGES_ALL = new Image();
+var IMAGES_TANKS = new Image();
+var IMAGES_BULLETS = new Image();
+var IMAGES_INRO = new Image();
+var IMAGES_ELEMENTS = new Image();*/
 function preload_all_files(){
 	images_to_preload = [
 		//general
@@ -392,7 +400,7 @@ function init_action(map_nr, my_team){
 		if(enemy_team == my_team)
 			enemy_team = 'R';	
 		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			random_type = 1;
+			//random_type = 1;
 		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
 		for(var i=1; i< MAPS[level-1].team_size; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
@@ -505,7 +513,6 @@ function quit_game(init_next_game){
 	try{
 		parent.document.getElementById("packets").innerHTML = "0/0";
 		parent.document.getElementById("fps").innerHTML = "";	
-
 		}catch(error){}
 	canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 	

@@ -11,7 +11,7 @@ HTML5 based tank game. Requires Firefox, Chrome, Internet explorer 10 or Opera. 
 * HTML5 only, no flash
 
 ## Getting Started
-* http://viliusle.github.com/vl-tanks/
+* http://viliusle.github.io/vl-tanks/
 * or download and open index.html in modern browser to play dev version
 
 ## Latest News

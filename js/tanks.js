@@ -5,10 +5,10 @@ function draw_tank(tank){
 	var tank_size =  TYPES[tank.type].size[1];
 	var visibility = 0;
 	
-	if(tank.y > -1*map_offset[1] + HEIGHT_SCROLL && FS==false){}	//skip - object below visible zone
-	else if(tank.y+tank_size < -1*map_offset[1] && FS==false){}		//skip - object above visible zone
-	else if(tank.x > -1*map_offset[0] + WIDTH_SCROLL && FS==false){}		//skip - object on right from visible zone
-	else if(tank.x+tank_size < -1*map_offset[0] && FS==false){}		//skip - object on left from above visible zone
+	if(tank.y > -1*map_offset[1] + HEIGHT_SCROLL && FS==false){}	//below visible zone
+	else if(tank.y+tank_size < -1*map_offset[1] && FS==false){}	//above visible zone
+	else if(tank.x > -1*map_offset[0] + WIDTH_SCROLL && FS==false){} //on right from visible zone
+	else if(tank.x+tank_size < -1*map_offset[0] && FS==false){}	//on left from visible zone
 	else{
 		visibility = 1;
 		
@@ -493,7 +493,7 @@ function draw_tank_move(mouseX, mouseY){
 			if(MUTE_FX==false){
 				try{
 					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', 'sounds/click.ogg');
+					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXP);
 					audio_finish.play();
 					}
 				catch(error){}
@@ -507,7 +507,7 @@ function check_collisions(xx, yy, TANK){
 	if(TANK.automove != undefined) return false;
 	xx = Math.round(xx);
 	yy = Math.round(yy);
-	var tank_size_half = round(TYPES[TANK.type].size[1]/2);
+	var tank_size_half = round(TYPES[TANK.type].size[1]/2);	
 
 	//borders
 	if(xx < 0 || yy < 0) return true;
@@ -529,8 +529,8 @@ function check_collisions(xx, yy, TANK){
 		if(MAPS[level-1].elements[e][4]!=0 && MAPS[level-1].elements[e][4] < elem_height)
 			elem_height = MAPS[level-1].elements[e][4];
 		//check
-		if(yy > elem_y && yy < elem_y+elem_height){
-			if(xx > elem_x && xx < elem_x+elem_width){
+		if(yy >= elem_y && yy <= elem_y+elem_height){
+			if(xx >= elem_x && xx <= elem_x+elem_width){
 				return true;
 				}
 			}
@@ -1430,5 +1430,11 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		TANK_tmp.master = master_tank;	
 	if(begin_time != undefined)
 		TANK_tmp.begin_time = begin_time;
+	TANK_tmp.cx = function(){ 
+		return this.x + TYPES[this.type].size[1]/2;
+		}
+	TANK_tmp.cy = function(){
+		return this.y + TYPES[this.type].size[1]/2;
+		}
 	TANKS.push(TANK_tmp);
 	}
