@@ -456,26 +456,24 @@ function draw_logo_tanks(left, top, change_logo){
 		if(TYPES[t].type != 'tank') continue;
 		var tank_size = TYPES[t].size[1];
 		//base
-		
-		
-		
-		
-		var img = new Image();
-		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_base[0];
-		if(TYPES[t].size[1] < max_size)	//normal
-			canvas_backround.drawImage(IMAGES_TANKS, 
-				IMAGES_SETTINGS.tanks[TYPES[t].name].x, IMAGES_SETTINGS.tanks[TYPES[t].name].y, max_w, max_h, 
-				x, y, max_w, max_h); 
-			//canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
-		else	//resized
-			canvas_backround.drawImage(IMAGES_TANKS, 
-				IMAGES_SETTINGS.tanks[TYPES[t].name].x, IMAGES_SETTINGS.tanks[TYPES[t].name].y, max_w, max_h, 
-				x, y, max_w, max_h); 
-			//canvas_backround.drawImage(img, 0, 0, tank_size, tank_size, left+t*(477/n)+(50-max_size)/2, top+52-max_size, max_size, max_size);
+		if(TYPES[t].size[1] < max_size){	
+			//original size
+			draw_image(canvas_backround, TYPES[t].name,
+				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, TYPES[t].size[1], TYPES[t].size[1],
+				100, 0, TYPES[t].size[1], TYPES[t].size[1]);
+				}	
+		else{	
+			//resized
+			draw_image(canvas_backround, TYPES[t].name,
+				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, max_size, max_size,
+				100, 0, TYPES[t].size[1], TYPES[t].size[1]);
+			}
 		//turret
-		var img = new Image();
-		img.src = '../img/tanks/'+TYPES[t].name+'/'+TYPES[t].icon_top[0];
-		canvas_backround.drawImage(img, left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size);
+		if(TYPES[t].icon_top != false){
+			draw_image(canvas_backround, TYPES[t].name,
+				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, TYPES[t].size[1], TYPES[t].size[1],
+				150, 0, TYPES[t].size[1], TYPES[t].size[1]);
+			}
 		}
 	}
 var score_button_pos = new Array();
@@ -626,17 +624,9 @@ function draw_final_score(live, lost_team){
 			canvas.fillText(j, Math.round((WIDTH_APP-button_width)/2)+10, text_y);
 			
 			//flag
-			flag_index = 1;
-			for(var c in COUNTRIES){
-				if(TANKS[i].team == COUNTRIES[c].color)
-					flag_index = c;	
-				}
-			var flag = new Image();
-			flag.src = 'flags';
-			canvas.drawImage(flag, 0, flag_index*flag_height, flag_width, flag_height, 
+			draw_image(canvas, COUNTRIES[TANKS[i].team].file, 
 				Math.round((WIDTH_SCROLL-button_width)/2)+30, 
-				top_margin+(button_height+buttons_gap)*j+flag_space, 
-				flag_width, flag_height);
+				top_margin+(button_height+buttons_gap)*j+flag_space);
 	
 			//name
 			canvas.fillStyle = "#000000";
@@ -763,8 +753,8 @@ function draw_tank_select_screen(selected_tank){
 			
 			//logo
 			var pos1 = 15+j*(preview_xy+gap);
-			var pos2 = y;	//.src
-			//drawImage_preloaded(canvas_backround, '../img/tanks/'+TYPES[i].name+'/'+TYPES[i].preview, pos1, pos2, PLACE, 90, 90, back_color, pos1+2, pos2+2, 90-4, 90-4);
+			var pos2 = y;
+			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
 			
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
@@ -805,11 +795,9 @@ function draw_tank_select_screen(selected_tank){
 
 	//tank stats
 	if(selected_tank != undefined){
-		var src = '../img/tanks/'+TYPES[selected_tank].name+'/'+TYPES[selected_tank].preview;
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_xy)/2);
-			//.src
-		//drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, 90, 90, '#ffffff', pos1, pos2, 90, 90);
+		draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
@@ -886,9 +874,9 @@ function draw_tank_select_screen(selected_tank){
 					src = '../img/tanks/'+TYPES[tank_i].name+'/'+TYPES[tank_i].preview;
 					var pos1 = 122+gap+15+j*(ICON_WIDTH+2+gap);
 					var pos2 = y;
-						//.src
-					//drawImage_preloaded(canvas_backround, src, pos1, pos2, PLACE, ICON_WIDTH, ICON_WIDTH, back_color, pos1+2, pos2+2, ICON_WIDTH-4, ICON_WIDTH-4);
-					
+					draw_image(canvas_backround, TYPES[tank_i].name, 
+						pos1, pos2, ICON_WIDTH, ICON_WIDTH,
+						0, 0, 90, 90);
 					j++;
 					}
 				}
@@ -1040,32 +1028,56 @@ function body_rotation(obj, str, speed, rot, time_diff){
 	}
 	return flag;
 	}
-function draw_image(canvas, name, x, y, max_w, max_h){
-	//check general
+function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w, clip_h){
+	if(offset_x == undefined) offset_x = 0;
+	if(offset_y == undefined) offset_y = 0;	
+		
+	//check general images
 	if(IMAGES_SETTINGS.general[name] != undefined){
 		if(max_w == undefined)	max_w = IMAGES_SETTINGS.general[name].w;
 		if(max_h == undefined)	max_h = IMAGES_SETTINGS.general[name].h;
-		canvas.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general[name].x, IMAGES_SETTINGS.general[name].y, max_w, max_h, x, y, max_w, max_h); 
+		if(clip_w == undefined)	clip_w = max_w;
+		if(clip_h == undefined)	clip_h = max_h;
+		canvas.drawImage(IMAGES_GENERAL,
+			IMAGES_SETTINGS.general[name].x+offset_x, IMAGES_SETTINGS.general[name].y+offset_y, clip_w, clip_h, 
+			x, y, max_w, max_h); 
+		return true;
 		}
 	
 	//chec bullets
 	if(IMAGES_SETTINGS.bullets[name] != undefined){
 		if(max_w == undefined)	max_w = IMAGES_SETTINGS.bullets[name].w;
 		if(max_h == undefined)	max_h = IMAGES_SETTINGS.bullets[name].h;
-		canvas.drawImage(IMAGES_BULLETS, IMAGES_SETTINGS.bullets[name].x, IMAGES_SETTINGS.bullets[name].y, max_w, max_h, x, y, max_w, max_h); 
+		if(clip_w == undefined)	clip_w = max_w;
+		if(clip_h == undefined)	clip_h = max_h;
+		canvas.drawImage(IMAGES_BULLETS, 
+			IMAGES_SETTINGS.bullets[name].x+offset_x, IMAGES_SETTINGS.bullets[name].y+offset_y, clip_w, clip_h, 
+			x, y, max_w, max_h); 
+		return true;	
 		}
 	
 	//check elements
 	if(IMAGES_SETTINGS.elements[name] != undefined){
 		if(max_w == undefined)	max_w = IMAGES_SETTINGS.elements[name].w;
 		if(max_h == undefined)	max_h = IMAGES_SETTINGS.elements[name].h;
-		canvas.drawImage(IMAGES_ELEMENTS, IMAGES_SETTINGS.elements[name].x, IMAGES_SETTINGS.elements[name].y, max_w, max_h, x, y, max_w, max_h); 
+		if(clip_w == undefined)	clip_w = max_w;
+		if(clip_h == undefined)	clip_h = max_h;
+		canvas.drawImage(IMAGES_ELEMENTS, 
+			IMAGES_SETTINGS.elements[name].x+offset_x, IMAGES_SETTINGS.elements[name].y+offset_y, clip_w, clip_h, 
+			x, y, max_w, max_h); 
+		return true;
 		}
 		
 	//check tanks
 	if(IMAGES_SETTINGS.tanks[name] != undefined){
 		if(max_w == undefined)	max_w = IMAGES_SETTINGS.tanks[name].w;
 		if(max_h == undefined)	max_h = IMAGES_SETTINGS.tanks[name].h;
-		canvas.drawImage(IMAGES_TANKS, IMAGES_SETTINGS.tanks[name].x, IMAGES_SETTINGS.tanks[name].y, max_w, max_h, x, y, max_w, max_h); 
+		if(clip_w == undefined)	clip_w = max_w;
+		if(clip_h == undefined)	clip_h = max_h;
+		canvas.drawImage(IMAGES_TANKS, 
+			IMAGES_SETTINGS.tanks[name].x+offset_x, IMAGES_SETTINGS.tanks[name].y+offset_y, clip_w, clip_h, 
+			x, y, max_w, max_h); 
+		return true;
 		}
+	log('Error: can not find image "'+name+'".');
 	}

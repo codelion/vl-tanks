@@ -12,7 +12,7 @@ function draw_tank(tank){
 	else{
 		visibility = 1;
 		
-		if(tank.dead == 1)		tank_size = tank_size/2; //dead
+		if(tank.dead == 1)	tank_size = tank_size/2; //dead
 		if(check_enemy_visibility(tank)==false)	return false; //out of sight
 		
 		lighten_pixels(tank);
@@ -77,12 +77,12 @@ function draw_tank(tank){
 				}
 			
 			//draw tank base
-			img_me = new Image();
-			img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_base[0];
-			if(TYPES[tank.type].icon_base[1] == "no-rotate"){
+			if(TYPES[tank.type].no_base_rotate === true){
 				//draw without rotation
 				tmp_object.restore();
-				tmp_object.drawImage(img_me, padding, padding, tank_size, tank_size);
+				draw_image(tmp_object, TYPES[tank.type].name,
+					padding, padding, undefined, undefined,	
+					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
 				tmp_object.save();
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
@@ -90,29 +90,29 @@ function draw_tank(tank){
 			else{
 				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
-				tmp_object.drawImage(img_me, -1*round(tank_size/2), -1*round(tank_size/2), tank_size, tank_size);
+				draw_image(tmp_object, TYPES[tank.type].name,
+					-1*round(tank_size/2), -1*round(tank_size/2), tank_size, tank_size,
+					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
 				}
 			tmp_object.restore();
 			
 			//draw top
-			if(TYPES[tank.type].icon_top[0] != undefined){
-				if(tank.dead != 1){
-					tmp_object.save();
-					img_me = new Image();
-					img_me.src = '../img/tanks/'+TYPES[tank.type].name+'/'+TYPES[tank.type].icon_top[0];
-					tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
-					tmp_object.rotate(tank.fire_angle * TO_RADIANS);
-					tmp_object.drawImage(img_me, -(tank_size/2), -(tank_size/2), tank_size, tank_size);
-					tmp_object.restore();
-					}
+			if(TYPES[tank.type].icon_top != false && tank.dead != 1){
+				tmp_object.save();
+				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
+				tmp_object.rotate(tank.fire_angle * TO_RADIANS);
+				draw_image(tmp_object, TYPES[tank.type].name,
+					-(tank_size/2), -(tank_size/2), tank_size, tank_size, 
+					150, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
+				tmp_object.restore();
 				}
 
 			//draw extra layer
 			for (i in tank.buffs){
 				if(tank.buffs[i].icon != undefined){
-					img_me = new Image();
-					img_me.src = '../img/'+tank.buffs[i].icon;
-					tmp_object.drawImage(img_me, padding+tank_size/2-tank.buffs[i].icon_size[0]/2, padding+tank_size/2-tank.buffs[i].icon_size[1]/2);
+					draw_image(tmp_object, tank.buffs[i].icon,
+						padding+tank_size/2-tank.buffs[i].icon_size[0]/2,
+						padding+tank_size/2-tank.buffs[i].icon_size[1]/2);
 					}
 				if(tank.buffs[i].circle != undefined){
 					tmp_object.beginPath();
@@ -142,7 +142,7 @@ function draw_tank(tank){
 			tank.cache_tank = [];
 			tank.cache_tank.object = tmp_canvas;
 			tank.cache_tank.unique = cache_id;
-			tank.cache_tank.time = Date.now()+2000;
+			tank.cache_tank.time = Date.now()+3000;
 			
 			//show
 			canvas_main.drawImage(tmp_canvas, round(tank.x+map_offset[0])-padding, round(tank.y+map_offset[1])-padding);
@@ -852,8 +852,12 @@ function draw_fire(TANK, TANK_TO){
 	dist_y = TANK_TO.y+TYPES[TANK_TO.type].size[1]/2 - explode_y;
 	radiance = Math.atan2(dist_y, dist_x);
 	explode_x = explode_x + Math.cos(radiance)*(TYPES[TANK.type].size[1]/2+10);
-	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);			
-	drawImage_rotated(canvas_main, 'explosion', explode_x+map_offset[0], explode_y+map_offset[1], 24, 32, TANK.fire_angle);
+	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);
+	canvas_main.save();
+	canvas_main.translate(explode_x+map_offset[0], explode_y+map_offset[1]);
+	canvas_main.rotate(TANK.fire_angle * TO_RADIANS);
+	draw_image(canvas_main, "fire", -(24/2), -(32/2));
+	canvas_main.restore();
 	}
 //shooting
 function shoot_sound(TANK){

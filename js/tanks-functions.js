@@ -933,7 +933,7 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 function AA_bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var power = 50 + 5 * (TANK.level-1);
-	var range = 120;
+	var range = 90;
 
 	if(descrition_only != undefined)
 		return 'Drop single target anti-armor bomb with damage of '+power+'.';

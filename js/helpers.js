@@ -115,7 +115,7 @@ function drawImage_rotated(canvas, file, x, y, width, height, angle){
 	img.src = file;
 	
 	canvas.save();
-	canvas.translate(x, y);			//canvas.translate(x+round(width/2), y+round(height/2));
+	canvas.translate(x, y);
 	canvas.rotate(angle * TO_RADIANS);
 	canvas.drawImage(img, -(width/2), -(height/2));
 	canvas.restore();

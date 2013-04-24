@@ -198,7 +198,7 @@ function soldiers_move(mouseX, mouseY){
 			if(MUTE_FX==false){
 				try{
 					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', 'sounds/click.ogg');
+					audio_finish.setAttribute('src', '../sounds/click.ogg');
 					audio_finish.play();
 					}
 				catch(error){}

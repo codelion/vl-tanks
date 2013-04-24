@@ -130,11 +130,12 @@ function draw_version(){
 	}
 //do mute or unmute music
 function mute_unmute_music(){
-	if(MUTE_MUSIC==false){	
+	if(MUTE_MUSIC==false){
 		//disable sound
 		MUTE_MUSIC = true;
 		setCookie("mute_music", "1", 30);
-		if(audio_main != undefined) audio_main.pause();
+		if(audio_main != undefined)
+			audio_main.pause();
 		}
 	else{
 		//enable sound
@@ -142,7 +143,7 @@ function mute_unmute_music(){
 		setCookie("mute_music", "0", 30);
 		try{
 			if(PLACE == 'game'){
-				var audio_main = document.getElementById("audio-main");
+				audio_main = document.createElement('audio');
 				audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
 				audio_main.setAttribute('loop', 'loop');
 				audio_main.play();

@@ -143,7 +143,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	
 	maps_positions = [];
 	
-	//clear name ara
+	//clear name area
 	canvas_backround.drawImage(IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){

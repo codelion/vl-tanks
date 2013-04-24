@@ -1,6 +1,6 @@
-implement sprites
-	do not load images on main loop
 IDEAS
+	towers regen hp?
+	restricted minions mode
 	new units
 		Drone: medium hp, medium armor, high dps, but low range. Skills: plasma shot+vr?, blink, slow.
 		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	

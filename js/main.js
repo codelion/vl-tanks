@@ -309,19 +309,19 @@ var IMAGES_SETTINGS = {
 		statusbar:	{ x:0,	y:350,w:800,h:130 },
 		},
 	tanks: {
-		Heavy:	{ x:0,	y:0,		w:100,	h:100 },
-		Tiger:	{ x:0,	y:100,	w:100,	h:100 },
-		Cruiser:	{ x:0,	y:200,	w:100,	h:100 },
-		Launcher:	{ x:0,	y:300,	w:100,	h:100 },
-		Stealth:	{ x:0,	y:400,	w:100,	h:100 },
-		Miner:	{ x:0,	y:500,	w:100,	h:100 },
-		Tech:		{ x:0,	y:600,	w:100,	h:100 },
-		Truck:	{ x:0,	y:700,	w:100,	h:100 },
-		Apache:	{ x:0,	y:800,	w:100,	h:100 },
-		Bomber:	{ x:0,	y:900,	w:100,	h:100 },
-		Soldier:	{ x:0,	y:1000,	w:100,	h:100 },
-		Tower:	{ x:0,	y:1100,	w:100,	h:100 },
-		Base:		{ x:0,	y:1200,	w:100,	h:100 },
+		Heavy:	{ x:0,	y:0,		w:90,	h:90 },
+		Tiger:	{ x:0,	y:100,	w:90,	h:90 },
+		Cruiser:	{ x:0,	y:200,	w:90,	h:90 },
+		Launcher:	{ x:0,	y:300,	w:90,	h:90 },
+		Stealth:	{ x:0,	y:400,	w:90,	h:90 },
+		Miner:	{ x:0,	y:500,	w:90,	h:90 },
+		Tech:		{ x:0,	y:600,	w:90,	h:90 },
+		Truck:	{ x:0,	y:700,	w:90,	h:90 },
+		Apache:	{ x:0,	y:800,	w:90,	h:90 },
+		Bomber:	{ x:0,	y:900,	w:90,	h:90 },
+		Soldier:	{ x:0,	y:1000,	w:90,	h:90 },
+		Tower:	{ x:0,	y:1100,	w:90,	h:90 },
+		Base:		{ x:0,	y:1200,	w:90,	h:90 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
@@ -392,7 +392,7 @@ function get_unique_id(){
 	}
 //tank moving speed conversion
 function speed2pixels(speed, time_diff){
-	return speed * 1.3 * time_diff/1000;
+	return speed * 1.4 * time_diff/1000;
 	}
 //repeat some functions in time
 function timed_functions_handler(){

@@ -53,7 +53,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
-		//{name: 'Damage',		passive: true,		broadcast: 0}, 
+		{name: 'Damage',		passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50],
 	preview: true,
@@ -352,7 +352,7 @@ TYPES.push({
 	preview: false,
 	icon_top: false,
 	icon_base: true,
-	no_rotate: true,
+	no_base_rotate: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,

@@ -37,7 +37,7 @@ function redraw_tank_stats(){
 	var left_x = status_x+255;
 	var left_x_values = status_x+305;
 	var gap = 19;
-	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;		//draw_counter_tank_selection(); return false;
+	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
 	
 	if(game_mode == 2 && MY_TANK.dead == 1){
 		ROOM = get_room_by_id(opened_room_id);
@@ -48,8 +48,8 @@ function redraw_tank_stats(){
 		}
 	
 	//clear
-	canvas_backround.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general.statusbar.x+245, IMAGES_SETTINGS.general.statusbar.y+10, 330, 83, 
-		status_x+245, top_y-40+10, 330, 83); 
+	draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
+		245, 10, 330, 83);
 	
 	//level
 	canvas_backround.fillStyle = "#182605";
@@ -185,7 +185,8 @@ function redraw_tank_stats(){
 	//fill
 	var hp = round(MY_TANK.hp);
 	var hp_max = TYPES[MY_TANK.type].life[0]+TYPES[MY_TANK.type].life[1]*(MY_TANK.level-1);
-	draw_image(canvas_backround, 'level', life_x, life_y, round(life_width*hp/hp_max), life_height);
+	if(round(life_width*hp/hp_max) > 0)
+		draw_image(canvas_backround, 'level', life_x, life_y, round(life_width*hp/hp_max), life_height);
 		
 	//text
 	canvas_backround.fillStyle = "#ffffff";
@@ -257,7 +258,6 @@ function draw_ability_reuse(object){
 		//if active
 		var img_height=0;
 		if(TYPES[MY_TANK.type].abilities[i].passive == false){
-			var img = new Image();
 			img_height = (SKILL_BUTTON) * ability_reuse / object.max + 5;
 			if(img_height > 65)
 				img_height = 65;	//error here
@@ -267,14 +267,13 @@ function draw_ability_reuse(object){
 				}
 			else{
 				//reuse on
-				canvas_backround.drawImage(IMAGES_GENERAL, 
-					IMAGES_SETTINGS.general.skill_off.x, IMAGES_SETTINGS.general.skill_off.y, 
-					SKILL_BUTTON+10, 
-					img_height, 
+				
+				draw_image(canvas_backround, 'skill_off', 
 					status_x_tmp+i*(SKILL_BUTTON+gap)-5, 
 					status_y-5, 
 					SKILL_BUTTON+10, 
-					img_height); 
+					img_height,
+					undefined, undefined, undefined, img_height);
 				canvas_backround.fillStyle = "#4b6125";
 				}
 			}
@@ -481,13 +480,7 @@ function draw_counter_tank_selection(selected_tank){
 	
 	if(selected_tank==last_selected_counter)
 		return false;
-		
-	if(first_time == true){
-		//clear
-		canvas_backround.drawImage(IMAGES_GENERAL, IMAGES_SETTINGS.general.statusbar.x+padding_left-10, IMAGES_SETTINGS.general.statusbar.y+padding_top-5, max_width, max_height, 
-			pos1-10, pos2-5, max_width, max_height);
-		}
-	
+
 	var j=0;
 	var row = 0;
 	for(var i in TYPES){
@@ -504,8 +497,9 @@ function draw_counter_tank_selection(selected_tank){
 			roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
 			
 			//logo
-			canvas_backround.drawImage(IMAGES_TANKS, IMAGES_SETTINGS.tanks[TYPES[i].name].x, IMAGES_SETTINGS.tanks[TYPES[i].name].y, 90, 90, 
-				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), msize, msize); 
+			draw_image(canvas_backround, TYPES[i].name, 
+				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), msize, msize,
+				undefined, undefined, 90, 90);
 			
 			//register button
 			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
