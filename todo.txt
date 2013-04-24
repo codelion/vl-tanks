@@ -1,3 +1,4 @@
+lvl progress
 IDEAS
 	towers regen hp?
 	restricted minions mode
