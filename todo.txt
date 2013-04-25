@@ -1,9 +1,6 @@
-lvl progress
 IDEAS
-	towers regen hp?
-	restricted minions mode
+	manual skill update
 	new units
-		Drone: medium hp, medium armor, high dps, but low range. Skills: plasma shot+vr?, blink, slow.
 		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	
 		sieger - explosive bullets, dig+range, undig
 	truck -> APC instead or LAV?
