@@ -15,7 +15,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [50, 0.35, 70],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
@@ -46,7 +46,7 @@ TYPES.push({
 	damage: [30, 1.5],		//30 dps
 	range: 80,
 	scout: 100,
-	armor: [30, 0.35, 50],
+	armor: [30, 0.5, 50],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 3,
@@ -73,7 +73,7 @@ TYPES.push({
 	damage: [18, 1.3],	//18 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.35, 40],
+	armor: [20, 0.5, 40],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 5,
@@ -155,7 +155,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.35, 40],
+	armor: [20, 0.5, 40],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -182,7 +182,7 @@ TYPES.push({
 	damage: [15, 1.1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.35, 40],	
+	armor: [20, 0.5, 40],	
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -227,6 +227,33 @@ TYPES.push({
 	accuracy: 90,
 	});
 
+//TRex
+TYPES.push({
+	name: 'TRex',
+	type: 'tank',
+	description: ["Plasma shots", "Jumps", "Huge damage, low range", "Light armor"],
+	life: [170, 11],
+	damage: [20, 1.4],	//20 dps
+	range: 40,
+	scout: 100,
+	armor: [30, 0.5, 50],
+	speed: 28,
+	attack_delay: 1,
+	turn_speed: 5,
+	abilities: [
+		{name: 'Plasma',	passive: false,		broadcast: 2}, 
+		{name: 'Jump',		passive: false,		broadcast: 2}, 
+		{name: 'Damage',	passive: true,		broadcast: 0}, 
+		],
+	size: ['M', 50],
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
+	fire_sound: 'shoot',
+	accuracy: 90,
+	});
+
 //Apache
 TYPES.push({
 	name: 'Apache',
@@ -236,7 +263,7 @@ TYPES.push({
 	damage: [20, 1.3],	//20 dps
 	range: 100,
 	scout: 120,
-	armor: [20, 0.35, 40],	
+	armor: [20, 0.5, 40],	
 	speed: 32,
 	attack_delay: 1,
 	turn_speed: 6,
@@ -262,11 +289,11 @@ TYPES.push({
 	type: 'tank',
 	description: ["Bombs", "Fast speed", "Low defence"],
 	life: [150, 10],
-	damage: [15, 1.1],	//15 dps
+	damage: [20, 1.3],	//20 dps
 	range: 90,
 	scout: 120,
 	armor: [10, 0, 10],
-	speed: 35,
+	speed: 37,
 	attack_delay: 1,
 	turn_speed: 4,
 	//bonus: 1,

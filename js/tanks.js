@@ -13,7 +13,7 @@ function draw_tank(tank){
 		visibility = 1;
 		
 		if(tank.dead == 1)	tank_size = tank_size/2; //dead
-		if(check_enemy_visibility(tank)==false)	return false; //out of sight
+		//if(check_enemy_visibility(tank)==false)	return false; //out of sight
 		
 		lighten_pixels(tank);
 		
@@ -290,8 +290,17 @@ function draw_bullets(TANK, time_gap){
 							
 					//extra effects for non tower
 					if(bullet_target.team != TANK.team && TYPES[bullet_target.type].type!='tower'){
+						//stun
 						if(BULLETS[b].stun_effect != undefined)
 							bullet_target.stun = Date.now() + BULLETS[b].stun_effect;
+						//slow
+						if(BULLETS[b].slow_debuff != undefined){
+							bullet_target.buffs.push({
+								name: BULLETS[b].slow_debuff.name,
+								power: BULLETS[b].slow_debuff.power,
+								lifetime: Date.now()+BULLETS[b].slow_debuff.duration,
+								});
+							}
 						}
 					}
 				}								
@@ -419,6 +428,7 @@ function draw_tank_move(mouseX, mouseY){
 	if(mouse_click_controll==true){
 		do_missile(MY_TANK.id);
 		do_bomb(MY_TANK.id);
+		do_jump(MY_TANK.id);
 		
 		//external click functions
 		for (i in on_click_functions)
@@ -427,6 +437,7 @@ function draw_tank_move(mouseX, mouseY){
 	else{
 		//delete other handlers
 		delete MY_TANK.try_missile;
+		delete MY_TANK.try_jump;
 		delete MY_TANK.try_bomb;
 		
 		if(MY_TANK.death_respan != undefined) return false;
@@ -530,7 +541,7 @@ function check_collisions(xx, yy, TANK){
 	//other tanks
 	if(TYPES[TANK.type].types != 'tower'){
 		for (i in TANKS){
-			if(TANK.use_AI == true && TANK.team == TANKS[i].team) continue;
+			if(TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'tower') continue;
 			if(TANKS[i].id == TANK.id) continue;			//same tank
 			if(TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
 			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
@@ -564,9 +575,9 @@ function tank_level_handler(){	//once per second
 		
 		//calc level
 		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets;
-		time_diff = Math.ceil(time_diff/LEVEl_UP_TIME);		
 		
-		TANKS[i].level = time_diff;
+		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
+		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	
 		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
@@ -600,12 +611,12 @@ function tank_level_handler(){	//once per second
 		}
 	}
 //checks tanks hp regen
-function level_hp_regen_handler(){		//once per 1 second - 1.5%/s
+function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
 	for (i in TANKS){
 		if(TANKS[i].dead == 1 || TYPES[TANKS[i].type].type == 'tower') continue;
 		var max_hp = TYPES[TANKS[i].type].life[0] + TYPES[TANKS[i].type].life[1] * (TANKS[i].level-1);
-		//passive hp regain - 1.5%/s
-		var extra_hp = round(max_hp * 1.5 / 100);
+		//passive hp regain - 2.2%/s
+		var extra_hp = round(max_hp * 2.2 / 100);
 		if(TANKS[i].hp < max_hp){
 			TANKS[i].hp = TANKS[i].hp + extra_hp;
 			if(TANKS[i].hp > max_hp)
@@ -956,6 +967,8 @@ function do_damage(TANK, TANK_TO, BULLET){
 		TANK.towers = TANK.towers + damage_at_tower;	
 		TANK.score = TANK.score + SCORES_INFO[3] * (damage / TYPES[TANK_TO.type].life[0]);
 		}
+	TANK.damage_done = TANK.damage_done + damage;
+	TANK_TO.damage_received = TANK_TO.damage_received + damage;
 	
 	life_total = TANK_TO.hp;
 	if(life_total-damage>0){
@@ -979,9 +992,8 @@ function do_damage(TANK, TANK_TO, BULLET){
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	//tanks without repawn
 			//base dead
 			if(TYPES[TANK_TO.type].name == "Base"){
-				if(game_mode == 1){
+				if(game_mode == 1)
 					draw_final_score(false, TANK_TO.team);
-					}
 				else
 					register_tank_action('end_game', opened_room_id, false, TANK_TO.team);
 				}
@@ -1398,7 +1410,8 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		angle: angle,
 		fire_angle: angle,
 		move: 0,
-		level: level,		
+		level: level,	
+		sublevel: 0,	
 		hp: hp_mod * (TYPES[type].life[0]+TYPES[type].life[1]*(level-1)),
 		abilities_lvl: [1, 1, 1],
 		abilities_reuse: [0, 0, 0],
@@ -1411,6 +1424,8 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		begin_time: Date.now(),
 		death_time: 0,	//how much second tank was dead
 		bullets: 0,	//how much second tank was in battle
+		damage_received: 0,	//total damage received
+		damage_done: 0,		//total damage done
 		score: 0,
 		kills: 0,
 		deaths: 0,

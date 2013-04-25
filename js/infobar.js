@@ -50,7 +50,21 @@ function redraw_tank_stats(){
 	//clear
 	draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
 		245, 10, 330, 83);
-	
+		
+	//sublevel clear
+	var max_width = 85;
+	canvas_backround.lineWidth = 2;
+	canvas_backround.beginPath();
+	canvas_backround.moveTo(status_x+130, status_y+36);
+	canvas_backround.lineTo(status_x+130+max_width, status_y+36);
+	canvas_backround.strokeStyle = '#2a4214';
+	canvas_backround.stroke();
+	//sublevel draw
+	canvas_backround.beginPath();
+	canvas_backround.moveTo(status_x+130, status_y+36);
+	canvas_backround.lineTo(status_x+130+round(MY_TANK.sublevel*max_width/100), status_y+36);
+	canvas_backround.strokeStyle = '#4a7c0d';
+	canvas_backround.stroke();
 	//level
 	canvas_backround.fillStyle = "#182605";
 	canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
@@ -110,15 +124,13 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
 	var speed_text = MY_TANK.speed;
-	if(MY_TANK.debuffs != undefined){
-		speed_first = speed_text;
-		for(var dd in MY_TANK.debuffs){
-			if(MY_TANK.debuffs[dd][0]=='slow'){
-				var diff = speed_first * MY_TANK.debuffs[dd][1] / 100;
-				speed_text = speed_text - diff;
-				if(speed_text < 0)
-					speed_text = 0;
-				}
+	speed_first = speed_text;
+	for(var dd in MY_TANK.buffs){
+		if(MY_TANK.buffs[dd].name == 'slow'){
+			var diff = speed_first * MY_TANK.buffs[dd].power / 100;
+			speed_text = speed_text - diff;
+			if(speed_text < 0)
+				speed_text = 0;
 			}
 		}
 	speed_text = Math.floor(speed_text)+" km/h";

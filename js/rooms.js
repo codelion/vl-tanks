@@ -314,17 +314,19 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	text = "Map:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
+	j=0;
 	for(var i in MAPS){
+		if(MAPS[i].singleplayer_only != undefined) continue;
 		//block
 		canvas_backround.strokeStyle = "#000000";
 		if(MAPS[i].name == game_map)
 			canvas_backround.fillStyle = button_active_color;
 		else
 			canvas_backround.fillStyle = button_inactive_color;
-		roundRect(canvas_backround, 10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
+		roundRect(canvas_backround, 10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
 		
 		//action
-		register_button(10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
+		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
 			game_map = extra;
 			draw_create_room(game_players, game_mode, game_type, game_map);
 			}, MAPS[i].name);
@@ -336,7 +338,8 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 			canvas_backround.fillStyle = "#3f3b30";
 		canvas_backround.font = "Normal 12px Arial";
 		text = ucfirst(MAPS[i].name);
-		canvas_backround.fillText(text, 10+offset_left+10+i*(button_width+button_gap), 60+offset_top+25);
+		canvas_backround.fillText(text, 10+offset_left+10+j*(button_width+button_gap), 60+offset_top+25);
+		j++;
 		}
 	offset_top = offset_top + 40;
 	

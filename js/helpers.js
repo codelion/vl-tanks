@@ -126,3 +126,17 @@ function convertToSlug(Text){
 function isIE () {
 	return !!navigator.userAgent.match(/MSIE 10/);
 	}
+function generatePassword(limit){
+	array1 = "zsdcrfvtgbhnjmkp";
+	array2 = "aeou"; //yes, no i
+	n1 = array1.length;
+	n2 = array2.length;
+	
+	string = "";
+	for(var i=0; i<limit; i=i+2){
+		string = string + array1[getRandomInt(0, n1-1)];
+		string = string + array2[getRandomInt(0, n2-1)];
+		}
+	
+	return string;
+	}
