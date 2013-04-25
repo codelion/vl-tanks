@@ -17,7 +17,8 @@ MAPS.push({
 	name: "Main",
 	width: 800,
 	height: 1000,
-	team_size: 3,
+	team_allies: 3,
+	team_enemies: 3,
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -64,7 +65,8 @@ MAPS.push({
 	name: "Labyrinth",
 	width: 800,
 	height: 1000,
-	team_size: 3,
+	team_allies: 3,
+	team_enemies: 3,
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -112,7 +114,8 @@ MAPS.push({
 	name: "Decision",
 	width: 800,
 	height: 1000,
-	team_size: 3,
+	team_allies: 3,
+	team_enemies: 3,
 	towers: [
 			//team x,	 y, 	name
 			//team x,	 y, 	name
@@ -156,7 +159,8 @@ MAPS.push({
 	name: "Mini",
 	width: 800,
 	height: 370,
-	team_size: 2,
+	team_allies: 2,
+	team_enemies: 2,
 	towers: [
 			//team x,	 y, 	name
 			['B',	50,	55,	'Base'],
@@ -178,6 +182,36 @@ MAPS.push({
 			['R',	75,	95,	[[5 ,80],[5 ,10]] ],
 		],
 	});
+	
+//====== Hell ==================================================================
+
+MAPS.push({
+	name: "Hell",
+	width: 800,
+	height: 600,
+	team_allies: 0,
+	team_enemies: 10,
+	ground_only: true,
+	singleplayer_only: true,
+	towers: [
+			//team x,	 y, 	name
+			['B',	400,	60,	'Base'],
+			['B',	420,	300,	'Tower'],
+			['R',	400,	540,	'Base'],
+		],
+	elements: [
+			//name, 	x,	y,   max_width,	max_height
+			['fence', 	0,	300,	0,	0],
+			['fence', 	100,	300,	0,	0],
+			['fence', 	200,	300,	0,	0],
+			['fence', 	300,	300,	0,	0],
+			['fence', 	440,	300,	0,	0],
+			['fence', 	540,	300,	0,	0],
+			['fence', 	640,	300,	0,	0],
+			['fence', 	740,	300,	60,	0],
+		],
+	bots: [],
+	});
 
 //====== Huge ==================================================================
 
@@ -185,7 +219,8 @@ MAPS.push({
 	name: "Huge",
 	width: 2000,
 	height: 3000,
-	team_size: 10,
+	team_allies: 10,
+	team_enemies: 10,
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],

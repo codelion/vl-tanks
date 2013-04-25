@@ -236,7 +236,7 @@ function draw_main(){
 	if(MY_TANK.dead == 1)	
 		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
 	
-	//show live scroes?
+	//show live scores?
 	if(tab_scores==true)
 		draw_final_score(true);
 	
@@ -487,6 +487,8 @@ function draw_final_score(live, lost_team){
 	var text_y = 70;
 	var flag_space = (button_height-flag_height)/2;
 	
+	if(live==false) tab_scores=false;
+	
 	//find canvas
 	if(live==true)
 		canvas = canvas_main;
@@ -592,11 +594,19 @@ function draw_final_score(live, lost_team){
 	canvas.fillStyle = "#056705";
 	canvas.fillText("Towers", Math.round((WIDTH_APP-button_width)/2)+400, text_y);
 	
+	canvas.fillStyle = "#056705";
+	canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+450, text_y-15);
+	canvas.fillText("done", Math.round((WIDTH_APP-button_width)/2)+450, text_y);
+	
+	canvas.fillStyle = "#b12525";
+	canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+500, text_y-15);
+	canvas.fillText("received", Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+	
 	canvas.fillStyle = "#d06a07";
-	canvas.fillText("Level", Math.round((WIDTH_APP-button_width)/2)+450, text_y);
+	canvas.fillText("Level", Math.round((WIDTH_APP-button_width)/2)+600, text_y);
 	
 	canvas.fillStyle = "#ff3405";
-	canvas.fillText("Score", Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+	canvas.fillText("Score", Math.round((WIDTH_APP-button_width)/2)+650, text_y);
 	
 	//sort
 	if(live==false)
@@ -665,14 +675,26 @@ function draw_final_score(live, lost_team){
 			towers = Math.round(towers*10)/10;
 			canvas.fillText(towers, Math.round((WIDTH_APP-button_width)/2)+400, text_y);
 			
+			//damage done
+			canvas.fillStyle = "#056705";
+			var value = TANKS[i].damage_done;
+			if(value>1000) value = Math.floor(value/100)/10+"k";
+			canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+450, text_y);	
+			
+			//damage received
+			canvas.fillStyle = "#b12525";
+			var value = TANKS[i].damage_received;
+			if(value>1000) value = Math.floor(value/100)/10+"k";
+			canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+			
 			//level
 			canvas.fillStyle = "#d06a07";
-			canvas.fillText(TANKS[i].level, Math.round((WIDTH_APP-button_width)/2)+450, text_y);
+			canvas.fillText(TANKS[i].level, Math.round((WIDTH_APP-button_width)/2)+600, text_y);
 			
 			//score
 			canvas.fillStyle = "#ff3405";
 			var score = TANKS[i].score;
-			canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+			canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+650, text_y);
 			
 			j++;
 			}

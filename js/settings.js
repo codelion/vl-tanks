@@ -26,12 +26,12 @@ var SKILL_BUTTON = 55;			//skill button width and height
 var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXT = '.ogg';			//default sound files extension
-var LEVEl_UP_TIME = 30;			//how much seconds must pass till level up
+var LEVEL_UP_TIME = 30;			//how much seconds must pass till level up
 var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
 var flag_width = 15;			//flag icon width
 var flag_height = 9;			//flag icon height
 var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
-var VERSION = "1.3.3";			//app version
+var VERSION = "1.3.4";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array

@@ -215,6 +215,8 @@ function init_action(map_nr, my_team){
 	add_towers();
 
 	//create ... me
+	if(game_mode==1 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
+		my_tank_nr = 0;
 	add_tank(1, name, name, my_tank_nr, my_team);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
@@ -231,23 +233,26 @@ function init_action(map_nr, my_team){
 			}
 			
 		//friends
-		for(var i=1; i< MAPS[level-1].team_size; i++){
+		for(var i=1; i< MAPS[level-1].team_allies;){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
+				continue;
 			if(DEBUG==false)
-				add_tank(1, get_unique_id(), "Bot", random_type, my_team, undefined, undefined, undefined, true);
+				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, undefined, undefined, undefined, true);
+			i++;
 			}
 		
 		//enemies
 		enemy_team = 'B';
 		if(enemy_team == my_team)
 			enemy_team = 'R';	
-		random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			//random_type = 1;
-		add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
-		for(var i=1; i< MAPS[level-1].team_size; i++){
+		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-			if(DEBUG==false)
-				add_tank(1, get_unique_id(), "Bot", random_type, enemy_team, undefined, undefined, undefined, true);
+			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
+				continue;
+			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);
+			if(DEBUG==true) break;
+			i++;
 			}
 		}
 
@@ -322,12 +327,14 @@ var IMAGES_SETTINGS = {
 		Soldier:	{ x:0,	y:1000,	w:90,	h:90 },
 		Tower:	{ x:0,	y:1100,	w:90,	h:90 },
 		Base:		{ x:0,	y:1200,	w:90,	h:90 },
+		TRex:		{ x:0,	y:1300,	w:90,	h:90 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
 		missle:	{ x:0,	y:50,		w:8,	h:23 }, 
 		airstrike:	{ x:0,	y:100,	w:38,	h:15 }, 
 		bomb: 	{ x:0,	y:150,	w:12,	h:12 },
+		plasma: { x:0,	y:200,	w:15,	h:15 },
 		},
 	elements: {
 		fence:	{ x:0,	y:0,		w:100,h:26 }, 

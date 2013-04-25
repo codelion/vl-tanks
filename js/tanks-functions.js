@@ -369,7 +369,7 @@ function Strike(TANK, descrition_only, settings_only, ai){
 	var range = 120;
 	
 	if(descrition_only != undefined)
-		return 'Powerfull shoot with area of '+power+'.';
+		return 'Powerful shoot with area of '+power+'.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_missile != undefined){
@@ -675,7 +675,8 @@ function Mass_virus(TANK, descrition_only, settings_only, ai){
 		
 	for (i in TANKS){				
 		if(TANKS[i].team == TANK.team)	continue;	//same team
-		if(TANKS[i].dead == 1)			continue;	//target dead
+		if(TANKS[i].stun != undefined)		continue;	//already got stun
+		if(TANKS[i].dead == 1)		continue;	//target dead
 		
 		//check
 		distance = get_distance_between_tanks(TANKS[i], TANK);
@@ -827,6 +828,166 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 	return reuse;
 	}
 
+//====== TRex ==================================================================
+
+function Plasma(TANK, descrition_only, settings_only, ai){
+	var reuse = 5000;
+	var power = 60 + 6 * (TANK.level-1);
+	var duration_slow = 2000;
+	var power_slow = 30 + (TANK.level-1);
+	if(power_slow > 60) power_slow = 60;
+	var range = 40;
+	
+	if(descrition_only != undefined)
+		return 'Powerful plasma shot with '+power+' power. Slows down enemy by '+power_slow+'%.';
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	if(TANK.try_missile != undefined){
+		delete TANK.try_missile;
+		if(TANK.id == MY_TANK.id){
+			mouse_click_controll = false;
+			target_range=0;
+			}
+		return 0;
+		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = 0;
+		}
+	//init
+	TANK.try_missile = {
+		range: range,
+		power: power,
+		reuse: reuse,
+		pierce: 1,
+		icon: 'plasma',
+		angle: false,
+		ability_nr: 0,
+		more: ['slow_debuff', {name: 'slow', power: power_slow, duration: duration_slow}],
+		};
+	
+	//return reuse - later, on use
+	return 0;
+	}
+function Jump(TANK, descrition_only, settings_only, ai){
+	var reuse = 8000;
+	var range = 120;
+	
+	if(descrition_only != undefined)
+		return 'Quick jump to free location with '+range+' range.';
+	if(settings_only != undefined) return {reuse: reuse};
+	if(ai != undefined) return false;
+	
+	if(TANK.try_jump != undefined){
+		delete TANK.try_jump;
+		if(TANK.id == MY_TANK.id){
+			mouse_click_controll = false;
+			target_range=0;
+			}
+		return 0;
+		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = 0;
+		}
+	//init
+	TANK.try_jump = {
+		range: range,
+		reuse: reuse,
+		ability_nr: 1,
+		};
+	//remove all bullets from it
+	for (b = 0; b < BULLETS.length; b++){
+		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
+			BULLETS.splice(b, 1); b--;
+			}
+		}
+	
+	//return reuse - later, on use
+	return 0;
+	}
+function do_jump(tank_id, skip_broadcast){
+	TANK = get_tank_by_id(tank_id);
+	if(TANK.try_jump == undefined) return false;
+	if(game_mode == 1 && MAPS[level-1].ground_only != undefined) return false;
+	if(TANK.name == name){
+		var mouseX = mouse_click_pos[0];
+		var mouseY = mouse_click_pos[1];
+		}
+	else{
+		mouseX = TANK.jump_x;
+		mouseY = TANK.jump_y;
+		}
+	var tank_size = TYPES[TANK.type].size[1]/2;		
+	
+	dist_x = mouseX - (TANK.cx());
+	dist_y = mouseY - (TANK.cy());
+	distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+	var radiance = Math.atan2(dist_y, dist_x);
+	if(distance < TANK.try_jump.range){
+		var move_x = mouseX;
+		var move_y = mouseY;
+		}
+	else{
+		move_x = TANK.cx() + Math.floor(Math.cos(radiance)*TANK.try_jump.range);
+		move_y = TANK.cy() + Math.floor(Math.sin(radiance)*TANK.try_jump.range);
+		}
+	dist_x = move_x - (TANK.cx());
+	dist_y = move_y - (TANK.cy());
+	radiance = Math.atan2(dist_y, dist_x);
+	var angle = (radiance*180.0)/Math.PI+90;
+		
+	if(check_collisions(move_x, move_y, TANK)==true)
+		return false;	//wrong place
+	
+	//broadcast
+	if(game_mode == 2 && skip_broadcast !== true){
+		DATA = {
+			function: 'do_jump',
+			fparam: [tank_id, true],
+			tank_params: [
+				{key: 'try_jump', value: TANK.try_jump},
+				{key: 'jump_x', value: mouse_click_pos[0]},
+				{key: 'jump_y', value: mouse_click_pos[1]},
+				],
+			};
+		register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+		delete TANK.try_jump;
+		mouse_click_controll = false;
+		target_range=0;
+		return false;
+		}
+	
+	//control
+	nr = TANK.try_jump.ability_nr;
+	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
+	TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;
+	
+	//effect
+	TANK.x = move_x - tank_size;
+	TANK.y = move_y - tank_size;
+	TANK.move = 0;
+	TANK.angle = angle;
+	TANK.fire_angle = angle;
+	auto_scoll_map();
+		
+	//init reuse
+	if(game_mode == 1 || TANK.name == name){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_jump.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_jump.ability_nr;	
+		tmp['max'] = TANK.try_jump.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
+	
+	delete TANK.try_jump;
+	mouse_click_controll = false;
+	target_range=0;
+	}
+
 //====== Helicopter ============================================================
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
@@ -902,7 +1063,7 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 	if(splash_range > 70) splash_range = 70; 
 
 	if(descrition_only != undefined)
-		return 'Drop powerfull bomb with area damage of '+power+'.';
+		return 'Drop powerful bomb with area damage of '+power+'.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_bomb != undefined){
