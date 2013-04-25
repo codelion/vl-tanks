@@ -579,6 +579,8 @@ function tank_level_handler(){	//once per second
 		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
 		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	
 		
+		TANKS[i].level = 100;
+		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
 			if(game_mode == 1){
