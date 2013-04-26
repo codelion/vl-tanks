@@ -13,7 +13,7 @@ function draw_tank(tank){
 		visibility = 1;
 		
 		if(tank.dead == 1)	tank_size = tank_size/2; //dead
-		//if(check_enemy_visibility(tank)==false)	return false; //out of sight
+		if(check_enemy_visibility(tank)==false)	return false; //out of sight
 		
 		lighten_pixels(tank);
 		
@@ -578,8 +578,6 @@ function tank_level_handler(){	//once per second
 		
 		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
 		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	
-		
-		TANKS[i].level = 100;
 		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
