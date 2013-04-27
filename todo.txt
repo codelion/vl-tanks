@@ -1,3 +1,20 @@
-sync AI actions
-	enable soldiers in multiplayer
-counter mode
+10min - 30lvl
+IDEAS
+	manual skill update
+	new units
+		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	
+		sieger - explosive bullets, dig+range, undig
+	truck -> APC instead or LAV?
+	Helium3
+		base, mines generates, spawn takes, on 0 - team dies.
+		H3 mines give your base more energy and your towers more attacking power. 
+		H3 should be deposited randomly across the map
+	new skills:
+		traps: root, slow
+		Phoenix - Upon death, you are revived with 1 HP.
+		block skills
+		Chain Lightning
+		medusa
+		Nanobots to bomber?
+		destruction
+		glue

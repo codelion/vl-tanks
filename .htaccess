@@ -1,0 +1,12 @@
+### caching
+<Files ~ "\.(css|jpg|jpeg|png|gif|js|swf|bmp)$"> 
+Header add "Cache-Control" "max-age=31536000"
+Header append Cache-Control "public"
+</Files>
+
+### compressing
+<Files ~ "\.(html|css|js)$"> 
+SetOutputFilter DEFLATE
+BrowserMatch ^Mozilla/4\.0[678] no-gzip\
+BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+</Files>
