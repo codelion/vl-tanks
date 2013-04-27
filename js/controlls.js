@@ -1,21 +1,33 @@
 //keyboard actions
 function on_keyboard_action(event){
-	k = event.keyCode;
+	k = event.keyCode;	//log(k);
 	
 	//add shortcuts
 	if(PLACE == 'game'){
-		if(MY_TANK.dead != 1){
-			if(k == 49 || k == 97 ){	
-				//special 1
-				do_ability(1, MY_TANK);
-				}	
-			else if(k == 50 || k == 98 ){
-				//sepcial 2
-				do_ability(2, MY_TANK);
-				}
-			else if(k == 51 || k == 99 ){
-				//special 3
-				do_ability(3, MY_TANK);
+		if(MY_TANK.dead != 1 && chat_mode==0){
+			if(k == 49 || k == 97 )	
+				do_ability(1, MY_TANK);	//special 1
+			else if(k == 50 || k == 98)
+				do_ability(2, MY_TANK);	//sepcial 2
+			else if(k == 51 || k == 99)
+				do_ability(3, MY_TANK);	//special 3
+			else if(k == 38)
+				scoll_map(0, 1);	//up
+			else if(k == 40)
+				scoll_map(0, -1); 	//down
+			else if(k == 39)
+				scoll_map(-1, 0);	//left
+			else if(k == 37)
+				scoll_map(1, 0); 	//right
+			else if(k == 27){		//esc
+				if(PLACE == 'game'){
+					MY_TANK.move = 0;
+					if(game_mode == 2){
+						register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
+						}
+					else
+						MY_TANK.move = 0;
+					}	
 				}
 			}
 		if(k==9){				
@@ -26,6 +38,8 @@ function on_keyboard_action(event){
 				tab_scores=false;
 			}
 		}
+	if(k==16)
+		shift_pressed = true; //shift
 	if(k==13){
 		//enter
 		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
@@ -34,6 +48,10 @@ function on_keyboard_action(event){
 				chat_mode=1;
 				document.getElementById("chat_write").style.visibility = 'visible';
 				document.getElementById("chat_text").focus();
+				if(shift_pressed==true)
+					chat_shifted = true;
+				else
+					chat_shifted = false;
 				}
 			else{
 				//end write
@@ -53,10 +71,35 @@ function on_keyboard_action(event){
 		}
 	
 	//disable some keys
-	if(k >= 37 && k <= 40)	return false;	//scroll with left, rigth, up and down
+	if(k >= 37 && k <= 40 && chat_mode != 1) return false;	//scroll with left, rigth, up and down
 	if(k==9)	return false;	//TAB
 		
 	return true;
+	}
+//keyboard release
+function on_keyboardup_action(event){
+	k = event.keyCode;
+	if(k==16)
+		shift_pressed = false; //shift
+	}
+//mouse scroll
+function MouseWheelHandler(e){
+	var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+	if(PLACE != 'game') return true;
+	
+	//enable manual scroll
+	if(MAP_SCROLL_MODE == 1)
+		MAP_SCROLL_MODE = 2;
+	
+	//scroll	
+	if(delta == 1)
+		scoll_map(0, 1);
+	else if(delta == -1)
+		scoll_map(0, -1);
+	
+	//disable page scroll - dont worry, only on started game area
+	e.preventDefault()
+	return false;
 	}
 //mouse move on background
 function on_mousemove_background(event){
@@ -130,8 +173,8 @@ function on_mousemove(event){
 		}
 	mouse_pos = [mouseX, mouseY];
 	}	
-//mouse click 
-function on_mousedown(event){
+//mouse right click
+function on_mouse_right_click(event){
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX-map_offset[0];
@@ -141,7 +184,23 @@ function on_mousedown(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
-	mouse_click_pos = [mouseX, mouseY];
+	if(PLACE == 'game')
+		soldiers_move(mouseX, mouseY);	
+	
+	return false;
+	}
+//mouse click 
+function on_mousedown(event){
+	if(event.which == 3) return false;
+	//mouse position
+	if(event.offsetX) {
+		mouseX = event.offsetX;
+		mouseY = event.offsetY;
+		}
+	else if(event.layerX) {
+		mouseX = event.layerX;
+		mouseY = event.layerY;
+		}
 	if(PLACE != 'game'){
 		menu_pressed = false;	
 		for(var i in BUTTONS){
@@ -152,11 +211,19 @@ function on_mousedown(event){
 				window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 			else
 				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
+			break;
 			}
 		}
 	//move tank
-	if(PLACE == 'game')
+	if(PLACE == 'game'){
+		mouseX = mouseX-map_offset[0];
+		mouseY = mouseY-map_offset[1];
+		mouse_click_pos = [mouseX, mouseY];
 		draw_tank_move(mouseX, mouseY);
+		}
+	}
+function on_mouse_up(event){
+	
 	}
 //mouse click on background
 function on_mousedown_back(event){
@@ -183,6 +250,7 @@ function on_mousedown_back(event){
 			window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 		else
 			BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
+		break;
 		}
 	}
 //mouse click release on background

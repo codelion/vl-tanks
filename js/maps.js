@@ -23,45 +23,27 @@ function draw_map(map_only){
 		}
 	
 	//background
-	var backround_height;
-	var background_elem = get_element_by_name('background');
-	if(background_elem==false)
-		alert("ERROR: missing element 'background' config in draw_map().");
-	backround_width = background_elem.size[0];
-	backround_height = background_elem.size[1];
-	var img_texture = new Image();
-	img_texture.src = '../img/map/moon.jpg';
-	img_texture.onload = function(){	//on background load
-		for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
-			for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++){
-				var img_texture = new Image();
-				img_texture.src = '../img/map/moon.jpg';
-				canvas_map.drawImage(img_texture, 0+j*backround_width, 0+i*backround_height);
-				}
-			}
-		
-		//elements
-		var img_wall = new Image();
-		img_wall.src = '../img/map/fence.png';
-		img_wall.onload = function(){	//on wall load
-			for(var e in MAPS[level-1].elements){
-				var element = get_element_by_name(MAPS[level-1].elements[e][0]);
-				x = MAPS[level-1].elements[e][1];
-				y = MAPS[level-1].elements[e][2];
-				if(element.size[0]<30)	x = x - round(element.size[0]/2);
-				if(element.size[1]<30)	y = y - round(element.size[1]/2);
-				max_w = element.size[0];
-				if(MAPS[level-1].elements[e][3]!=0)
-					max_w = MAPS[level-1].elements[e][3];
-				max_h = element.size[1];
-				if(MAPS[level-1].elements[e][4]!=0)
-					max_h = MAPS[level-1].elements[e][4];
-					
-				var img_element = new Image();
-				img_element.src = '../img/map/'+element.file;
-				canvas_map.drawImage(img_element, 0, 0, max_w, max_h, x, y, max_w, max_h);
-				}
-			}
+	backround_width = 400;
+	backround_height = 400;
+	for(var i=0; i<Math.ceil(MAPS[level-1].height/backround_height); i++){
+		for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++)
+			canvas_map.drawImage(IMAGE_MOON, 0+j*backround_width, 0+i*backround_height);
+		}
+	
+	//elements
+	for(var e in MAPS[level-1].elements){
+		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		x = MAPS[level-1].elements[e][1];
+		y = MAPS[level-1].elements[e][2];
+		if(element.size[0]<30)	x = x - round(element.size[0]/2);
+		if(element.size[1]<30)	y = y - round(element.size[1]/2);
+		max_w = element.size[0];
+		if(MAPS[level-1].elements[e][3]!=0)
+			max_w = MAPS[level-1].elements[e][3];
+		max_h = element.size[1];
+		if(MAPS[level-1].elements[e][4]!=0)
+			max_h = MAPS[level-1].elements[e][4];
+		draw_image(canvas_map, element.name, x, y, max_w, max_h);
 		}
 	
 	if(map_only==false)
@@ -157,15 +139,12 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	var button_height = 81;
 	var gap = 10;
 	var letter_height = 8;
-	var letter_width = 9;
 	var selected_block_padding=0;
 	
 	maps_positions = [];
 	
-	//clear name ara
-	img = new Image();
-	img.src = '../img/background.jpg';
-	canvas_backround.drawImage(img, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
+	//clear name area
+	canvas_backround.drawImage(IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){
 		//background
@@ -185,7 +164,9 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 				canvas_this.fillStyle = "#0000aa";
 			else
 				canvas_this.fillStyle = "#b12525";
-			canvas_this.fillRect(pos1+1+Math.ceil(MAPS[i].towers[ii][1]*(button_width-2-msize)/100), pos2+1+Math.ceil(MAPS[i].towers[ii][2]*(button_height-2-msize)/100), msize, msize);
+			tank_x = pos1 + round((MAPS[i].towers[ii][1]) * button_width / round(MAPS[i].width));
+			tank_y = pos2 + round((MAPS[i].towers[ii][2]) * button_height /(MAPS[i].height));
+			canvas_this.fillRect(tank_x, tank_y, msize, msize);
 			}
 		
 		//elements
@@ -212,12 +193,14 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			}
 			
 		//name
-		var padding_left = Math.round((button_width-letter_width*MAPS[i].name.length)/2);
 		if(level - 1==i)
 			canvas_this.fillStyle = "#c10000";
 		else
 			canvas_this.fillStyle = "#196119";
 		canvas_this.font = "bold 14px Helvetica";
+		var letters_width = canvas_this.measureText(MAPS[i].name).width;
+		var padding_left = Math.round((button_width-letters_width)/2);
+		if(padding_left<0) padding_left=0;
 		canvas_this.fillText(MAPS[i].name, 15+i*(button_width+gap)+padding_left, top_height+1+button_height+gap+10);
 		
 		if(can_select_map==true){
@@ -252,6 +235,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
 	}
+//return map element info by name
 function get_element_by_name(name){
 	for(var i in ELEMENTS){
 		if(ELEMENTS[i].name == name){
@@ -260,7 +244,25 @@ function get_element_by_name(name){
 		}
 	return false;
 	}
-function prepare_maps(){
-	//for(var m in MAPS){
-	//	}
+//scroll map in manual scroll mode
+function scoll_map(xx, yy){
+	if(MAP_SCROLL_MODE==1) return false;
+	
+	var step = 50;
+	
+	//calc
+	map_offset[0] = map_offset[0] + xx * step;
+	map_offset[1] = map_offset[1] + yy * step;
+	
+	//check limits
+	if(map_offset[0]>0)	map_offset[0]=0;
+	if(map_offset[1]>0)	map_offset[1]=0;
+	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
+		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
+	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
+		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
+			
+	//scroll
+	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	}

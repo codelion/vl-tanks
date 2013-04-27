@@ -6,14 +6,12 @@
 <link rel="stylesheet" type="text/css" href="../styles.css" />
 </head>
 <body style="margin:0px;padding:0px;background-color:#ffffff;" onload="init_game(true)">
-<div class="alert">
-	<b>Error.</b> Please use Firefox, Chrome or Opera. Internet explorer and Safari do not support all HTML5 features.
-</div>
 <div id="canvas_area">
-	<canvas style="position:absolute;" id="canvas_map"></canvas>
+	<canvas style="position:absolute;" id="canvas_map">Your browser doesn't support canvas.</canvas>
 	<canvas style="position:absolute;" id="canvas_map_sight"></canvas>
 	<canvas style="position:absolute;" id="canvas_backround"></canvas>
 	<canvas style="position:absolute;" id="canvas_main"></canvas>
+	<div id="chat_box"></div>
 	<div id="chat_write">
 		<input type="text" style="width:250px;" id="chat_text" />
 		<input type="submit" value="Say" onclick="chat();" />

@@ -84,7 +84,7 @@ function font_pixel_to_height(px){
 function ucfirst(string){
 	return string.charAt(0).toUpperCase() + string.slice(1);
 	}
-function get_fimensions(){
+function get_dimensions(){
 	var theWidth, theHeight;
 	if (window.innerWidth) {
 		theWidth=window.innerWidth;
@@ -115,7 +115,7 @@ function drawImage_rotated(canvas, file, x, y, width, height, angle){
 	img.src = file;
 	
 	canvas.save();
-	canvas.translate(x, y);			//canvas.translate(x+round(width/2), y+round(height/2));
+	canvas.translate(x, y);
 	canvas.rotate(angle * TO_RADIANS);
 	canvas.drawImage(img, -(width/2), -(height/2));
 	canvas.restore();
@@ -123,16 +123,20 @@ function drawImage_rotated(canvas, file, x, y, width, height, angle){
 function convertToSlug(Text){
 	return Text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
 	}
-function drawImage_preloaded(canvas, src, xx, yy, place_last, width, height){
-	var img = new Image();
-	img.src = src;
-	img.onload = function(){	//wait till img is loaded
-		if(PLACE != place_last) return false;
-		var img = new Image();
-		img.src = src;
-		if(width==undefined && height==undefined)
-			canvas.drawImage(img, xx, yy);
-		else
-			canvas.drawImage(img, xx, yy, width, height);
+function isIE () {
+	return !!navigator.userAgent.match(/MSIE 10/);
+	}
+function generatePassword(limit){
+	array1 = "zsdcrfvtgbhnjmkp";
+	array2 = "aeou"; //yes, no i
+	n1 = array1.length;
+	n2 = array2.length;
+	
+	string = "";
+	for(var i=0; i<limit; i=i+2){
+		string = string + array1[getRandomInt(0, n1-1)];
+		string = string + array2[getRandomInt(0, n2-1)];
 		}
+	
+	return string;
 	}
