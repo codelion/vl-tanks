@@ -15,7 +15,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 100,					//tank scout range
-	armor: [50, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [50, 0.5, 75],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 4,					//turn speed, higher - faster
@@ -26,7 +26,7 @@ TYPES.push({
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
-		{name: 'Shield',		passive: true,		broadcast: 0}, 
+		{name: 'Shield',		passive: true,		broadcast: 0}, 	//chance to get 1 damage
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: true,				//tank base images
@@ -46,14 +46,14 @@ TYPES.push({
 	damage: [30, 1.5],		//30 dps
 	range: 80,
 	scout: 100,
-	armor: [30, 0.5, 50],
+	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
-		{name: 'Damage',		passive: true,		broadcast: 0}, 
+		{name: 'Damage',		passive: true,		broadcast: 0}, 	//armor pierce
 		],
 	size: ['M', 50],
 	preview: true,
@@ -73,7 +73,7 @@ TYPES.push({
 	damage: [18, 1.3],	//18 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.5, 40],
+	armor: [20, 0.5, 45],
 	speed: 30,
 	attack_delay: 1,
 	turn_speed: 5,
@@ -107,7 +107,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Missile',		passive: false,		broadcast: 2}, 
 		{name: 'Mortar',		passive: false,		broadcast: 2}, 
-		{name: 'Range',		passive: true,		broadcast: 0}, 
+		{name: 'Range',		passive: true,		broadcast: 0},  //extra rocket
 		],
 	size: ['M', 50],
 	preview: true,
@@ -127,14 +127,14 @@ TYPES.push({
 	damage: [40, 2],	//20 dps
 	range: 120,
 	scout: 100,
-	armor: [10, 0, 10],
+	armor: [10, 0.2, 20],
 	speed: 28,
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Strike',		passive: false,		broadcast: 2}, 
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
-		{name: 'Range',		passive: true,		broadcast: 0}, 
+		{name: 'Range',		passive: true,		broadcast: 0},  //sight
 		],
 	size: ['M', 50],
 	ignore_armor: 1,
@@ -155,7 +155,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.5, 40],
+	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -182,14 +182,14 @@ TYPES.push({
 	damage: [15, 1.1],	//15 dps
 	range: 80,
 	scout: 100,
-	armor: [20, 0.5, 40],	
+	armor: [20, 0.5, 45],	
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 4,
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
-		{name: 'Mass virus',	passive: false,		broadcast: 1}, 
-		{name: 'Advanced',	passive: true,		broadcast: 0}, 
+		{name: 'Mass virus',	passive: false,		broadcast: 1}, 	//EMP bomb, 0 dmg - mass stun
+		{name: 'Advanced',	passive: true,		broadcast: 0}, 	//AA-field, anti missile field
 		],
 	size: ['M', 50],
 	preview: true,
@@ -236,14 +236,14 @@ TYPES.push({
 	damage: [20, 1.4],	//20 dps
 	range: 40,
 	scout: 100,
-	armor: [30, 0.5, 50],
+	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 5,
 	abilities: [
 		{name: 'Plasma',	passive: false,		broadcast: 2}, 
 		{name: 'Jump',		passive: false,		broadcast: 2}, 
-		{name: 'Damage',	passive: true,		broadcast: 0}, 
+		{name: 'Damage',	passive: true,		broadcast: 0}, 		//plasma shield - 0 damage from skills
 		],
 	size: ['M', 50],
 	preview: true,
@@ -263,7 +263,7 @@ TYPES.push({
 	damage: [20, 1.3],	//20 dps
 	range: 100,
 	scout: 120,
-	armor: [20, 0.5, 40],	
+	armor: [20, 0.5, 45],	
 	speed: 32,
 	attack_delay: 1,
 	turn_speed: 6,
@@ -272,7 +272,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
-		{name: 'Range',		passive: true,		broadcast: 0}, 
+		{name: 'Range',		passive: true,		broadcast: 0}, 		//armor pierce
 		],
 	size: ['M', 50],
 	preview: true,
@@ -292,7 +292,7 @@ TYPES.push({
 	damage: [20, 1.3],	//20 dps
 	range: 90,
 	scout: 120,
-	armor: [10, 0, 10],
+	armor: [10, 0.2, 20],
 	speed: 37,
 	attack_delay: 1,
 	turn_speed: 4,
@@ -301,7 +301,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
 		{name: 'AA bomb',		passive: false,		broadcast: 2}, 
-		{name: 'Rest',		passive: false,		broadcast: 1}, 
+		{name: 'Rest',		passive: false,		broadcast: 1}, 	//0 dps during repair
 		],
 	size: ['M', 50],
 	preview: true,
