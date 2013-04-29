@@ -574,7 +574,11 @@ function tank_level_handler(){	//once per second
 		last_level = TANKS[i].level;
 		
 		//calc level
-		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets;
+		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets*TYPES[TANKS[i].type].attack_delay;
+		
+		
+		if(TANKS[i].name==name)
+			log(TANKS[i].bullets*TYPES[TANKS[i].type].attack_delay);
 		
 		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
 		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	

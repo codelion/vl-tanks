@@ -367,7 +367,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	canvas_backround.fillStyle = "#c50000";
 	roundRect(canvas_backround, 10+offset_left+120, 60+offset_top, 105, 30, 2, true);
 	
-	//back button text
+	//back button texts
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Arial";
 	text = "Back";
@@ -378,6 +378,12 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		room_id_to_join = -1;
 		draw_rooms_list();
 		});
+	
+	//notice
+	canvas_backround.fillStyle = "#000000";
+	canvas_backround.font = "Normal 12px Arial";
+	text = "Notice: While you hosting game, please do not switch this tab or minimize browser while game is active.";
+	canvas_backround.fillText(text, 10+offset_left, 120+offset_top);
 	}
 //room waiting for players
 function draw_room(room_id){

@@ -85,7 +85,7 @@ function redraw_tank_stats(){
 	for(var dd in MY_TANK.buffs){
 		if(MY_TANK.buffs[dd].name == 'weak'){
 			damage_string = damage_string * MY_TANK.buffs[dd].power;
-			if(damage_first < 0) damage_first = 0;
+			if(damage_string < 0) damage_string = 0;
 			}
 		if(MY_TANK.buffs[dd].name == 'damage'){
 			damage_string = damage_string * MY_TANK.buffs[dd].power;

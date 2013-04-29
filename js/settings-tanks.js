@@ -132,9 +132,9 @@ TYPES.push({
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Strike',		passive: false,		broadcast: 2}, 
+		{name: 'Strike',	passive: false,		broadcast: 2}, 
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
-		{name: 'Range',		passive: true,		broadcast: 0},  //sight
+		{name: 'Scout',		passive: false,		broadcast: 0},
 		],
 	size: ['M', 50],
 	ignore_armor: 1,
@@ -301,7 +301,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
 		{name: 'AA bomb',		passive: false,		broadcast: 2}, 
-		{name: 'Rest',		passive: false,		broadcast: 1}, 	//0 dps during repair
+		{name: 'Rest',		passive: false,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,

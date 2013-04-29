@@ -4,9 +4,11 @@ function Rest(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
 	var power = 15 + 1 * (TANK.level-1);
+	var power_slow = 100;
+	var power_weak = 0.5;
 	
 	if(descrition_only != undefined)
-		return 'Rest and try to repair yourself with '+(power*duration/1000)+' power.';
+		return 'Rest and try to repair yourself with '+(power*duration/1000)+' power. Damage decreased';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
 		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
@@ -18,6 +20,7 @@ function Rest(TANK, descrition_only, settings_only, ai){
 	else if(TYPES[TANK.type].name == "Bomber")
 		TANK.abilities_reuse[2] = Date.now() + reuse;
 	
+	//heal
 	TANK.buffs.push({
 		name: 'repair',
 		power: power,
@@ -26,16 +29,20 @@ function Rest(TANK, descrition_only, settings_only, ai){
 		icon_size: [16,16],
 		id: TANK.id,
 		});
-	TANK.speed = 0;
-	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Rest_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
-	
+	//slow
+	TANK.buffs.push({
+		name: 'slow',
+		power: power_slow,
+		lifetime: Date.now()+duration,
+		id: TANK.id,
+		});
+	//weak
+	TANK.buffs.push({
+		name: 'weak',
+		power: power_weak,
+		lifetime: Date.now()+duration,
+		id: TANK.id,
+		});	
 	return reuse;
 	}
 function Rage(TANK, descrition_only, settings_only, ai){
@@ -71,10 +78,6 @@ function Rage(TANK, descrition_only, settings_only, ai){
 function Shield(TANK, descrition_only, settings_only, ai){
 	if(descrition_only != undefined)
 		return 'Tank uses heavy armor. Passive ability.';
-	}
-function Rest_stop(object){
-	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
 	}
 function Rage_stop(object){
 	var TANK = object.tank;
@@ -988,7 +991,7 @@ function do_jump(tank_id, skip_broadcast){
 	target_range=0;
 	}
 
-//====== Helicopter ============================================================
+//====== Apache ================================================================
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
@@ -1036,7 +1039,10 @@ function Scout(TANK, descrition_only, settings_only, ai){
 	
 	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2) + power;
 	
-	TANK.abilities_reuse[1] = Date.now() + reuse;
+	if(TYPES[TANK.type]=="Apache")
+		TANK.abilities_reuse[1] = Date.now() + reuse;
+	else if(TYPES[TANK.type]=="Stealth")
+		TANK.abilities_reuse[2] = Date.now() + reuse;
 	
 	//register stop function	
 	var tmp = new Array();
