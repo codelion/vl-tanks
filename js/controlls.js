@@ -21,12 +21,18 @@ function on_keyboard_action(event){
 				scoll_map(1, 0); 	//right
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
+					//stop move
 					MY_TANK.move = 0;
 					if(game_mode == 2){
 						register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
 						}
 					else
 						MY_TANK.move = 0;
+					//reset scroll
+					if(MAP_SCROLL_MODE==2){
+						MAP_SCROLL_MODE = 1;
+						auto_scoll_map();
+						}
 					}	
 				}
 			}

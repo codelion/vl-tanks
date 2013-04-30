@@ -31,7 +31,7 @@ var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
 var flag_width = 15;			//flag icon width
 var flag_height = 9;			//flag icon height
 var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
-var VERSION = "1.3.4";			//app version
+var VERSION = "1.3.5";			//app version
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -93,6 +93,7 @@ var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
 var intro_page = 0;			//intro page
 var intro_enabled = 1;			//if show intro
+var time_gap;				//time difference between frames
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

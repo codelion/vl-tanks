@@ -11,14 +11,14 @@ TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
-	life: [230, 13],				//[tank life in level 0, life increase in each level]
+	life: [230, 13],  				//[tank life in level 0, life increase in each level]
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
-	scout: 100,					//tank scout range
+	scout: 90,					//tank scout range
 	armor: [50, 0.5, 75],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
-	turn_speed: 4,					//turn speed, higher - faster
+	turn_speed: 2.5,					//turn speed, higher - faster
 	//no_repawn: 1,					//if tank dies - he will not respawn
 	//no_collisions: 1,				//tank can go other walls and other tanks
 	//bonus: 1,					//tank will be available only in single mode, random and mirror
@@ -45,15 +45,15 @@ TYPES.push({
 	life: [200, 12],
 	damage: [30, 1.5],		//30 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
-	turn_speed: 3,
+	turn_speed: 2.5,
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
-		{name: 'Damage',		passive: true,		broadcast: 0}, 	//armor pierce
+		{name: 'AA Bullets',		passive: true,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -72,11 +72,11 @@ TYPES.push({
 	life: [180, 11],
 	damage: [18, 1.3],	//18 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [20, 0.5, 45],
 	speed: 30,
 	attack_delay: 1,
-	turn_speed: 5,
+	turn_speed: 3,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
 		{name: 'Repair',		passive: false,		broadcast: 0}, 
@@ -98,7 +98,7 @@ TYPES.push({
 	description: ["Long range attacks", "Slow", "High accuracy"],
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
-	range: 120,
+	range: 100,
 	scout: 100,
 	armor: [10, 0, 10],
 	speed: 25,
@@ -107,7 +107,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Missile',		passive: false,		broadcast: 2}, 
 		{name: 'Mortar',		passive: false,		broadcast: 2}, 
-		{name: 'Range',		passive: true,		broadcast: 0},  //extra rocket
+		{name: 'Range',		passive: true,		broadcast: 0},  	//extra rocket
 		],
 	size: ['M', 50],
 	preview: true,
@@ -125,7 +125,7 @@ TYPES.push({
 	description: ["Camouflage", "Long range and huge damage", "Penetrates armor", "Slow speed and attack"],
 	life: [150, 10],
 	damage: [40, 2],	//20 dps
-	range: 120,
+	range: 100,
 	scout: 100,
 	armor: [10, 0.2, 20],
 	speed: 28,
@@ -154,11 +154,11 @@ TYPES.push({
 	life: [180, 11],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
-	turn_speed: 4,
+	turn_speed: 3,
 	abilities: [
 		{name: 'Mine',		passive: false,		broadcast: 1}, 
 		{name: 'Explode',		passive: false,		broadcast: 1}, 
@@ -181,11 +181,11 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [20, 0.5, 45],	
 	speed: 28,
 	attack_delay: 1,
-	turn_speed: 4,
+	turn_speed: 3,
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
 		{name: 'Mass virus',	passive: false,		broadcast: 1}, 	//EMP bomb, 0 dmg - mass stun
@@ -208,11 +208,11 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 100,
+	scout: 90,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 1,
-	turn_speed: 4,
+	turn_speed: 3,
 	abilities: [
 		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
@@ -235,11 +235,11 @@ TYPES.push({
 	life: [170, 11],
 	damage: [20, 1.4],	//20 dps
 	range: 40,
-	scout: 100,
+	scout: 80,
 	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
-	turn_speed: 5,
+	turn_speed: 3,
 	abilities: [
 		{name: 'Plasma',	passive: false,		broadcast: 2}, 
 		{name: 'Jump',		passive: false,		broadcast: 2}, 
@@ -261,18 +261,18 @@ TYPES.push({
 	description: ["Missiles", "Light armor", "Strong against all"],
 	life: [180, 11],
 	damage: [20, 1.3],	//20 dps
-	range: 100,
-	scout: 120,
+	range: 90,
+	scout: 100,
 	armor: [20, 0.5, 45],	
 	speed: 32,
 	attack_delay: 1,
-	turn_speed: 6,
+	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
-		{name: 'Range',		passive: true,		broadcast: 0}, 		//armor pierce
+		{name: 'AA Bullets',	passive: false,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -290,12 +290,12 @@ TYPES.push({
 	description: ["Bombs", "Fast speed", "Low defence"],
 	life: [150, 10],
 	damage: [20, 1.3],	//20 dps
-	range: 90,
-	scout: 120,
+	range: 80,
+	scout: 100,
 	armor: [10, 0.2, 20],
 	speed: 37,
 	attack_delay: 1,
-	turn_speed: 4,
+	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
 	abilities: [
@@ -344,11 +344,11 @@ TYPES.push({
 	life: [1200,0],
 	damage: [30, 0],	//30 dps
 	range: 120,
-	scout: 130,
+	scout: 120,
 	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
-	turn_speed: 4,
+	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [],
 	size: ['L', 50],
@@ -368,11 +368,11 @@ TYPES.push({
 	life: [2500, 0],
 	damage: [45, 0],	//45 dps
 	range: 120,
-	scout: 130,
+	scout: 120,
 	armor: [50, 0, 50],
 	speed: 0,
 	attack_delay: 1.1,
-	turn_speed: 4,
+	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [],
 	size: ['L', 90],

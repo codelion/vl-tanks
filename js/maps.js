@@ -70,21 +70,21 @@ function darken_map(){
 		}
 	}
 //visible tank area in map are light
-//there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all insted by increasing app quality.
+//there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all instead by increasing game quality.
 function lighten_pixels(tank){
 	if(QUALITY !=3) return false;
 	if(tank.team != MY_TANK.team) return false;
 			
-	var half_size = round(TYPES[tank.type].size[1]/2);
-	var xx = round(tank.x+map_offset[0]+half_size);
-	var yy = round(tank.y+map_offset[1]+half_size);
+	var xx = round(tank.cx() + map_offset[0]);
+	var yy = round(tank.cy() + map_offset[1]);
 	
 	canvas_map_sight.beginPath();
 	canvas_map_sight.save();
 	
-	canvas_map_sight.arc(xx, yy, tank.sight, 0 , 2 * Math.PI, true);
+	var sight_range = tank.sight+tank.size()/2;
+	canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 	canvas_map_sight.clip(); 
-	canvas_map_sight.clearRect(xx-tank.sight, yy-tank.sight, tank.sight*2, tank.sight*2);
+	canvas_map_sight.clearRect(xx-sight_range, yy-sight_range, sight_range*2, sight_range*2);
 	
 	canvas_map_sight.restore();
 	}
@@ -97,11 +97,10 @@ function lighten_pixels_all(tank){
 	for(var i in TANKS){
 		if(TANKS[i].team != MY_TANK.team) continue;
 		
-		var half_size = round(TYPES[TANKS[i].type].size[1]/2);
-		var xx = round(TANKS[i].x+map_offset[0]+half_size);
-		var yy = round(TANKS[i].y+map_offset[1]+half_size);
+		var xx = round(TANKS[i].cx() + map_offset[0]);
+		var yy = round(TANKS[i].cy() + map_offset[1]);
 		canvas_map_sight.beginPath();
-		canvas_map_sight.arc(xx, yy, TANKS[i].sight, 0 , 2 * Math.PI, true);
+		canvas_map_sight.arc(xx, yy, TANKS[i].sight+TANKS[i].size()/2, 0 , 2 * Math.PI, true);
 		canvas_map_sight.fill();
 		}
 	canvas_map_sight.restore();	

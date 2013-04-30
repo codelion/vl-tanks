@@ -8,7 +8,7 @@ function Rest(TANK, descrition_only, settings_only, ai){
 	var power_weak = 0.5;
 	
 	if(descrition_only != undefined)
-		return 'Rest and try to repair yourself with '+(power*duration/1000)+' power. Damage decreased';
+		return 'Rest and repair yourself with '+(power*duration/1000)+' power. Damage is decreased.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
 		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
@@ -152,9 +152,21 @@ function Frenzy(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
-function Damage(TANK, descrition_only, settings_only, ai){
+function AA_Bullets(TANK, descrition_only, settings_only, ai){		log('2222');
+	var power = 1 + (TANK.level-1);	power = 100;
+	
 	if(descrition_only != undefined)
-		return 'Tank does huge damage. Passive ability.';
+		return 'Use armor piercing bullets. Power: '+power+'%.';
+	
+	TANK.pierce_armor = power;
+	
+	//passive
+	return 0;
+	}
+function AA_Bullets_once(TANK, descrition_only, settings_only, ai){	log('11111');
+	var power = 1 + (TANK.level-1);
+	
+	TANK.pierce_armor = power;
 	}
 function Blitzkrieg_stop(object){
 	var TANK = object.tank;
@@ -291,7 +303,7 @@ function Turbo_stop(object){
 function Missile(TANK, descrition_only, settings_only, ai){
 	var reuse = 6000;
 	var power = 40 + 4 * (TANK.level-1);
-	var range = 120;
+	var range = 100;
 	
 	if(descrition_only != undefined)
 		return 'Launch missile with damage of '+power+'.';
@@ -369,7 +381,7 @@ function Range(TANK, descrition_only, settings_only, ai){
 function Strike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var power = 40 + 4 * (TANK.level-1);
-	var range = 120;
+	var range = 100;
 	
 	if(descrition_only != undefined)
 		return 'Powerful shoot with area of '+power+'.';
@@ -424,14 +436,17 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	timed_functions.push(tmp);
 	
 	//remove all bullets from it, same for his own bullets
-	for (b = 0; b < BULLETS.length; b++){
-		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
-			}
-		if(BULLETS[b].bullet_from_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
+	try{
+		for (b = 0; b < BULLETS.length; b++){
+			if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
+				BULLETS.splice(b, 1); b--;
+				}
+			if(BULLETS[b].bullet_from_target.id == TANK.id){
+				BULLETS.splice(b, 1); b--;
+				}
 			}
 		}
+	catch(err){console.log("Error: "+err.message);}
 	
 	return reuse;
 	}
@@ -555,7 +570,7 @@ function SAM(TANK, descrition_only, settings_only, ai){
 		tmp['bullet_to_target'] = enemy;
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = power;
-		tmp['pierce_armor'] = 1;
+		tmp['pierce_armor'] = 100;
 		tmp['angle'] = angle;
 		tmp['bullet_icon'] = 'missle';
 		BULLETS.push(tmp);
@@ -842,7 +857,7 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 	var range = 40;
 	
 	if(descrition_only != undefined)
-		return 'Powerful plasma shot with '+power+' power. Slows down enemy by '+power_slow+'%.';
+		return 'Powerful plasma shot with '+power+' power and '+power_slow+'% slow effect.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_missile != undefined){
@@ -899,12 +914,16 @@ function Jump(TANK, descrition_only, settings_only, ai){
 		reuse: reuse,
 		ability_nr: 1,
 		};
+	
 	//remove all bullets from it
-	for (b = 0; b < BULLETS.length; b++){
-		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
+	try{
+		for (b = 0; b < BULLETS.length; b++){
+			if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
+				BULLETS.splice(b, 1); b--;
+				}
 			}
 		}
+	catch(err){console.log("Error: "+err.message);}
 	
 	//return reuse - later, on use
 	return 0;
@@ -1233,7 +1252,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_missile.power;
-	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_missile.angle == true)		tmp['angle'] = angle;
 	if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
 	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
@@ -1334,7 +1353,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_bomb.power;
-	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
 	if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
 	if(TANK.try_bomb.aoe != undefined){

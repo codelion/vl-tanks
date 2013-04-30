@@ -171,7 +171,12 @@ function send_packet(type, message, force_list_connection){
 		console.log('Error: trying to send without connection: '+type);
 		return false;
 		}
-	//if(DEBUG==true)	console.log("["+type+"]------->");
+	/*if(DEBUG==true){
+		if(type=="tank_update")
+			console.log("["+type+"]------->"+message[0]);
+		else
+			console.log("["+type+"]------->");
+		}*/
 	
 	//log packets count
 	packets_used++;
@@ -613,10 +618,20 @@ function get_packet(fromClient, message){
 		//adding extra info to tank
 		for(var i in DATA[1]){
 			var key = DATA[1][i].key;
+			var value = DATA[1][i].value;
 			if(key == 'buffs')
-				TANK.buffs.push(DATA[1][i].value);
-			else
-				TANK[key] = DATA[1][i].value;
+				TANK.buffs.push(value);
+			else if(value == 'delete')
+				delete TANK[key];
+			else if(key == 'attacking'){
+				var enemy = get_tank_by_id(value);
+				TANK[key] = enemy;
+				delete TANK.attacking_sig_wait;
+				}
+			else{
+				//default
+				TANK[key] = value;
+				}
 			}
 		}
 	else if(type == 'tank_kill'){	//tank was killed
@@ -722,12 +737,12 @@ function get_packet(fromClient, message){
 		if(DATA[4] != undefined && DATA[4] != false)
 			tmp.instant_bullet = 1;
 		if(DATA[5] != undefined && DATA[5] != false)
-			tmp.pierce_armor = 1;
+			tmp.pierce_armor = DATA[5];
 		BULLETS.push(tmp);
 		if(TYPES[TANK_TO.type].type != 'human') TANK.bullets++;
 		
 		//extra updates
-		TANK.fire_angle = DATA[2];
+		TANK.attacking = TANK_TO;
 		draw_fire(TANK, TANK_TO);	
 		}	
 	}
