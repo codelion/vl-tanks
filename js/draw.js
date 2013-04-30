@@ -7,7 +7,7 @@ function draw_main(){
 	if(frame_last_time==undefined)
 		frame_last_time = Date.now();
 	frame_time = Date.now();
-	var time_gap = Date.now() - frame_last_time;
+	time_gap = Date.now() - frame_last_time;
 	
 	//clear
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
@@ -158,8 +158,6 @@ function draw_main(){
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
-					if(TANKS[i].hit_reuse - Date.now() < 0)
-						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
@@ -195,8 +193,25 @@ function draw_main(){
 							}
 						}	
 					}
-				else if(TANKS[i].hit_reuse - Date.now() < 0)
+				}
+			//fire angle
+			if(TANKS[i].stun == undefined){
+				if(TANKS[i].attacking == undefined){
+					//if peace
+					if(angle != undefined)
 						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
+					}
+				else{
+					//in battle
+					var TANK_TO = TANKS[i].attacking;
+					dist_x = TANK_TO.cx() - (TANKS[i].cx());
+					dist_y = TANK_TO.cy() - (TANKS[i].cy());
+					var radiance = Math.atan2(dist_y, dist_x);
+					var enemy_angle = (radiance*180.0)/Math.PI+90;
+					
+					//rotate
+					body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, enemy_angle, time_gap);
+					}	//log(TANKS[i].id+"      "+TANKS[i].fire_angle);
 				}
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
@@ -1031,24 +1046,24 @@ function update_scrolling_chat(CHAT){
 //calculate body and turret rotation
 function body_rotation(obj, str, speed, rot, time_diff){
 	if(obj.stun != undefined)	return false; //stun
-	if(obj.speed == 0)	return false; //0 speed
-	speed = speed * 100 * time_diff/1000;
-	var flag = false;
-	if (obj[str] - 180 > rot){
-		rot += 360;
-	}
-	if (obj[str] + 180 < rot){
-		rot -= 360;
-	}
-	if (obj[str] - rot > speed){
+	if(obj.speed == 0 && TYPES[obj.type].type == 'tank')	return false; //0 speed
+	speed = speed * 100 * time_diff/1000;	
+			//if(str=="fire_angle" && obj.name==name) log(round(speed)+"            "+obj[str]);
+	
+	if (obj[str] > 360) obj[str] = obj[str] - 360;
+	if (obj[str] < 0) obj[str] = obj[str] + 360;
+	
+	if (obj[str] - 180 > rot) rot += 360;
+	if (obj[str] + 180 < rot) rot -= 360;
+	if (obj[str] - rot > speed)
 		obj[str] -= speed;
-	} else if (obj[str] - rot < -speed){
+	else if(obj[str] - rot < -speed)
 		obj[str] += speed;
-	} else {
+	else{
 		obj[str] = rot;
-		flag = true;
-	}
-	return flag;
+		return true
+		}
+	return false;
 	}
 function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w, clip_h){
 	if(offset_x == undefined) offset_x = 0;

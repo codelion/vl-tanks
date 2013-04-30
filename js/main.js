@@ -36,7 +36,7 @@ function init_game(first_time){
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//text
-	var text = "Moon wars".split("").join(String.fromCharCode(8201))
+	var text = "Moon wars".split("").join(String.fromCharCode(8201));
 	canvas_backround.font = "Bold 70px Arial";
 	canvas_backround.strokeStyle = '#ffffff';
 	canvas_backround.strokeText(text, 160, 340);
@@ -248,6 +248,7 @@ function init_action(map_nr, my_team){
 			enemy_team = 'R';	
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+				random_type = 0;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);
@@ -498,7 +499,7 @@ function quit_game(init_next_game){
 	frame_time = undefined;
 	intro_page = 0;
 	
-	if(init_next_game!=false){
+	if(init_next_game != false){
 		init_game(false);
 		}
 	}

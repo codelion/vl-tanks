@@ -1,4 +1,15 @@
+pierece armor in multi
+autofollow
+	check multi
+skills
+animation
+	explode
+	camoflauge transparent
+	fade in/out
 IDEAS
+	cartoonish design
+		red blue green
+		3d models
 	manual skill update
 	new units
 		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	

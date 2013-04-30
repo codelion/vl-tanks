@@ -201,9 +201,11 @@ function redraw_tank_stats(){
 		draw_image(canvas_backround, 'level', life_x, life_y, round(life_width*hp/hp_max), life_height);
 		
 	//text
+	var text = hp+"/"+hp_max;
+	var text_width = canvas_backround.measureText(text).width;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "normal 9px Verdana";
-	canvas_backround.fillText(hp+"/"+hp_max, life_x+life_width-60, life_y+life_height-5);
+	canvas_backround.fillText(text, life_x+life_width-text_width-5, life_y+life_height-5);
 
 	//show fps
 	update_fps();
