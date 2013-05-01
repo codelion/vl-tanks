@@ -15,7 +15,7 @@ TYPES.push({
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 90,					//tank scout range
-	armor: [50, 0.5, 75],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [45, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 2.5,					//turn speed, higher - faster
@@ -26,7 +26,7 @@ TYPES.push({
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
-		{name: 'Shield',		passive: true,		broadcast: 0}, 	//chance to get 1 damage
+		{name: 'Shield',		passive: true,		broadcast: 1}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: true,				//tank base images
@@ -53,7 +53,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',		passive: false,		broadcast: 1}, 
-		{name: 'AA Bullets',		passive: true,		broadcast: 1},
+		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -107,7 +107,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Missile',		passive: false,		broadcast: 2}, 
 		{name: 'Mortar',		passive: false,		broadcast: 2}, 
-		{name: 'Range',		passive: true,		broadcast: 0},  	//extra rocket
+		{name: 'MM Missile',	passive: false,		broadcast: 2},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -132,7 +132,7 @@ TYPES.push({
 	attack_delay: 2,
 	turn_speed: 2,
 	abilities: [
-		{name: 'Strike',	passive: false,		broadcast: 2}, 
+		{name: 'Strike',		passive: false,		broadcast: 2}, 
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Scout',		passive: false,		broadcast: 0},
 		],
@@ -182,14 +182,14 @@ TYPES.push({
 	damage: [15, 1.1],	//15 dps
 	range: 80,
 	scout: 90,
-	armor: [20, 0.5, 45],	
+	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
-		{name: 'Mass virus',	passive: false,		broadcast: 1}, 	//EMP bomb, 0 dmg - mass stun
-		{name: 'Advanced',	passive: true,		broadcast: 0}, 	//AA-field, anti missile field
+		{name: 'EMP Bomb',	passive: false,		broadcast: 2},
+		{name: 'M7 Shield',	passive: false,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -241,9 +241,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
-		{name: 'Plasma',	passive: false,		broadcast: 2}, 
+		{name: 'Plasma',		passive: false,		broadcast: 2}, 
 		{name: 'Jump',		passive: false,		broadcast: 2}, 
-		{name: 'Damage',	passive: true,		broadcast: 0}, 		//plasma shield - 0 damage from skills
+		{name: 'PL Shield',	passive: false,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,

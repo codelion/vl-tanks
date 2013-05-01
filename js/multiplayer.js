@@ -695,6 +695,19 @@ function get_packet(fromClient, message){
 		if(TANK_TO.armor > TYPES[TANK_TO.type].armor[2])
 			TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
 		TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
+		
+		//update passive abilites
+		for(a in TYPES[TANK_TO.type].abilities){ 
+			if(TYPES[TANK_TO.type].abilities[a].passive == false) continue;
+			var nr = 1+parseInt(a);
+			var ability_function = TYPES[TANK_TO.type].abilities[a].name.replace(/ /g,'_');
+			if(ability_function != undefined){
+				try{
+					window[ability_function](TANK_TO);
+					}
+				catch(err){console.log("Error: "+err.message);}
+				}
+			}
 		}
 	else if(type == 'del_invisible'){	//remove invisibility
 		//DATA = [player_id]
@@ -743,7 +756,11 @@ function get_packet(fromClient, message){
 		
 		//extra updates
 		TANK.attacking = TANK_TO;
-		draw_fire(TANK, TANK_TO);	
+		if(DATA[2] != 0){
+			draw_fire(TANK, TANK_TO);
+			if(TANK.id == MY_TANK.id)
+				shoot_sound(TANK);
+			}
 		}	
 	}
 //sending action to other players

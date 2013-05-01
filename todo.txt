@@ -1,30 +1,26 @@
-pierece armor in multi
+skills
+	Shield
+	PL_Shield
+	M7_Shield
+		bot uses multi skills once
+	
+	strike for bots do not work
 autofollow
 	check multi
-skills
+manual skill update
 animation
 	explode
 	camoflauge transparent
+	jump
 	fade in/out
 IDEAS
 	cartoonish design
 		red blue green
 		3d models
-	manual skill update
 	new units
 		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	
-		sieger - explosive bullets, dig+range, undig
-	truck -> APC instead or LAV?
+	truck -> APC/LAV
 	Helium3
 		base, mines generates, spawn takes, on 0 - team dies.
 		H3 mines give your base more energy and your towers more attacking power. 
 		H3 should be deposited randomly across the map
-	new skills:
-		traps: root, slow
-		Phoenix - Upon death, you are revived with 1 HP.
-		block skills
-		Chain Lightning
-		medusa
-		Nanobots to bomber?
-		destruction
-		glue

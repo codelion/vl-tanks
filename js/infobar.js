@@ -101,7 +101,14 @@ function redraw_tank_stats(){
 	//value
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
-	var armor_text = Math.floor(MY_TANK.armor);
+	var armor_text = MY_TANK.armor;
+	for(var dd in MY_TANK.buffs){
+		if(MY_TANK.buffs[dd].name == 'shield'){
+			armor_text = armor_text + MY_TANK.buffs[dd].power;
+			if(armor_text > 100) armor_text = 100;
+			}
+		}
+	armor_text = Math.floor(armor_text);
 	canvas_backround.fillText(armor_text+"%", left_x_values, top_y+28);
 	
 	left_x = status_x+370;

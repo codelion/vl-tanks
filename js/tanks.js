@@ -243,7 +243,7 @@ function add_player_name(tank){
 function draw_bullets(TANK, time_gap){
 	for (b = 0; b < BULLETS.length; b++){
 		if(BULLETS[b].bullet_from_target.id != TANK.id) continue; // bullet from another tank
-		if(TANK.stun != undefined && BULLETS[b].skill==undefined) continue; //stun
+		//if(TANK.stun != undefined && BULLETS[b].skill==undefined) continue; //stun
 		
 		TANK.last_bullet_time = Date.now();
 		//follows tank
@@ -323,6 +323,10 @@ function draw_bullets(TANK, time_gap){
 					distance_b = distance_b - TYPES[TANKS[ii].type].size[1]/2;
 							
 					if(distance_b > BULLETS[b].aoe_splash_range)	continue;	//too far
+					
+					//stun
+					if(BULLETS[b].stun_effect != undefined && TYPES[TANKS[ii].type].type!='tower')
+						TANKS[ii].stun = Date.now() + BULLETS[b].stun_effect;
 					
 					//do damage
 					if(game_mode == 1){
@@ -596,8 +600,9 @@ function tank_level_handler(){	//once per second
 				draw_tank_abilities();
 				}
 				
-			//auto add 1 lvl upgrade
+			//update passive abilites
 			for(a in TYPES[TANKS[i].type].abilities){ 
+				if(game_mode != 1) continue;
 				if(TYPES[TANKS[i].type].abilities[a].passive == false) continue;
 				var nr = 1+parseInt(a);
 				var ability_function = TYPES[TANKS[i].type].abilities[a].name.replace(/ /g,'_');
@@ -828,16 +833,17 @@ function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
 		tmp['angle'] = round(shoot_angle);
 		BULLETS.push(tmp);
 		if(TYPES[TANK_TO.type].type != 'human') TANK.bullets++;
+		
+		if(aoe == undefined){
+			shoot_sound(TANK);
+			draw_fire(TANK, TANK_TO);
+			}
 		}
 	else
 		send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle)]);
 	
 	TANK.hit_reuse = TANK.attack_delay*1000+Date.now();	
 	TANK.check_enemies_reuse = 0;
-	if(aoe == undefined){
-		shoot_sound(TANK);
-		draw_fire(TANK, TANK_TO);
-		}
 	}
 //draw tank shooting fire
 function draw_fire(TANK, TANK_TO){
@@ -905,6 +911,12 @@ function do_damage(TANK, TANK_TO, BULLET){
 	armor = TANK_TO.armor;
 	if(armor > TYPES[TANK_TO.type].armor[2])
 		armor = TYPES[TANK_TO.type].armor[2];
+	for(var dd in TANK_TO.buffs){
+		if(TANK_TO.buffs[dd].name == 'shield'){
+			armor = armor + TANK_TO.buffs[dd].power;
+			if(armor > 100) armor = 100;
+			}
+		}
 	
 	//check armor_piercing
 	armor = armor - TANK.pierce_armor;
@@ -914,8 +926,8 @@ function do_damage(TANK, TANK_TO, BULLET){
 	
 	if(TYPES[TANK.type].ignore_armor != undefined)
 		armor = 0;	//pierce armor
-				log(armor);
-	damage = round( damage*(100-armor)/100 );		//log(damage+", target armor="+armor+", type="+TYPES[TANK_TO.type].name);
+	
+	damage = round( damage*(100-armor)/100 );
 	
 	//mines do less damage on ally towers
 	if(BULLET.damage_all_teams != undefined && TYPES[TANK_TO.type].type=="tower" && BULLET.bullet_from_target.team == TANK_TO.team)
