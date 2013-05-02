@@ -1,13 +1,6 @@
-skills
-	Shield
-	PL_Shield
-	M7_Shield
-		bot uses multi skills once
-	
-	strike for bots do not work
-autofollow
-	check multi
 manual skill update
+	lvl up
+	check multi
 animation
 	explode
 	camoflauge transparent
@@ -17,8 +10,6 @@ IDEAS
 	cartoonish design
 		red blue green
 		3d models
-	new units
-		sniper: low damage, 0 armor, low hp, skills: Strike, perma hide, unhide.	
 	truck -> APC/LAV
 	Helium3
 		base, mines generates, spawn takes, on 0 - team dies.

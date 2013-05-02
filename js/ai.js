@@ -1,6 +1,5 @@
 function check_path_AI(TANK){
 	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
-	if(TANK.invisibility != undefined) return false;	//invisibility
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
 	if(game_mode == 1)
 		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
@@ -138,13 +137,6 @@ function soldiers_move(mouseX, mouseY){
 	for(var i in TANKS){
 		if(TANKS[i].master == undefined) continue;	//not under controll
 		if(TANKS[i].master != undefined && TANKS[i].master.id != MY_TANK.id) continue;	//not under MY controll
-		
-		if(MY_TANK.invisibility != undefined){
-			if(game_mode == 2)
-				send_packet('del_invisible', [MY_TANK.id]);
-			else
-				delete MY_TANK.invisibility;
-			}
 		
 		//randomize
 		mouseX = mouseX_copy + getRandomInt(-gap_rand, gap_rand);

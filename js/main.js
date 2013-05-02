@@ -332,6 +332,7 @@ var IMAGES_SETTINGS = {
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
+		small_bullet:	{ x:0,	y:250,	w:4,	h:4 },
 		missle:	{ x:0,	y:50,		w:8,	h:23 }, 
 		airstrike:	{ x:0,	y:100,	w:38,	h:15 }, 
 		bomb: 	{ x:0,	y:150,	w:12,	h:12 },

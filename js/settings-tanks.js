@@ -11,11 +11,11 @@ TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
-	life: [230, 13],  				//[tank life in level 0, life increase in each level]
+	life: [210, 12],  				//[tank life in level 0, life increase in each level]
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
 	scout: 90,					//tank scout range
-	armor: [45, 0.5, 70],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [40, 0.5, 65],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
 	turn_speed: 2.5,					//turn speed, higher - faster
@@ -26,13 +26,13 @@ TYPES.push({
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
-		{name: 'Shield',		passive: true,		broadcast: 1}, 
+		{name: 'Health',	passive: true,		broadcast: 1}, 
 		],
 	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: true,				//tank base images
 	icon_base: true,			//tank top images
 	preview: true,				//tank preview image
-	bullet: 'bullet',				//bullet_image
+	bullet: 'small_bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	accuracy: 90,					//chance to hit target, %
 	});
@@ -41,12 +41,12 @@ TYPES.push({
 TYPES.push({
 	name: 'Tiger',
 	type: 'tank',
-	description: ["Light armor", "Huge damage", "Strong against slow enemies"],
-	life: [200, 12],
+	description: ["Huge damage", "Strong against slow enemies", "Light armor"],
+	life: [210, 12],
 	damage: [30, 1.5],		//30 dps
 	range: 80,
 	scout: 90,
-	armor: [30, 0.5, 55],
+	armor: [25, 0.5, 50],
 	speed: 28,
 	attack_delay: 1,
 	turn_speed: 2.5,
@@ -68,7 +68,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Cruiser',
 	type: 'tank',
-	description: ["Fast scout", "Repair for allies", "Light armor"],
+	description: ["Fast scout", "Repair and damage boost for allies", "Light armor"],
 	life: [180, 11],
 	damage: [18, 1.3],	//18 dps
 	range: 80,
@@ -86,7 +86,7 @@ TYPES.push({
 	preview: true,
 	icon_top: true,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -95,7 +95,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Launcher',
 	type: 'tank',
-	description: ["Long range attacks", "Slow", "High accuracy"],
+	description: ["Long range attacks", "Slow"],
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
 	range: 100,
@@ -113,7 +113,7 @@ TYPES.push({
 	preview: true,
 	icon_top: true,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 100,
 	});
@@ -150,7 +150,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Miner',
 	type: 'tank',
-	description: ["Lands mines", "Light armor", "Low damage", "Very weak agains air units"],
+	description: ["Lands poweful mines", "Light armor", "Low tank damage"],
 	life: [180, 11],
 	damage: [15, 1],	//15 dps
 	range: 80,
@@ -168,7 +168,7 @@ TYPES.push({
 	preview: true,
 	icon_top: true,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -177,7 +177,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Tech',
 	type: 'tank',
-	description: ["Can send virus to deactivate enemy", "Light armor", "Low damage"],
+	description: ["Deactivates enemies", "Boosts team defence", "Light armor"],
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
 	range: 80,
@@ -189,13 +189,13 @@ TYPES.push({
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
 		{name: 'EMP Bomb',	passive: false,		broadcast: 2},
-		{name: 'M7 Shield',	passive: false,		broadcast: 1},
+		{name: 'M7 Shield',	passive: false,		broadcast: 0},
 		],
 	size: ['M', 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -204,7 +204,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Truck',
 	type: 'tank',
-	description: ["Uses many soldiers for attack", "Very low damage"],
+	description: ["Uses elite soldiers for attack", "Low tank damage"],
 	life: [150, 10],
 	damage: [15, 1],	//15 dps
 	range: 80,
@@ -222,7 +222,7 @@ TYPES.push({
 	preview: true,
 	icon_top: false,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -269,10 +269,11 @@ TYPES.push({
 	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
+	flying: true,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
-		{name: 'AA Bullets',	passive: false,		broadcast: 1},
+		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
 	size: ['M', 50],
 	preview: true,
@@ -298,6 +299,7 @@ TYPES.push({
 	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
+	flying: true,
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
 		{name: 'AA bomb',		passive: false,		broadcast: 2}, 
@@ -331,7 +333,7 @@ TYPES.push({
 	preview: true,
 	icon_top: false,
 	icon_base: true,
-	bullet: 'bullet',
+	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
 	});
@@ -343,8 +345,8 @@ TYPES.push({
 	description: ["Tower for defence"],
 	life: [1200,0],
 	damage: [30, 0],	//30 dps
-	range: 120,
-	scout: 120,
+	range: 110,
+	scout: 110,
 	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
@@ -367,8 +369,8 @@ TYPES.push({
 	description: ["Main base"],
 	life: [2500, 0],
 	damage: [45, 0],	//45 dps
-	range: 120,
-	scout: 120,
+	range: 110,
+	scout: 110,
 	armor: [50, 0, 50],
 	speed: 0,
 	attack_delay: 1.1,

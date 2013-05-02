@@ -33,9 +33,8 @@ function draw_main(){
 			var speed_multiplier = 1;
 			speed_first = speed_multiplier;
 			for(var dd in TANKS[i].buffs){
-				if(TANKS[i].buffs[dd].name == 'slow'){
-					var diff = speed_first * TANKS[i].buffs[dd].power / 100;
-					speed_multiplier = speed_multiplier - diff;
+				if(TANKS[i].buffs[dd].name == 'speed'){
+					speed_multiplier = speed_multiplier * TANKS[i].buffs[dd].power / 100;
 					if(speed_multiplier < 0) 
 						speed_multiplier = 0;
 					}
@@ -61,12 +60,12 @@ function draw_main(){
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i].x = round(APP_SIZE_CACHE[0]*2/3);
 						TANKS[i].y = 20;
-						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						}
 					else{	//bottom
 						TANKS[i].x = round(APP_SIZE_CACHE[0]/3);
 						TANKS[i].y = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
-						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						}
 					if(TANKS[i].id==MY_TANK.id)
 						auto_scoll_map();
@@ -96,9 +95,20 @@ function draw_main(){
 					if(TANKS[t].id == TANKS[i].target_move_lock)
 						i_locked = t;
 					}
-				if(TANKS[i_locked] == undefined){	//maybe target is already dead
-					TANKS[i].move = 0;
-					delete TANKS[i].target_move;
+				if(TANKS[i_locked] == undefined || TANKS[i_locked].dead == 1){	//maybe target is already dead
+					if(game_mode == 1){
+						TANKS[i].move = 0;
+						delete TANKS[i].target_move;
+						delete TANKS[i].target_move_lock;
+						}
+					else{
+						var params = [
+							{key: 'move', value: 0 },
+							{key: 'target_move', value: "delete" },
+							{key: 'target_move_lock', value: "delete" },
+							];
+						send_packet('tank_update', [TANKS[i].id, params]);
+						}
 					}
 				else{
 					tmp_distance = get_distance_between_tanks(TANKS[i_locked], TANKS[i]);
@@ -112,9 +122,14 @@ function draw_main(){
 						delete TANKS[i].reach_tank_and_execute;
 						}
 					//reached targeted enemy for general attack
-					if(TANKS[i].reach_tank_and_execute == undefined && tmp_distance < TYPES[TANKS[i].type].range){ 	
-						TANKS[i].move = 0;
-						delete TANKS[i].target_move;
+					if(TANKS[i].reach_tank_and_execute == undefined && TANKS[i].target_move_lock != undefined){
+						if(tmp_distance < TYPES[TANKS[i].type].range-5){ 	
+							TANKS[i].move = 0;
+							}
+						else{
+							TANKS[i].move_to = [TANKS[i_locked].cx(), TANKS[i_locked].cy()];
+							TANKS[i].move = 1;
+							}
 						}
 					}
 				}
@@ -142,6 +157,9 @@ function draw_main(){
 			//autopilot
 			if(TANKS[i].use_AI == true)
 				check_path_AI(TANKS[i]);
+			
+			if(TANKS[i].invisibility == 1)
+				check_invisibility(TANKS[i]);
 			
 			//move tank
 			if(TANKS[i].move == 1 && TANKS[i].stun == undefined && TANKS[i].move_to != undefined){

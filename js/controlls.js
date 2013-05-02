@@ -1,3 +1,6 @@
+//check support
+if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
+
 //keyboard actions
 function on_keyboard_action(event){
 	k = event.keyCode;	//log(k);
@@ -42,6 +45,21 @@ function on_keyboard_action(event){
 				tab_scores=true;	
 			else
 				tab_scores=false;
+			}
+		if(k==85){
+			//u
+			ABILITIES_MODE++;
+			if(ABILITIES_MODE>3) ABILITIES_MODE = 0;
+			if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL){
+				ABILITIES_MODE++;
+				if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL){
+					ABILITIES_MODE++;
+					if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL)
+						ABILITIES_MODE++;
+					}	
+				}
+			if(ABILITIES_MODE>3) ABILITIES_MODE = 0;
+			draw_tank_abilities();
 			}
 		}
 	if(k==16)

@@ -429,7 +429,7 @@ function get_packet(fromClient, message){
 						var level = TANKS[i].level;
 						//change stats
 						TANKS[i].type = type;
-						TANKS[i].hp = TYPES[type].life[0]+TYPES[type].life[1]*(level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						TANKS[i].sight = TYPES[type].scout + round(TYPES[type].size[1]/2);
 						TANKS[i].speed = TYPES[type].speed;
 						TANKS[i].armor = TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1);
@@ -716,8 +716,7 @@ function get_packet(fromClient, message){
 			console.log('Error: tank "'+DATA[0]+'" was not found on del_invisible.');
 			return false;
 			}
-		delete TANK.invisibility;
-		TANK.speed = TYPES[TANK.type].speed;
+		stop_camouflage(TANK);
 		}
 	else if(type == 'summon_bots'){	//send bots
 		//DATA = [room_id, random_id]
