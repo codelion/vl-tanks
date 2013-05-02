@@ -319,7 +319,7 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [130, 0],
+	life: [130, 6],
 	damage: [12, 0.7],	//12 dps
 	range: 70,
 	scout: 80,

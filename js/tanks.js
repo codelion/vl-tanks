@@ -604,9 +604,15 @@ function tank_level_handler(){	//once per second
 				}
 			redraw_tank_stats();
 			if(TANKS[i].id == MY_TANK.id){	//if mine
-				if(game_mode == 2)
-					register_tank_action('level_up', opened_room_id, TANKS[i].id, TANKS[i].level);
-				//upgrade_abilities(MY_TANK);
+				var ability_nr = get_ability_to_ugrade(MY_TANK);
+				if(game_mode == 1){
+					MY_TANK.abilities_lvl[ability_nr]++;
+					}
+				else{
+					register_tank_action('level_up', opened_room_id, TANKS[i].id, TANKS[i].level, ability_nr);
+					}
+				
+				//show
 				draw_tank_abilities();
 				}
 				
@@ -649,6 +655,32 @@ function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
 			}
 		}
 	redraw_tank_stats();
+	}
+function get_ability_to_ugrade(TANK){
+	var nr = 0;
+	if(ABILITIES_MODE != 0)
+		nr = ABILITIES_MODE-1;
+	if(ABILITIES_MODE == 0 || TANK.abilities_lvl[nr]==MAX_ABILITY_LEVEL){
+		//find lowest
+		if(TANK.abilities_lvl[0] < TANK.abilities_lvl[nr])
+			nr = 0;
+		if(TANK.abilities_lvl[1] < TANK.abilities_lvl[nr])
+			nr = 1;
+		if(TANK.abilities_lvl[2] < TANK.abilities_lvl[nr])
+			nr = 2;
+		}
+	if(TANK.abilities_lvl[nr]==MAX_ABILITY_LEVEL)
+		return false;		
+	else
+		return nr;
+	/*if(game_mode==1)
+		TANK.abilities_lvl[nr]++;
+	else{
+		var params = [
+			{key: 'abilities_lvl', value: TANK.abilities_lvl },
+			];
+		send_packet('tank_update', [TANK.id, params]);
+		}*/
 	}
 //actions on enemies
 function check_enemies(TANK){

@@ -1,10 +1,7 @@
-manual skill update
-	lvl up
-	check multi
 animation
-	explode
 	camoflauge transparent
 	jump
+	explode
 	fade in/out
 IDEAS
 	cartoonish design

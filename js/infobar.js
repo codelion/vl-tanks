@@ -69,10 +69,15 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#182605";
 	canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
 	//draw
+	var text = Math.floor(MY_TANK.level);
 	canvas_backround.fillStyle = "#c10000";
 	canvas_backround.font = "normal 18px Verdana";
-	var text = Math.floor(MY_TANK.level);
-	canvas_backround.fillText(text, status_x+195, status_y+28);
+	if(text>99)
+		canvas_backround.font = "normal 11px Verdana";
+	if(text>999)
+		canvas_backround.font = "normal 8px Verdana";
+	var text_length = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, status_x+218-text_length, status_y+28);
 	
 	//damage
 	canvas_backround.fillStyle = "#7b8a69";
@@ -247,11 +252,21 @@ function draw_tank_abilities(){
 		var value = MY_TANK.abilities_lvl[i];
 		canvas_backround.font = "normal 8px Verdana";
 		canvas_backround.fillStyle = "#2f391c";
-		if(i==ABILITIES_MODE-1 || ABILITIES_MODE == 0){
-			canvas_backround.font = "bold 8px Verdana";
-			canvas_backround.fillStyle = "#710000";
-			}
 		canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+		
+		//ability to upgrade
+		if(i==ABILITIES_MODE-1){
+			canvas_backround.beginPath();
+			canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 3, 0, 2*Math.PI);	
+			canvas_backround.fillStyle = "#1d2e0b";
+			canvas_backround.fill();
+			}
+		if(ABILITIES_MODE == 0){
+			canvas_backround.beginPath();
+			canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 2, 0, 2*Math.PI);	
+			canvas_backround.fillStyle = "#1d2e0b";
+			canvas_backround.fill();
+			}
 		
 		//save position
 		if(ABILITIES_POS.length < TYPES[MY_TANK.type].abilities.length){
@@ -321,11 +336,21 @@ function draw_ability_reuse(object){
 		var value = MY_TANK.abilities_lvl[i];
 		canvas_backround.font = "normal 8px Verdana";
 		canvas_backround.fillStyle = "#2f391c";
-		if(i==ABILITIES_MODE-1 || ABILITIES_MODE == 0){
-			canvas_backround.font = "bold 8px Verdana";
-			canvas_backround.fillStyle = "#710000";
-			}
 		canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+		
+		//ability to upgrade
+		if(i==ABILITIES_MODE-1){
+			canvas_backround.beginPath();
+			canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 3, 0, 2*Math.PI);	
+			canvas_backround.fillStyle = "#1d2e0b";
+			canvas_backround.fill();
+			}
+		if(ABILITIES_MODE == 0){
+			canvas_backround.beginPath();
+			canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 2, 0, 2*Math.PI);	
+			canvas_backround.fillStyle = "#1d2e0b";
+			canvas_backround.fill();
+			}
 		
 		//reuse left
 		reuse = Math.ceil(ability_reuse / 1000);

@@ -73,7 +73,6 @@ function Rage(TANK, descrition_only, settings_only, ai){
 	}	
 function Health(TANK, descrition_only, settings_only, ai){
 	var power = 110 + (TANK.abilities_lvl[2]-1);
-	if(power > 130) power = 130;
 	
 	if(descrition_only != undefined)
 		return 'Increase total health by '+(power-100)+'%.';
@@ -891,7 +890,7 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 function Medicine(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 10 + 0.3 * (TANK.abilities_lvl[2]-1);
+	var power = 10 + 1 * (TANK.abilities_lvl[2]-1);
 	var range = 80;
 	
 	if(descrition_only != undefined)
@@ -1021,8 +1020,7 @@ function Jump(TANK, descrition_only, settings_only, ai){
 	}
 function PL_Shield(TANK, descrition_only, settings_only, ai){
 	var reuse = 17000;
-	var duration = 2000 + 105*(TANK.abilities_lvl[2]-1);
-	if(duration > 4000) duration = 4000;
+	var duration = 3000 + 105*(TANK.abilities_lvl[2]-1);
 	var power = 5 + 1*(TANK.abilities_lvl[2]-1);
 	
 	if(descrition_only != undefined)

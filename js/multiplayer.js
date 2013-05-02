@@ -683,7 +683,7 @@ function get_packet(fromClient, message){
 			chat(TANK_TO.name+" was killed by "+TANK_FROM.name+"!", false, false);
 		}
 	else if(type == 'level_up'){	//tank leveled up
-		//DATA = room_id, player_id, level
+		//DATA = room_id, player_id, level, xxxxxxxxxxxxx
 		TANK_TO = get_tank_by_id(DATA[1]);
 		if(TANK_TO===false){	
 			console.log('Error: tank_to "'+DATA[1]+'" was not found on level_up.');
@@ -695,6 +695,10 @@ function get_packet(fromClient, message){
 		if(TANK_TO.armor > TYPES[TANK_TO.type].armor[2])
 			TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
 		TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
+		
+		TANK_TO.abilities_lvl[DATA[3]]++;
+		if(TANK_TO.id == MY_TANK.id)
+			draw_tank_abilities();
 		
 		//update passive abilites
 		for(a in TYPES[TANK_TO.type].abilities){ 
@@ -791,7 +795,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 	else if(action=='skill_advanced')
 		send_packet('skill_advanced', [room_id, player, data]);
 	else if(action=='level_up')
-		send_packet('level_up', [room_id, player, data]);
+		send_packet('level_up', [room_id, player, data, data2]);
 	else if(action=='change_tank')
 		send_packet('change_tank', [room_id, data, player, data2]);
 	else if(action=='leave_room'){
