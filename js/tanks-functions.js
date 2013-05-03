@@ -224,6 +224,18 @@ function Repair(TANK, descrition_only, settings_only, ai){
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
+		
+		var valid = true;
+		if(TYPES[TANKS[i].type].name == 'Cruiser'){
+			for (b in TANKS[i].buffs){
+				if(TANKS[i].buffs[b].name == 'repair'){
+					valid = false;
+					break;
+					}
+				}
+			}
+		if(valid==false) continue;	//lets avoid exploits/immortality here		
+		
 		//add effect
 		if(game_mode == 1){
 			//repair buff
@@ -940,7 +952,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 //====== TRex ==================================================================
 
 function Plasma(TANK, descrition_only, settings_only, ai){
-	var reuse = 5000;
+	var reuse = 7000;
 	var power = 60 + 7 * (TANK.abilities_lvl[0]-1);
 	var duration_slow = 2000;
 	var power_slow = 70 - (TANK.abilities_lvl[0]-1);
@@ -967,7 +979,7 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 		range: range,
 		power: power,
 		reuse: reuse,
-		pierce: 1,
+		//pierce: 1,
 		icon: 'plasma',
 		angle: false,
 		ability_nr: 0,
@@ -978,7 +990,7 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 function Jump(TANK, descrition_only, settings_only, ai){
-	var reuse = 8000;
+	var reuse = 10000;
 	var range = 100 + 2.7 * (TANK.abilities_lvl[1]-1);
 	
 	if(descrition_only != undefined)
@@ -1019,7 +1031,7 @@ function Jump(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 function PL_Shield(TANK, descrition_only, settings_only, ai){
-	var reuse = 17000;
+	var reuse = 15000;
 	var duration = 3000 + 105*(TANK.abilities_lvl[2]-1);
 	var power = 5 + 1*(TANK.abilities_lvl[2]-1);
 	
@@ -1096,6 +1108,15 @@ function do_jump(tank_id, skip_broadcast){
 	TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;
 	
 	//effect
+	TANK.jump_animation = {
+		to_x: move_x - tank_size,
+		to_y: move_y - tank_size,
+		from_x: TANK.x,
+		from_y: TANK.y,
+		angle: angle,
+		lifetime: Date.now() + 1000,
+		duration: 1000,
+		};
 	TANK.x = move_x - tank_size;
 	TANK.y = move_y - tank_size;
 	TANK.move = 0;

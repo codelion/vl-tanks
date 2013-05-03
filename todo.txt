@@ -1,8 +1,4 @@
-animation
-	camoflauge transparent
-	jump
-	explode
-	fade in/out
+explode animation
 IDEAS
 	cartoonish design
 		red blue green

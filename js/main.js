@@ -77,7 +77,7 @@ function intro(force){
 		return false;
 		}
 	//draw
-	IMAGES_INRO.src = '../img/intro.jpg';
+	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	IMAGES_INRO.onload = function(){
 		canvas_backround.drawImage(IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 		//draw text
@@ -359,13 +359,13 @@ function preload_all_files(){
 	preload_total = preload_left;
 	
 	//preload images
-	IMAGE_BACK.src = '../img/background.jpg';	IMAGE_BACK.onload = function(){ update_preload(1); }
-	IMAGE_LOGO.src = '../img/logo.png';	IMAGE_LOGO.onload = function(){ update_preload(1); }
-	IMAGE_MOON.src = '../img/moon.jpg';	IMAGE_MOON.onload = function(){ update_preload(1); }
-	IMAGES_GENERAL.src = '../img/general.png';	IMAGES_GENERAL.onload = function(){ update_preload(1); }
-	IMAGES_TANKS.src = '../img/tanks.png';	IMAGES_TANKS.onload = function(){ update_preload(1); }
-	IMAGES_BULLETS.src = '../img/bullets.png';	IMAGES_BULLETS.onload = function(){ update_preload(1); }
-	IMAGES_ELEMENTS.src = '../img/elements.png';	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
+	IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	IMAGE_BACK.onload = function(){ update_preload(1); }
+	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	IMAGE_LOGO.onload = function(){ update_preload(1); }
+	IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	IMAGE_MOON.onload = function(){ update_preload(1); }
+	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	IMAGES_GENERAL.onload = function(){ update_preload(1); }
+	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	IMAGES_TANKS.onload = function(){ update_preload(1); }
+	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	IMAGES_BULLETS.onload = function(){ update_preload(1); }
+	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
 	
 	//prelaod sound
 	for(var i in audio_to_preload){

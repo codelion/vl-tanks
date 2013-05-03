@@ -79,14 +79,15 @@ function draw_main(){
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
 					last_selected_counter = -1;
-					TANKS[i].x -= TYPES[TANKS[i].type].size[1]/4;
-					TANKS[i].y -= TYPES[TANKS[i].type].size[1]/4;
 					}
 				}
 			
 			//check stun
 			if(TANKS[i].stun - Date.now() < 0)
 				delete TANKS[i].stun;
+			
+			//animations
+			do_animations(TANKS[i]);
 				
 			//move lock
 			if(TANKS[i].target_move_lock != undefined){
@@ -283,6 +284,31 @@ function draw_main(){
 	//request next draw
 	if(render_mode == 'requestAnimationFrame')
 		requestAnimationFrame(draw_main);
+	}
+function do_animations(TANK){
+	if(QUALITY == 1) return false;
+	//jump
+	if(TANK.jump_animation != undefined){
+		var gap = 10;
+		//lifetime
+		if(TANK.jump_animation.lifetime < Date.now() ){
+			delete TANK.jump_animation;
+			return false;
+			}
+		//animate
+		dist_x = TANK.jump_animation.to_x - (TANK.jump_animation.from_x);
+		dist_y = TANK.jump_animation.to_y - (TANK.jump_animation.from_y);
+		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+		var radiance = Math.atan2(dist_y, dist_x);
+		if(distance<gap) return false;	
+		for(var i = 0; gap*i < distance; i++){
+			alpha = (TANK.jump_animation.lifetime - Date.now()) / TANK.jump_animation.duration;
+			alpha = round(alpha*100)/100;
+			x = TANK.jump_animation.from_x + round(Math.cos(radiance)*(i*gap));
+			y = TANK.jump_animation.from_y + round(Math.sin(radiance)*(i*gap));
+			draw_tank_clone(TANK, x, y, TANK.jump_animation.angle, alpha);
+			}
+		}
 	}
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
