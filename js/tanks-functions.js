@@ -36,7 +36,7 @@ function Rest(TANK, descrition_only, settings_only, ai){
 		});
 	//weak debuff
 	TANK.buffs.push({
-		name: 'weak',
+		name: 'damage',
 		power: power_weak,
 		lifetime: Date.now()+duration,
 		});	
@@ -58,6 +58,7 @@ function Rage(TANK, descrition_only, settings_only, ai){
 	//armor debuff
 	TANK.buffs.push({
 		name: 'shield',
+		type: 'static',
 		power: power_armor,
 		lifetime: Date.now()+duration,
 		});
@@ -72,10 +73,10 @@ function Rage(TANK, descrition_only, settings_only, ai){
 	return reuse;
 	}	
 function Health(TANK, descrition_only, settings_only, ai){
-	var power = 110 + (TANK.abilities_lvl[2]-1);
+	var power = 1.1 + 0.01 * (TANK.abilities_lvl[2]-1);
 	
 	if(descrition_only != undefined)
-		return 'Increase total health by '+(power-100)+'%.';
+		return 'Increase total health by '+round((power-1)*100)+'%.';
 	
 	//update health buff
 	for(var b in TANK.buffs){
@@ -87,7 +88,7 @@ function Health(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 function Health_once(TANK, descrition_only, settings_only, ai){
-	var power = 110 + (TANK.abilities_lvl[2]-1);
+	var power = 1.1 + 0.01 *(TANK.abilities_lvl[2]-1);
 	if(power > 130) power = 130;
 	
 	//health buff
@@ -102,12 +103,12 @@ function Health_once(TANK, descrition_only, settings_only, ai){
 function Blitzkrieg(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power_speed = 120;
+	var power_speed = 1.2;
 	var power_damage = 1.2 + 0.02* (TANK.abilities_lvl[0]-1);
 	var power_armor = -100;
 	
 	if(descrition_only != undefined)
-		return 'Attack with '+round(power_damage*100)+'% damage and '+(power_speed-100)+'% speed, but no armor.';
+		return 'Attack with '+round(power_damage*100)+'% damage and '+round(power_speed*100)+'% speed, but no armor.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
 		var max_hp = get_tank_max_hp(TANK);
@@ -131,6 +132,7 @@ function Blitzkrieg(TANK, descrition_only, settings_only, ai){
 	//armor debuff
 	TANK.buffs.push({
 		name: 'shield',
+		type: 'static',
 		power: power_armor,
 		lifetime: Date.now()+duration,
 		});
@@ -188,10 +190,10 @@ function AA_Bullets_once(TANK, descrition_only, settings_only, ai){
 function Turbo(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 3000 + 100 * (TANK.abilities_lvl[0]-1);
-	var power = 117;	
+	var power = 1.17;
 
 	if(descrition_only != undefined)
-		return 'Increase speed by '+(power-100)+'% for '+round(duration/100)/10+'s.';
+		return 'Increase speed by '+round((power-1)*100)+'% for '+round(duration/100)/10+'s.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	TANK.abilities_reuse[0] = Date.now() + reuse;
@@ -502,13 +504,14 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	TANK.speed = round(TANK.speed * power_speed);
 	//weak debuff
 	TANK.buffs.push({
-		name: 'weak',
+		name: 'damage',
 		source: 'camouflage',
 		power: power_weak,
 		});
 	//armor debuff
 	TANK.buffs.push({
 		name: 'shield',
+		type: 'static',
 		source: 'camouflage',
 		power: power_armor,
 		});
@@ -521,7 +524,7 @@ function stop_camouflage(TANK){
 	
 	//update buffs
 	for(var b in TANK.buffs){
-		if(TANK.buffs[b].name == 'weak' && TANK.buffs[b].source == 'camouflage'){
+		if(TANK.buffs[b].name == 'damage' && TANK.buffs[b].source == 'camouflage'){
 			TANK.buffs.splice(b, 1); b--;
 			}
 		}
@@ -803,6 +806,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 			//shield buff
 			TANKS[ii].buffs.push({
 				name: 'shield',
+				type: 'static',
 				power: power,
 				lifetime: Date.now()+duration,
 				circle: '#196119',
@@ -813,6 +817,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 				{key: 'buffs', 
 					value: {
 						name: 'shield',
+						type: 'static',
 						power: power,
 						lifetime: Date.now()+duration,
 						circle: '#196119',
@@ -954,12 +959,12 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 function Plasma(TANK, descrition_only, settings_only, ai){
 	var reuse = 7000;
 	var power = 60 + 7 * (TANK.abilities_lvl[0]-1);
-	var duration_slow = 2000;
-	var power_slow = 70 - (TANK.abilities_lvl[0]-1);
+	var duration_slow = 3000;
+	var power_slow = 0.7 - 0.01 * (TANK.abilities_lvl[0]-1);
 	var range = 40;
 	
 	if(descrition_only != undefined)
-		return 'Powerful plasma shot with '+power+' power and '+(100-power_slow)+'% slow effect.';
+		return 'Powerful plasma shot with '+power+' power and '+round(100-power_slow*100)+'% slow effect.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_missile != undefined){
@@ -1043,6 +1048,7 @@ function PL_Shield(TANK, descrition_only, settings_only, ai){
 	//shield buff
 	TANK.buffs.push({
 		name: 'shield',
+		type: 'static',
 		power: power,
 		lifetime: Date.now()+duration,
 		circle: '#196119',
@@ -1107,16 +1113,18 @@ function do_jump(tank_id, skip_broadcast){
 	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 	TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;
 	
-	//effect
-	TANK.jump_animation = {
+	//animation
+	TANK.animations.push({
+		name: 'jump',
 		to_x: move_x - tank_size,
 		to_y: move_y - tank_size,
 		from_x: TANK.x,
 		from_y: TANK.y,
 		angle: angle,
 		lifetime: Date.now() + 1000,
-		duration: 1000,
-		};
+		duration: 1000,	
+		});
+	
 	TANK.x = move_x - tank_size;
 	TANK.y = move_y - tank_size;
 	TANK.move = 0;

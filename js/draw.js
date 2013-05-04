@@ -31,14 +31,7 @@ function draw_main(){
 		try{
 			//speed multiplier
 			var speed_multiplier = 1;
-			speed_first = speed_multiplier;
-			for(var dd in TANKS[i].buffs){
-				if(TANKS[i].buffs[dd].name == 'speed'){
-					speed_multiplier = speed_multiplier * TANKS[i].buffs[dd].power / 100;
-					if(speed_multiplier < 0) 
-						speed_multiplier = 0;
-					}
-				}
+			speed_multiplier = apply_buff(TANKS[i], 'speed', speed_multiplier);
 				
 			//check buffs
 			for(var x=0; x < TANKS[i].buffs.length; x++){
@@ -287,27 +280,54 @@ function draw_main(){
 	}
 function do_animations(TANK){
 	if(QUALITY == 1) return false;
-	//jump
-	if(TANK.jump_animation != undefined){
-		var gap = 10;
+	for(var a=0; a < TANK.animations.length; a++){
 		//lifetime
-		if(TANK.jump_animation.lifetime < Date.now() ){
-			delete TANK.jump_animation;
-			return false;
+		if(TANK.animations[a].lifetime < Date.now() ){
+			TANK.animations.splice(a, 1); a--;
+			continue;
 			}
-		//animate
-		dist_x = TANK.jump_animation.to_x - (TANK.jump_animation.from_x);
-		dist_y = TANK.jump_animation.to_y - (TANK.jump_animation.from_y);
-		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		var radiance = Math.atan2(dist_y, dist_x);
-		if(distance<gap) return false;	
-		for(var i = 0; gap*i < distance; i++){
-			alpha = (TANK.jump_animation.lifetime - Date.now()) / TANK.jump_animation.duration;
+		var animation = TANK.animations[a];
+		//jump
+		if(animation.name == 'jump'){
+			var gap = 10;
+			dist_x = animation.to_x - (animation.from_x);
+			dist_y = animation.to_y - (animation.from_y);
+			distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			var radiance = Math.atan2(dist_y, dist_x);
+			if(distance<gap) return false;	
+			for(var i = 0; gap*i < distance; i++){
+				alpha = (animation.lifetime - Date.now()) / animation.duration;
+				alpha = round(alpha*100)/100;
+				x = animation.from_x + round(Math.cos(radiance)*(i*gap));
+				y = animation.from_y + round(Math.sin(radiance)*(i*gap));
+				draw_tank_clone(TANK, x, y, animation.angle, alpha);
+				}
+			}
+		//fire
+		else if(animation.name == 'fire'){
+			alpha = (animation.lifetime - Date.now()) / animation.duration;
 			alpha = round(alpha*100)/100;
-			x = TANK.jump_animation.from_x + round(Math.cos(radiance)*(i*gap));
-			y = TANK.jump_animation.from_y + round(Math.sin(radiance)*(i*gap));
-			draw_tank_clone(TANK, x, y, TANK.jump_animation.angle, alpha);
+			dist_x = animation.to_x - animation.from_x;
+			dist_y = animation.to_y - animation.from_y;
+			radiance = Math.atan2(dist_y, dist_x);
+			explode_x = animation.from_x + Math.cos(radiance)*(TANK.size()/2+10);
+			explode_y = animation.from_y + Math.sin(radiance)*(TANK.size()/2+10);
+			canvas_main.save();
+			canvas_main.globalAlpha = alpha;
+			canvas_main.translate(explode_x+map_offset[0], explode_y+map_offset[1]);
+			canvas_main.rotate(animation.angle * TO_RADIANS);
+			draw_image(canvas_main, "fire", -(24/2), -(32/2));
+			canvas_main.restore();
 			}
+		//explosion
+		else if(animation.name == 'explosion'){
+			alpha = (animation.lifetime - Date.now()) / animation.duration;
+			alpha = round(alpha*100)/100;
+			canvas_main.save();
+			canvas_main.globalAlpha = alpha;
+			draw_image(canvas_main, 'explosion', animation.x, animation.y);
+			canvas_main.restore();
+			}	
 		}
 	}
 function add_first_screen_elements(){

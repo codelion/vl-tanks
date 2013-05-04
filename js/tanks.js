@@ -435,8 +435,14 @@ function draw_bullets(TANK, time_gap){
 						}
 					}
 				
-				//draw aoe explosion
-				draw_image(canvas_main, 'explosion', BULLETS[b].x-25+map_offset[0], BULLETS[b].y-25+map_offset[1]);
+				//animation
+				TANK.animations.push({
+					name: 'explosion',
+					x: BULLETS[b].x-25+map_offset[0],
+					y: BULLETS[b].y-25+map_offset[1],
+					lifetime: Date.now() + 500,
+					duration: 500,	
+					});
 				}
 			
 			//remove bullet
@@ -947,18 +953,19 @@ function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
 //draw tank shooting fire
 function draw_fire(TANK, TANK_TO){
 	if(TANK.invisibility==1) return false;
-	explode_x = TANK.x+TYPES[TANK.type].size[1]/2;
-	explode_y = TANK.y+TYPES[TANK.type].size[1]/2;
-	dist_x = TANK_TO.x+TYPES[TANK_TO.type].size[1]/2 - explode_x;
-	dist_y = TANK_TO.y+TYPES[TANK_TO.type].size[1]/2 - explode_y;
-	radiance = Math.atan2(dist_y, dist_x);
-	explode_x = explode_x + Math.cos(radiance)*(TYPES[TANK.type].size[1]/2+10);
-	explode_y = explode_y + Math.sin(radiance)*(TYPES[TANK.type].size[1]/2+10);
-	canvas_main.save();
-	canvas_main.translate(explode_x+map_offset[0], explode_y+map_offset[1]);
-	canvas_main.rotate(TANK.fire_angle * TO_RADIANS);
-	draw_image(canvas_main, "fire", -(24/2), -(32/2));
-	canvas_main.restore();
+	if(TYPES[TANK.type].type == 'human') return false;
+	
+	//register animation
+	TANK.animations.push({
+		name: 'fire',
+		to_x: TANK_TO.cx(),
+		to_y: TANK_TO.cy(),
+		from_x: TANK.cx(),
+		from_y: TANK.cy(),
+		angle: TANK.fire_angle,
+		lifetime: Date.now() + 150,
+		duration: 150,
+		});
 	}
 //shooting
 function shoot_sound(TANK){
@@ -996,27 +1003,15 @@ function do_damage(TANK, TANK_TO, BULLET){
 		}	
 	
 	damage = TANK.damage;
-	for(var dd in TANK.buffs){
-		if(TANK.buffs[dd].name == 'weak'){
-			damage = damage * TANK.buffs[dd].power;
-			if(damage < 0) damage = 0;
-			}
-		if(TANK.buffs[dd].name == 'damage'){
-			damage = damage * TANK.buffs[dd].power;
-			}
-		}
+	damage = apply_buff(TANK, 'damage', damage);
 	
 	if(BULLET.damage != undefined)
 		damage = BULLET.damage;
 	armor = TANK_TO.armor;
 	if(armor > TYPES[TANK_TO.type].armor[2])
 		armor = TYPES[TANK_TO.type].armor[2];
-	for(var dd in TANK_TO.buffs){
-		if(TANK_TO.buffs[dd].name == 'shield'){
-			armor = armor + TANK_TO.buffs[dd].power;
-			if(armor > 100) armor = 100;
-			}
-		}
+	armor = apply_buff(TANK_TO, 'shield', armor);
+	if(armor > 100) armor = 100;
 	
 	//check armor_piercing
 	armor = armor - TANK.pierce_armor;
@@ -1398,10 +1393,7 @@ function sync_movement(TANK, xx, yy){
 	}
 function get_tank_max_hp(TANK){
 	var max_hp = TYPES[TANK.type].life[0] + TYPES[TANK.type].life[1] * (TANK.level-1);
-	for(var b in TANK.buffs){
-		if(TANK.buffs[b].name == 'health')
-			max_hp = max_hp * TANK.buffs[b].power / 100;
-		}
+	max_hp = apply_buff(TANK, 'health', max_hp);
 	max_hp = round(max_hp);
 	return max_hp;
 	}
@@ -1477,6 +1469,19 @@ function check_invisibility(TANK, force_check){
 			}
 		}
 	}
+function apply_buff(TANK, buff_name, original_value){
+	for(var b in TANK.buffs){
+		if(TANK.buffs[b].name == buff_name){
+			if(TANK.buffs[b].type == 'static'){
+				original_value = original_value + TANK.buffs[b].power;
+				}
+			else
+				original_value = original_value * TANK.buffs[b].power;
+			}
+		}
+	if(original_value < 0) original_value = 0;
+	return original_value;
+	}
 //adds new tank
 function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, begin_time){
 	if(type==undefined) type = 0;
@@ -1530,6 +1535,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		attack_delay: TYPES[type].attack_delay,
 		turn_speed: TYPES[type].turn_speed,
 		pierce_armor: 0,
+		animations: [],
 		visible: {state: false, time: Date.now()-10000},	//if visible, used only for grapchics effects
 		begin_time: Date.now(),	//time it was created
 		death_time: 0,	//how much second tank was dead

@@ -87,15 +87,7 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
 	var damage_string = MY_TANK.damage;
-	for(var dd in MY_TANK.buffs){
-		if(MY_TANK.buffs[dd].name == 'weak'){
-			damage_string = damage_string * MY_TANK.buffs[dd].power;
-			if(damage_string < 0) damage_string = 0;
-			}
-		if(MY_TANK.buffs[dd].name == 'damage'){
-			damage_string = damage_string * MY_TANK.buffs[dd].power;
-			}
-		}
+	damage_string = apply_buff(MY_TANK, 'damage', damage_string);
 	damage_string = Math.floor(damage_string);
 	canvas_backround.fillText(damage_string, left_x_values, top_y);
 	
@@ -107,12 +99,8 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
 	var armor_text = MY_TANK.armor;
-	for(var dd in MY_TANK.buffs){
-		if(MY_TANK.buffs[dd].name == 'shield'){
-			armor_text = armor_text + MY_TANK.buffs[dd].power;
-			if(armor_text > 100) armor_text = 100;
-			}
-		}
+	armor_text = apply_buff(MY_TANK, 'shield', armor_text);
+	if(armor_text > 100) armor_text = 100;
 	if(armor_text < 0) armor_text = 0;
 	armor_text = Math.floor(armor_text);
 	canvas_backround.fillText(armor_text+"%", left_x_values, top_y+28);
@@ -137,14 +125,7 @@ function redraw_tank_stats(){
 	canvas_backround.fillStyle = "#a3ad16";
 	canvas_backround.font = "bold 10px Verdana";
 	var speed_text = MY_TANK.speed;
-	speed_first = speed_text;
-	for(var dd in MY_TANK.buffs){
-		if(MY_TANK.buffs[dd].name == 'speed'){
-			speed_text = speed_text * MY_TANK.buffs[dd].power / 100;
-			if(speed_text < 0)
-				speed_text = 0;
-			}
-		}
+	speed_text = apply_buff(MY_TANK, 'speed', speed_text);
 	speed_text = Math.floor(speed_text)+" km/h";
 	canvas_backround.fillText(speed_text, left_x_values, top_y+28);
 	
