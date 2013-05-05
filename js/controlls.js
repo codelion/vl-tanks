@@ -25,9 +25,9 @@ function on_keyboard_action(event){
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
 					//stop move
-					MY_TANK.move = 0;
 					if(game_mode == 2){
-						register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
+						if(MY_TANK.move == 1)
+							register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
 						}
 					else
 						MY_TANK.move = 0;
