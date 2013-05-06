@@ -22,6 +22,7 @@ TYPES.push({
 	//no_repawn: 1,					//if tank dies - he will not respawn
 	//no_collisions: 1,				//tank can go other walls and other tanks
 	//bonus: 1,					//tank will be available only in single mode, random and mirror
+	//flying: true,					//can fly
 	//ignore_armor: 1,				//tank will ignore armor
 	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
 		{name: 'Rest',		passive: false,		broadcast: 1}, 

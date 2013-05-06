@@ -196,41 +196,42 @@ function draw_tank(tank){
 	update_radar(tank);
 	}
 //draw selected tank on selected place
-function draw_tank_clone(CLONE, x, y, angle, alpha){
+function draw_tank_clone(CLONE, x, y, angle, alpha, canvas){
 	x = x + map_offset[0];
 	y = y + map_offset[1];
 	if(alpha == undefined) alpha = 1;
+	if(canvas == undefined) canvas = canvas_main;
 
 	//draw tank base
-	canvas_main.save();
-	canvas_main.globalAlpha = alpha;
+	canvas.save();
+	canvas.globalAlpha = alpha;
 	if(TYPES[CLONE.type].no_base_rotate === true){
 		//draw without rotation
-		draw_image(canvas_main, TYPES[CLONE.type].name,
+		draw_image(canvas, TYPES[CLONE.type].name,
 			x, y, undefined, undefined,	
 			100, 0, TYPES[CLONE.type].size[1], TYPES[CLONE.type].size[1]);
-		canvas_main.translate(round(CLONE.size()/2), round(CLONE.size()/2));
-		canvas_main.rotate(angle * TO_RADIANS);
+		canvas.translate(round(CLONE.size()/2), round(CLONE.size()/2));
+		canvas.rotate(angle * TO_RADIANS);
 		}
 	else{
-		canvas_main.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
-		canvas_main.rotate(angle * TO_RADIANS);
-		draw_image(canvas_main, TYPES[CLONE.type].name,
+		canvas.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
+		canvas.rotate(angle * TO_RADIANS);
+		draw_image(canvas, TYPES[CLONE.type].name,
 			-1*round(CLONE.size()/2), -1*round(CLONE.size()/2), CLONE.size(), CLONE.size(),
 			100, 0, TYPES[CLONE.type].size[1], TYPES[CLONE.type].size[1]);
 		}
-	canvas_main.restore();
+	canvas.restore();
 	
 	//draw top
 	if(TYPES[CLONE.type].icon_top != false){
-		canvas_main.save();
-		canvas_main.globalAlpha = alpha;
-		canvas_main.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
-		canvas_main.rotate(angle * TO_RADIANS);
-		draw_image(canvas_main, TYPES[CLONE.type].name,
+		canvas.save();
+		canvas.globalAlpha = alpha;
+		canvas.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
+		canvas.rotate(angle * TO_RADIANS);
+		draw_image(canvas, TYPES[CLONE.type].name,
 			-(CLONE.size()/2), -(CLONE.size()/2), CLONE.size(), CLONE.size(), 
 			150, 0, CLONE.size(), CLONE.size());
-		canvas_main.restore();
+		canvas.restore();
 		}
 	}
 //tank hp bar above

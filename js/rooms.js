@@ -5,7 +5,7 @@ function draw_rooms_list(message){
 	unregister_buttons('rooms');
 	
 	room_controller();
-	
+
 	x = 10;
 	y = 10;
 	gap = 10;
@@ -15,6 +15,25 @@ function draw_rooms_list(message){
 	
 	//background
 	canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+	
+	if(socket_live == false){
+		//cconnecting block
+		width = 300;
+		height = 50;
+		canvas_backround.strokeStyle = "#000000";
+		canvas_backround.fillStyle = "#8fc74c";
+		roundRect(canvas_backround, (WIDTH_APP-width)/2, (HEIGHT_APP-27-150-height)/2, width, height, 5, true);
+		
+		//text
+		canvas_backround.fillStyle = "#000000";
+		canvas_backround.font = "Bold 13px Helvetica";
+		text = "Connecting...";
+		text_width = canvas_backround.measureText(text).width;
+		canvas_backround.fillText(text, (WIDTH_APP-text_width)/2, (HEIGHT_APP-27-150-height)/2+30);
+		
+		//abort, not connected
+		return false;
+		}
 	
 	//create button
 	width = 100;
@@ -30,12 +49,9 @@ function draw_rooms_list(message){
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Helvetica";
 	canvas_backround.fillText(text, x+letter_padding_left+12, y+(height+font_pixel_to_height(13))/2);
-	
 	x = x + 100+10;
 	
 	//refresh button
-	width = 100;
-	height = 30;
 	canvas_backround.strokeStyle = "#000000";
 	canvas_backround.fillStyle = "#69a126";
 	roundRect(canvas_backround, x, y, width, height, 5, true);

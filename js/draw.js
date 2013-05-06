@@ -418,6 +418,9 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	var top_margin = 370;
 	var button_i=0;
 	var letter_height = 9;
+	var padding = 5;
+	var minibutton_width = 48;
+	var minibutton_height = 20;
 	
 	if(active_i==undefined)
 		active_i = -1;
@@ -465,15 +468,34 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	var left = (WIDTH_APP-598)/2;	
 	canvas_backround.drawImage(IMAGE_LOGO, left, 15);
 	
-	//intro text
-	canvas_backround.font = "Normal 18px Arial";
-	canvas_backround.fillStyle = '#ffffff';
-	canvas_backround.fillText("Intro", WIDTH_APP-50, 20);
-	//link
-	register_button(WIDTH_APP-60, 0, 60, 25, PLACE, function(){ 
+	//intro button
+	var mi = 0;
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 11px Arial";
+	text = "Intro";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
 		intro_page=0;
 		PLACE = 'intro';
 		intro(true);
+		});
+	
+	//library
+	mi = 1;
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 11px Arial";
+	text = "Library";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		draw_library_list();
 		});
 	
 	for (i in text_array){
