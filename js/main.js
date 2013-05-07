@@ -248,7 +248,7 @@ function init_action(map_nr, my_team){
 			enemy_team = 'R';	
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-				//random_type = 0;
+				//random_type = 4;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);

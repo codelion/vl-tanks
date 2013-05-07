@@ -198,7 +198,7 @@ function draw_tank(tank){
 //draw selected tank on selected place
 function draw_tank_clone(CLONE, x, y, angle, alpha, canvas){
 	x = x + map_offset[0];
-	y = y + map_offset[1];
+	y = y + map_offset[1];	
 	if(alpha == undefined) alpha = 1;
 	if(canvas == undefined) canvas = canvas_main;
 

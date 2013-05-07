@@ -1,5 +1,5 @@
 //game settings
-var VERSION = "1.4";			//app version
+var VERSION = "1.4.2";			//app version
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
@@ -14,7 +14,7 @@ var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
 var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var DEBUG = true;			//show debug info
+var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXT = '.ogg';			//default sound files extension
 var LEVEL_UP_TIME = 30;			//how much seconds must pass till level up
@@ -63,7 +63,7 @@ var pre_draw_functions = [];		//extra functions executed before main draw loop
 var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
 var game_mode = 0;			//1=single player, 2=multi player
 var QUALITY = 3;			//1=low, 2=mid, 3=high
-var PLACE = '';				//init, intro, settings, select, game, score, rooms, room, create_room
+var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room
 var preloaded=false;			//if all images preloaded
 var preload_total=0;			//total images for preload
 var preload_left=0;			//total images left for preload

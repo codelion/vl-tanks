@@ -480,7 +480,7 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 	TANK.abilities_reuse[1] = Date.now() + reuse;
 	
 	//check ranges
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id || ai != undefined){
 		for(var i in TANKS){
 			if(TANKS[i].team == TANK.team) continue; //same team
 			var distance = get_distance_between_tanks(TANKS[i], TANK);

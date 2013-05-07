@@ -419,8 +419,6 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	var button_i=0;
 	var letter_height = 9;
 	var padding = 5;
-	var minibutton_width = 48;
-	var minibutton_height = 20;
 	
 	if(active_i==undefined)
 		active_i = -1;
@@ -467,36 +465,8 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	//logo
 	var left = (WIDTH_APP-598)/2;	
 	canvas_backround.drawImage(IMAGE_LOGO, left, 15);
-	
-	//intro button
-	var mi = 0;
-	var mini_x = WIDTH_APP-minibutton_width-padding;
-	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
-	canvas_backround.fillStyle = "#0c2c0c";
-	canvas_backround.font = "Bold 11px Arial";
-	text = "Intro";
-	text_width = canvas_backround.measureText(text).width;
-	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
-	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
-		intro_page=0;
-		PLACE = 'intro';
-		intro(true);
-		});
-	
-	//library
-	mi = 1;
-	var mini_x = WIDTH_APP-minibutton_width-padding;
-	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
-	canvas_backround.fillStyle = "#0c2c0c";
-	canvas_backround.font = "Bold 11px Arial";
-	text = "Library";
-	text_width = canvas_backround.measureText(text).width;
-	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
-	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
-		draw_library_list();
-		});
+
+	draw_right_buttons();	
 	
 	for (i in text_array){
 		//background
@@ -524,6 +494,110 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 		
 		button_i++;
 		}
+	}
+function draw_right_buttons(){
+	var minibutton_width = 48;
+	var minibutton_height = 20;
+	var padding = 5;
+	var mi = 0;
+	
+	//intro button
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Intro";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		intro_page=0;
+		PLACE = 'intro';
+		intro(true);
+		});
+	mi++;
+	
+	//library
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Library";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		draw_library_list();
+		});
+	mi++;
+	
+	//Controls
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Controls";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		PLACE = 'library';
+		var padding = 20;
+		//background
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.fillStyle = "#ffffff";
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, padding, padding, WIDTH_APP-padding-70, 220, 5, true);
+		
+		var height_space = 16;
+		var st=0;
+		lib_show_stats("move and target", "Mouse", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("control soldiers", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("skills", "1, 2, 3", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("global chat or team chat in game", "Shift+Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("change scroll mode", "s", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("scroll map in manual scroll mode", "arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("scroll map up/down", "mouse wheel", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("stop and move map to your tank", "Esc", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("change abilities upgrade mode", "u", padding+20+90, padding+20+st*height_space, -90); st++;
+		
+		draw_right_buttons();
+		});
+	mi++;
+	
+	//About
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "About";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		PLACE = 'library';
+		var padding = 20;
+		//background
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.fillStyle = "#ffffff";
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, padding, padding, WIDTH_APP-padding-70, 220, 5, true);
+		
+		var height_space = 16;
+		var st=0;
+		lib_show_stats("Moon wars", "Name", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("Vilius", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("www.viliusl@gmail.com", "Email", padding+20+90, padding+20+st*height_space, -90); st++;
+		
+		canvas_backround.font = "normal 11px Verdana";
+		canvas_backround.fillStyle = "#196119";
+		canvas_backround.fillText("Moon wars is free online HTML5 based tank game. Main features: 9 tanks and 2 air units, 5 maps, single player, ", padding+20, padding+20+(st+1)*height_space);
+		canvas_backround.fillText("multiplayer with 4 modes, full screen support, HTML5 only, no flash.", padding+20, padding+20+(st+2)*height_space);
+		draw_right_buttons();
+		});
+	mi++;
 	}
 function draw_logo_tanks(left, top, change_logo){
 	var max_size = 60;
