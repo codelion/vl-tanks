@@ -588,8 +588,19 @@ function draw_right_buttons(){
 		var height_space = 16;
 		var st=0;
 		lib_show_stats("Moon wars", "Name", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("Vilius", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("www.viliusl@gmail.com", "Email", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("ViliusL", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats(APP_EMAIL, "Email", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("", "Website", padding+20+90, padding+20+st*height_space, -90); st++;
+		//link
+		canvas_backround.font = "Bold 10px Verdana";
+		canvas_backround.fillStyle = "#69a126";
+		var text = APP_URL;
+		var text_length = canvas_backround.measureText(text).width;
+		canvas_backround.fillText(text, padding+20+90, padding+20+(st-1)*height_space);
+		register_button(padding+20+90, padding+20+(st-1)*height_space-10, text_length, 10, PLACE, function(){
+			var win=window.open(APP_URL, '_blank');
+			win.focus();
+			});
 		
 		canvas_backround.font = "normal 11px Verdana";
 		canvas_backround.fillStyle = "#196119";

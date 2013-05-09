@@ -1,5 +1,5 @@
 //game settings
-var VERSION = "1.4.2";			//app version
+var VERSION = "1.4.3";			//app version
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
@@ -25,6 +25,8 @@ var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
 var MAX_ABILITY_LEVEL=20;		//max ability level
 var INVISIBILITY_SPOT_RANGE=50;		//% of enemy range, if enemy comes close, invisibility wanishes.
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
+var APP_URL = 'http://viliusle.github.io/vl-tanks/';
+var APP_EMAIL = 'www.viliusl@gmail.com';
 
 //other global variables
 var TANKS = new Array();		//tanks array

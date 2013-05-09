@@ -93,6 +93,10 @@ function on_keyboard_action(event){
 			auto_scoll_map();
 			}
 		}
+	if(k == 27){	//esc
+		if(PLACE == 'library' || PLACE == 'intro')
+			quit_game();
+		}
 	
 	//disable some keys
 	if(k >= 37 && k <= 40 && chat_mode != 1) return false;	//scroll with left, rigth, up and down
