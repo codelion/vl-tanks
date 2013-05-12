@@ -918,7 +918,7 @@ function draw_tank_select_screen(selected_tank){
 	room_controller();
 	
 	var y = 10;
-	var gap = 5;
+	var gap = 8;
 	if(selected_tank == undefined){
 		if(game_mode == 1)
 			selected_tank = 0; 
@@ -941,11 +941,12 @@ function draw_tank_select_screen(selected_tank){
 	
 	//show all possible tanks
 	j = 0;
-	preview_xy = 90;
+ 	preview_x = 90;
+	preview_y = 80;
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
-		if(15+j*(preview_xy+gap)+ preview_xy > WIDTH_APP){
-			y = y + preview_xy+gap;
+		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
+			y = y + preview_y+gap;
 			j = 0;
 			}
 		if(i == selected_tank || i == last_selected || last_selected==-1){
@@ -957,20 +958,20 @@ function draw_tank_select_screen(selected_tank){
 				back_color = "#dbd9da";
 			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
+			roundRect(canvas_backround, 15+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 			
 			//logo
-			var pos1 = 15+j*(preview_xy+gap);
+			var pos1 = 15+j*(preview_x+gap);
 			var pos2 = y;
 			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
 			
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
 			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
-				draw_image(canvas_backround, 'lock', pos1+90-14-5, pos2+90-20-5);
+				draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
 			
 			//register button
-			register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
+			register_button(15+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				if(game_mode == 2){
 					ROOM = get_room_by_id(opened_room_id);
 					if(ROOM.settings[0]=='normal' || ROOM.settings[0]=='counter'){
@@ -992,7 +993,7 @@ function draw_tank_select_screen(selected_tank){
 		j++;
 		}
 	last_selected = selected_tank;
-	y = y + preview_xy+10;
+	y = y + preview_y+10;
 	
 	//tank info block
 	var info_left = 15;
@@ -1004,19 +1005,19 @@ function draw_tank_select_screen(selected_tank){
 	//tank stats
 	if(selected_tank != undefined){
 		var pos1 = info_left+10;
-		var pos2 = y+((info_block_height-preview_xy)/2);
+		var pos2 = y+((info_block_height-preview_y)/2);
 		draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
-		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+25);
+		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_x+40, y+25);
 		
 		//description
 		var height_space = 13;
 		for(var d in TYPES[selected_tank].description){
 			canvas_backround.font = "bold 11px Verdana";
 			canvas_backround.fillStyle = "#69a126";
-			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+50+d*height_space);
+			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_x+40, y+50+d*height_space);
 			}
 		}
 	y = y + info_block_height+10;

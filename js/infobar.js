@@ -11,7 +11,7 @@ function draw_infobar(){
 	//tank icon
 	var icon_x = status_x+140;
 	if(TYPES[MY_TANK.type].preview != false)
-		draw_image(canvas_backround, TYPES[MY_TANK.type].name, icon_x, status_y+37, 100, 100);
+		draw_image(canvas_backround, TYPES[MY_TANK.type].name, icon_x, status_y+40, 100, 100);
 		
 	//tank name
 	canvas_backround.fillStyle = "#a3ad16";

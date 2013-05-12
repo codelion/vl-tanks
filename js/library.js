@@ -67,15 +67,16 @@ function draw_library_list(next){
 function draw_library_units(selected_tank){
 	draw_library_list(false);
 	var y = TOP;
-	var gap = 5;
+	var gap = 8;
 	
 	if(selected_tank==undefined) selected_tank = 0;
 	//show all possible tanks
 	j = 0;
-	preview_xy = 90;
+	preview_x = 90;
+	preview_y = 80;
 	for(var i in TYPES){
-		if(15+j*(preview_xy+gap)+ preview_xy > WIDTH_APP){
-			y = y + preview_xy+gap;
+		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
+			y = y + preview_y+gap;
 			j = 0;
 			}
 		//reset background
@@ -86,30 +87,30 @@ function draw_library_units(selected_tank){
 			back_color = "#dbd9da";
 		canvas_backround.fillStyle = back_color;
 		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, 10+j*(preview_xy+gap), y, 90, 90, 5, true);
+		roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 		
 		//logo
-		var pos1 = 10+j*(preview_xy+gap);
+		var pos1 = 10+j*(preview_x+gap);
 		var pos2 = y;
-		if(TYPES[i].type == 'tank')
+		if(TYPES[i].type != 'tower')
 			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
 		else{
-			var pos_left = pos1 + (90-TYPES[i].size[1])/2;
-			var pos_top = pos2 + (90-TYPES[i].size[1])/2;
+			var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
+			var pos_top = pos2 + (preview_y-TYPES[i].size[1])/2;
 			draw_tank_clone(
 				{type: i, size: function(){ return TYPES[i].size[1]; }},
 				pos_left, pos_top, 0, 1, canvas_backround);
 			}
 		
 		//register button
-		register_button(10+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
+		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 			//index;
 			draw_library_units(index);
 			}, i);
 		j++;
 		}
 	last_selected = selected_tank;
-	y = y + preview_xy+20;	
+	y = y + preview_y+20;	
 	
 	//tank info block
 	var info_left = 10;
@@ -121,8 +122,8 @@ function draw_library_units(selected_tank){
 
 	//tank stats
 	if(selected_tank != undefined){
-		var pos1 = info_left+10 + (90-TYPES[selected_tank].size[1])/2;	
-		var pos2 = y + round((info_block_height-preview_xy)/2) + (90-TYPES[selected_tank].size[1])/2;
+		var pos1 = info_left+10 + (preview_x-TYPES[selected_tank].size[1])/2;	
+		var pos2 = y + round((info_block_height-preview_y)/2) + (preview_y-TYPES[selected_tank].size[1])/2;
 		draw_tank_clone(
 			{type: selected_tank, size: function(){ return TYPES[selected_tank].size[1]; }},
 			pos1, pos2, 0, 1, canvas_backround);
@@ -131,7 +132,7 @@ function draw_library_units(selected_tank){
 		canvas_backround.fillStyle = "#196119";
 		text = TYPES[selected_tank].name;
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, info_left+preview_xy+40, y+25);
+		canvas_backround.fillText(text, info_left+preview_x+40, y+25);
 		
 		//description
 		var text = '';
@@ -142,11 +143,11 @@ function draw_library_units(selected_tank){
 			}
 		canvas_backround.font = "bold 11px Verdana";
 		canvas_backround.fillStyle = "#69a126";
-		canvas_backround.fillText(text, info_left+preview_xy+40+text_width+10, y+25);
+		canvas_backround.fillText(text, info_left+preview_x+40+text_width+10, y+25);
 		
 		var height_space = 16;
 		var st=0;
-		var xx = info_left+preview_xy+40;
+		var xx = info_left+preview_x+40;
 		var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay]
 		lib_show_stats("DPS", value, xx, y+50+st*height_space, 90, false, 10, 30); st++;
 		lib_show_stats("Life", TYPES[selected_tank].life, xx, y+50+st*height_space, 90, false, 100, 250); st++;
@@ -155,7 +156,7 @@ function draw_library_units(selected_tank){
 		lib_show_stats("Range", TYPES[selected_tank].range, xx, y+50+st*height_space, 90); st++;
 		lib_show_stats("Scout", TYPES[selected_tank].scout, xx, y+50+st*height_space, 90); st++;
 		lib_show_stats("Turn speed", TYPES[selected_tank].turn_speed, xx, y+50+st*height_space, 90); st++;
-		lib_show_stats("Ignore armor", TYPES[selected_tank].ignore_armor, info_left+preview_xy+40, y+50+st*height_space, 90); st++;
+		lib_show_stats("Ignore armor", TYPES[selected_tank].ignore_armor, info_left+preview_x+40, y+50+st*height_space, 90); st++;
 		//1st ability
 		var value = "";
 		if(TYPES[selected_tank].abilities[0] != undefined){
@@ -182,7 +183,7 @@ function draw_library_units(selected_tank){
 function draw_library_maps(){
 	draw_library_list(false);
 	var y = TOP;
-	var gap = 5;
+	var gap = 8;
 	
 	maps_positions = [];
 	game_mode = 1;

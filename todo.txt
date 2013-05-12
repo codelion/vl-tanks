@@ -1,3 +1,4 @@
+counter hero icon
 single player:
 	number of opponents
 	fog on/off
