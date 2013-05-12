@@ -1,3 +1,6 @@
+single player:
+	number of opponents
+	fog on/off
 IDEAS
 	cartoonish design
 		red blue green
