@@ -128,6 +128,7 @@ function draw_library_units(selected_tank){
 			{type: selected_tank, size: function(){ return TYPES[selected_tank].size[1]; }},
 			pos1, pos2, 0, 1, canvas_backround);
 		
+		//name
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
 		text = TYPES[selected_tank].name;
@@ -188,6 +189,30 @@ function draw_library_maps(){
 	maps_positions = [];
 	game_mode = 1;
 	show_maps_selection(canvas_backround, y, true);
+	y = y + 80 + 40;
+	var active_map = MAPS[level-1];
+	
+	//tank info block
+	var info_block_height = 150; //HEIGHT_APP-27-y-10;
+	var info_block_width = WIDTH_APP-20;
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.strokeStyle = "#196119";
+	roundRect(canvas_backround, 10, y, info_block_width, info_block_height, 5, true);
+	
+	//name
+	canvas_backround.font = "bold 18px Verdana";
+	canvas_backround.fillStyle = "#196119";
+	text = active_map.name;
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, 20, y+25);
+	
+	var height_space = 16;
+	var st=0;
+	lib_show_stats("Description", active_map.description, 20, y+50+st*height_space, 90); st++;
+	lib_show_stats("Size", active_map.width+"x"+active_map.height+" px", 20, y+50+st*height_space, 90); st++;
+	lib_show_stats("Players", active_map.team_allies+" vs "+active_map.team_enemies, 20, y+50+st*height_space, 90); st++;
+	lib_show_stats("Total towers", active_map.towers.length, 20, y+50+st*height_space, 90); st++;
+	lib_show_stats("Bots groups", active_map.bots.length, 20, y+50+st*height_space, 90); st++;
 	}
 function lib_show_stats(name, value, x, y, gap, nobold, min_char_value, max_char_value){
 	value_copy = value;

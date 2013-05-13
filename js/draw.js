@@ -695,7 +695,7 @@ function draw_final_score(live, lost_team){
 		button_height = 10;
 		buttons_gap = 3;
 		}
-	if(live==false){					//final scores
+	if(live==false){				//final scores
 		//add some score to winning team
 		if(lost_team != false){
 			for (var i in TANKS){
@@ -714,6 +714,7 @@ function draw_final_score(live, lost_team){
 		
 		if(audio_main != undefined)
 			audio_main.pause();
+		canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		

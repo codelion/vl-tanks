@@ -73,6 +73,7 @@ function darken_map(){
 //there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all instead by increasing game quality.
 function lighten_pixels(tank){
 	if(QUALITY !=3) return false;
+	if(PLACE != 'game') return false;
 	if(tank.team != MY_TANK.team) return false;
 			
 	var xx = round(tank.cx() + map_offset[0]);
@@ -91,6 +92,7 @@ function lighten_pixels(tank){
 //visible all tanks areas are light
 function lighten_pixels_all(tank){
 	if(QUALITY != 2) return false;
+	if(PLACE != 'game') return false;
 	
 	canvas_map_sight.save();
 	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
@@ -221,6 +223,8 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 							//we have click on map
 							level = 1+parseInt(maps_positions[i].index); 
 							show_maps_selection(canvas_backround, top_height, true);
+							if(PLACE == 'library')
+								draw_library_maps();
 							}
 					
 						}

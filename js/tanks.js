@@ -1073,8 +1073,9 @@ function do_damage(TANK, TANK_TO, BULLET){
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	//tanks without repawn
 			//base dead
 			if(TYPES[TANK_TO.type].name == "Base"){
-				if(game_mode == 1)
+				if(game_mode == 1){
 					draw_final_score(false, TANK_TO.team);
+					}
 				else
 					register_tank_action('end_game', opened_room_id, false, TANK_TO.team);
 				}

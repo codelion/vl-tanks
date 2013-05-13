@@ -19,6 +19,7 @@ MAPS.push({
 	height: 1000,
 	team_allies: 3,
 	team_enemies: 3,
+	description: "Default map balanced for all situations.",
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -67,6 +68,7 @@ MAPS.push({
 	height: 1000,
 	team_allies: 3,
 	team_enemies: 3,
+	description: "Difficult map with lots of collisions. Beware of air units here! ",
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -114,6 +116,7 @@ MAPS.push({
 	height: 1000,
 	team_allies: 3,
 	team_enemies: 3,
+	description: "Make a decision - attack from left, center or right, be careful - enemies can strike from all directions.",
 	towers: [
 			//team x,	 y, 	name
 			//team x,	 y, 	name
@@ -159,6 +162,7 @@ MAPS.push({
 	height: 370,
 	team_allies: 2,
 	team_enemies: 2,
+	description: "You, enemy, 4 towers, 2 bases and no time and space. Victory or defeat will come fast!",
 	towers: [
 			//team x,	 y, 	name
 			['B',	50,	55,	'Base'],
@@ -187,10 +191,11 @@ MAPS.push({
 	name: "Hell",
 	width: 800,
 	height: 600,
-	team_allies: 0,
+	team_allies: 1,
 	team_enemies: 10,
 	ground_only: true,
 	singleplayer_only: true,
+	description: "What the hell happened here? They are everywhere, help, arrr... (signal lost)",
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -219,6 +224,7 @@ MAPS.push({
 	height: 3000,
 	team_allies: 10,
 	team_enemies: 10,
+	description: "Huge area for epic battles only. Don't try to enter without big team - it will be too big for you.",
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
@@ -259,9 +265,6 @@ MAPS.push({
 			['fence', 	100,	1500,	0,	0],
 			['fence', 	200,	1500,	0,	0],
 			['fence', 	300,	1500,	0,	0],
-			/*['fence', 	400,	1500,	0,	0],
-			['fence', 	500,	1500,	0,	0],
-			['fence', 	600,	1500,	0,	0],*/	
 			
 			['fence', 	1300,	1500,	0,	0],					
 			['fence', 	1400,	1500,	0,	0],

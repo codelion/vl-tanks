@@ -529,7 +529,16 @@ function draw_counter_tank_selection(selected_tank){
 	
 	if(selected_tank==last_selected_counter)
 		return false;
-
+		
+	//tank icon
+	if(TYPES[MY_TANK.type].preview != false){
+		//clear
+		draw_image(canvas_backround, 'statusbar', status_x+140, status_y+40, 90, 80, status_x+140, status_y+40, 90, 80);
+		//draw
+		draw_image(canvas_backround, TYPES[MY_TANK.type].name, status_x+140, status_y+40, undefined, undefined);
+		}
+	
+	//tanks
 	var j=0;
 	var row = 0;
 	for(var i in TYPES){
