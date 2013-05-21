@@ -1,6 +1,5 @@
 function check_path_AI(TANK){
 	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
-	if(TANK.invisibility != undefined) return false;	//invisibility
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
 	if(game_mode == 1)
 		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
@@ -139,13 +138,6 @@ function soldiers_move(mouseX, mouseY){
 		if(TANKS[i].master == undefined) continue;	//not under controll
 		if(TANKS[i].master != undefined && TANKS[i].master.id != MY_TANK.id) continue;	//not under MY controll
 		
-		if(MY_TANK.invisibility != undefined){
-			if(game_mode == 2)
-				send_packet('del_invisible', [MY_TANK.id]);
-			else
-				delete MY_TANK.invisibility;
-			}
-		
 		//randomize
 		mouseX = mouseX_copy + getRandomInt(-gap_rand, gap_rand);
 		mouseY = mouseY_copy + getRandomInt(-gap_rand, gap_rand);
@@ -253,7 +245,7 @@ function do_auto_missile(tank_id){
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_missile.power;
-	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_missile.angle == true)		tmp['angle'] = angle;
 	if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
 	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
@@ -302,7 +294,7 @@ function do_auto_bomb(tank_id){
 	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_bomb.power;
-	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
 	if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
 	if(TANK.try_bomb.aoe != undefined){

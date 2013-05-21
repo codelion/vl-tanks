@@ -171,7 +171,12 @@ function send_packet(type, message, force_list_connection){
 		console.log('Error: trying to send without connection: '+type);
 		return false;
 		}
-	//if(DEBUG==true)	console.log("["+type+"]------->");
+	/*if(DEBUG==true){
+		if(type=="tank_update")
+			console.log("["+type+"]------->"+message[0]);
+		else
+			console.log("["+type+"]------->");
+		}*/
 	
 	//log packets count
 	packets_used++;
@@ -424,7 +429,7 @@ function get_packet(fromClient, message){
 						var level = TANKS[i].level;
 						//change stats
 						TANKS[i].type = type;
-						TANKS[i].hp = TYPES[type].life[0]+TYPES[type].life[1]*(level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						TANKS[i].sight = TYPES[type].scout + round(TYPES[type].size[1]/2);
 						TANKS[i].speed = TYPES[type].speed;
 						TANKS[i].armor = TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1);
@@ -613,10 +618,20 @@ function get_packet(fromClient, message){
 		//adding extra info to tank
 		for(var i in DATA[1]){
 			var key = DATA[1][i].key;
+			var value = DATA[1][i].value;
 			if(key == 'buffs')
-				TANK.buffs.push(DATA[1][i].value);
-			else
-				TANK[key] = DATA[1][i].value;
+				TANK.buffs.push(value);
+			else if(value == 'delete')
+				delete TANK[key];
+			else if(key == 'attacking'){
+				var enemy = get_tank_by_id(value);
+				TANK[key] = enemy;
+				delete TANK.attacking_sig_wait;
+				}
+			else{
+				//default
+				TANK[key] = value;
+				}
 			}
 		}
 	else if(type == 'tank_kill'){	//tank was killed
@@ -668,7 +683,7 @@ function get_packet(fromClient, message){
 			chat(TANK_TO.name+" was killed by "+TANK_FROM.name+"!", false, false);
 		}
 	else if(type == 'level_up'){	//tank leveled up
-		//DATA = room_id, player_id, level
+		//DATA = room_id, player_id, level, xxxxxxxxxxxxx
 		TANK_TO = get_tank_by_id(DATA[1]);
 		if(TANK_TO===false){	
 			console.log('Error: tank_to "'+DATA[1]+'" was not found on level_up.');
@@ -680,6 +695,23 @@ function get_packet(fromClient, message){
 		if(TANK_TO.armor > TYPES[TANK_TO.type].armor[2])
 			TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
 		TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
+		
+		TANK_TO.abilities_lvl[DATA[3]]++;
+		if(TANK_TO.id == MY_TANK.id)
+			draw_tank_abilities();
+		
+		//update passive abilites
+		for(a in TYPES[TANK_TO.type].abilities){ 
+			if(TYPES[TANK_TO.type].abilities[a].passive == false) continue;
+			var nr = 1+parseInt(a);
+			var ability_function = TYPES[TANK_TO.type].abilities[a].name.replace(/ /g,'_');
+			if(ability_function != undefined){
+				try{
+					window[ability_function](TANK_TO);
+					}
+				catch(err){console.log("Error: "+err.message);}
+				}
+			}
 		}
 	else if(type == 'del_invisible'){	//remove invisibility
 		//DATA = [player_id]
@@ -688,8 +720,7 @@ function get_packet(fromClient, message){
 			console.log('Error: tank "'+DATA[0]+'" was not found on del_invisible.');
 			return false;
 			}
-		delete TANK.invisibility;
-		TANK.speed = TYPES[TANK.type].speed;
+		stop_camouflage(TANK);
 		}
 	else if(type == 'summon_bots'){	//send bots
 		//DATA = [room_id, random_id]
@@ -722,13 +753,17 @@ function get_packet(fromClient, message){
 		if(DATA[4] != undefined && DATA[4] != false)
 			tmp.instant_bullet = 1;
 		if(DATA[5] != undefined && DATA[5] != false)
-			tmp.pierce_armor = 1;
+			tmp.pierce_armor = DATA[5];
 		BULLETS.push(tmp);
 		if(TYPES[TANK_TO.type].type != 'human') TANK.bullets++;
 		
 		//extra updates
-		TANK.fire_angle = DATA[2];
-		draw_fire(TANK, TANK_TO);	
+		TANK.attacking = TANK_TO;
+		if(DATA[2] != 0){
+			draw_fire(TANK, TANK_TO);
+			if(TANK.id == MY_TANK.id)
+				shoot_sound(TANK);
+			}
 		}	
 	}
 //sending action to other players
@@ -760,7 +795,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 	else if(action=='skill_advanced')
 		send_packet('skill_advanced', [room_id, player, data]);
 	else if(action=='level_up')
-		send_packet('level_up', [room_id, player, data]);
+		send_packet('level_up', [room_id, player, data, data2]);
 	else if(action=='change_tank')
 		send_packet('change_tank', [room_id, data, player, data2]);
 	else if(action=='leave_room'){
