@@ -1,14 +1,5 @@
-//check support
-if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
-
-//canvas layers
-var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map
-var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//sight
-var canvas_backround = document.getElementById("canvas_backround").getContext("2d");	//backgrounds
-var canvas_base = document.getElementById("canvas_main");
-var canvas_main = canvas_base.getContext("2d");						//objects
-
 //game settings
+var VERSION = "1.4.4";			//app version
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
@@ -31,7 +22,11 @@ var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
 var flag_width = 15;			//flag icon width
 var flag_height = 9;			//flag icon height
 var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
-var VERSION = "1.3.4";			//app version
+var MAX_ABILITY_LEVEL=20;		//max ability level
+var INVISIBILITY_SPOT_RANGE=50;		//% of enemy range, if enemy comes close, invisibility wanishes.
+var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
+var APP_URL = 'http://viliusle.github.io/vl-tanks/';
+var APP_EMAIL = 'www.viliusl@gmail.com';
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -70,7 +65,7 @@ var pre_draw_functions = [];		//extra functions executed before main draw loop
 var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
 var game_mode = 0;			//1=single player, 2=multi player
 var QUALITY = 3;			//1=low, 2=mid, 3=high
-var PLACE = '';				//init, intro, settings, select, game, score, rooms, room, create_room
+var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room
 var preloaded=false;			//if all images preloaded
 var preload_total=0;			//total images for preload
 var preload_left=0;			//total images left for preload
@@ -93,6 +88,7 @@ var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
 var intro_page = 0;			//intro page
 var intro_enabled = 1;			//if show intro
+var time_gap;				//time difference between frames
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop
@@ -102,6 +98,13 @@ var timed_functions_id;			//controller for timed functions
 var start_game_timer_id;		//controller for timer in select window
 var chat_interval_id;			//controller for chat
 var bots_interval_id;			//controller for adding new bots function
+
+//canvas layers
+var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map
+var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//sight
+var canvas_backround = document.getElementById("canvas_backround").getContext("2d");	//backgrounds
+var canvas_base = document.getElementById("canvas_main");
+var canvas_main = canvas_base.getContext("2d");						//objects
 
 //on exit
 window.onbeforeunload = disconnect_game;

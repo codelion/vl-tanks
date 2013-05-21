@@ -7,7 +7,7 @@ function draw_main(){
 	if(frame_last_time==undefined)
 		frame_last_time = Date.now();
 	frame_time = Date.now();
-	var time_gap = Date.now() - frame_last_time;
+	time_gap = Date.now() - frame_last_time;
 	
 	//clear
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
@@ -31,15 +31,7 @@ function draw_main(){
 		try{
 			//speed multiplier
 			var speed_multiplier = 1;
-			speed_first = speed_multiplier;
-			for(var dd in TANKS[i].buffs){
-				if(TANKS[i].buffs[dd].name == 'slow'){
-					var diff = speed_first * TANKS[i].buffs[dd].power / 100;
-					speed_multiplier = speed_multiplier - diff;
-					if(speed_multiplier < 0) 
-						speed_multiplier = 0;
-					}
-				}
+			speed_multiplier = apply_buff(TANKS[i], 'speed', speed_multiplier);
 				
 			//check buffs
 			for(var x=0; x < TANKS[i].buffs.length; x++){
@@ -61,12 +53,12 @@ function draw_main(){
 					if(TANKS[i].team == 'B'){	//top
 						TANKS[i].x = round(APP_SIZE_CACHE[0]*2/3);
 						TANKS[i].y = 20;
-						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						}
 					else{	//bottom
 						TANKS[i].x = round(APP_SIZE_CACHE[0]/3);
 						TANKS[i].y = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
-						TANKS[i].hp = TYPES[TANKS[i].type].life[0]+TYPES[TANKS[i].type].life[1]*(TANKS[i].level-1);
+						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 						}
 					if(TANKS[i].id==MY_TANK.id)
 						auto_scoll_map();
@@ -80,14 +72,15 @@ function draw_main(){
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
 					last_selected_counter = -1;
-					TANKS[i].x -= TYPES[TANKS[i].type].size[1]/4;
-					TANKS[i].y -= TYPES[TANKS[i].type].size[1]/4;
 					}
 				}
 			
 			//check stun
 			if(TANKS[i].stun - Date.now() < 0)
 				delete TANKS[i].stun;
+			
+			//animations
+			do_animations(TANKS[i]);
 				
 			//move lock
 			if(TANKS[i].target_move_lock != undefined){
@@ -96,9 +89,20 @@ function draw_main(){
 					if(TANKS[t].id == TANKS[i].target_move_lock)
 						i_locked = t;
 					}
-				if(TANKS[i_locked] == undefined){	//maybe target is already dead
-					TANKS[i].move = 0;
-					delete TANKS[i].target_move;
+				if(TANKS[i_locked] == undefined || TANKS[i_locked].dead == 1){	//maybe target is already dead
+					if(game_mode == 1){
+						TANKS[i].move = 0;
+						delete TANKS[i].target_move;
+						delete TANKS[i].target_move_lock;
+						}
+					else{
+						var params = [
+							{key: 'move', value: 0 },
+							{key: 'target_move', value: "delete" },
+							{key: 'target_move_lock', value: "delete" },
+							];
+						send_packet('tank_update', [TANKS[i].id, params]);
+						}
 					}
 				else{
 					tmp_distance = get_distance_between_tanks(TANKS[i_locked], TANKS[i]);
@@ -112,9 +116,14 @@ function draw_main(){
 						delete TANKS[i].reach_tank_and_execute;
 						}
 					//reached targeted enemy for general attack
-					if(TANKS[i].reach_tank_and_execute == undefined && tmp_distance < TYPES[TANKS[i].type].range){ 	
-						TANKS[i].move = 0;
-						delete TANKS[i].target_move;
+					if(TANKS[i].reach_tank_and_execute == undefined && TANKS[i].target_move_lock != undefined){
+						if(tmp_distance < TYPES[TANKS[i].type].range-5){ 	
+							TANKS[i].move = 0;
+							}
+						else{
+							TANKS[i].move_to = [TANKS[i_locked].cx(), TANKS[i_locked].cy()];
+							TANKS[i].move = 1;
+							}
 						}
 					}
 				}
@@ -143,6 +152,9 @@ function draw_main(){
 			if(TANKS[i].use_AI == true)
 				check_path_AI(TANKS[i]);
 			
+			if(TANKS[i].invisibility == 1)
+				check_invisibility(TANKS[i]);
+			
 			//move tank
 			if(TANKS[i].move == 1 && TANKS[i].stun == undefined && TANKS[i].move_to != undefined){
 				if(TANKS[i].move_to[0].length == undefined){
@@ -158,8 +170,6 @@ function draw_main(){
 				var angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
-					if(TANKS[i].hit_reuse - Date.now() < 0)
-						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
 					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
 						if(TANKS[i].move_to[0].length == undefined){
 							TANKS[i].move = 0;
@@ -195,8 +205,25 @@ function draw_main(){
 							}
 						}	
 					}
-				else if(TANKS[i].hit_reuse - Date.now() < 0)
+				}
+			//fire angle
+			if(TANKS[i].stun == undefined){
+				if(TANKS[i].attacking == undefined){
+					//if peace
+					if(angle != undefined)
 						body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
+					}
+				else{
+					//in battle
+					var TANK_TO = TANKS[i].attacking;
+					dist_x = TANK_TO.cx() - (TANKS[i].cx());
+					dist_y = TANK_TO.cy() - (TANKS[i].cy());
+					var radiance = Math.atan2(dist_y, dist_x);
+					var enemy_angle = (radiance*180.0)/Math.PI+90;
+					
+					//rotate
+					body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, enemy_angle, time_gap);
+					}	//log(TANKS[i].id+"      "+TANKS[i].fire_angle);
 				}
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
@@ -250,6 +277,58 @@ function draw_main(){
 	//request next draw
 	if(render_mode == 'requestAnimationFrame')
 		requestAnimationFrame(draw_main);
+	}
+function do_animations(TANK){
+	if(QUALITY == 1) return false;
+	for(var a=0; a < TANK.animations.length; a++){
+		//lifetime
+		if(TANK.animations[a].lifetime < Date.now() ){
+			TANK.animations.splice(a, 1); a--;
+			continue;
+			}
+		var animation = TANK.animations[a];
+		//jump
+		if(animation.name == 'jump'){
+			var gap = 10;
+			dist_x = animation.to_x - (animation.from_x);
+			dist_y = animation.to_y - (animation.from_y);
+			distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			var radiance = Math.atan2(dist_y, dist_x);
+			if(distance<gap) return false;	
+			for(var i = 0; gap*i < distance; i++){
+				alpha = (animation.lifetime - Date.now()) / animation.duration;
+				alpha = round(alpha*100)/100;
+				x = animation.from_x + round(Math.cos(radiance)*(i*gap));
+				y = animation.from_y + round(Math.sin(radiance)*(i*gap));
+				draw_tank_clone(TANK, x, y, animation.angle, alpha);
+				}
+			}
+		//fire
+		else if(animation.name == 'fire'){
+			alpha = (animation.lifetime - Date.now()) / animation.duration;
+			alpha = round(alpha*100)/100;
+			dist_x = animation.to_x - animation.from_x;
+			dist_y = animation.to_y - animation.from_y;
+			radiance = Math.atan2(dist_y, dist_x);
+			explode_x = animation.from_x + Math.cos(radiance)*(TANK.size()/2+10);
+			explode_y = animation.from_y + Math.sin(radiance)*(TANK.size()/2+10);
+			canvas_main.save();
+			canvas_main.globalAlpha = alpha;
+			canvas_main.translate(explode_x+map_offset[0], explode_y+map_offset[1]);
+			canvas_main.rotate(animation.angle * TO_RADIANS);
+			draw_image(canvas_main, "fire", -(24/2), -(32/2));
+			canvas_main.restore();
+			}
+		//explosion
+		else if(animation.name == 'explosion'){
+			alpha = (animation.lifetime - Date.now()) / animation.duration;
+			alpha = round(alpha*100)/100;
+			canvas_main.save();
+			canvas_main.globalAlpha = alpha;
+			draw_image(canvas_main, 'explosion', animation.x, animation.y);
+			canvas_main.restore();
+			}	
+		}
 	}
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"]);
@@ -339,6 +418,7 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	var top_margin = 370;
 	var button_i=0;
 	var letter_height = 9;
+	var padding = 5;
 	
 	if(active_i==undefined)
 		active_i = -1;
@@ -385,17 +465,8 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	//logo
 	var left = (WIDTH_APP-598)/2;	
 	canvas_backround.drawImage(IMAGE_LOGO, left, 15);
-	
-	//intro text
-	canvas_backround.font = "Normal 18px Arial";
-	canvas_backround.fillStyle = '#ffffff';
-	canvas_backround.fillText("Intro", WIDTH_APP-50, 20);
-	//link
-	register_button(WIDTH_APP-60, 0, 60, 25, PLACE, function(){ 
-		intro_page=0;
-		PLACE = 'intro';
-		intro(true);
-		});
+
+	draw_right_buttons();	
 	
 	for (i in text_array){
 		//background
@@ -423,6 +494,121 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 		
 		button_i++;
 		}
+	}
+function draw_right_buttons(){
+	var minibutton_width = 48;
+	var minibutton_height = 20;
+	var padding = 5;
+	var mi = 0;
+	
+	//intro button
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Intro";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		intro_page=0;
+		PLACE = 'intro';
+		intro(true);
+		});
+	mi++;
+	
+	//library
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Library";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		draw_library_list();
+		});
+	mi++;
+	
+	//Controls
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "Controls";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		PLACE = 'library';
+		var padding = 20;
+		//background
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.fillStyle = "#ffffff";
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, padding, padding, WIDTH_APP-padding-70, 220, 5, true);
+		
+		var height_space = 16;
+		var st=0;
+		lib_show_stats("move and target", "Mouse", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("control soldiers", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("skills", "1, 2, 3", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("global chat or team chat in game", "Shift+Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("change scroll mode", "s", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("scroll map in manual scroll mode", "arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("scroll map up/down", "mouse wheel", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("stop and move map to your tank", "Esc", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("change abilities upgrade mode", "u", padding+20+90, padding+20+st*height_space, -90); st++;
+		
+		draw_right_buttons();
+		});
+	mi++;
+	
+	//About
+	var mini_x = WIDTH_APP-minibutton_width-padding;
+	var mini_y = mi*(minibutton_height+padding)+padding;
+	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.fillStyle = "#0c2c0c";
+	canvas_backround.font = "Bold 10px Arial";
+	text = "About";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
+	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
+		PLACE = 'library';
+		var padding = 20;
+		//background
+		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.fillStyle = "#ffffff";
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, padding, padding, WIDTH_APP-padding-70, 220, 5, true);
+		
+		var height_space = 16;
+		var st=0;
+		lib_show_stats("Moon wars", "Name", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("ViliusL", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats(APP_EMAIL, "Email", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("", "Website", padding+20+90, padding+20+st*height_space, -90); st++;
+		//link
+		canvas_backround.font = "Bold 10px Verdana";
+		canvas_backround.fillStyle = "#69a126";
+		var text = APP_URL;
+		var text_length = canvas_backround.measureText(text).width;
+		canvas_backround.fillText(text, padding+20+90, padding+20+(st-1)*height_space);
+		register_button(padding+20+90, padding+20+(st-1)*height_space-10, text_length, 10, PLACE, function(){
+			var win=window.open(APP_URL, '_blank');
+			win.focus();
+			});
+		
+		canvas_backround.font = "normal 11px Verdana";
+		canvas_backround.fillStyle = "#196119";
+		canvas_backround.fillText("Moon wars is free online HTML5 based tank game. Main features: 9 tanks and 2 air units, 5 maps, single player, ", padding+20, padding+20+(st+1)*height_space);
+		canvas_backround.fillText("multiplayer with 4 modes, full screen support, HTML5 only, no flash.", padding+20, padding+20+(st+2)*height_space);
+		draw_right_buttons();
+		});
+	mi++;
 	}
 function draw_logo_tanks(left, top, change_logo){
 	var max_size = 60;
@@ -509,7 +695,7 @@ function draw_final_score(live, lost_team){
 		button_height = 10;
 		buttons_gap = 3;
 		}
-	if(live==false){					//final scores
+	if(live==false){				//final scores
 		//add some score to winning team
 		if(lost_team != false){
 			for (var i in TANKS){
@@ -528,6 +714,7 @@ function draw_final_score(live, lost_team){
 		
 		if(audio_main != undefined)
 			audio_main.pause();
+		canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		
@@ -732,7 +919,7 @@ function draw_tank_select_screen(selected_tank){
 	room_controller();
 	
 	var y = 10;
-	var gap = 5;
+	var gap = 8;
 	if(selected_tank == undefined){
 		if(game_mode == 1)
 			selected_tank = 0; 
@@ -755,11 +942,12 @@ function draw_tank_select_screen(selected_tank){
 	
 	//show all possible tanks
 	j = 0;
-	preview_xy = 90;
+ 	preview_x = 90;
+	preview_y = 80;
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
-		if(15+j*(preview_xy+gap)+ preview_xy > WIDTH_APP){
-			y = y + preview_xy+gap;
+		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
+			y = y + preview_y+gap;
 			j = 0;
 			}
 		if(i == selected_tank || i == last_selected || last_selected==-1){
@@ -771,20 +959,20 @@ function draw_tank_select_screen(selected_tank){
 				back_color = "#dbd9da";
 			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 15+j*(preview_xy+gap), y, 90, 90, 5, true);
+			roundRect(canvas_backround, 15+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 			
 			//logo
-			var pos1 = 15+j*(preview_xy+gap);
+			var pos1 = 15+j*(preview_x+gap);
 			var pos2 = y;
 			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
 			
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
 			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
-				draw_image(canvas_backround, 'lock', pos1+90-14-5, pos2+90-20-5);
+				draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
 			
 			//register button
-			register_button(15+j*(preview_xy+gap)+1, y+1, preview_xy, preview_xy, PLACE, function(mouseX, mouseY, index){
+			register_button(15+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				if(game_mode == 2){
 					ROOM = get_room_by_id(opened_room_id);
 					if(ROOM.settings[0]=='normal' || ROOM.settings[0]=='counter'){
@@ -806,7 +994,7 @@ function draw_tank_select_screen(selected_tank){
 		j++;
 		}
 	last_selected = selected_tank;
-	y = y + preview_xy+10;
+	y = y + preview_y+10;
 	
 	//tank info block
 	var info_left = 15;
@@ -818,19 +1006,19 @@ function draw_tank_select_screen(selected_tank){
 	//tank stats
 	if(selected_tank != undefined){
 		var pos1 = info_left+10;
-		var pos2 = y+((info_block_height-preview_xy)/2);
+		var pos2 = y+((info_block_height-preview_y)/2);
 		draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
 		
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
-		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_xy+40, y+25);
+		canvas_backround.fillText(TYPES[selected_tank].name, info_left+preview_x+40, y+25);
 		
 		//description
 		var height_space = 13;
 		for(var d in TYPES[selected_tank].description){
 			canvas_backround.font = "bold 11px Verdana";
 			canvas_backround.fillStyle = "#69a126";
-			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_xy+40, y+50+d*height_space);
+			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_x+40, y+50+d*height_space);
 			}
 		}
 	y = y + info_block_height+10;
@@ -1031,24 +1219,24 @@ function update_scrolling_chat(CHAT){
 //calculate body and turret rotation
 function body_rotation(obj, str, speed, rot, time_diff){
 	if(obj.stun != undefined)	return false; //stun
-	if(obj.speed == 0)	return false; //0 speed
-	speed = speed * 100 * time_diff/1000;
-	var flag = false;
-	if (obj[str] - 180 > rot){
-		rot += 360;
-	}
-	if (obj[str] + 180 < rot){
-		rot -= 360;
-	}
-	if (obj[str] - rot > speed){
+	if(obj.speed == 0 && TYPES[obj.type].type == 'tank')	return false; //0 speed
+	speed = speed * 100 * time_diff/1000;	
+			//if(str=="fire_angle" && obj.name==name) log(round(speed)+"            "+obj[str]);
+	
+	if (obj[str] > 360) obj[str] = obj[str] - 360;
+	if (obj[str] < 0) obj[str] = obj[str] + 360;
+	
+	if (obj[str] - 180 > rot) rot += 360;
+	if (obj[str] + 180 < rot) rot -= 360;
+	if (obj[str] - rot > speed)
 		obj[str] -= speed;
-	} else if (obj[str] - rot < -speed){
+	else if(obj[str] - rot < -speed)
 		obj[str] += speed;
-	} else {
+	else{
 		obj[str] = rot;
-		flag = true;
-	}
-	return flag;
+		return true
+		}
+	return false;
 	}
 function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w, clip_h){
 	if(offset_x == undefined) offset_x = 0;

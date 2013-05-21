@@ -3,13 +3,15 @@
 function Rest(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 15 + 1 * (TANK.level-1);
+	var power = 10 + 1 * (TANK.abilities_lvl[0]-1);
+	var power_slow = 0;
+	var power_weak = 0.5;
 	
 	if(descrition_only != undefined)
-		return 'Rest and try to repair yourself with '+(power*duration/1000)+' power.';
+		return 'Rest and repair yourself with '+(power*duration/1000)+' power. Damage is decreased.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
-		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		var max_hp = get_tank_max_hp(TANK);
 		if(TANK.hp > max_hp/2) return false;
 		}
 	
@@ -18,39 +20,49 @@ function Rest(TANK, descrition_only, settings_only, ai){
 	else if(TYPES[TANK.type].name == "Bomber")
 		TANK.abilities_reuse[2] = Date.now() + reuse;
 	
+	//repair buff
 	TANK.buffs.push({
 		name: 'repair',
 		power: power,
 		lifetime: Date.now()+duration,
 		icon: 'repair',
 		icon_size: [16,16],
-		id: TANK.id,
 		});
-	TANK.speed = 0;
-	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Rest_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
-	
+	//speed debuff
+	TANK.buffs.push({
+		name: 'speed',
+		power: power_slow,
+		lifetime: Date.now()+duration,
+		});
+	//weak debuff
+	TANK.buffs.push({
+		name: 'damage',
+		power: power_weak,
+		lifetime: Date.now()+duration,
+		});	
 	return reuse;
 	}
 function Rage(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 7000;
-	var power_damage = 1.5;
-	var power_armor = 0;
+	var power_damage = 1.30 + 0.02* (TANK.abilities_lvl[1]-1);
+	var power_armor = -100;
 	
 	if(descrition_only != undefined)
-		return 'Attack with increased damage by '+((power_damage-1)*100)+'%, but disabled armor.';
+		return 'Attack with increased damage by '+round((power_damage-1)*100)+'%, but disabled armor.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 	
 	TANK.abilities_reuse[1] = Date.now() + reuse;
-	TANK.armor = power_armor;
+	
+	//armor debuff
+	TANK.buffs.push({
+		name: 'shield',
+		type: 'static',
+		power: power_armor,
+		lifetime: Date.now()+duration,
+		});
+	//damage buff
 	TANK.buffs.push({
 		name: 'damage',
 		power: power_damage,
@@ -58,30 +70,32 @@ function Rage(TANK, descrition_only, settings_only, ai){
 		circle: '#ffff00',
 		});
 	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Rage_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);	
-	
 	return reuse;
 	}	
-function Shield(TANK, descrition_only, settings_only, ai){
+function Health(TANK, descrition_only, settings_only, ai){
+	var power = 1.1 + 0.01 * (TANK.abilities_lvl[2]-1);
+	
 	if(descrition_only != undefined)
-		return 'Tank uses heavy armor. Passive ability.';
+		return 'Increase total health by '+round((power-1)*100)+'%.';
+	
+	//update health buff
+	for(var b in TANK.buffs){
+		if(TANK.buffs[b].name == 'health')
+			TANK.buffs[b].power = power;
+		}
+		
+	//passive
+	return 0;
 	}
-function Rest_stop(object){
-	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
-	}
-function Rage_stop(object){
-	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
-	TANK.armor = TYPES[TANK.type].armor[0] + round(TYPES[TANK.type].armor[1]*(TANK.level-1));
-	if(TANK.armor > TYPES[TANK.type].armor[2])
-		TANK.armor = TYPES[TANK.type].armor[2];
+function Health_once(TANK, descrition_only, settings_only, ai){
+	var power = 1.1 + 0.01 *(TANK.abilities_lvl[2]-1);
+	if(power > 130) power = 130;
+	
+	//health buff
+	TANK.buffs.push({
+		name: 'health',
+		power: power,
+		});
 	}
 
 //====== Tiger =================================================================
@@ -89,50 +103,54 @@ function Rage_stop(object){
 function Blitzkrieg(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power_speed = 5;
-	var power_damage = 1.3;
-	var power_armor = 0;
+	var power_speed = 1.2;
+	var power_damage = 1.2 + 0.02* (TANK.abilities_lvl[0]-1);
+	var power_armor = -100;
 	
 	if(descrition_only != undefined)
-		return 'Attack with increased damage and speed, but disabled armor.';
+		return 'Attack with '+round(power_damage*100)+'% damage and '+round(power_speed*100)+'% speed, but no armor.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
-		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		var max_hp = get_tank_max_hp(TANK);
 		if(TANK.hp < max_hp/2) return false;
 		}
 	
 	TANK.abilities_reuse[0] = Date.now() + reuse;
-	TANK.speed = TANK.speed + power_speed;
+	//speed buff
+	TANK.buffs.push({
+		name: 'speed',
+		power: power_speed,
+		lifetime: Date.now()+duration,
+		});
+	//damage buff
 	TANK.buffs.push({
 		name: 'damage',
 		power: power_damage,
 		lifetime: Date.now()+duration,
 		circle: '#ffff00',
 		});
-	TANK.armor = power_armor;
-	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Blitzkrieg_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	//armor debuff
+	TANK.buffs.push({
+		name: 'shield',
+		type: 'static',
+		power: power_armor,
+		lifetime: Date.now()+duration,
+		});
 	
 	return reuse;
 	}
 function Frenzy(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 2;
+	var power = 2.05 + 0.05* (TANK.abilities_lvl[1]-1);
 	var hp_level = 30;	//%
 	
 	if(descrition_only != undefined)
-		return 'Increase damage by '+((power-1)*100)+'% if hp lower then '+hp_level+'%.';
+		return 'Increase damage by '+round((power-1)*100)+'% if hp lower then '+hp_level+'%.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	//check
-	var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+	var max_hp = get_tank_max_hp(TANK);
 	if(TANK.hp > max_hp*hp_level/100){ 
 		TANK.abilities_reuse[1] = Date.now();
 		return false;
@@ -140,6 +158,7 @@ function Frenzy(TANK, descrition_only, settings_only, ai){
 
 	//do
 	TANK.abilities_reuse[1] = Date.now() + reuse;
+	//damage buff
 	TANK.buffs.push({
 		name: 'damage',
 		power: power,
@@ -149,64 +168,79 @@ function Frenzy(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
-function Damage(TANK, descrition_only, settings_only, ai){
+function AA_Bullets(TANK, descrition_only, settings_only, ai){
+	var power = 6 + (TANK.abilities_lvl[2]-1);
+	
 	if(descrition_only != undefined)
-		return 'Tank does huge damage. Passive ability.';
+		return 'Use armor piercing bullets that decrease enmy armor by '+power+'%.';
+	
+	TANK.pierce_armor = power;
+	
+	//passive
+	return 0;
 	}
-function Blitzkrieg_stop(object){
-	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
-	TANK.armor = TYPES[TANK.type].armor[0] + round(TYPES[TANK.type].armor[1]*(TANK.level-1));
-	if(TANK.armor > TYPES[TANK.type].armor[2])
-		TANK.armor = TYPES[TANK.type].armor[2];
+function AA_Bullets_once(TANK, descrition_only, settings_only, ai){
+	var power = 6 + (TANK.abilities_lvl[2]-1);
+	
+	TANK.pierce_armor = power;
 	}
 
 //====== Cruiser ===============================================================
 
 function Turbo(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var duration = 4000;
-	var power = 8;
+	var duration = 3000 + 100 * (TANK.abilities_lvl[0]-1);
+	var power = 1.17;
 
 	if(descrition_only != undefined)
-		return 'Increase speed by '+power+' for 5s.';
+		return 'Increase speed by '+round((power-1)*100)+'% for '+round(duration/100)/10+'s.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	TANK.abilities_reuse[0] = Date.now() + reuse;
-	TANK.speed = TANK.speed + power;
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Turbo_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	//speed buff
+	TANK.buffs.push({
+		name: 'speed',
+		power: power,
+		lifetime: Date.now()+duration,
+		});
 	
 	return reuse;
 	}
 function Repair(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 12 + 1 * (TANK.level-1);
+	var power = 12 + 1 * (TANK.abilities_lvl[1]-1);
 	var range = 80;
 	
 	if(descrition_only != undefined)
 		return 'Slowly repair yourself and allies with '+(power*duration/1000)+' power.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
-		var max_hp = TYPES[TANK.type].life[0]+TYPES[TANK.type].life[1]*(TANK.level-1);
+		var max_hp = get_tank_max_hp(TANK);
 		if(TANK.hp > max_hp/2) return false;
 		}
 
 	TANK.abilities_reuse[1] = Date.now() + reuse;
-	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
+		
+		var valid = true;
+		if(TYPES[TANKS[i].type].name == 'Cruiser'){
+			for (b in TANKS[i].buffs){
+				if(TANKS[i].buffs[b].name == 'repair'){
+					valid = false;
+					break;
+					}
+				}
+			}
+		if(valid==false) continue;	//lets avoid exploits/immortality here		
+		
 		//add effect
 		if(game_mode == 1){
+			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
 				power: power,
@@ -238,15 +272,14 @@ function Repair(TANK, descrition_only, settings_only, ai){
 function Boost(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 6000;
-	var power = 1.2;
+	var power = 1.1 + 0.01* (TANK.abilities_lvl[2]-1);
 	var range = 80;
 	
 	if(descrition_only != undefined)
-		return 'Inrease nearby allies damage by '+power+'.';
+		return 'Inrease nearby allies damage by '+round(power*100-100)+'%.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	TANK.abilities_reuse[2] = Date.now() + reuse; 
-	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
@@ -254,11 +287,12 @@ function Boost(TANK, descrition_only, settings_only, ai){
 		if(distance > range)		continue;	//too far
 		//add effect
 		if(game_mode == 1){
+			//damage buff
 			TANKS[ii].buffs.push({
 				name: 'damage',
 				power: power,
 				lifetime: Date.now()+duration,
-				circle: '#ffff00',
+				circle: '#196119',
 				});
 			}
 		else{
@@ -268,7 +302,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 						name: 'damage',
 						power: power,
 						lifetime: Date.now()+duration,
-						circle: '#8fc74c',
+						circle: '#196119',
 						}
 					},
 				];
@@ -278,17 +312,13 @@ function Boost(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}		
-function Turbo_stop(object){
-	var TANK = object.tank;
-	TANK.speed = TYPES[TANK.type].speed;
-	}
 
 //====== Launcher ==============================================================
 
 function Missile(TANK, descrition_only, settings_only, ai){
 	var reuse = 6000;
-	var power = 40 + 4 * (TANK.level-1);
-	var range = 120;
+	var power = 50 + 4 * (TANK.abilities_lvl[0]-1);
+	var range = 100;
 	
 	if(descrition_only != undefined)
 		return 'Launch missile with damage of '+power+'.';
@@ -321,10 +351,9 @@ function Missile(TANK, descrition_only, settings_only, ai){
 	}
 function Mortar(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 50 + 5 * (TANK.level-1);
+	var power = 50 + 6 * (TANK.abilities_lvl[1]-1);
 	var range = 130;
-	var splash_range = 45 + 0.8 * (TANK.level-1);
-	if(splash_range > 70) splash_range = 70;
+	var splash_range = 45 + 1.8 * (TANK.abilities_lvl[1]-1);
 	
 	if(descrition_only != undefined)
 		return 'Launch missile with area damage of '+power+'.';
@@ -356,6 +385,40 @@ function Mortar(TANK, descrition_only, settings_only, ai){
 	//return reuse - later, on use
 	return 0;
 	}
+function MM_Missile(TANK, descrition_only, settings_only, ai){
+	var reuse = 25000;
+	var power = 42 + 8 * (TANK.abilities_lvl[2]-1);
+	var range = 100;
+	
+	if(descrition_only != undefined)
+		return 'Launch plasma shot with damage of '+power+'.';
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	if(TANK.try_missile != undefined){
+		delete TANK.try_missile;
+		if(TANK.id == MY_TANK.id){
+			mouse_click_controll = false;
+			target_range=0;
+			}
+		return 0;
+		}
+	if(TANK.id == MY_TANK.id){	
+		mouse_click_controll = true;
+		target_range = 0;
+		}
+	//init
+	TANK.try_missile = {
+		range: range,
+		power: power,
+		reuse: reuse,
+		icon: 'plasma',
+		angle: false,
+		ability_nr: 2,
+		};
+	
+	//return reuse - later, on use
+	return 0;
+	}
 function Range(TANK, descrition_only, settings_only, ai){
 	if(descrition_only != undefined)
 		return 'Tank range is increased. Passive ability.';
@@ -365,11 +428,11 @@ function Range(TANK, descrition_only, settings_only, ai){
 
 function Strike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 40 + 4 * (TANK.level-1);
-	var range = 120;
+	var power = 40 + 7 * (TANK.abilities_lvl[0]-1);
+	var range = 100;
 	
 	if(descrition_only != undefined)
-		return 'Powerful shoot with area of '+power+'.';
+		return 'Powerful shoot with damage of '+power+'. Ignore armor.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_missile != undefined){
@@ -396,54 +459,88 @@ function Strike(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 function Camouflage(TANK, descrition_only, settings_only, ai){
-	var reuse = 20000;
+	var reuse = 4000;
 	var duration = 5000;
-	var power_speed = 0.7 + 0.01 * (TANK.level-1);
+	var power_speed = 0.5 + 0.01 * (TANK.abilities_lvl[1]-1);
+	var power_weak = 0.5
 	if(power_speed > 1) power_speed = 1;
+	var power_armor = -100;
 	
-	if(descrition_only != undefined)
-		return 'Become invisible for '+(duration/1000)+'s. Speed is reduced by '+round(100-power_speed*100)+'%';
+	if(descrition_only != undefined){ 
+		if(TANK.invisibility == undefined)
+			return 'Camouflage youself. Damage reduced, speed reduced by '+round(100-power_speed*100)+'%.';
+		else
+			return 'Disable camouflage and restore full speed and damage.';	
+		}
 	if(settings_only != undefined) return {reuse: reuse};
-	if(ai != undefined)
-		TANK.move = 0;
-	
+	if(ai != undefined){
+		if(TANK.invisibility == 1) return false;
+		}
+		
 	TANK.abilities_reuse[1] = Date.now() + reuse;
-	TANK.invisibility = 1;
-	TANK.speed = round(TANK.speed * power_speed);
-	delete TANK.target_shoot_lock;
 	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Camouflage_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
-	
-	//remove all bullets from it, same for his own bullets
-	for (b = 0; b < BULLETS.length; b++){
-		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
-			}
-		if(BULLETS[b].bullet_from_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
+	//check ranges
+	if(TANK.id == MY_TANK.id || ai != undefined){
+		for(var i in TANKS){
+			if(TANKS[i].team == TANK.team) continue; //same team
+			var distance = get_distance_between_tanks(TANKS[i], TANK);
+			var min_range = TANKS[i].sight;
+			min_range = min_range - TANK.size()/2;
+			if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
+				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
+			if(distance < min_range){	
+				return false;	//too close to somebody
+				}
 			}
 		}
 	
+	//remove invisibility
+	if(TANK.invisibility == 1){
+		stop_camouflage(TANK);
+		return reuse;
+		}
+	
+	TANK.invisibility = 1;
+	TANK.speed = round(TANK.speed * power_speed);
+	//weak debuff
+	TANK.buffs.push({
+		name: 'damage',
+		source: 'camouflage',
+		power: power_weak,
+		});
+	//armor debuff
+	TANK.buffs.push({
+		name: 'shield',
+		type: 'static',
+		source: 'camouflage',
+		power: power_armor,
+		});
+		
 	return reuse;
 	}
-function Camouflage_stop(object){
-	var TANK = object.tank;
+function stop_camouflage(TANK){
 	TANK.speed = TYPES[TANK.type].speed;
 	delete TANK.invisibility;
+	
+	//update buffs
+	for(var b in TANK.buffs){
+		if(TANK.buffs[b].name == 'damage' && TANK.buffs[b].source == 'camouflage'){
+			TANK.buffs.splice(b, 1); b--;
+			}
+		}
+	for(var b in TANK.buffs){
+		if(TANK.buffs[b].name == 'shield' && TANK.buffs[b].source == 'camouflage'){
+			TANK.buffs.splice(b, 1); b--;
+			}
+		}
 	}
 
 //====== Miner =================================================================
 
 function Mine(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 130 + 10 * (TANK.level-1);	
-	var splash_range = 45 + 0.8 * (TANK.level-1);
+	var power = 130 + 10 * (TANK.abilities_lvl[1]-1);	
+	var splash_range = 45 + 0.8 * (TANK.abilities_lvl[1]-1);
 	if(splash_range > 70) splash_range = 70; 
 	
 	if(descrition_only != undefined)
@@ -466,11 +563,10 @@ function Mine(TANK, descrition_only, settings_only, ai){
 	}
 function Explode(TANK, descrition_only, settings_only, ai){
 	var reuse = 5000;
-	var range = 45 + 0.8 * (TANK.level-1);
-	if(range > 70) range = 70; 
+	var range = 45 + 0.8 * (TANK.abilities_lvl[1]-1);
 	
 	if(descrition_only != undefined)
-		return 'Detonate nearby mines. Are you ready?';
+		return 'Detonate nearby mines in '+range+' range. Are you ready?';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 	
@@ -508,7 +604,7 @@ function Explode(TANK, descrition_only, settings_only, ai){
 	}
 function SAM(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 50 + 5 * (TANK.level-1);
+	var power = 50 + 6 * (TANK.abilities_lvl[2]-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -552,7 +648,7 @@ function SAM(TANK, descrition_only, settings_only, ai){
 		tmp['bullet_to_target'] = enemy;
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = power;
-		tmp['pierce_armor'] = 1;
+		tmp['pierce_armor'] = 100;
 		tmp['angle'] = angle;
 		tmp['bullet_icon'] = 'missle';
 		BULLETS.push(tmp);
@@ -619,8 +715,9 @@ function check_mines(tank_id){
 
 function Virus(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
-	var power = 60 + 6 * (TANK.level-1);	
-	var duration = 4000;
+	var power = 50 + 6 * (TANK.abilities_lvl[0]-1);	
+	var duration = 2000 + 105 * (TANK.abilities_lvl[0]-1);	
+	if(duration > 4000) duration = 4000;
 	var range = 70;
 
 	if(descrition_only != undefined)
@@ -651,63 +748,133 @@ function Virus(TANK, descrition_only, settings_only, ai){
 	//return reuse - later, on use
 	return 0;
 	}
-function Mass_virus(TANK, descrition_only, settings_only, ai){
-	var reuse = 40000;
-	var power = 30 + 3 * (TANK.level-1);	
-	var duration = 2000;
-	var range = 40;
+function EMP_Bomb(TANK, descrition_only, settings_only, ai){
+	var reuse = 25000;		
+	var power = 0;	
+	var duration = 2000 + 53 * (TANK.abilities_lvl[1]-1);	
+	var range = 120;
+	var splash_range = 45 + 1.8 * (TANK.abilities_lvl[1]-1);
 
 	if(descrition_only != undefined)
-		return 'Send virus to all near enemies and damage it with '+power+' power.';
+		return 'An electromagnetic pulse that corrupts electronic equipments.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	TANK.abilities_reuse[1] = Date.now() + reuse;
-	var tank_size = TYPES[TANK.type].size[1]/2;
-	
-	//draw
-	canvas_main.beginPath();
-	var tank_size =  TYPES[TANK.type].size[1];
-	radius = tank_size/2 + range;
-	canvas_main.arc(TANK.x+tank_size/2+map_offset[0], TANK.y+tank_size/2+map_offset[1], radius, 0 , 2 * Math.PI, false);	
-	canvas_main.lineWidth = 1;
-	canvas_main.fillStyle = "#8a8a8a";
-	canvas_main.fill();
-		
-	for (i in TANKS){				
-		if(TANKS[i].team == TANK.team)	continue;	//same team
-		if(TANKS[i].stun != undefined)		continue;	//already got stun
-		if(TANKS[i].dead == 1)		continue;	//target dead
-		
-		//check
-		distance = get_distance_between_tanks(TANKS[i], TANK);
-		if(distance > range)			continue;	//target too far
-		
-		//bullet	
-		var tmp = new Array();
-		tmp['x'] = TANK.x+tank_size;
-		tmp['y'] = TANK.y+tank_size;
-		tmp['bullet_to_target'] = TANKS[i];
-		tmp['bullet_from_target'] = TANK;
-		tmp['damage'] = power;
-		tmp['stun_effect'] = duration;
-		BULLETS.push(tmp);
+	if(TANK.try_bomb != undefined){
+		delete TANK.try_bomb;
+		if(TANK.id == MY_TANK.id){
+	 		mouse_click_controll = false;
+	 		target_range=0;
+	 		}
+		return 0;
 		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = splash_range;
+		}
+	//init
+	TANK.try_bomb = {
+		range: range,
+		aoe: splash_range,
+		power: power,
+		reuse: reuse,
+		icon: 'plasma',
+		ability_nr: 1,
+		more: ['stun_effect', duration],
+		};
 		
-	return reuse;
+	//return reuse - later, on use
+	return 0;
 	}	
-function Advanced(TANK, descrition_only, settings_only, ai){
+function M7_Shield(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var duration = 2000 + 105*(TANK.abilities_lvl[2]-1);
+	var power = 5 + 0.5*(TANK.abilities_lvl[2]-1);
+	var range = 80;
+	
 	if(descrition_only != undefined)
-		return 'Tank use advanced technologies. Passive ability.';
+		return 'Increase shield by '+power+'% for allies for '+round(duration/100)/10+'s.';
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	TANK.abilities_reuse[2] = Date.now() + reuse;
+	for (ii in TANKS){
+		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
+		if(TANKS[ii].team != TANK.team)			continue; //enemy
+		distance = get_distance_between_tanks(TANK, TANKS[ii]);
+		if(distance > range)		continue;	//too far
+		//add effect
+		if(game_mode == 1){
+			//shield buff
+			TANKS[ii].buffs.push({
+				name: 'shield',
+				type: 'static',
+				power: power,
+				lifetime: Date.now()+duration,
+				circle: '#196119',
+				});
+			}
+		else{
+			var params = [
+				{key: 'buffs', 
+					value: {
+						name: 'shield',
+						type: 'static',
+						power: power,
+						lifetime: Date.now()+duration,
+						circle: '#196119',
+						}
+					},
+				];
+			send_packet('tank_update', [TANKS[ii].id, params]);
+			}			
+		}
+	
+	return reuse;
 	}
 
 //====== Truck =================================================================
 
+function Fire_bomb(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var power = 50 + 7 * (TANK.abilities_lvl[0]-1);
+	var range = 80;
+	var splash_range = 45 + 1.8 * (TANK.abilities_lvl[1]-1);
+	
+	if(descrition_only != undefined)
+		return 'Drop Fire bomb with damage of '+power+'.';
+	if(settings_only != undefined) return {reuse: reuse};
+		
+	if(TANK.try_bomb != undefined){
+		delete TANK.try_bomb;
+		if(TANK.id == MY_TANK.id){
+	 		mouse_click_controll = false;
+	 		target_range=0;
+	 		}
+		return 0;
+		}
+	
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = splash_range;
+		}
+	//init
+	TANK.try_bomb = {
+		range: range,
+		aoe: splash_range,
+		power: power,
+		reuse: reuse,
+		icon: 'bomb',
+		ability_nr: 0,
+		};
+		
+	//return reuse - later, on use
+	return 0;
+	}
 function Soldiers(TANK, descrition_only, settings_only, ai){
-	var reuse = 30000;
+	var reuse = 35000 - 500 * (TANK.abilities_lvl[2]-1);
 	var n = 2;
 	
 	if(descrition_only != undefined)
-		return 'Send '+n+' elite soldiers to the battle.';
+		return 'Send '+n+' elite soldiers to the battle once in '+round(reuse/1000)+'s.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 		
@@ -737,60 +904,18 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 	
 	return reuse;
 	}
-function Fire_bomb(TANK, descrition_only, settings_only, ai){
-	var reuse = 20000;
-	var power = 50 + 5 * (TANK.level-1);
-	var range = 80;
-	var splash_range = 45 + 0.8 * (TANK.level-1);
-	if(splash_range > 70) splash_range = 70; 
-	
-	if(descrition_only != undefined)
-		return 'Drop Fire bomb with damage of '+power+'.';
-	if(settings_only != undefined) return {reuse: reuse};
-		
-	if(TANK.try_bomb != undefined){
-		delete TANK.try_bomb;
-		if(TANK.id == MY_TANK.id){
-	 		mouse_click_controll = false;
-	 		target_range=0;
-	 		}
-		return 0;
-		}
-	
-	ability_nr = 0;
-	if(TYPES[TANK.type].name == 'Apache')
-		ability_nr = 1;	
-	
-	if(TANK.id == MY_TANK.id){
-		mouse_click_controll = true;
-		target_range = splash_range;
-		}
-	//init
-	TANK.try_bomb = {
-		range: range,
-		aoe: splash_range,
-		power: power,
-		reuse: reuse,
-		icon: 'bomb',
-		ability_nr: ability_nr,
-		};
-		
-	//return reuse - later, on use
-	return 0;
-	}
 function Medicine(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 5000;
-	var power = 12 + 1 * (TANK.level-1);
+	var power = 10 + 1 * (TANK.abilities_lvl[2]-1);
 	var range = 80;
 	
 	if(descrition_only != undefined)
-		return 'Heal elite soldiers.';
+		return 'Heal elite soldiers with '+(power*duration/1000)+' power.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined) return false;
 	
 	TANK.abilities_reuse[2] = Date.now() + reuse;
-	var tank_size_from = TYPES[TANK.type].size[1]/2;
 	for (ii in TANKS){
 		if(TANKS[ii].master == undefined) continue; //not selite soldier
 		if(TANKS[ii].master.id != TANK.id) continue; //not mine
@@ -799,6 +924,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 		if(distance > range)		continue;	//too far
 		//add effect
 		if(game_mode == 1){
+			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
 				power: power,
@@ -831,15 +957,14 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 //====== TRex ==================================================================
 
 function Plasma(TANK, descrition_only, settings_only, ai){
-	var reuse = 5000;
-	var power = 60 + 6 * (TANK.level-1);
-	var duration_slow = 2000;
-	var power_slow = 30 + (TANK.level-1);
-	if(power_slow > 60) power_slow = 60;
+	var reuse = 7000;
+	var power = 60 + 7 * (TANK.abilities_lvl[0]-1);
+	var duration_slow = 3000;
+	var power_slow = 0.7 - 0.01 * (TANK.abilities_lvl[0]-1);
 	var range = 40;
 	
 	if(descrition_only != undefined)
-		return 'Powerful plasma shot with '+power+' power. Slows down enemy by '+power_slow+'%.';
+		return 'Powerful plasma shot with '+power+' power and '+round(100-power_slow*100)+'% slow effect.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.try_missile != undefined){
@@ -859,19 +984,19 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 		range: range,
 		power: power,
 		reuse: reuse,
-		pierce: 1,
+		//pierce: 1,
 		icon: 'plasma',
 		angle: false,
 		ability_nr: 0,
-		more: ['slow_debuff', {name: 'slow', power: power_slow, duration: duration_slow}],
+		more: ['slow_debuff', {name: 'speed', power: power_slow, duration: duration_slow}],
 		};
 	
 	//return reuse - later, on use
 	return 0;
 	}
 function Jump(TANK, descrition_only, settings_only, ai){
-	var reuse = 8000;
-	var range = 120;
+	var reuse = 10000;
+	var range = 100 + 2.7 * (TANK.abilities_lvl[1]-1);
 	
 	if(descrition_only != undefined)
 		return 'Quick jump to free location with '+range+' range.';
@@ -896,15 +1021,40 @@ function Jump(TANK, descrition_only, settings_only, ai){
 		reuse: reuse,
 		ability_nr: 1,
 		};
+	
 	//remove all bullets from it
-	for (b = 0; b < BULLETS.length; b++){
-		if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
-			BULLETS.splice(b, 1); b--;
+	try{
+		for (b = 0; b < BULLETS.length; b++){
+			if(BULLETS[b].bullet_to_target != undefined && BULLETS[b].bullet_to_target.id == TANK.id){
+				BULLETS.splice(b, 1); b--;
+				}
 			}
 		}
+	catch(err){console.log("Error: "+err.message);}
 	
 	//return reuse - later, on use
 	return 0;
+	}
+function PL_Shield(TANK, descrition_only, settings_only, ai){
+	var reuse = 15000;
+	var duration = 3000 + 105*(TANK.abilities_lvl[2]-1);
+	var power = 5 + 1*(TANK.abilities_lvl[2]-1);
+	
+	if(descrition_only != undefined)
+		return 'Plasma shield that rises your armor by '+power+'% for '+round(duration/100)/10+'s.';
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	TANK.abilities_reuse[2] = Date.now() + reuse;
+	//shield buff
+	TANK.buffs.push({
+		name: 'shield',
+		type: 'static',
+		power: power,
+		lifetime: Date.now()+duration,
+		circle: '#196119',
+		});
+		
+	return reuse;
 	}
 function do_jump(tank_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
@@ -963,7 +1113,18 @@ function do_jump(tank_id, skip_broadcast){
 	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 	TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;
 	
-	//effect
+	//animation
+	TANK.animations.push({
+		name: 'jump',
+		to_x: move_x - tank_size,
+		to_y: move_y - tank_size,
+		from_x: TANK.x,
+		from_y: TANK.y,
+		angle: angle,
+		lifetime: Date.now() + 1000,
+		duration: 1000,	
+		});
+	
 	TANK.x = move_x - tank_size;
 	TANK.y = move_y - tank_size;
 	TANK.move = 0;
@@ -988,11 +1149,11 @@ function do_jump(tank_id, skip_broadcast){
 	target_range=0;
 	}
 
-//====== Helicopter ============================================================
+//====== Apache ================================================================
 
 function Airstrike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 60 + 5 * (TANK.level-1);
+	var power = 60 + 7 * (TANK.abilities_lvl[0]-1);
 	var range = 120;
 	
 	if(descrition_only != undefined)
@@ -1025,10 +1186,12 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 	//return reuse - later, on use
 	return 0;
 	}
-function Scout(TANK, descrition_only, settings_only, ai){
+function Scout(TANK, descrition_only, settings_only, ai){	//multi
+	var ability_nr = 1;
+	if(TYPES[TANK.type].name == 'Stealth') ability_nr = 2;
 	var reuse = 15000;
 	var duration = 3000;
-	var power = 50;
+	var power = 50 + 2.7 * (TANK.abilities_lvl[ability_nr]-1);
 	
 	if(descrition_only != undefined)
 		return 'Increase sight by '+power+' for '+(duration/1000)+'s.';
@@ -1036,7 +1199,13 @@ function Scout(TANK, descrition_only, settings_only, ai){
 	
 	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2) + power;
 	
-	TANK.abilities_reuse[1] = Date.now() + reuse;
+	TANK.abilities_reuse[ability_nr] = Date.now() + reuse;
+		
+	//check invisible enemies
+	for(var i in TANKS){
+		if(TANKS[i].invisibility != undefined && TANKS[i].team != TANK.team)
+			check_invisibility(TANKS[i], true);
+		}
 	
 	//register stop function	
 	var tmp = new Array();
@@ -1057,10 +1226,9 @@ function Scout_stop(object){
 
 function Bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 15000;
-	var power = 60 + 6 * (TANK.level-1);
+	var power = 60 + 7 * (TANK.abilities_lvl[0]-1);
 	var range = 60;
-	var splash_range = 45 + 0.8 * (TANK.level-1);
-	if(splash_range > 70) splash_range = 70; 
+	var splash_range = 45 + 1.8 * (TANK.abilities_lvl[0]-1);
 
 	if(descrition_only != undefined)
 		return 'Drop powerful bomb with area damage of '+power+'.';
@@ -1093,7 +1261,7 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 	}
 function AA_bomb(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 50 + 5 * (TANK.level-1);
+	var power = 50 + 6 * (TANK.abilities_lvl[1]-1);
 	var range = 90;
 
 	if(descrition_only != undefined)
@@ -1149,7 +1317,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 			enemy = get_tank_by_coords(mouseX, mouseY, 'R', TANK);
 		if(enemy==false) return false;
 		if(enemy.dead == 1) return false;
-		if(enemy.invisibility == 1) return false;
+		//if(enemy.invisibility == 1) return false;
 		
 		if(enemy.tmp_range > TANK.try_missile.range){
 			//too far - move to target
@@ -1227,7 +1395,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_missile.power;
-	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_missile.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_missile.angle == true)		tmp['angle'] = angle;
 	if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
 	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
@@ -1328,7 +1496,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_bomb.power;
-	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 1;
+	if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 100;
 	if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
 	if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
 	if(TANK.try_bomb.aoe != undefined){

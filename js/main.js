@@ -36,7 +36,7 @@ function init_game(first_time){
 	canvas_backround.fillStyle = "#676767";
 	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
 	//text
-	var text = "Moon wars".split("").join(String.fromCharCode(8201))
+	var text = "Moon wars".split("").join(String.fromCharCode(8201));
 	canvas_backround.font = "Bold 70px Arial";
 	canvas_backround.strokeStyle = '#ffffff';
 	canvas_backround.strokeText(text, 160, 340);
@@ -77,7 +77,7 @@ function intro(force){
 		return false;
 		}
 	//draw
-	IMAGES_INRO.src = '../img/intro.jpg';
+	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	IMAGES_INRO.onload = function(){
 		canvas_backround.drawImage(IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 		//draw text
@@ -248,6 +248,7 @@ function init_action(map_nr, my_team){
 			enemy_team = 'R';	
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
+				//random_type = 4;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);
@@ -314,23 +315,24 @@ var IMAGES_SETTINGS = {
 		statusbar:	{ x:0,	y:350,w:800,h:130 },
 		},
 	tanks: {
-		Heavy:	{ x:0,	y:0,		w:90,	h:90 },
-		Tiger:	{ x:0,	y:100,	w:90,	h:90 },
-		Cruiser:	{ x:0,	y:200,	w:90,	h:90 },
-		Launcher:	{ x:0,	y:300,	w:90,	h:90 },
-		Stealth:	{ x:0,	y:400,	w:90,	h:90 },
-		Miner:	{ x:0,	y:500,	w:90,	h:90 },
-		Tech:		{ x:0,	y:600,	w:90,	h:90 },
-		Truck:	{ x:0,	y:700,	w:90,	h:90 },
-		Apache:	{ x:0,	y:800,	w:90,	h:90 },
-		Bomber:	{ x:0,	y:900,	w:90,	h:90 },
-		Soldier:	{ x:0,	y:1000,	w:90,	h:90 },
-		Tower:	{ x:0,	y:1100,	w:90,	h:90 },
-		Base:		{ x:0,	y:1200,	w:90,	h:90 },
-		TRex:		{ x:0,	y:1300,	w:90,	h:90 },
+		Heavy:	{ x:0,	y:0,		w:90,	h:80 },
+		Tiger:	{ x:0,	y:100,	w:90,	h:80 },
+		Cruiser:	{ x:0,	y:200,	w:90,	h:80 },
+		Launcher:	{ x:0,	y:300,	w:90,	h:80 },
+		Stealth:	{ x:0,	y:400,	w:90,	h:80 },
+		Miner:	{ x:0,	y:500,	w:90,	h:80 },
+		Tech:		{ x:0,	y:600,	w:90,	h:80 },
+		Truck:	{ x:0,	y:700,	w:90,	h:80 },
+		Apache:	{ x:0,	y:800,	w:90,	h:80 },
+		Bomber:	{ x:0,	y:900,	w:90,	h:80 },
+		Soldier:	{ x:0,	y:1000,	w:90,	h:80 },
+		Tower:	{ x:0,	y:1100,	w:90,	h:80 },
+		Base:		{ x:0,	y:1200,	w:90,	h:80 },
+		TRex:		{ x:0,	y:1300,	w:90,	h:80 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
+		small_bullet:	{ x:0,	y:250,	w:4,	h:4 },
 		missle:	{ x:0,	y:50,		w:8,	h:23 }, 
 		airstrike:	{ x:0,	y:100,	w:38,	h:15 }, 
 		bomb: 	{ x:0,	y:150,	w:12,	h:12 },
@@ -357,13 +359,13 @@ function preload_all_files(){
 	preload_total = preload_left;
 	
 	//preload images
-	IMAGE_BACK.src = '../img/background.jpg';	IMAGE_BACK.onload = function(){ update_preload(1); }
-	IMAGE_LOGO.src = '../img/logo.png';	IMAGE_LOGO.onload = function(){ update_preload(1); }
-	IMAGE_MOON.src = '../img/moon.jpg';	IMAGE_MOON.onload = function(){ update_preload(1); }
-	IMAGES_GENERAL.src = '../img/general.png';	IMAGES_GENERAL.onload = function(){ update_preload(1); }
-	IMAGES_TANKS.src = '../img/tanks.png';	IMAGES_TANKS.onload = function(){ update_preload(1); }
-	IMAGES_BULLETS.src = '../img/bullets.png';	IMAGES_BULLETS.onload = function(){ update_preload(1); }
-	IMAGES_ELEMENTS.src = '../img/elements.png';	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
+	IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	IMAGE_BACK.onload = function(){ update_preload(1); }
+	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	IMAGE_LOGO.onload = function(){ update_preload(1); }
+	IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	IMAGE_MOON.onload = function(){ update_preload(1); }
+	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	IMAGES_GENERAL.onload = function(){ update_preload(1); }
+	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	IMAGES_TANKS.onload = function(){ update_preload(1); }
+	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	IMAGES_BULLETS.onload = function(){ update_preload(1); }
+	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
 	
 	//prelaod sound
 	for(var i in audio_to_preload){
@@ -498,7 +500,7 @@ function quit_game(init_next_game){
 	frame_time = undefined;
 	intro_page = 0;
 	
-	if(init_next_game!=false){
+	if(init_next_game != false){
 		init_game(false);
 		}
 	}

@@ -1,3 +1,6 @@
+//check support
+if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
+
 //keyboard actions
 function on_keyboard_action(event){
 	k = event.keyCode;	//log(k);
@@ -21,12 +24,18 @@ function on_keyboard_action(event){
 				scoll_map(1, 0); 	//right
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
-					MY_TANK.move = 0;
+					//stop move
 					if(game_mode == 2){
-						register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
+						if(MY_TANK.move == 1)
+							register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
 						}
 					else
 						MY_TANK.move = 0;
+					//reset scroll
+					if(MAP_SCROLL_MODE==2){
+						MAP_SCROLL_MODE = 1;
+						auto_scoll_map();
+						}
 					}	
 				}
 			}
@@ -36,6 +45,21 @@ function on_keyboard_action(event){
 				tab_scores=true;	
 			else
 				tab_scores=false;
+			}
+		if(k==85){
+			//u
+			ABILITIES_MODE++;
+			if(ABILITIES_MODE>3) ABILITIES_MODE = 0;
+			if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL){
+				ABILITIES_MODE++;
+				if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL){
+					ABILITIES_MODE++;
+					if(MY_TANK.abilities_lvl[ABILITIES_MODE-1]==MAX_ABILITY_LEVEL)
+						ABILITIES_MODE++;
+					}	
+				}
+			if(ABILITIES_MODE>3) ABILITIES_MODE = 0;
+			draw_tank_abilities();
 			}
 		}
 	if(k==16)
@@ -68,6 +92,10 @@ function on_keyboard_action(event){
 			MAP_SCROLL_MODE = 1;
 			auto_scoll_map();
 			}
+		}
+	if(k == 27){	//esc
+		if(PLACE == 'library' || PLACE == 'intro')
+			quit_game();
 		}
 	
 	//disable some keys
