@@ -164,6 +164,7 @@ function redraw_tank_stats(){
 		canvas_backround.font = "normal 10px Verdana";
 		canvas_backround.fillText("Players", left_x, top_y+40);
 		//value
+		canvas_backround.fillStyle = "#a3ad16";
 		canvas_backround.font = "bold 10px Verdana";
 		ROOM = get_room_by_id(opened_room_id);
 		p_n = 0;
@@ -362,19 +363,20 @@ function show_skill_description(){
 	
 	var limit = 193;
 	var ability_hover_text_more = '';
-	var words = ability_hover_text.split(" ");
-	ability_hover_text = '';
 	active_line = 1;
-	for(var i in words){
-		var tmp = ability_hover_text.concat(' ').concat(words[i]);
-		if(active_line == 1 && canvas_backround.measureText(tmp).width < limit)
-			ability_hover_text = ability_hover_text+" "+words[i];
-		else{ 
-			ability_hover_text_more = ability_hover_text_more+" "+words[i];
-			active_line=2;
+	if(ability_hover_text != ''){
+		var words = ability_hover_text.split(" ");
+		ability_hover_text = '';
+		for(var i in words){
+			var tmp = ability_hover_text.concat(' ').concat(words[i]);
+			if(active_line == 1 && canvas_backround.measureText(tmp).width < limit)
+				ability_hover_text = ability_hover_text+" "+words[i];
+			else{ 
+				ability_hover_text_more = ability_hover_text_more+" "+words[i];
+				active_line=2;
+				}
 			}
 		}
-	
 	//show description
 	canvas_backround.fillStyle = "#8f947d";
 	canvas_backround.font = "normal 10px Verdana";

@@ -651,6 +651,7 @@ function check_collisions(xx, yy, TANK){
 	}
 //checks tanks levels
 function tank_level_handler(){	//once per second
+	//check level-up
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tower') continue;
 		if(TYPES[TANKS[i].type].type == 'human') continue;
@@ -704,6 +705,9 @@ function tank_level_handler(){	//once per second
 				}
 			}
 		}
+	//he-3 regen
+	if(MY_TANK.dead != 1)
+		MY_TANK.he3 += 1; 
 	}
 //checks tanks hp regen
 function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
@@ -1493,13 +1497,13 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 	if(x==undefined && y==undefined && angle==undefined){
 		if(team=='B'){	//blue top
 			x = round(APP_SIZE_CACHE[0]*5.5/10);
-			x = x + get_team_tanks_count(team)*space;
+			x = x + get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
 			y = 20;
 			angle = 180;
 			}
 		else{		//red bottom 
 			x = round(APP_SIZE_CACHE[0]*4/10);
-			x = x - get_team_tanks_count(team)*space;
+			x = x - get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
 			y = HEIGHT_MAP-20-TYPES[type].size[1];
 			angle = 0;
 			}
@@ -1550,6 +1554,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		cache_tank: [],
 		buffs: [],	//buffs array
 		last_bullet_time: Date.now()-5000,
+		he3: 0,
 		};
 	if(AI != undefined)
 		TANK_tmp.use_AI = AI;

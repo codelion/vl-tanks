@@ -1,7 +1,25 @@
 COUNTRIES = {
-	B: {name: 'United States', file: 'us'},
-	R: {name: 'Russia', file: 'ru'},
-	Y: {name: 'China', file: 'ch'},
+	B: {
+		name: 'United States', 
+		file: 'us',
+		description: 'Strong country. Units have 10% more dps, 10% more shields.',
+		pros: 'More dps, more defence.',
+		cons: 'No weak points.',
+		},
+	R: {
+		name: 'Russia', 
+		file: 'ru',
+		description: 'Strange country. Units can be rebuilt 50% faster.',
+		pros: 'Fast unit rebuild gives good base defence.',
+		cons: 'Weak units.',
+		},
+	Y: {
+		name: 'China', 
+		file: 'ch',
+		description: 'Country has fastest-growing economy. Once it gathers enough experience, units get level boost bonus.',
+		pros: 'Strongest economy in late game.',
+		cons: 'Weak in early game.',
+		},
 	}
 
 //====== TANKS =================================================================
