@@ -28,6 +28,7 @@ function draw_main(){
 	for(var i=0; i < TANKS.length; i++){
 		if(PLACE != 'game') return false;
 		var tank_size =  TYPES[TANKS[i].type].size[1];
+		var angle = undefined;
 		try{
 			//speed multiplier
 			var speed_multiplier = 1;
@@ -167,7 +168,7 @@ function draw_main(){
 					}
 				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 				radiance = Math.atan2(dist_y, dist_x);
-				var angle = (radiance*180.0)/Math.PI+90;
+				angle = (radiance*180.0)/Math.PI+90;
 				angle = round(angle);
 				if(body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
 					if(distance < speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
@@ -223,7 +224,7 @@ function draw_main(){
 					
 					//rotate
 					body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, enemy_angle, time_gap);
-					}	//log(TANKS[i].id+"      "+TANKS[i].fire_angle);
+					}
 				}
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
@@ -821,7 +822,7 @@ function draw_final_score(live, lost_team){
 			canvas.fillText(j, Math.round((WIDTH_APP-button_width)/2)+10, text_y);
 			
 			//flag
-			draw_image(canvas, COUNTRIES[TANKS[i].team].file, 
+			draw_image(canvas, COUNTRIES[TANKS[i].nation].file, 
 				Math.round((WIDTH_SCROLL-button_width)/2)+30, 
 				top_margin+(button_height+buttons_gap)*j+flag_space);
 	
@@ -996,14 +997,13 @@ function draw_tank_select_screen(selected_tank){
 	last_selected = selected_tank;
 	y = y + preview_y+10;
 	
+	
 	//tank info block
 	var info_left = 15;
 	var info_block_height = 100;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.strokeStyle = "#196119";
 	roundRect(canvas_backround, info_left, y, 585, info_block_height, 5, true);
-
-	//tank stats
 	if(selected_tank != undefined){
 		var pos1 = info_left+10;
 		var pos2 = y+((info_block_height-preview_y)/2);
@@ -1021,6 +1021,11 @@ function draw_tank_select_screen(selected_tank){
 			canvas_backround.fillText(TYPES[selected_tank].description[d], info_left+preview_x+40, y+50+d*height_space);
 			}
 		}
+		
+	if(game_mode == 1){
+		show_countries_selection(canvas_backround, info_left+585+15, y);
+		}
+		
 	y = y + info_block_height+10;
 	
 	//mini maps
@@ -1050,14 +1055,19 @@ function draw_tank_select_screen(selected_tank){
 			else
 				canvas_backround.fillStyle = "#ffffff";
 			roundRect(canvas_backround, 15+1, y+1, 120, ICON_WIDTH, 2, true);
+			
+			//flag
+			nation_tmp = get_nation_by_team(teams[t]);
+			draw_image(canvas_backround, nation_tmp, 15+10, y+1+round((ICON_WIDTH-9)/2));
+			
 			//text
 			if(teams[t]==my_team)
-				text = "You and your team";	
+				text = "Your team";	
 			else
-				text = "The enemy team";
+				text = "Your enemies";
 			canvas_backround.fillStyle = "#000000";
 			canvas_backround.font = "Bold 12px Arial";
-			canvas_backround.fillText(text, 15+10, y+1+round(ICON_WIDTH/2));
+			canvas_backround.fillText(text, 20+15+10, y+1+round((ICON_WIDTH)/2)+4);
 			
 			//players
 			for(var p in ROOM.players){
@@ -1103,6 +1113,40 @@ function draw_tank_select_screen(selected_tank){
 			starting_timer = START_GAME_COUNT_MULTI;
 		}
 	draw_timer_graph();
+	}
+var my_nation;
+function show_countries_selection(canvas, x, y, selected_item){
+	j=0;
+	var gap = 8;
+	preview_x = 50;
+	preview_y = 40;	
+	if(selected_item != undefined)
+		my_nation = selected_item;
+	if(my_nation == undefined)
+		my_nation = 'us';
+	for(var i in COUNTRIES){
+		//reset background
+		var back_color = '';
+		if(my_nation == i)
+			back_color = "#8fc74c"; //selected
+		else
+			back_color = "#dbd9da";
+		canvas.fillStyle = back_color;
+		canvas.strokeStyle = "#196119";
+		roundRect(canvas, x+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+		
+		//logo
+		var flag_size = IMAGES_SETTINGS.general[COUNTRIES[i].file];
+		var pos1 = x+j*(preview_x+gap) + round((preview_x-flag_size.w)/2);
+		var pos2 = y + round((preview_y-flag_size.h)/2);
+		draw_image(canvas, COUNTRIES[i].file, pos1, pos2);
+		
+		//register button
+		register_button(x+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			show_countries_selection(canvas, x, y, index);
+			}, i);
+		j++;
+		}
 	}
 function draw_timer_graph(){
 	graph_width=WIDTH_APP-30;
@@ -1221,7 +1265,6 @@ function body_rotation(obj, str, speed, rot, time_diff){
 	if(obj.stun != undefined)	return false; //stun
 	if(obj.speed == 0 && TYPES[obj.type].type == 'tank')	return false; //0 speed
 	speed = speed * 100 * time_diff/1000;	
-			//if(str=="fire_angle" && obj.name==name) log(round(speed)+"            "+obj[str]);
 	
 	if (obj[str] > 360) obj[str] = obj[str] - 360;
 	if (obj[str] < 0) obj[str] = obj[str] + 360;

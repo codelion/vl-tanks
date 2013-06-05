@@ -2,6 +2,10 @@
 Name: Moon wars
 Author: Vilius
 Email: www.viliusl@gmail.com
+
+TODO:
+	respawn buff
+	level_up buff
 */
 
 //init hello screen
@@ -211,13 +215,13 @@ function init_action(map_nr, my_team){
 			}
 		catch(error){}
 		}
-
-	add_towers();
-
+	
 	//create ... me
 	if(game_mode==1 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
 		my_tank_nr = 0;
-	add_tank(1, name, name, my_tank_nr, my_team);
+	if(game_mode==2)
+		my_nation = get_nation_by_team(my_team);
+	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
 	auto_scoll_map();
@@ -238,24 +242,34 @@ function init_action(map_nr, my_team){
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			if(DEBUG==false)
-				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, undefined, undefined, undefined, true);
+				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
 			i++;
 			}
 		
 		//enemies
 		enemy_team = 'B';
 		if(enemy_team == my_team)
-			enemy_team = 'R';	
+			enemy_team = 'R';
+		//find nation
+		enemy_nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != my_nation)
+				enemy_nation_tmp.push(n);
+			}
+		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
+		//create
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 				//random_type = 4;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
-			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);
+			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
 			i++;
 			}
 		}
+		
+	add_towers();
 
 	sync_multiplayers();
 	
@@ -500,6 +514,7 @@ function quit_game(init_next_game){
 	chat_shifted=false;
 	frame_time = undefined;
 	intro_page = 0;
+	my_team = undefined;
 	
 	if(init_next_game != false){
 		init_game(false);

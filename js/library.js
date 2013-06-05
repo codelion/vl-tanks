@@ -305,8 +305,7 @@ function draw_library_countries(selected_item){
 		canvas_backround.font = "bold 14px Helvetica";
 		var letters_width = canvas_backround.measureText(COUNTRIES[i].name).width;
 		var padding_left = Math.round((preview_x-letters_width)/2);
-		if(padding_left<0) padding_left=0;
-		canvas_backround.fillText(COUNTRIES[i].name, 15+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
+		canvas_backround.fillText(COUNTRIES[i].name, 10+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
 		
 		//register button
 		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){

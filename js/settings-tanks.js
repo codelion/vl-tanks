@@ -1,24 +1,34 @@
 COUNTRIES = {
-	B: {
+	us: {
 		name: 'United States', 
 		file: 'us',
 		description: 'Strong country. Units have 10% more dps, 10% more shields.',
 		pros: 'More dps, more defence.',
 		cons: 'No weak points.',
+		buffs: [
+			{ name: 'damage',	power: 1.1, },
+			{ name: 'shield',	power: 10,	type: 'static' },
+			],
 		},
-	R: {
+	ru: {
 		name: 'Russia', 
 		file: 'ru',
-		description: 'Strange country. Units can be rebuilt 50% faster.',
+		description: 'Defensive country. Units can be rebuilt 50% faster.',
 		pros: 'Fast unit rebuild gives good base defence.',
 		cons: 'Weak units.',
+		buffs: [
+			{ name: 'respawn',	power: 0.5, },
+			],
 		},
-	Y: {
+	ch: {
 		name: 'China', 
 		file: 'ch',
-		description: 'Country has fastest-growing economy. Once it gathers enough experience, units get level boost bonus.',
+		description: 'Country has fastest-growing economy. Units level-up faster by 20%.',
 		pros: 'Strongest economy in late game.',
 		cons: 'Weak in early game.',
+		buffs: [
+			{ name: 'level_up',	power: 0.8, },
+			],
 		},
 	}
 
