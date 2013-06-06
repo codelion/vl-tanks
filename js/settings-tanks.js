@@ -2,37 +2,69 @@ COUNTRIES = {
 	us: {
 		name: 'United States', 
 		file: 'us',
-		description: 'Strong country. Units have 10% more dps, 10% more shields.',
-		pros: 'More dps, more defence.',
+		description: 'Strong offensive country. Units have 10% more dps and 5% more shields.',
+		pros: 'More dps, more unit armor. Good at offensive strategy.',
 		cons: 'No weak points.',
 		buffs: [
 			{ name: 'damage',	power: 1.1, },
-			{ name: 'shield',	power: 10,	type: 'static' },
+			{ name: 'shield',	power: 5,	type: 'static' },
 			],
+		tanks_lock: ['Heavy', 'Miner', 'Truck'],
+		tank_unique: 'Bomber',
 		},
 	ru: {
 		name: 'Russia', 
 		file: 'ru',
 		description: 'Defensive country. Units can be rebuilt 50% faster.',
 		pros: 'Fast unit rebuild gives good base defence.',
-		cons: 'Weak units.',
+		cons: 'Enemies has more powerful units and are advanced more.',
 		buffs: [
 			{ name: 'respawn',	power: 0.5, },
 			],
+		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
+		tank_unique: 'Heavy',
 		},
 	ch: {
 		name: 'China', 
 		file: 'ch',
 		description: 'Country has fastest-growing economy. Units level-up faster by 20%.',
 		pros: 'Strongest economy in late game.',
-		cons: 'Weak in early game.',
+		cons: 'Weak in early game, can not afford to use some advanced technologies.',
 		buffs: [
 			{ name: 'level_up',	power: 0.8, },
 			],
+		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		},
 	}
 
 //====== TANKS =================================================================
+
+//Tiger
+TYPES.push({
+	name: 'Tiger',
+	type: 'tank',
+	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
+	life: [210, 12],
+	damage: [30, 1.5],		//30 dps
+	range: 80,
+	scout: 90,
+	armor: [25, 0.5, 50],
+	speed: 28,
+	attack_delay: 1,
+	turn_speed: 2.5,
+	abilities: [
+		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
+		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
+		{name: 'AA Bullets',	passive: true,		broadcast: 1},
+		],
+	size: ['M', 50],
+	preview: true,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
+	fire_sound: 'shoot',
+	accuracy: 90,
+	});
 
 //Heavy
 TYPES.push({
@@ -64,33 +96,6 @@ TYPES.push({
 	bullet: 'small_bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	accuracy: 90,					//chance to hit target, %
-	});
-
-//Tiger
-TYPES.push({
-	name: 'Tiger',
-	type: 'tank',
-	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
-	life: [210, 12],
-	damage: [30, 1.5],		//30 dps
-	range: 80,
-	scout: 90,
-	armor: [25, 0.5, 50],
-	speed: 28,
-	attack_delay: 1,
-	turn_speed: 2.5,
-	abilities: [
-		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
-		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
-		{name: 'AA Bullets',	passive: true,		broadcast: 1},
-		],
-	size: ['M', 50],
-	preview: true,
-	icon_top: true,
-	icon_base: true,
-	bullet: 'bullet',
-	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Cruiser

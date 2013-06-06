@@ -543,6 +543,7 @@ function draw_right_buttons(){
 	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
 	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
 		PLACE = 'library';
+		unregister_buttons(PLACE);
 		var padding = 20;
 		//background
 		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
@@ -579,6 +580,7 @@ function draw_right_buttons(){
 	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
 	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
 		PLACE = 'library';
+		unregister_buttons(PLACE);
 		var padding = 20;
 		//background
 		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
@@ -911,8 +913,10 @@ function update_fps(){
 var red_line_y=0;
 //selecting tank window
 var last_selected = -1;
-function draw_tank_select_screen(selected_tank){
+var my_nation;
+function draw_tank_select_screen(selected_tank, selected_nation){
 	PLACE = 'select';
+	unregister_buttons(PLACE);
 	dynamic_title();
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
@@ -922,8 +926,10 @@ function draw_tank_select_screen(selected_tank){
 	var y = 10;
 	var gap = 8;
 	if(selected_tank == undefined){
-		if(game_mode == 1)
-			selected_tank = 0; 
+		if(game_mode == 1){
+			selected_tank = 0;
+			my_tank_nr = selected_tank;
+			}
 		else{
 			//find me
 			ROOM = get_room_by_id(opened_room_id);
@@ -936,6 +942,21 @@ function draw_tank_select_screen(selected_tank){
 				}
 			}
 		}
+	if(game_mode == 2){
+		ROOM = get_room_by_id(opened_room_id);
+		var my_team;
+		for(var t in ROOM.players){
+			if(ROOM.players[t].name == name)
+				my_team=ROOM.players[t].team;
+			}
+		my_nation = get_nation_by_team(my_team);
+		}
+	else{
+		if(selected_nation != undefined)
+			my_nation = selected_nation;
+		if(my_nation == undefined)
+			my_nation = 'us';
+		}
 	
 	//background
 	if(last_selected == -1)
@@ -947,37 +968,58 @@ function draw_tank_select_screen(selected_tank){
 	preview_y = 80;
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
+		if(my_nation == undefined)
+			my_nation = 'us';
+		var locked = false;
+		if(check_nation_tank(TYPES[i].name, my_nation)==false)
+			locked = true;
+		
+		if(locked==true && selected_tank == i){
+			selected_tank++;
+			my_tank_nr = selected_tank;
+			if(TYPES[selected_tank].type != 'tank'){
+				selected_tank = 0;
+				my_tank_nr = selected_tank;
+				draw_tank_select_screen(selected_tank);
+				return false;
+				}
+			}
+		
 		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
 			y = y + preview_y+gap;
 			j = 0;
 			}
-		if(i == selected_tank || i == last_selected || last_selected==-1){
-			//reset background
-			var back_color = '';
-			if(selected_tank != undefined && selected_tank == i)
-				back_color = "#8fc74c"; //selected
-			else
-				back_color = "#dbd9da";
-			canvas_backround.fillStyle = back_color;
-			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 15+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
-			
-			//logo
-			var pos1 = 15+j*(preview_x+gap);
-			var pos2 = y;
+
+		//reset background
+		var back_color = '';
+		if(selected_tank != undefined && selected_tank == i)
+			back_color = "#8fc74c"; //selected
+		else
+			back_color = "#dbd9da";
+		canvas_backround.fillStyle = back_color;
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, 15+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+		
+		//logo
+		var pos1 = 15+j*(preview_x+gap);
+		var pos2 = y;
+		if(locked==false)
 			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
-			
-			//if bonus
-			ROOM = get_room_by_id(opened_room_id);
-			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
-				draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
-			
-			//register button
+		else
+			draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
+		
+		//if bonus
+		ROOM = get_room_by_id(opened_room_id);
+		if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
+			draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
+
+		//register button
+		if(locked==false){
 			register_button(15+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				if(game_mode == 2){
 					ROOM = get_room_by_id(opened_room_id);
 					if(ROOM.settings[0]=='normal' || ROOM.settings[0]=='counter'){
-						if(TYPES[index].bonus != undefined && DEBUG == false){
+						if(TYPES[index].bonus != undefined){
 							return false;
 							}
 						else{
@@ -996,7 +1038,6 @@ function draw_tank_select_screen(selected_tank){
 		}
 	last_selected = selected_tank;
 	y = y + preview_y+10;
-	
 	
 	//tank info block
 	var info_left = 15;
@@ -1023,7 +1064,33 @@ function draw_tank_select_screen(selected_tank){
 		}
 		
 	if(game_mode == 1){
-		show_countries_selection(canvas_backround, info_left+585+15, y);
+		preview_x = 50;
+		preview_y = 40;	
+		x = info_left+585+1+gap;
+		j=0;
+		for(var i in COUNTRIES){
+			//reset background
+			var back_color = '';
+			if(my_nation == i)
+				back_color = "#8fc74c"; //selected
+			else
+				back_color = "#dbd9da";
+			canvas_backround.fillStyle = back_color;
+			canvas_backround.strokeStyle = "#196119";
+			roundRect(canvas_backround, x+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+			
+			//logo
+			var flag_size = IMAGES_SETTINGS.general[COUNTRIES[i].file];
+			var pos1 = x+j*(preview_x+gap) + round((preview_x-flag_size.w)/2);
+			var pos2 = y + round((preview_y-flag_size.h)/2);
+			draw_image(canvas_backround, COUNTRIES[i].file, pos1, pos2);
+			
+			//register button
+			register_button(x+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+				draw_tank_select_screen(index[0], index[1]);
+				}, [selected_tank, COUNTRIES[i].file]);
+			j++;
+			}
 		}
 		
 	y = y + info_block_height+10;
@@ -1113,40 +1180,6 @@ function draw_tank_select_screen(selected_tank){
 			starting_timer = START_GAME_COUNT_MULTI;
 		}
 	draw_timer_graph();
-	}
-var my_nation;
-function show_countries_selection(canvas, x, y, selected_item){
-	j=0;
-	var gap = 8;
-	preview_x = 50;
-	preview_y = 40;	
-	if(selected_item != undefined)
-		my_nation = selected_item;
-	if(my_nation == undefined)
-		my_nation = 'us';
-	for(var i in COUNTRIES){
-		//reset background
-		var back_color = '';
-		if(my_nation == i)
-			back_color = "#8fc74c"; //selected
-		else
-			back_color = "#dbd9da";
-		canvas.fillStyle = back_color;
-		canvas.strokeStyle = "#196119";
-		roundRect(canvas, x+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
-		
-		//logo
-		var flag_size = IMAGES_SETTINGS.general[COUNTRIES[i].file];
-		var pos1 = x+j*(preview_x+gap) + round((preview_x-flag_size.w)/2);
-		var pos2 = y + round((preview_y-flag_size.h)/2);
-		draw_image(canvas, COUNTRIES[i].file, pos1, pos2);
-		
-		//register button
-		register_button(x+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
-			show_countries_selection(canvas, x, y, index);
-			}, i);
-		j++;
-		}
 	}
 function draw_timer_graph(){
 	graph_width=WIDTH_APP-30;

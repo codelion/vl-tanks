@@ -543,8 +543,10 @@ function draw_counter_tank_selection(selected_tank){
 	//tanks
 	var j=0;
 	var row = 0;
+	var nation = get_nation_by_team(MY_TANK.team);
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
+		if(check_nation_tank(TYPES[i].name, nation)==false) continue;
 		if(i == selected_tank || i == last_selected_counter || last_selected_counter==-1){
 			//reset background
 			var back_color = '';

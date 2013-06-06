@@ -1312,18 +1312,58 @@ function get_tank_by_id(tank_id){
 		}
 	return false;
 	}
+function check_nation_tank(tank_name, nation){
+	for(var x in COUNTRIES[nation].tanks_lock){
+		if(COUNTRIES[nation].tanks_lock[x] == tank_name){
+			return false;
+			}
+		}
+	return true;
+	}
 //choose tanks on mirror/random
 function choose_and_register_tanks(ROOM){
 	//get possible types
-	var possible_types = [];
+	var possible_types_ally = [];
+	var possible_types_enemy = [];
+	first_team = ROOM.players[0].team;
+	
+	//first team possible types
+	var nation = get_nation_by_team(first_team);
 	for(var t in TYPES){
-		if(TYPES[t].type=='tank')
-			possible_types.push(t);
+		if(TYPES[t].type != 'tank') continue;
+		if(check_nation_tank(TYPES[t].name, nation)==false) continue;
+		possible_types_ally.push(t);
 		}
-	//choose
+	
+	//second team possible types
+	nation = '';
+	for(var p in ROOM.players){
+		if(ROOM.players[p].team == first_team) continue;
+		nation = get_nation_by_team(ROOM.players[p].team);
+		break;
+		}
+	if(nation != ''){
+		for(var t in TYPES){
+			if(TYPES[t].type != 'tank') continue;
+			if(check_nation_tank(TYPES[t].name, nation)==false) continue;
+			possible_types_enemy.push(t);
+			}
+		}
+	
+	//choose types
 	if(ROOM.settings[0]=='random'){
+		first_team = ROOM.players[0].team;
+		//first team
 		for(var p in ROOM.players){
-			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
+			if(ROOM.players[p].team != first_team) continue;
+			random_type = possible_types_ally[getRandomInt(0, possible_types_ally.length-1)];//randomize
+			//register
+			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
+			}
+		//second team	
+		for(var p in ROOM.players){
+			if(ROOM.players[p].team == first_team) continue;
+			random_type = possible_types_enemy[getRandomInt(0, possible_types_enemy.length-1)];//randomize
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
 			}
@@ -1334,7 +1374,7 @@ function choose_and_register_tanks(ROOM){
 		//first team
 		for(var p in ROOM.players){
 			if(ROOM.players[p].team != first_team) continue;
-			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
+			random_type = possible_types_ally[getRandomInt(0, possible_types_ally.length-1)];//randomize
 			selected_types.push(random_type);
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
@@ -1344,11 +1384,12 @@ function choose_and_register_tanks(ROOM){
 			if(ROOM.players[p].team == first_team) continue;
 			//get index
 			random_type_i = getRandomInt(0, selected_types.length-1);
+			
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i], false);
 
 			//remove selected type
-			selected_types.splice(i, 1);  i--;
+			selected_types.splice(random_type_i, 1);  i--;
 			}
 		}
 	}

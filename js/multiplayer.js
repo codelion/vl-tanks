@@ -413,10 +413,13 @@ function get_packet(fromClient, message){
 						ROOM.players[p].tank = DATA[1];
 						}
 					}
-				if(DATA[2]==name)
+				if(DATA[2]==name){
+					//me
 					my_tank_nr = DATA[1];
-				//redraw
-				draw_tank_select_screen();
+					draw_tank_select_screen(my_tank_nr);
+					}
+				else
+					draw_tank_select_screen();
 				}
 			}
 		else if(PLACE=="game" && DATA[3] == true){

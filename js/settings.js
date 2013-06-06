@@ -1,5 +1,5 @@
 //game settings
-var VERSION = "1.4.4";			//app version
+var VERSION = "1.5";			//app version
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons

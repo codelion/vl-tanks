@@ -500,7 +500,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map, nation1,
 	//notice
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Normal 12px Arial";
-	text = "Notice: While you hosting game, please do not switch this tab or minimize browser while game is active.";
+	text = "Notice: If you are hosting game, please do not switch this tab or minimize browser while game is active.";
 	canvas_backround.fillText(text, 10+offset_left, 120+offset_top);
 	}
 //room waiting for players

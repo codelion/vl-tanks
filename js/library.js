@@ -341,6 +341,8 @@ function draw_library_countries(selected_item){
 	var st=0;
 	var xx = info_left+10;
 	lib_show_stats("Description", COUNTRIES[country].description, xx, y+50+st*height_space, 90); st++;
-	lib_show_stats("Pros", COUNTRIES[country].pros, xx, y+50+st*height_space, 90); st++;
-	lib_show_stats("Cons", COUNTRIES[country].cons, xx, y+50+st*height_space, 90); st++;
+	lib_show_stats("Pros", COUNTRIES[country].pros, xx, y+50+st*height_space, 90, true); st++;
+	lib_show_stats("Cons", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
+	lib_show_stats("Unique unit", COUNTRIES[country].tank_unique, xx, y+50+st*height_space, 90); st++;
+	lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
 	}
