@@ -1,6 +1,6 @@
 //game settings
 var VERSION = "1.5";			//app version
-var DEBUG = false;			//show debug info
+var DEBUG = true;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
@@ -81,7 +81,7 @@ var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mi
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join=-1;			//id of room, requested to join
 var render_mode = 'requestAnimationFrame';	//render mode
-var page_title_copy = '';		//copy of original title
+var page_title_copy = 'Moon wars';		//copy of original title
 var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed

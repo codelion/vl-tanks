@@ -641,14 +641,19 @@ function dynamic_title(data){
 	try{
 		if(page_title_copy=='') page_title_copy = parent.document.title;
 		if(PLACE == 'rooms'){
-			if(ROOMS.length>0)
-				parent.document.title = page_title_copy + " ["+ROOMS.length+"]";
+			if(ROOMS.length==1)
+				parent.document.title = page_title_copy + " ["+ROOMS.length+" room]";
+			else if(ROOMS.length > 1)
+				parent.document.title = page_title_copy + " ["+ROOMS.length+" rooms]";
 			else
 				parent.document.title = page_title_copy;
 			}
 		else if(PLACE == 'room'){
 			ROOM = get_room_by_id(data);
-			parent.document.title = page_title_copy + " ["+ROOM.players.length+"]";
+			if(ROOM.players.length==1)
+				parent.document.title = page_title_copy + " ["+ROOM.players.length+" player]";
+			else
+				parent.document.title = page_title_copy + " ["+ROOM.players.length+" players]";
 			}
 		else{
 			parent.document.title = page_title_copy;
