@@ -172,7 +172,7 @@ function AA_Bullets(TANK, descrition_only, settings_only, ai){
 	var power = 6 + (TANK.abilities_lvl[2]-1);
 	
 	if(descrition_only != undefined)
-		return 'Use armor piercing bullets that decrease enmy armor by '+power+'%.';
+		return 'Use armor piercing bullets that decrease enemy armor by '+power+'%.';
 	
 	TANK.pierce_armor = power;
 	
