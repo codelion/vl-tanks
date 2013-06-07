@@ -651,23 +651,23 @@ function check_collisions(xx, yy, TANK){
 	return false;
 	}
 //checks tanks levels
-function tank_level_handler(){	//once per second
+function tank_level_handler(){		//once per second
 	//check level-up
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tower') continue;
 		if(TYPES[TANKS[i].type].type == 'human') continue;
 		if(game_mode == 2 && TANKS[i].id != MY_TANK.id)	continue;	//not our business
-		if(TANKS[i].dead == 1) {
-			TANKS[i].death_time++;
-			continue; //dead
-			}
+		if(TANKS[i].dead == 1)	continue; //dead
+		
 		last_level = TANKS[i].level;
+		var tank_level_up_time = LEVEL_UP_TIME;
+		tank_level_up_time = apply_buff(TANKS[i], 'level_up', tank_level_up_time);
 		
 		//calc level
 		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets*TYPES[TANKS[i].type].attack_delay;
 		
-		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
-		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	
+		TANKS[i].level = Math.ceil(time_diff/tank_level_up_time);	
+		TANKS[i].sublevel = round(time_diff/tank_level_up_time*100) - TANKS[i].level*100 + 100;	
 		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
@@ -1158,13 +1158,16 @@ function death(tank){
 	delete tank.target_shoot_lock;
 	mouse_click_controll = false;
 	target_range=0;	
-	//removing buffs/debuffs
-	tank.buffs = [];
-
+	//tank.buffs = [];	//removing buffs?
+	
+	var respan_time;
 	if(tank.level < 3)
-		tank.respan_time = 5*1000+Date.now();
+		respan_time = 3*1000;	//minimum
 	else
-		tank.respan_time = (tank.level*1+2)*1000+Date.now();
+		respan_time = tank.level*1000;
+	respan_time = apply_buff(tank, 'respawn', respan_time);
+	respan_time = respan_time + Date.now();
+	tank.respan_time = respan_time;
 	}
 //add towers to map
 function add_towers(){
@@ -1209,10 +1212,8 @@ function get_nation_by_team(team){
 			return ROOM.nation1;
 		else if(team == 'R')
 			return ROOM.nation2;
-		else 
-			alert('Error: unknown teem: "'+team+'"');
 		}
-	alert('Error: can not find nation.');
+	log('Error: can not find nation.');
 	}
 //tank special ability activated	
 function do_ability(nr, TANK){

@@ -2,10 +2,6 @@
 Name: Moon wars
 Author: Vilius
 Email: www.viliusl@gmail.com
-
-TODO:
-	respawn buff
-	level_up buff
 */
 
 //init hello screen
@@ -286,6 +282,19 @@ function init_action(map_nr, my_team){
 				}
 			}
 		}
+	
+	//racial stats
+	for(i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'human') continue;
+		for(var b in COUNTRIES[TANKS[i].nation].buffs){
+			var buff = COUNTRIES[TANKS[i].nation].buffs[b];
+			TANKS[i].buffs.push({
+				name: buff.name,
+				power: buff.power,
+				type: buff.type,
+				});
+			}
+		}	
 	
 	//handler for mini map
 	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
