@@ -107,15 +107,11 @@ function draw_library_units(selected_tank){
 		//logo
 		var pos1 = 10+j*(preview_x+gap);
 		var pos2 = y;
-		if(TYPES[i].type != 'tower')
-			draw_image(canvas_backround, TYPES[i].name, pos1, pos2);
-		else{
-			var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
-			var pos_top = pos2 + (preview_y-TYPES[i].size[1])/2;
-			draw_tank_clone(
-				{type: i, size: function(){ return TYPES[i].size[1]; }},
-				pos_left, pos_top, 0, 1, canvas_backround);
-			}
+		var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
+		var pos_top = pos2 + (preview_y-TYPES[i].size[1])/2;
+		draw_tank_clone(
+			{type: i, size: function(){ return TYPES[i].size[1]; }},
+			pos_left, pos_top, 0, 1, canvas_backround);
 		
 		//register button
 		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
@@ -137,11 +133,11 @@ function draw_library_units(selected_tank){
 
 	//tank stats
 	if(selected_tank != undefined){
-		var pos1 = info_left+10 + (preview_x-TYPES[selected_tank].size[1])/2;	
-		var pos2 = y + round((info_block_height-preview_y)/2) + (preview_y-TYPES[selected_tank].size[1])/2;
-		draw_tank_clone(
-			{type: selected_tank, size: function(){ return TYPES[selected_tank].size[1]; }},
-			pos1, pos2, 0, 1, canvas_backround);
+		var pos1 = info_left+10 + (preview_x-preview_x)/2;	
+		var pos2 = y + round((info_block_height-preview_y)/2) + (preview_y-preview_y)/2;
+		
+		//hero	
+		draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
 		
 		//name
 		canvas_backround.font = "bold 18px Verdana";

@@ -2,6 +2,8 @@
 Name: Moon wars
 Author: Vilius
 Email: www.viliusl@gmail.com
+
+TODO:
 */
 
 //init hello screen
@@ -46,6 +48,7 @@ function init_game(first_time){
 		if(MUTE_FX==false){
 			var audio_fire = document.createElement('audio');
 			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXT);
+			audio_fire.volume = FX_VOLUME;
 			audio_fire.play();
 			}
 		});
@@ -206,6 +209,7 @@ function init_action(map_nr, my_team){
 		audio_main = document.createElement('audio');
 		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
 		audio_main.setAttribute('loop', 'loop');
+		audio_main.volume = MUSIC_VOLUME;
 		try{
 			audio_main.play();
 			}
@@ -222,8 +226,8 @@ function init_action(map_nr, my_team){
 	
 	auto_scoll_map();
 	
-	//add enemy if single player
-	if(game_mode==1){
+	//add bots if single player
+	if(game_mode != 2){
 		//get random type
 		var possible_types = [];
 		var random_type=0;
@@ -233,13 +237,19 @@ function init_action(map_nr, my_team){
 			}
 			
 		//friends
-		for(var i=1; i< MAPS[level-1].team_allies;){
+		var n = MAPS[level-1].team_allies;
+		if(game_mode == 3)
+			n = 7;
+		for(var i=1; i<n; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
-			if(DEBUG==false)
-				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
-			i++;
+			if(DEBUG==false){
+				if(game_mode == 3)
+					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation);
+				else
+					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
+				}
 			}
 		
 		//enemies
@@ -261,6 +271,7 @@ function init_action(map_nr, my_team){
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
+			if(game_mode == 3); break;
 			i++;
 			}
 		}
@@ -304,7 +315,8 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 	
-	bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
+	if(game_mode != 3)	
+		bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
@@ -517,6 +529,7 @@ function quit_game(init_next_game){
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
 	document.getElementById("chat_box").style.display = 'none';
+	document.getElementById("popup").style.display="none";
 	packets_used=0;
 	packets_all=0;
 	shift_pressed = false;
@@ -524,6 +537,7 @@ function quit_game(init_next_game){
 	frame_time = undefined;
 	intro_page = 0;
 	my_team = undefined;
+	map_offset = [0, 0];
 	
 	if(init_next_game != false){
 		init_game(false);
@@ -563,7 +577,7 @@ function starting_game_timer_handler(){
 	if(starting_timer==0){
 		starting_timer = -1;
 		clearInterval(start_game_timer_id);
-		if(game_mode == 1)
+		if(game_mode != 2)
 			init_action(level, 'R');
 		else{
 			ROOM = get_room_by_id(opened_room_id);

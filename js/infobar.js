@@ -143,10 +143,10 @@ function redraw_tank_stats(){
 	text = MY_TANK.kills;
 	canvas_backround.fillText(text, left_x_values, top_y);
 	
-	if(game_mode == 1)
-		death_padding = 28;
-	else
+	if(game_mode == 2)
 		death_padding = 20;
+	else
+		death_padding = 28;
 	
 	//deaths
 	canvas_backround.fillStyle = "#7b8a69";

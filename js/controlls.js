@@ -154,13 +154,13 @@ function on_mousemove_background(event){
 			if(mouseX > settings_positions[i].x && mouseX < settings_positions[i].x+settings_positions[i].width){
 				if(mouseY > settings_positions[i].y && mouseY < settings_positions[i].y+settings_positions[i].height){
 					//we have mouse over button
-					add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"], i);
+					add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"], i);
 					found = true;
 					}
 				}
 			}
 		if(found == false)
-			add_settings_buttons(canvas_backround, ["Single player","Multiplayer","Settings"], 99);		
+			add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"], 99);		
 		}
 	if(PLACE=='game'){
 		//mouse hover on abilities
@@ -199,10 +199,15 @@ function on_mousemove(event){
 		mouseX = event.layerX;
 		mouseY = event.layerY;
 		}
+	if(selection.drag == true){
+		selection.x2 = mouseX;
+		selection.y2 = mouseY;
+		}
 	mouse_pos = [mouseX, mouseY];
 	}	
+var selection = false;
 //mouse right click
-function on_mouse_right_click(event){
+function on_mouse_right_click(event){				//////////////////
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX-map_offset[0];
@@ -212,14 +217,30 @@ function on_mouse_right_click(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
+	if(selection.drag == true){
+		selection.drag = false;
+		selection.x2 = mouseX;
+		selection.y2 = mouseY;
+		
+		//unselect all
+		for(var i in TANKS)
+			delete TANKS[i].selected;
+		//select some
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].dead == 1) continue;
+			if(TYPES[TANKS[i].type].type != 'tank') continue;
+			if(TANKS[i].cx() < selection.x || TANKS[i].cx() > selection.x2 ) continue;
+			if(TANKS[i].cy() < selection.y || TANKS[i].cy() > selection.y2 ) continue;
+			TANKS[i].selected = 1;
+			}
+		}
 	if(PLACE == 'game')
-		soldiers_move(mouseX, mouseY);	
-	
+		soldiers_move(mouseX, mouseY);
 	return false;
 	}
 //mouse click 
-function on_mousedown(event){
-	if(event.which == 3) return false;
+function on_mousedown(event){					////////////////////
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX;
@@ -228,6 +249,18 @@ function on_mousedown(event){
 	else if(event.layerX) {
 		mouseX = event.layerX;
 		mouseY = event.layerY;
+		}
+	if(event.which == 3){	//right click
+		if(game_mode == 3){
+			selection = {
+				x: mouseX, 
+				y: mouseY,
+				x2: mouseX,
+				y2: mouseY,
+				drag: true,
+				};
+			}
+		return false;
 		}
 	if(PLACE != 'game'){
 		menu_pressed = false;	
@@ -333,4 +366,92 @@ function full_screenchange_handler(event){
 			init_game(false);
 			}	
 		}
+	}
+function popup_save(){
+	document.getElementById("popup").style.display="none";
+	var response={};
+	inputs = document.getElementsByTagName('input');
+	for (i = 0; i<inputs.length; i++) {
+		if(inputs[i].id.substr(0,11)=='popup_data_'){
+			var key = inputs[i].id.substr(11);
+			var value = inputs[i].value;
+			response[key] = value;
+			}
+		}
+	selects = document.getElementsByTagName('select');
+	for (i = 0; i<selects.length; i++) {
+		if(selects[i].id.substr(0,11)=='popup_data_'){
+			var key = selects[i].id.substr(11);
+			var value = selects[i].value;
+			response[key] = value;
+			}
+		}
+	handler = document.getElementById("popup_handler").value;
+	popup_active = false;
+	if(handler != ''){
+		handler = ""+handler;
+		window[handler](response);
+		}
+	}
+function popup(title, handler, settings, can_be_canceled){
+	var html='';
+	popup_active = true;
+	
+	html += '<h2>'+title+'</h2>';
+	html += '<input type="hidden" id="popup_handler" value="'+handler+'" />';
+	html += '<table style="width:99%;">';
+	for(var i in settings){
+		html += '<tr>';
+		html += '<td style="font-weight:bold;padding-right:3px;">'+settings[i].title+'</td>';
+		if(settings[i].name != undefined){
+			if(settings[i].value != undefined)
+				html += '<td><input style="width:100%;" type="text" id="popup_data_'+settings[i].name+'" value="'+settings[i].value+'" /></td>';
+			else if(settings[i].values != undefined){
+				html += '<td><select id="popup_data_'+settings[i].name+'">';
+				for(var j in settings[i].values)
+					html += '<option value="'+settings[i].values[j]+'">'+settings[i].values[j]+'</option>';
+				html += '</select></td>';
+				}
+			}
+		else	
+			//locked fields
+			html += '<td><input style="width:100%;color:#393939;padding-left:5px;" disabled="disabled" type="text" id="popup_data_'+settings[i].name+'" value="'+settings[i].value+'" /></td>';
+		html += '</tr>';
+		}
+	html += '</table>';
+	html += '<div style="text-align:center;margin-top:20px;">';
+	html += '<input type="button" onclick="popup_save();" class="button" value="OK" />';
+	if(can_be_canceled==undefined || can_be_canceled==true)
+		html += '<input type="button" onclick="popup_active=false;document.getElementById(\'popup\').style.display=\'none\';" class="button" value="Cancel" />';
+	html += '</div>';
+		
+	document.getElementById("popup").innerHTML = html;
+	document.getElementById("popup").style.display="block";
+	}
+function update_name(user_response){
+	name = user_response.name;
+	name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+	if(name==''){
+		var popup_settings=[];
+		popup_settings.push({
+			name: "name",
+			title: "Enter your name:",
+			value: name,
+			});
+		popup('Player name', 'update_name', popup_settings, false);
+		return false;
+		}
+	name = name[0].toUpperCase() + name.slice(1);
+	name = name.substring(0, 10);
+	setCookie("name", name, 30);
+	if(PLACE == 'library')
+		draw_settings();
+	}
+function update_counter(user_response){
+	START_GAME_COUNT_SINGLE = parseInt(user_response.number);
+	if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
+	if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
+	add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
+	setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
+	draw_settings();
 	}

@@ -30,6 +30,7 @@ function draw_status_bar(){
 //show mute music button in statusbar
 function draw_mute_music_button(){
 	PADDING = 55;
+	var width = 48;
 	
 	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Music";
@@ -40,11 +41,25 @@ function draw_mute_music_button(){
 	canvas_backround.font = "Bold 11px Arial";
 	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+9, HEIGHT_APP-18-5+14);
 	
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music');
+	//line
+	if(MUTE_MUSIC == false){
+		canvas_backround.beginPath();
+		var min = WIDTH_APP-PADDING+5;
+		var max = WIDTH_APP-PADDING+width-5;
+		var length = MUSIC_VOLUME * (max-min) + min;
+		canvas_backround.moveTo(min, HEIGHT_APP-7+0.5);
+		canvas_backround.lineTo(length, HEIGHT_APP-7+0.5);
+		canvas_backround.lineWidth = 1;
+		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.stroke();
+		}
+      
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music', WIDTH_APP-PADDING);
 	}
 //draw mute effects button in statusbar
 function draw_mute_fx_button(){
 	PADDING = 108;
+	var width = 48;
 	
 	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Sound";
@@ -55,7 +70,20 @@ function draw_mute_fx_button(){
 	canvas_backround.font = "Bold 11px Arial";
 	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+5, HEIGHT_APP-18-5+14);
 	
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx');
+	//line
+	if(MUTE_FX == false){
+		canvas_backround.beginPath();
+		var min = WIDTH_APP-PADDING+5;
+		var max = WIDTH_APP-PADDING+width-5;
+		var length = FX_VOLUME * (max-min) + min;
+		canvas_backround.moveTo(min, HEIGHT_APP-7+0.5);
+		canvas_backround.lineTo(length, HEIGHT_APP-7+0.5);
+		canvas_backround.lineWidth = 1;
+		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.stroke();
+		}
+	
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx', WIDTH_APP-PADDING);
 	}
 //show quality button in statusbar
 function draw_quality_button(first_run){
@@ -129,40 +157,77 @@ function draw_version(){
 	canvas_backround.fillText("v"+VERSION, PADDING, HEIGHT_APP-18-5+14);
 	}
 //do mute or unmute music
-function mute_unmute_music(){
-	if(MUTE_MUSIC==false){
-		//disable sound
-		MUTE_MUSIC = true;
-		setCookie("mute_music", "1", 30);
-		if(audio_main != undefined)
-			audio_main.pause();
-		}
-	else{
-		//enable sound
-		MUTE_MUSIC = false;
-		setCookie("mute_music", "0", 30);
-		try{
-			if(PLACE == 'game'){
-				audio_main = document.createElement('audio');
-				audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
-				audio_main.setAttribute('loop', 'loop');
-				audio_main.play();
+function mute_unmute_music(mouse_x, mouse_y, left_margin){
+	mode = 1;
+	if(mouse_y - HEIGHT_APP + 23 > 15){
+		mode = 2;
+		var min = left_margin+5;
+		var max = left_margin+48-5;
+		var power = 100 * (mouse_x - min) / (max - min);
+		if(power<0) power = 10;
+		if(power>100) power = 100;
+		power = round(power)/100;
+		MUSIC_VOLUME = power;
+		if(MUTE_MUSIC==true)
+			mode=1;
+		else{
+			try{
+				audio_main.volume = MUSIC_VOLUME;
 				}
-			}catch(error){}
+			catch(error){}
+			}
+		}
+	if(mode==1){
+		if(MUTE_MUSIC==false){
+			//disable sound
+			MUTE_MUSIC = true;
+			setCookie("mute_music", "1", 30);
+			if(audio_main != undefined)
+				audio_main.pause();
+			}
+		else{
+			//enable sound
+			MUTE_MUSIC = false;
+			setCookie("mute_music", "0", 30);
+			try{
+				if(PLACE == 'game'){
+					audio_main = document.createElement('audio');
+					audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
+					audio_main.setAttribute('loop', 'loop');
+					audio_main.volume = MUSIC_VOLUME;
+					audio_main.play();
+					}
+				}catch(error){}
+			}
 		}
 	draw_mute_music_button();
 	}
 //do mute or unmute effects
-function mute_unmute_fx(){
-	if(MUTE_FX==false){		
-		//disable sound
-		MUTE_FX = true;
-		setCookie("mute_fx", "1", 30);
+function mute_unmute_fx(mouse_x, mouse_y, left_margin){
+	mode = 1;
+	if(mouse_y - HEIGHT_APP + 23 > 15){
+		mode = 2;
+		var min = left_margin+5;
+		var max = left_margin+48-5;
+		var power = 100 * (mouse_x - min) / (max - min);
+		if(power<0) power = 10;
+		if(power>100) power = 100;
+		power = round(power)/100;
+		FX_VOLUME = power;
+		if(MUTE_FX==true)
+			mode=1;
 		}
-	else{			
-		//enable sound
-		MUTE_FX = false;
-		setCookie("mute_fx", "0", 30);
+	if(mode==1){
+		if(MUTE_FX==false){
+			//disable sound
+			MUTE_FX = true;
+			setCookie("mute_fx", "1", 30);
+			}
+		else{	
+			//enable sound
+			MUTE_FX = false;
+			setCookie("mute_fx", "0", 30);
+			}
 		}
 	draw_mute_fx_button();
 	}

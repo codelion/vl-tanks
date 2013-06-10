@@ -534,6 +534,7 @@ function get_packet(fromClient, message){
 			try{
 				audio_finish = document.createElement('audio');
 				audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+				audio_finish.volume = FX_VOLUME;
 				audio_finish.play();
 				}
 			catch(error){}

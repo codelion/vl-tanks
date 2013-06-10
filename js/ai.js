@@ -1,10 +1,10 @@
 function check_path_AI(TANK){
 	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
-	if(game_mode == 1)
-		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
-	else
+	if(game_mode == 2)
 		TANK.ai_reuse = 1000+Date.now();	//second pause
+	else
+		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
 	if(TANK.dead==1) return false;	//dead
 	
 	var tank_size = TYPES[TANK.type].size[1];
@@ -16,7 +16,7 @@ function check_path_AI(TANK){
 	
 	//if in battle - stop
 	if(TANK.last_bullet_time + 1000 - Date.now() > 0){
-		if(game_mode == 1){
+		if(game_mode != 2){
 			TANK.move = 0;
 			try_skills(TANK);
 			}
@@ -86,7 +86,7 @@ function set_random_path_AI(TANK){
 		else
 			do_ai_move(TANK, 0, TANK.y, 'left');	//must turn left
 		}
-	if(game_mode == 1){
+	if(game_mode != 2){
 		TANK.move=1;
 		}
 	}
@@ -191,6 +191,7 @@ function soldiers_move(mouseX, mouseY){
 				try{
 					audio_finish = document.createElement('audio');
 					audio_finish.setAttribute('src', '../sounds/click.ogg');
+					audio_finish.volume = FX_VOLUME;
 					audio_finish.play();
 					}
 				catch(error){}

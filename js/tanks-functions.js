@@ -239,7 +239,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 		if(valid==false) continue;	//lets avoid exploits/immortality here		
 		
 		//add effect
-		if(game_mode == 1){
+		if(game_mode != 2){
 			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
@@ -286,7 +286,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode == 1){
+		if(game_mode != 2){
 			//damage buff
 			TANKS[ii].buffs.push({
 				name: 'damage',
@@ -684,7 +684,7 @@ function check_mines(tank_id){
 			if(TYPES[TANKS[i].type].type != 'tank') continue;	//must be tank
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
-			if(game_mode == 1 && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
+			if(game_mode != 2 && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
 			var size = TYPES[TANKS[i].type].size[1];
 			if(TANKS[i].x+size > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
 				if(TANKS[i].y+size > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){
@@ -802,7 +802,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode == 1){
+		if(game_mode != 2){
 			//shield buff
 			TANKS[ii].buffs.push({
 				name: 'shield',
@@ -923,7 +923,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode == 1){
+		if(game_mode != 2){
 			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
@@ -1059,7 +1059,7 @@ function PL_Shield(TANK, descrition_only, settings_only, ai){
 function do_jump(tank_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_jump == undefined) return false;
-	if(game_mode == 1 && MAPS[level-1].ground_only != undefined) return false;
+	if(game_mode != 2 && MAPS[level-1].ground_only != undefined) return false;
 	if(TANK.name == name){
 		var mouseX = mouse_click_pos[0];
 		var mouseY = mouse_click_pos[1];
@@ -1133,7 +1133,7 @@ function do_jump(tank_id, skip_broadcast){
 	auto_scoll_map();
 		
 	//init reuse
-	if(game_mode == 1 || TANK.name == name){
+	if(game_mode != 2 || TANK.name == name){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_jump.reuse;
@@ -1402,7 +1402,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode == 1 || TANK.name == name){
+	if(game_mode != 2 || TANK.name == name){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_missile.reuse;
@@ -1506,7 +1506,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode == 1 || TANK.name == name){
+	if(game_mode != 2 || TANK.name == name){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_bomb.reuse;

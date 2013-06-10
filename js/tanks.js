@@ -199,20 +199,18 @@ function draw_tank(tank){
 //draw selected tank on selected place
 function draw_tank_clone(CLONE, x, y, angle, alpha, canvas){
 	x = x + map_offset[0];
-	y = y + map_offset[1];	
+	y = y + map_offset[1];		
 	if(alpha == undefined) alpha = 1;
 	if(canvas == undefined) canvas = canvas_main;
 
 	//draw tank base
 	canvas.save();
 	canvas.globalAlpha = alpha;
-	if(TYPES[CLONE.type].no_base_rotate === true){
-		//draw without rotation
+	if(TYPES[CLONE.type].no_base_rotate === true || angle == 0){
+		//without rotation
 		draw_image(canvas, TYPES[CLONE.type].name,
-			x, y, undefined, undefined,	
+			x, y, CLONE.size(), CLONE.size(),	
 			100, 0, TYPES[CLONE.type].size[1], TYPES[CLONE.type].size[1]);
-		canvas.translate(round(CLONE.size()/2), round(CLONE.size()/2));
-		canvas.rotate(angle * TO_RADIANS);
 		}
 	else{
 		canvas.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
@@ -398,7 +396,7 @@ function draw_bullets(TANK, time_gap){
 						TANKS[ii].stun = Date.now() + BULLETS[b].stun_effect;
 					
 					//do damage
-					if(game_mode == 1){
+					if(game_mode != 2){
 						var response = do_damage(TANK, TANKS[ii], BULLETS[b]);	
 						if(response === true)
 							ii--;	//tank dead and removed from array, must repeat	}
@@ -577,14 +575,27 @@ function draw_tank_move(mouseX, mouseY){
 			}
 		else{
 			if(found_something==false){
-				MY_TANK.move = 1;
-				MY_TANK.move_to = [mouseX, mouseY];
+				if(game_mode == 3){
+					for(var i in TANKS){
+						if(TANKS[i].team != MY_TANK.team) continue;
+						if(TANKS[i].dead == 1) continue;
+						if(TANKS[i].selected == 1){
+							TANKS[i].move = 1;
+							TANKS[i].move_to = [mouseX, mouseY];
+							}
+						}
+					}
+				else{
+					MY_TANK.move = 1;
+					MY_TANK.move_to = [mouseX, mouseY];
+					}
 				}
 			
 			if(MUTE_FX==false){
 				try{
 					audio_finish = document.createElement('audio');
 					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+					audio_finish.volume = FX_VOLUME;
 					audio_finish.play();
 					}
 				catch(error){}
@@ -671,7 +682,7 @@ function tank_level_handler(){		//once per second
 		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
-			if(game_mode == 1){
+			if(game_mode != 2){
 				TANKS[i].armor = TANKS[i].armor + TYPES[TANKS[i].type].armor[1];
 				TANKS[i].damage = TANKS[i].damage + TYPES[TANKS[i].type].damage[1];
 				if(TANKS[i].armor > TYPES[TANKS[i].type].armor[2])
@@ -682,7 +693,7 @@ function tank_level_handler(){		//once per second
 			
 			//ability level-up
 			var ability_nr = get_ability_to_ugrade(MY_TANK);
-			if(game_mode == 1){
+			if(game_mode != 2){
 				TANKS[i].abilities_lvl[ability_nr]++;
 				}
 			else{
@@ -693,7 +704,7 @@ function tank_level_handler(){		//once per second
 				
 			//update passive abilites
 			for(a in TYPES[TANKS[i].type].abilities){ 
-				if(game_mode != 1) continue;
+				if(game_mode == 2) continue;
 				if(TYPES[TANKS[i].type].abilities[a].passive == false) continue;
 				var nr = 1+parseInt(a);
 				var ability_function = TYPES[TANKS[i].type].abilities[a].name.replace(/ /g,'_');
@@ -876,7 +887,7 @@ function check_enemies(TANK){
 	if(TANK.automove == 1){
 		//soldiers stops for shooting
 		if(found == true && TANK.move == 1)
-			if(game_mode == 1)
+			if(game_mode != 2)
 				TANK.move = 0;
 			else{
 				var ROOM = get_room_by_id(opened_room_id);
@@ -890,7 +901,7 @@ function check_enemies(TANK){
 			
 		//soldiers continue to move if no enemies
 		if(found == false && TANK.move == 0)
-			if(game_mode == 1)
+			if(game_mode != 2)
 				TANK.move = 1;
 			else{
 				var ROOM = get_room_by_id(opened_room_id);
@@ -906,7 +917,7 @@ function check_enemies(TANK){
 	//if not found, do short pause till next search for enemies
 	if(found == false){
 		TANK.check_enemies_reuse = 1000/2+Date.now();	//half second pause
-		if(game_mode == 1)
+		if(game_mode != 2)
 			delete TANK.attacking;
 		else if(check_if_broadcast(TANK)==true && TANK.attacking != undefined){
 			var params = [
@@ -918,7 +929,7 @@ function check_enemies(TANK){
 	}
 //bullet shoot
 function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
-	if(game_mode == 1)
+	if(game_mode != 2)
 		TANK.attacking = TANK_TO;
 	
 	//check turret
@@ -935,7 +946,7 @@ function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
 		return false;
 		}
 	//do
-	if(game_mode == 1){
+	if(game_mode != 2){
 		var tmp = new Array();
 		tmp['x'] = TANK.cx();
 		tmp['y'] = TANK.cy();
@@ -981,6 +992,7 @@ function shoot_sound(TANK){
 	try{
 		var audio_fire = document.createElement('audio');
 		audio_fire.setAttribute('src', '../sounds/'+TYPES[TANK.type].fire_sound+SOUND_EXT);
+		audio_fire.volume = FX_VOLUME;
 		audio_fire.play();
 		}
 	catch(error){}
@@ -1003,6 +1015,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 		try{
 			var audio_fire = document.createElement('audio');
 			audio_fire.setAttribute('src', '../sounds/metal'+SOUND_EXT);
+			audio_fire.volume = FX_VOLUME;
 			audio_fire.play();
 			}
 		catch(error){}
@@ -1036,7 +1049,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 	
 	//check invisibility
 	if(TANK_TO.invisibility != undefined && BULLET.aoe_effect != undefined){
-		if(game_mode == 1)
+		if(game_mode != 2)
 			stop_camouflage(TANK_TO);
 		else
 			send_packet('del_invisible', [TANK_TO.id]);
@@ -1065,7 +1078,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 	//death	
 	else{	
 		//updates deaths
-		if(game_mode == 1){
+		if(game_mode != 2){
 			TANK_TO.deaths = TANK_TO.deaths + 1;
 			TANK_TO.score = TANK_TO.score + SCORES_INFO[2];
 			}
@@ -1078,13 +1091,13 @@ function do_damage(TANK, TANK_TO, BULLET){
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	//tanks without repawn
 			//base dead
 			if(TYPES[TANK_TO.type].name == "Base"){
-				if(game_mode == 1){
+				if(game_mode != 2){
 					draw_final_score(false, TANK_TO.team);
 					}
 				else
 					register_tank_action('end_game', opened_room_id, false, TANK_TO.team);
 				}
-			else if(TYPES[TANK_TO.type].name == "Tower" && game_mode == 1){
+			else if(TYPES[TANK_TO.type].name == "Tower" && game_mode != 2){
 				//tower dead - decreasing base armor
 				for(var b in TANKS){
 					if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
@@ -1113,7 +1126,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 			//if tank
 			if(TYPES[TANK_TO.type].type == 'tank'){
 				//update kills
-				if(game_mode == 1){
+				if(game_mode != 2){
 					killer.kills = killer.kills + 1;
 					//add score
 					TANK.score = TANK.score + SCORES_INFO[1];
@@ -1125,7 +1138,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 				}
 		
 			//player death			
-			if(game_mode == 1)
+			if(game_mode != 2)
 				death(TANK_TO);	
 			}
 		}
@@ -1195,13 +1208,13 @@ function add_towers(){
 		}
 	}
 function get_nation_by_team(team){
-	if(game_mode==1){
+	if(game_mode != 2){
 		for(var i in TANKS){
 			if(TANKS[i].team == team)
 				return TANKS[i].nation;
 			}
 		}
-	else if(game_mode==2){
+	else{
 		ROOM = get_room_by_id(opened_room_id);
 		for(var p in ROOM.players){
 			if(ROOM.players[p].team == team){
@@ -1225,7 +1238,7 @@ function do_ability(nr, TANK){
 	var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
 	var broadcast_mode = TYPES[TANK.type].abilities[nr-1].broadcast;
 	if(ability_function != undefined){
-		if(game_mode == 1){
+		if(game_mode != 2){
 			//execute
 			var ability_reuse = window[ability_function](TANK);
 			if(ability_reuse != undefined && ability_reuse != 0){
@@ -1240,7 +1253,7 @@ function do_ability(nr, TANK){
 				timed_functions.push(tmp);
 				}
 			}
-		else if(game_mode == 2){ //broadcasting
+		else{ //broadcasting
 			if(broadcast_mode==0){
 				//execute
 				var ability_reuse = window[ability_function](TANK);
@@ -1478,7 +1491,7 @@ function add_bots(random_id){
 
 	//prepare
 	if(DEBUG == true && game_mode == 2) return false;	//no need here
-	if(game_mode == 1)
+	if(game_mode != 2)
 		var random_id = Math.floor(Math.random()*9999999);
 	if(game_mode == 2 && random_id == undefined){
 		ROOM = get_room_by_id(opened_room_id);
@@ -1536,10 +1549,10 @@ function check_invisibility(TANK, force_check){
 		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
 			min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 		if(distance < min_range){	
-			if(game_mode == 1)
-				stop_camouflage(TANK);
-			else
+			if(game_mode == 2)
 				send_packet('del_invisible', [TANK.id]);
+			else
+				stop_camouflage(TANK);
 			}
 		}
 	}

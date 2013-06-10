@@ -1,11 +1,11 @@
 //game settings
-var VERSION = "1.5";			//app version
-var DEBUG = true;			//show debug info
+var VERSION = "1.5.1";			//app version
+var DEBUG = false;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
-var settings_font = "bold 18px Helvetica";	//default font for settings buttons
-var START_GAME_COUNT_SINGLE=15;		//second how much to count in singleplayer
-var START_GAME_COUNT_MULTI=20;		//second how much to count in multiplayer
+var settings_font="bold 18px Helvetica";//default font for settings buttons
+var START_GAME_COUNT_SINGLE = 15;	//second how much to count in singleplayer
+var START_GAME_COUNT_MULTI = 20;	//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
@@ -13,17 +13,17 @@ var SOCKET_ROOM_PREFIX = 'mv_';		//unique prefix for sockets library
 var MAX_SENT_PACKETS = 6000;		//max packets, that we can send to server per game
 var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
-var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
+var MINI_MAP_PLACE = [13,13,104,104,3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
+var SCORES_INFO = [10,40,-20,50,100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXT = '.ogg';			//default sound files extension
 var LEVEL_UP_TIME = 30;			//how much seconds must pass till level up
-var TOWER_HP_DAMAGE_IN_1VS1 = [0.7, 0.9];	//towers modifiers in multiplayer 1vs1
+var TOWER_HP_DAMAGE_IN_1VS1 = [0.7,0.9];//towers modifiers in multiplayer 1vs1
 var flag_width = 15;			//flag icon width
 var flag_height = 9;			//flag icon height
 var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
-var MAX_ABILITY_LEVEL=20;		//max ability level
-var INVISIBILITY_SPOT_RANGE=50;		//% of enemy range, if enemy comes close, invisibility wanishes.
+var MAX_ABILITY_LEVEL = 20;		//max ability level
+var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invisibility wanishes.
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
 var APP_URL = 'http://viliusle.github.io/vl-tanks/';
 var APP_EMAIL = 'www.viliusl@gmail.com';
@@ -43,13 +43,15 @@ var PLAYERS = new Array();		//players list
 var opened_room_id = -1;		//active room id
 var WIDTH_MAP;				//map width, if big, offset start to work (works as scroll)
 var HEIGHT_MAP;				//map height, if big, offset start to work (works as scroll)
-var WIDTH_SCROLL;				//visible map part width, similar to WIDTH_APP
+var WIDTH_SCROLL;			//visible map part width, similar to WIDTH_APP
 var HEIGHT_SCROLL;			//visible map part height, = HEIGHT_APP - status bar height
 var APP_SIZE_CACHE = [WIDTH_APP, HEIGHT_APP]; //original app dimensions cache
 var MUTE_FX=false;			//if effects muted
 var MUTE_MUSIC=false;			//if backgrond music muted
+var MUSIC_VOLUME = 1;			//music volume, 0 - 1
+var FX_VOLUME = 1;			//sound effects volume, 0 - 1
 var level = 1;				//map index
-var name="user-"+Math.floor(Math.random()*9999);	//user name
+var name = '';				//user name
 var my_tank_nr = -1;			//my tank type: [0,1...n]
 var audio_main;				//main audio track controller
 var map_offset = [0, 0];		//map offest [x ,y], < 0, this is for map scrolling, if map bigger then canvas size
@@ -63,7 +65,7 @@ var mouse_pos = [0,0];			//current mouse position for external functions
 var mouse_click_pos = [0,0];		//last mouse click position for external functions
 var pre_draw_functions = [];		//extra functions executed before main draw loop
 var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
-var game_mode = 0;			//1=single player, 2=multi player
+var game_mode = 0;			//1=single player, 2=multi player, 3=commander mode
 var QUALITY = 3;			//1=low, 2=mid, 3=high
 var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room
 var preloaded=false;			//if all images preloaded
@@ -80,8 +82,8 @@ var TO_RADIANS = Math.PI/180; 		//for rotating
 var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join=-1;			//id of room, requested to join
-var render_mode = 'requestAnimationFrame';	//render mode
-var page_title_copy = 'Moon wars';		//copy of original title
+var render_mode='requestAnimationFrame';//render mode
+var page_title_copy = 'Moon wars';	//copy of original title
 var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed
@@ -121,6 +123,7 @@ document.getElementById("canvas_backround").addEventListener('mouseup', on_mouse
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 canvas_base.addEventListener('mouseup', on_mouse_up, false);
 document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
+//document.onmousedown = function(e) {return on_mousedown(e); }
 
 //keyboard handlers
 document.onkeydown = function(e) {return on_keyboard_action(e); }

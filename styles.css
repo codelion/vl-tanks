@@ -70,7 +70,8 @@ div, form{
 	padding:0px;
 }
 input{
-	border:1px solid #777777;
+	/*border:1px solid #777777;*/
+	border:1px solid #393939;
 	}
 hr {
 	background-color: #e7e7e7;
@@ -165,6 +166,27 @@ canvas{
 	}
 #chat_box div{
 	margin-bottom:3px;
+	}
+#popup{
+	position:relative;
+	border:1px solid #393939;
+	background-color:#727272;
+	width:400px;
+	margin:0px auto 0px auto;
+	top:150px;
+	display:none;
+	padding:10px;
+	font-size:11px;
+	}
+#popup h2{
+	margin-top:0px;
+	color:#0e340e;
+	}
+#popup .button{
+	margin-right:5px;
+	background-color:#69a126;
+	width:60px;
+	height:25px;
 	}
 /*========== CLASSES =========================================================*/
 .alert{
