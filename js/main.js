@@ -211,13 +211,13 @@ function init_action(map_nr, my_team){
 			}
 		catch(error){}
 		}
-
-	add_towers();
-
+	
 	//create ... me
 	if(game_mode==1 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
 		my_tank_nr = 0;
-	add_tank(1, name, name, my_tank_nr, my_team);
+	if(game_mode==2)
+		my_nation = get_nation_by_team(my_team);
+	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
 	auto_scoll_map();
@@ -238,24 +238,34 @@ function init_action(map_nr, my_team){
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			if(DEBUG==false)
-				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, undefined, undefined, undefined, true);
+				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
 			i++;
 			}
 		
 		//enemies
 		enemy_team = 'B';
 		if(enemy_team == my_team)
-			enemy_team = 'R';	
+			enemy_team = 'R';
+		//find nation
+		enemy_nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != my_nation)
+				enemy_nation_tmp.push(n);
+			}
+		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
+		//create
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 				//random_type = 4;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
-			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, undefined, undefined, undefined, true);
+			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
 			i++;
 			}
 		}
+		
+	add_towers();
 
 	sync_multiplayers();
 	
@@ -272,6 +282,19 @@ function init_action(map_nr, my_team){
 				}
 			}
 		}
+	
+	//racial stats
+	for(i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'human') continue;
+		for(var b in COUNTRIES[TANKS[i].nation].buffs){
+			var buff = COUNTRIES[TANKS[i].nation].buffs[b];
+			TANKS[i].buffs.push({
+				name: buff.name,
+				power: buff.power,
+				type: buff.type,
+				});
+			}
+		}	
 	
 	//handler for mini map
 	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
@@ -313,6 +336,7 @@ var IMAGES_SETTINGS = {
 		skill_off:	{ x:0,	y:150,w:65,	h:65 },
 		skill_on:	{ x:0,	y:250,w:65,	h:65 },
 		statusbar:	{ x:0,	y:350,w:800,h:130 },
+		he3:	{ x:100,	y:100,w:13,h:20 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },
@@ -499,6 +523,7 @@ function quit_game(init_next_game){
 	chat_shifted=false;
 	frame_time = undefined;
 	intro_page = 0;
+	my_team = undefined;
 	
 	if(init_next_game != false){
 		init_game(false);
@@ -616,14 +641,19 @@ function dynamic_title(data){
 	try{
 		if(page_title_copy=='') page_title_copy = parent.document.title;
 		if(PLACE == 'rooms'){
-			if(ROOMS.length>0)
-				parent.document.title = page_title_copy + " ["+ROOMS.length+"]";
+			if(ROOMS.length==1)
+				parent.document.title = page_title_copy + " ["+ROOMS.length+" room]";
+			else if(ROOMS.length > 1)
+				parent.document.title = page_title_copy + " ["+ROOMS.length+" rooms]";
 			else
 				parent.document.title = page_title_copy;
 			}
 		else if(PLACE == 'room'){
 			ROOM = get_room_by_id(data);
-			parent.document.title = page_title_copy + " ["+ROOM.players.length+"]";
+			if(ROOM.players.length==1)
+				parent.document.title = page_title_copy + " ["+ROOM.players.length+" player]";
+			else
+				parent.document.title = page_title_copy + " ["+ROOM.players.length+" players]";
 			}
 		else{
 			parent.document.title = page_title_copy;

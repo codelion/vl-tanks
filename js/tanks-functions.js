@@ -172,7 +172,7 @@ function AA_Bullets(TANK, descrition_only, settings_only, ai){
 	var power = 6 + (TANK.abilities_lvl[2]-1);
 	
 	if(descrition_only != undefined)
-		return 'Use armor piercing bullets that decrease enmy armor by '+power+'%.';
+		return 'Use armor piercing bullets that decrease enemy armor by '+power+'%.';
 	
 	TANK.pierce_armor = power;
 	
@@ -897,7 +897,7 @@ function Soldiers(TANK, descrition_only, settings_only, ai){
 		if(rand==undefined)
 			rand = getRandomInt(1, 999999);
 		id = 'bot'+TANK.team+(i+1)+":"+rand+":"+TANK.id;
-		add_tank(TANK.level, id, '', type, TANK.team, x, y, angle, false, TANK);
+		add_tank(TANK.level, id, '', type, TANK.team, TANK.nation, x, y, angle, false, TANK);
 		added_tank = get_tank_by_id(id);
 		added_tank.lifetime = Date.now() + reuse;	//will disappear later
 		}

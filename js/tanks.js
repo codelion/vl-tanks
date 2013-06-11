@@ -56,6 +56,7 @@ function draw_tank(tank){
 		//generate unique cache id
 		var cache_id = "";
 		cache_id += "T:"+tank.type+',';
+		cache_id += "NA:"+tank.nation+',';
 		cache_id += "A:"+tank.angle+',';
 		cache_id += "FA:"+tank.fire_angle+',';
 		cache_id += "Si:"+tank_size+',';
@@ -291,7 +292,7 @@ function add_player_name(tank){
 		var total_width = flag_width + flag_gap + tmp_object.measureText(player_name).width;
 		var name_pos_x = round(TYPES[tank.type].size[1]/2 + name_padding - total_width/2);
 		if(name_pos_x < 0) name_pos_x = 0;		
-		draw_image(tmp_object, COUNTRIES[tank.team].file, name_pos_x, 4);
+		draw_image(tmp_object, COUNTRIES[tank.nation].file, name_pos_x, 4);
 		
 		//name
 		tmp_object.fillStyle = "#000000";
@@ -650,22 +651,23 @@ function check_collisions(xx, yy, TANK){
 	return false;
 	}
 //checks tanks levels
-function tank_level_handler(){	//once per second
+function tank_level_handler(){		//once per second
+	//check level-up
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tower') continue;
 		if(TYPES[TANKS[i].type].type == 'human') continue;
 		if(game_mode == 2 && TANKS[i].id != MY_TANK.id)	continue;	//not our business
-		if(TANKS[i].dead == 1) {
-			TANKS[i].death_time++;
-			continue; //dead
-			}
+		if(TANKS[i].dead == 1)	continue; //dead
+		
 		last_level = TANKS[i].level;
+		var tank_level_up_time = LEVEL_UP_TIME;
+		tank_level_up_time = apply_buff(TANKS[i], 'level_up', tank_level_up_time);
 		
 		//calc level
 		time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets*TYPES[TANKS[i].type].attack_delay;
 		
-		TANKS[i].level = Math.ceil(time_diff/LEVEL_UP_TIME);	
-		TANKS[i].sublevel = round(time_diff/LEVEL_UP_TIME*100) - TANKS[i].level*100 + 100;	
+		TANKS[i].level = Math.ceil(time_diff/tank_level_up_time);	
+		TANKS[i].sublevel = round(time_diff/tank_level_up_time*100) - TANKS[i].level*100 + 100;	
 		
 		//do level changes	
 		if(TANKS[i].level != last_level){				//lvl changed
@@ -704,6 +706,9 @@ function tank_level_handler(){	//once per second
 				}
 			}
 		}
+	//he-3 regen
+	if(MY_TANK.dead != 1)
+		MY_TANK.he3 += 1; 
 	}
 //checks tanks hp regen
 function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
@@ -1153,13 +1158,16 @@ function death(tank){
 	delete tank.target_shoot_lock;
 	mouse_click_controll = false;
 	target_range=0;	
-	//removing buffs/debuffs
-	tank.buffs = [];
-
+	//tank.buffs = [];	//removing buffs?
+	
+	var respan_time;
 	if(tank.level < 3)
-		tank.respan_time = 5*1000+Date.now();
+		respan_time = 3*1000;	//minimum
 	else
-		tank.respan_time = (tank.level*1+2)*1000+Date.now();
+		respan_time = tank.level*1000;
+	respan_time = apply_buff(tank, 'respawn', respan_time);
+	respan_time = respan_time + Date.now();
+	tank.respan_time = respan_time;
 	}
 //add towers to map
 function add_towers(){
@@ -1173,7 +1181,8 @@ function add_towers(){
 				}
 			}
 		if(type=='') alert('Error: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
-		var team = MAPS[level-1]['towers'][i][0];	
+		var team = MAPS[level-1]['towers'][i][0];
+		var nation = get_nation_by_team(team);
 		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
 		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
 		var x = MAPS[level-1]['towers'][i][1] - round(TYPES[type].size[1]/2);
@@ -1182,8 +1191,29 @@ function add_towers(){
 		if(team != 'B')
 			angle = 0;
 		//add
-		add_tank(1, 'tow'+team+x+"."+y, '', type, team, x, y, angle);
+		add_tank(1, 'tow'+team+x+"."+y, '', type, team, nation, x, y, angle);
 		}
+	}
+function get_nation_by_team(team){
+	if(game_mode==1){
+		for(var i in TANKS){
+			if(TANKS[i].team == team)
+				return TANKS[i].nation;
+			}
+		}
+	else if(game_mode==2){
+		ROOM = get_room_by_id(opened_room_id);
+		for(var p in ROOM.players){
+			if(ROOM.players[p].team == team){
+				return ROOM.players[p].nation;
+				}
+			}
+		if(team == 'B')
+			return ROOM.nation1;
+		else if(team == 'R')
+			return ROOM.nation2;
+		}
+	log('Error: can not find nation.');
 	}
 //tank special ability activated	
 function do_ability(nr, TANK){
@@ -1283,18 +1313,58 @@ function get_tank_by_id(tank_id){
 		}
 	return false;
 	}
+function check_nation_tank(tank_name, nation){
+	for(var x in COUNTRIES[nation].tanks_lock){
+		if(COUNTRIES[nation].tanks_lock[x] == tank_name){
+			return false;
+			}
+		}
+	return true;
+	}
 //choose tanks on mirror/random
 function choose_and_register_tanks(ROOM){
 	//get possible types
-	var possible_types = [];
+	var possible_types_ally = [];
+	var possible_types_enemy = [];
+	first_team = ROOM.players[0].team;
+	
+	//first team possible types
+	var nation = get_nation_by_team(first_team);
 	for(var t in TYPES){
-		if(TYPES[t].type=='tank')
-			possible_types.push(t);
+		if(TYPES[t].type != 'tank') continue;
+		if(check_nation_tank(TYPES[t].name, nation)==false) continue;
+		possible_types_ally.push(t);
 		}
-	//choose
+	
+	//second team possible types
+	nation = '';
+	for(var p in ROOM.players){
+		if(ROOM.players[p].team == first_team) continue;
+		nation = get_nation_by_team(ROOM.players[p].team);
+		break;
+		}
+	if(nation != ''){
+		for(var t in TYPES){
+			if(TYPES[t].type != 'tank') continue;
+			if(check_nation_tank(TYPES[t].name, nation)==false) continue;
+			possible_types_enemy.push(t);
+			}
+		}
+	
+	//choose types
 	if(ROOM.settings[0]=='random'){
+		first_team = ROOM.players[0].team;
+		//first team
 		for(var p in ROOM.players){
-			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
+			if(ROOM.players[p].team != first_team) continue;
+			random_type = possible_types_ally[getRandomInt(0, possible_types_ally.length-1)];//randomize
+			//register
+			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
+			}
+		//second team	
+		for(var p in ROOM.players){
+			if(ROOM.players[p].team == first_team) continue;
+			random_type = possible_types_enemy[getRandomInt(0, possible_types_enemy.length-1)];//randomize
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
 			}
@@ -1305,7 +1375,7 @@ function choose_and_register_tanks(ROOM){
 		//first team
 		for(var p in ROOM.players){
 			if(ROOM.players[p].team != first_team) continue;
-			random_type = possible_types[getRandomInt(0, possible_types.length-1)];//randomize
+			random_type = possible_types_ally[getRandomInt(0, possible_types_ally.length-1)];//randomize
 			selected_types.push(random_type);
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, random_type, false);
@@ -1315,11 +1385,12 @@ function choose_and_register_tanks(ROOM){
 			if(ROOM.players[p].team == first_team) continue;
 			//get index
 			random_type_i = getRandomInt(0, selected_types.length-1);
+			
 			//register
 			register_tank_action('change_tank', ROOM.id, ROOM.players[p].name, selected_types[random_type_i], false);
 
 			//remove selected type
-			selected_types.splice(i, 1);  i--;
+			selected_types.splice(random_type_i, 1);  i--;
 			}
 		}
 	}
@@ -1428,6 +1499,7 @@ function add_bots(random_id){
 	var bot_nr = 0;
 	for (i in MAPS[level-1].bots){
 		team = MAPS[level-1].bots[i][0];
+		var nation = get_nation_by_team(team);
 		angle = 0;
 		if(team == 'B')
 			angle = 180;
@@ -1437,7 +1509,7 @@ function add_bots(random_id){
 			xx = Math.floor(MAPS[level-1].bots[i][1]*width_tmp/100) + g*gap;
 			yy = Math.floor(MAPS[level-1].bots[i][2]*height_tmp/100);
 			//add
-			add_tank(1, id, '', type, team, xx, yy, angle);
+			add_tank(1, id, '', type, team, nation, xx, yy, angle);
 			//change
 			TANK_added = get_tank_by_id(id);
 			TANK_added.automove = 1;	//will stop near enemies, and continue to move
@@ -1485,7 +1557,7 @@ function apply_buff(TANK, buff_name, original_value){
 	return original_value;
 	}
 //adds new tank
-function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, begin_time){
+function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_tank, begin_time){
 	if(type==undefined) type = 0;
 	var space = 35;
 	
@@ -1493,13 +1565,13 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 	if(x==undefined && y==undefined && angle==undefined){
 		if(team=='B'){	//blue top
 			x = round(APP_SIZE_CACHE[0]*5.5/10);
-			x = x + get_team_tanks_count(team)*space;
+			x = x + get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
 			y = 20;
 			angle = 180;
 			}
 		else{		//red bottom 
 			x = round(APP_SIZE_CACHE[0]*4/10);
-			x = x - get_team_tanks_count(team)*space;
+			x = x - get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
 			y = HEIGHT_MAP-20-TYPES[type].size[1];
 			angle = 0;
 			}
@@ -1520,6 +1592,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		name: name,
 		type: type,
 		team: team,
+		nation: nation,
 		x: x,
 		y: y,
 		angle: angle,
@@ -1550,6 +1623,7 @@ function add_tank(level, id, name, type, team, x, y, angle, AI, master_tank, beg
 		cache_tank: [],
 		buffs: [],	//buffs array
 		last_bullet_time: Date.now()-5000,
+		he3: 0,
 		};
 	if(AI != undefined)
 		TANK_tmp.use_AI = AI;

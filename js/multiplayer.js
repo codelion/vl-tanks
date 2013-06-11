@@ -335,7 +335,11 @@ function get_packet(fromClient, message){
 			if(team_b_n<team_r_n)
 				player_team = 'B';	
 			//join
-			ROOM.players.push({name: DATA[1], team: player_team});
+			ROOM.players.push({
+				name: DATA[1], 
+				team: player_team,
+				nation: get_nation_by_team(player_team),
+				});
 			
 			//repaint
 			if(PLACE=='room')
@@ -367,6 +371,7 @@ function get_packet(fromClient, message){
 						ROOM.players[j].team = 'B';
 					else if(ROOM.players[j].team == 'B' && ROOM.max/2 > team_r_n)
 						ROOM.players[j].team = 'R';
+					ROOM.players[j].nation = get_nation_by_team(ROOM.players[j].team);
 					}
 				}
 						
@@ -408,10 +413,13 @@ function get_packet(fromClient, message){
 						ROOM.players[p].tank = DATA[1];
 						}
 					}
-				if(DATA[2]==name)
+				if(DATA[2]==name){
+					//me
 					my_tank_nr = DATA[1];
-				//redraw
-				draw_tank_select_screen();
+					draw_tank_select_screen(my_tank_nr);
+					}
+				else
+					draw_tank_select_screen();
 				}
 			}
 		else if(PLACE=="game" && DATA[3] == true){
@@ -469,6 +477,7 @@ function get_packet(fromClient, message){
 				for(var i in ROOM.players){
 					if(ROOM.players[i].name == players_data[p].name){
 						ROOM.players[i].team = players_data[p].team;
+						ROOM.players[i].nation = get_nation_by_team(ROOM.players[i].team);
 						ROOM.players[i].tank = players_data[p].tank; 
 						break;
 						}
@@ -834,11 +843,12 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 		alert('Error, unknown action ['+action+'] in register_tank_action();');	
 	}
 //new room was created
-function register_new_room(room_name, mode, type, max_players, map){
+function register_new_room(room_name, mode, type, max_players, map, nation1, nation2){
 	var players = [];
 	players.push({
 		name: name, 
 		team: 'B',
+		nation: nation1,
 		ping: Date.now(),
 		});
 	
@@ -850,6 +860,8 @@ function register_new_room(room_name, mode, type, max_players, map){
 		host: name,
 		players: players,
 		version: VERSION,
+		nation1: nation1,
+		nation2: nation2,
 		};
 	ROOMS.push(ROOM);
 	send_packet('new_room', ROOM);						//broadcast it
@@ -860,7 +872,8 @@ function sync_multiplayers(){
 	var ROOM = get_room_by_id(opened_room_id);
 	for(var i in ROOM.players){
 		if(ROOM.players[i].name != name){	//if not me
-			add_tank(1, ROOM.players[i].name, ROOM.players[i].name, ROOM.players[i].tank, ROOM.players[i].team);
+			var nation = get_nation_by_team(ROOM.players[i].team);
+			add_tank(1, ROOM.players[i].name, ROOM.players[i].name, ROOM.players[i].tank, ROOM.players[i].team, nation);
 			}
 		}
 	}

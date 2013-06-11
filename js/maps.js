@@ -136,11 +136,11 @@ var maps_positions = [];
 //redraw actions in selecting tank/map window
 function show_maps_selection(canvas_this, top_height, can_select_map){
 	if(game_mode == 2) return false;
+	var gap = 8;
 	var button_width = 81;
 	var button_height = 81;
-	var gap = 10;
-	var letter_height = 8;
-	var selected_block_padding=0;
+				button_width = 90;
+				button_height = 80;
 	
 	maps_positions = [];
 	
@@ -148,14 +148,21 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 	canvas_backround.drawImage(IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 	
 	for (i in MAPS){
+		var padding_left = 15;
+		if(PLACE == 'library')
+			padding_left = 10;	
 		//background
-		canvas_this.fillStyle = "#cccccc";
-		canvas_this.fillRect(15+i*(button_width+gap)+1, top_height+1, (button_width-2), (button_width-2));
+		if(level - 1==i)
+			canvas_this.fillStyle = "#8fc74c";	//selected
+		else
+			canvas_this.fillStyle = "#cccccc";
+		canvas_this.strokeStyle = "#196119";
+		roundRect(canvas_this, padding_left+i*(button_width+gap), top_height, button_width, button_height, 5, true);
 		
 		//calcuate mini-size
 		mini_w = (button_width-2)/MAPS[i].width;
 		mini_h = (button_height-2)/MAPS[i].height;
-		var pos1 = 15+i*(button_width+gap)+Math.floor((button_width-70)/2)-5;
+		var pos1 = padding_left+i*(button_width+gap);
 		var pos2 = top_height;
 		
 		//paint towers
@@ -200,14 +207,14 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			canvas_this.fillStyle = "#196119";
 		canvas_this.font = "bold 14px Helvetica";
 		var letters_width = canvas_this.measureText(MAPS[i].name).width;
-		var padding_left = Math.round((button_width-letters_width)/2);
-		if(padding_left<0) padding_left=0;
-		canvas_this.fillText(MAPS[i].name, 15+i*(button_width+gap)+padding_left, top_height+1+button_height+gap+10);
+		var text_padding_left = Math.round((button_width-letters_width)/2);
+		if(text_padding_left<0) text_padding_left=0;
+		canvas_this.fillText(MAPS[i].name, padding_left+i*(button_width+gap)+text_padding_left, top_height+1+button_height+gap+10);
 		
 		if(can_select_map==true){
 			//save position
 			var tmp = new Array();
-			tmp['x'] = 15+i*(81+gap)+1;
+			tmp['x'] = padding_left+i*(button_width+gap)+1;
 			tmp['y'] = top_height+1;
 			tmp['width'] = button_width;
 			tmp['height'] = button_height;
@@ -231,11 +238,6 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 					}
 				});
 			}
-		if(level - 1==i)	//selected - show border
-			canvas_this.strokeStyle = "#ff0000";
-		else			//not selected
-			canvas_this.strokeStyle = "#196119";
-		roundRect(canvas_this, 15+i*(81+gap)-selected_block_padding, top_height-selected_block_padding, button_width+selected_block_padding*2, button_width+selected_block_padding*2, 4, false, true);
 		}
 	}
 //return map element info by name

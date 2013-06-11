@@ -191,7 +191,7 @@ function draw_rooms_list(message){
 		}
 	}
 //create new room window
-function draw_create_room(game_players, game_mode, game_type, game_map){
+function draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2){
 	if(game_players==undefined)
 		game_players='14';
 	if(game_mode==undefined)
@@ -200,8 +200,25 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		game_type='';
 	if(game_map==undefined)
 		game_map='Main';
-		
+	if(nation1==undefined){
+		nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != nation2)
+				nation_tmp.push(n);
+			}
+		nation1 = nation_tmp[getRandomInt(0, nation_tmp.length-1)];
+		}
+	if(nation2==undefined){
+		nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != nation1)
+				nation_tmp.push(n);
+			}
+		nation2 = nation_tmp[getRandomInt(0, nation_tmp.length-1)];
+		}
+			
 	PLACE = 'create_room';
+	unregister_buttons('create_room');
 	dynamic_title();
 	
 	//dynamic title
@@ -276,7 +293,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		//action
 		register_button(10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
 			game_players = extra;
-			draw_create_room(game_players, game_mode, game_type, game_map);
+			draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2);
 			}, values[i]);
 		
 		//text
@@ -310,7 +327,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		//action
 		register_button(10+offset_left+i*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
 			game_mode = extra;
-			draw_create_room(game_players, game_mode, game_type, game_map);
+			draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2);
 			}, values[i]);
 		
 		//text
@@ -344,7 +361,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		//action
 		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
 			game_map = extra;
-			draw_create_room(game_players, game_mode, game_type, game_map);
+			draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2);
 			}, MAPS[i].name);
 		
 		//text
@@ -358,6 +375,91 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 		j++;
 		}
 	offset_top = offset_top + 40;
+	
+	//my nation
+	canvas_backround.fillStyle = "#3f3b30";
+	canvas_backround.font = "Bold 13px Arial";
+	text = "First nation:";
+	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
+	button_width = button_width + 30;
+	j=0;
+	for(var i in COUNTRIES){
+		if(COUNTRIES[i].file == nation2){
+			j++;
+			continue;
+			}
+		//block
+		canvas_backround.strokeStyle = "#000000";
+		if(COUNTRIES[i].file == nation1)
+			canvas_backround.fillStyle = button_active_color;
+		else
+			canvas_backround.fillStyle = button_inactive_color;
+		roundRect(canvas_backround, 10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
+		
+		//action
+		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
+			if(extra==nation2) return false;
+			nation1 = extra;
+			draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2);
+			}, COUNTRIES[i].file);
+		
+		//flag
+		draw_image(canvas_backround, COUNTRIES[i].file, 10+offset_left+10+j*(button_width+button_gap), 60+offset_top+15);
+		
+		//text
+		if(COUNTRIES[i].file == nation1)
+			canvas_backround.fillStyle = "#ffffff";
+		else
+			canvas_backround.fillStyle = "#3f3b30";
+		canvas_backround.font = "Normal 12px Arial";
+		text = ucfirst(COUNTRIES[i].name);
+		canvas_backround.fillText(text, 20+10+offset_left+10+j*(button_width+button_gap), 60+offset_top+25);
+		j++;
+		}
+	offset_top = offset_top + 40;
+	
+	//enemy nation
+	canvas_backround.fillStyle = "#3f3b30";
+	canvas_backround.font = "Bold 13px Arial";
+	text = "Second nation:";
+	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
+	j=0;
+	for(var i in COUNTRIES){
+		if(COUNTRIES[i].file == nation1){
+			j++;
+			continue;
+			}
+		//block
+		canvas_backround.strokeStyle = "#000000";
+		if(COUNTRIES[i].file == nation2)
+			canvas_backround.fillStyle = button_active_color;
+		else
+			canvas_backround.fillStyle = button_inactive_color;
+		roundRect(canvas_backround, 10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
+		
+		//action
+		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
+			if(extra==nation1) return false;
+			nation2 = extra;
+			draw_create_room(game_players, game_mode, game_type, game_map, nation1, nation2);
+			}, COUNTRIES[i].file);
+		
+		//flag
+		draw_image(canvas_backround, COUNTRIES[i].file, 10+offset_left+10+j*(button_width+button_gap), 60+offset_top+15);
+		
+		//text
+		if(COUNTRIES[i].file == nation2)
+			canvas_backround.fillStyle = "#ffffff";
+		else
+			canvas_backround.fillStyle = "#3f3b30";
+		canvas_backround.font = "Normal 12px Arial";
+		text = ucfirst(COUNTRIES[i].name);
+		canvas_backround.fillText(text, 20+10+offset_left+10+j*(button_width+button_gap), 60+offset_top+25);
+		j++;
+		}
+	offset_top = offset_top + 40;
+	
+	
 	
 	offset_top = offset_top + 20;
 	//create button block
@@ -373,7 +475,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	
 	//register button
 	register_button(10+offset_left, 60+offset_top, 105, 30, PLACE, function(){
-		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map);
+		new_id = register_new_room(game_name, game_mode, game_type, game_players, game_map, nation1, nation2);
 		draw_room(new_id);
 		room_controller("room"+new_id);
 		});	
@@ -398,7 +500,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map){
 	//notice
 	canvas_backround.fillStyle = "#000000";
 	canvas_backround.font = "Normal 12px Arial";
-	text = "Notice: While you hosting game, please do not switch this tab or minimize browser while game is active.";
+	text = "Notice: If you are hosting game, please do not switch this tab or minimize browser while game is active.";
 	canvas_backround.fillText(text, 10+offset_left, 120+offset_top);
 	}
 //room waiting for players
@@ -564,7 +666,7 @@ function draw_room(room_id){
 			roundRect(canvas_backround, x1, y, width, height, 0, true);
 			
 			//flag
-			draw_image(canvas_backround, COUNTRIES.B.file, x1+flag_space, y+flag_space);
+			draw_image(canvas_backround, ROOM.nation1, x1+flag_space, y+flag_space);
 			
 			//name
 			text = players[i].name;
@@ -615,7 +717,7 @@ function draw_room(room_id){
 			roundRect(canvas_backround, x2, y, width, height, 0, true);
 			
 			//flag
-			draw_image(canvas_backround, COUNTRIES.R.file, x2+flag_space, y+flag_space);
+			draw_image(canvas_backround, ROOM.nation2, x2+flag_space, y+flag_space);
 			
 			//name
 			text = players[i].name;

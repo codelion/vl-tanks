@@ -58,6 +58,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 	ctx.lineTo(x, y + radius);
 	ctx.quadraticCurveTo(x, y, x + radius, y);
 	ctx.closePath();
+	ctx.lineWidth = 1;
 	if (stroke)	
 		ctx.stroke();	//borders
 	if (fill)	
