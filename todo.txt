@@ -1,9 +1,7 @@
+countries: usa, russia, chinna
 IDEAS
-	cartoonish design
-		red blue green
 	number of opponents on single
 	fog on/off	
-	truck -> APC/LAV
 	Helium3
 		base, mines generates, spawn takes, on 0 - team dies.
 		H3 mines give your base more energy and your towers more attacking power. 

@@ -43,6 +43,21 @@ function draw_library_list(next){
 	canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
 	x = x + 100+10;
 	
+	//countries button
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#69a126";
+	roundRect(canvas_backround, x, y, width, height, 5, true);
+	register_button(x, y, width, height, PLACE, function(xx, yy){
+		draw_library_countries();
+		});
+	//text
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "Bold 13px Helvetica";
+	text = "Countries";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+	x = x + 100+10;
+	
 	//back button
 	width = 80;
 	canvas_backround.strokeStyle = "#000000";
@@ -250,4 +265,84 @@ function lib_show_stats(name, value, x, y, gap, nobold, min_char_value, max_char
 			canvas_backround.fillStyle = "#69a126";
 		canvas_backround.fillRect(x, y-height, width, height);
 		}
+	}
+function draw_library_countries(selected_item){
+	draw_library_list(false);
+	var y = TOP;
+	var gap = 8;
+	
+	if(selected_item==undefined) selected_item = 0;
+	//show list
+	preview_x = 90;
+	preview_y = 80;
+	var j=0;
+	var country;
+	for(var i in COUNTRIES){
+		if(selected_item == j)
+			country = i;
+		
+		//reset background
+		var back_color = '';
+		if(selected_item == j)
+			back_color = "#8fc74c"; //selected
+		else
+			back_color = "#dbd9da";
+		canvas_backround.fillStyle = back_color;
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+		
+		//logo
+		var flag_size = IMAGES_SETTINGS.general[COUNTRIES[i].file];
+		var pos1 = 10+j*(preview_x+gap) + round((preview_x-flag_size.w)/2);
+		var pos2 = y + round((preview_y-flag_size.h)/2);
+		draw_image(canvas_backround, COUNTRIES[i].file, pos1, pos2);
+		
+		//name
+		if(selected_item == j)
+			canvas_backround.fillStyle = "#c10000"; //selected
+		else
+			canvas_backround.fillStyle = "#196119";
+		canvas_backround.font = "bold 14px Helvetica";
+		var letters_width = canvas_backround.measureText(COUNTRIES[i].name).width;
+		var padding_left = Math.round((preview_x-letters_width)/2);
+		canvas_backround.fillText(COUNTRIES[i].name, 10+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
+		
+		//register button
+		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			//index;
+			draw_library_countries(index);
+			}, j);
+		j++;
+		}
+	y = y + preview_y+40;	
+	
+	//tank info block
+	var info_left = 10;
+	var info_block_height = HEIGHT_APP-27-y-10;
+	var info_block_width = WIDTH_APP-20;
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.strokeStyle = "#196119";
+	roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
+
+	//stats
+	
+	//flag
+	draw_image(canvas_backround, COUNTRIES[country].file, info_left+10, y+13);
+	
+	//name
+	canvas_backround.font = "bold 18px Verdana";
+	canvas_backround.fillStyle = "#196119";
+	text = COUNTRIES[country].name;
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, info_left+30, y+25);
+	
+	//description
+	var height_space = 16;
+	var st=0;
+	var xx = info_left+10;
+	lib_show_stats("Description", COUNTRIES[country].description, xx, y+50+st*height_space, 90); st++;
+	lib_show_stats("Pros", COUNTRIES[country].pros, xx, y+50+st*height_space, 90, true); st++;
+	lib_show_stats("Cons", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
+	lib_show_stats("Unique unit", COUNTRIES[country].tank_unique, xx, y+50+st*height_space, 90); st++;
+	lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
 	}

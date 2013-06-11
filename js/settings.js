@@ -1,5 +1,6 @@
 //game settings
-var VERSION = "1.4.4";			//app version
+var VERSION = "1.5";			//app version
+var DEBUG = false;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
 var settings_font = "bold 18px Helvetica";	//default font for settings buttons
@@ -14,7 +15,6 @@ var INFO_HEIGHT = 130;			//height of information block
 var STATUS_HEIGHT = 25;			//height of statusbar
 var MINI_MAP_PLACE = [13, 13, 104, 104, 3];	//x, y, width, height, border width
 var SKILL_BUTTON = 55;			//skill button width and height
-var DEBUG = false;			//show debug info
 var SCORES_INFO = [10, 40, -20, 50, 100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXT = '.ogg';			//default sound files extension
 var LEVEL_UP_TIME = 30;			//how much seconds must pass till level up
@@ -81,7 +81,7 @@ var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mi
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join=-1;			//id of room, requested to join
 var render_mode = 'requestAnimationFrame';	//render mode
-var page_title_copy = '';		//copy of original title
+var page_title_copy = 'Moon wars';		//copy of original title
 var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
 var shift_pressed = false;		//if shift is pressed
