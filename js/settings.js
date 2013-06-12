@@ -1,5 +1,5 @@
 //game settings
-var VERSION = "1.5.1";			//app version
+var VERSION = "1.5";			//app version
 var DEBUG = false;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var FPS = 25;				//frames per second
