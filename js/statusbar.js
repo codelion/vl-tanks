@@ -169,7 +169,7 @@ function mute_unmute_music(mouse_x, mouse_y, left_margin){
 		power = round(power)/100;
 		MUSIC_VOLUME = power;
 		if(MUTE_MUSIC==true)
-			mode=1;
+			MUTE_MUSIC = false;
 		else{
 			try{
 				audio_main.volume = MUSIC_VOLUME;
@@ -181,14 +181,12 @@ function mute_unmute_music(mouse_x, mouse_y, left_margin){
 		if(MUTE_MUSIC==false){
 			//disable sound
 			MUTE_MUSIC = true;
-			setCookie("mute_music", "1", 30);
 			if(audio_main != undefined)
 				audio_main.pause();
 			}
 		else{
 			//enable sound
 			MUTE_MUSIC = false;
-			setCookie("mute_music", "0", 30);
 			try{
 				if(PLACE == 'game'){
 					audio_main = document.createElement('audio');
@@ -200,6 +198,8 @@ function mute_unmute_music(mouse_x, mouse_y, left_margin){
 				}catch(error){}
 			}
 		}
+	if(MUTE_MUSIC==true)	setCookie("mute_music", "0", 30);
+	else			setCookie("mute_music", MUSIC_VOLUME, 30);
 	draw_mute_music_button();
 	}
 //do mute or unmute effects
@@ -215,19 +215,13 @@ function mute_unmute_fx(mouse_x, mouse_y, left_margin){
 		power = round(power)/100;
 		FX_VOLUME = power;
 		if(MUTE_FX==true)
-			mode=1;
+			MUTE_FX = false;
 		}
 	if(mode==1){
-		if(MUTE_FX==false){
-			//disable sound
-			MUTE_FX = true;
-			setCookie("mute_fx", "1", 30);
-			}
-		else{	
-			//enable sound
-			MUTE_FX = false;
-			setCookie("mute_fx", "0", 30);
-			}
+		if(MUTE_FX==false)	MUTE_FX = true;
+		else			MUTE_FX = false;
 		}
+	if(MUTE_FX==true)	setCookie("mute_fx", "0", 30);
+	else			setCookie("mute_fx", FX_VOLUME, 30);
 	draw_mute_fx_button();
 	}

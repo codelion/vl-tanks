@@ -82,7 +82,7 @@ function lighten_pixels(tank){
 	canvas_map_sight.beginPath();
 	canvas_map_sight.save();
 	
-	var sight_range = tank.sight+tank.size()/2;
+	var sight_range = tank.sight + tank.width()/2;
 	canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 	canvas_map_sight.clip(); 
 	canvas_map_sight.clearRect(xx-sight_range, yy-sight_range, sight_range*2, sight_range*2);
@@ -102,7 +102,7 @@ function lighten_pixels_all(tank){
 		var xx = round(TANKS[i].cx() + map_offset[0]);
 		var yy = round(TANKS[i].cy() + map_offset[1]);
 		canvas_map_sight.beginPath();
-		canvas_map_sight.arc(xx, yy, TANKS[i].sight+TANKS[i].size()/2, 0 , 2 * Math.PI, true);
+		canvas_map_sight.arc(xx, yy, TANKS[i].sight + TANKS[i].width()/2, 0 , 2 * Math.PI, true);
 		canvas_map_sight.fill();
 		}
 	canvas_map_sight.restore();	
@@ -114,11 +114,10 @@ function move_to_place_reset(){
 	}
 //move map by tank position
 function auto_scoll_map(){
-	var tank_size_half = round(TYPES[MY_TANK.type].size[1]/2);
-		
+	
 	//calc
-	map_offset[0] = -1 * (MY_TANK.x+tank_size_half) + WIDTH_SCROLL/2;
-	map_offset[1] = -1 * (MY_TANK.y+tank_size_half) + HEIGHT_SCROLL/2;
+	map_offset[0] = -1 * MY_TANK.cx() + WIDTH_SCROLL/2;
+	map_offset[1] = -1 * MY_TANK.cy() + HEIGHT_SCROLL/2;
 	
 	//check
 	if(map_offset[0]>0)	map_offset[0]=0;

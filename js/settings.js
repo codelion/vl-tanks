@@ -59,6 +59,7 @@ var unique_id = 0;			//number for id generation
 var timed_functions = [];		//timed functions array, for repeative exec.
 var mouse_move_controll = false;	//if external funtion takes mouse control
 var mouse_click_controll = false;	//if external funtion takes mouse clicks controll
+var target_mode = '';			//target mode: target, rectangle
 var target_range = 0;			//targer circle range for aoe skills
 var lastLoop = new Date;		//tmp var for fps
 var mouse_pos = [0,0];			//current mouse position for external functions

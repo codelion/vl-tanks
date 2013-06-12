@@ -27,7 +27,6 @@ function draw_main(){
 	//tanks actions
 	for(var i=0; i < TANKS.length; i++){
 		if(PLACE != 'game') return false;
-		var tank_size =  TYPES[TANKS[i].type].size[1];
 		var angle = undefined;
 		try{
 			//speed multiplier
@@ -51,16 +50,8 @@ function draw_main(){
 			if(TANKS[i].death_respan != undefined){
 				if(TANKS[i].death_respan - Date.now() < 0){
 					delete TANKS[i].death_respan;
-					if(TANKS[i].team == 'B'){	//top
-						TANKS[i].x = round(APP_SIZE_CACHE[0]*2/3);
-						TANKS[i].y = 20;
-						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
-						}
-					else{	//bottom
-						TANKS[i].x = round(APP_SIZE_CACHE[0]/3);
-						TANKS[i].y = HEIGHT_MAP-20-TYPES[TANKS[i].type].size[1];
-						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
-						}
+					set_spawn_coordinates(TANKS[i]);
+					TANKS[i].hp = get_tank_max_hp(TANKS[i]);
 					if(TANKS[i].id==MY_TANK.id)
 						auto_scoll_map();
 					}
@@ -69,7 +60,7 @@ function draw_main(){
 			//ghost mode
 			if(TANKS[i].respan_time != undefined){
 				speed_multiplier = 0.5;
-				if(TANKS[i].respan_time - Date.now() < 0){	
+				if(TANKS[i].respan_time - Date.now() < 0){
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
 					last_selected_counter = -1;
@@ -134,10 +125,10 @@ function draw_main(){
 				var xx = TANKS[i].reach_pos_and_execute[2];
 				var yy = TANKS[i].reach_pos_and_execute[3];
 				//get distance
-				tmp_dist_x = xx-(TANKS[i].x+TYPES[TANKS[i].type].size[1]/2)
-				tmp_dist_y = yy-(TANKS[i].y+TYPES[TANKS[i].type].size[1]/2)
+				tmp_dist_x = xx-TANKS[i].cx();
+				tmp_dist_y = yy-TANKS[i].cy();
 				tmp_distance = Math.sqrt((tmp_dist_x*tmp_dist_x)+(tmp_dist_y*tmp_dist_y));
-				tmp_distance =  tmp_distance - TYPES[TANKS[i].type].size[1]/2;
+				tmp_distance =  tmp_distance - TANKS[i].width()/2;
 				
 				//executing custom function
 				if(tmp_distance < TANKS[i].reach_pos_and_execute[0]){
@@ -184,8 +175,9 @@ function draw_main(){
 								}	
 							}
 						}
-					if(check_collisions(TANKS[i].x+tank_size/2+Math.cos(radiance)*tank_size/2, TANKS[i].y+tank_size/2+Math.sin(radiance)*tank_size/2, TANKS[i])==true){
-						TANKS[i].move = 0;
+					if(check_collisions(TANKS[i].cx() + Math.cos(radiance)*TANKS[i].width()/2, TANKS[i].cy()+Math.sin(radiance)*TANKS[i].height()/2, TANKS[i])==true){
+						if(game_mode != 3)
+							TANKS[i].move = 0;
 						}
 					else{
 						var last_x = TANKS[i].x;
@@ -195,10 +187,10 @@ function draw_main(){
 						
 						//border controll
 						var border_error = false;
-						if(TANKS[i].x+tank_size/2 < 0) border_error = true;
-						if(TANKS[i].y+tank_size/2 < 0) border_error = true;
-						if(TANKS[i].x+tank_size/2 > WIDTH_MAP) border_error = true;
-						if(TANKS[i].y+tank_size/2 > HEIGHT_MAP) border_error = true;
+						if(TANKS[i].cx() < 0) border_error = true;
+						if(TANKS[i].cy() < 0) border_error = true;
+						if(TANKS[i].cx() > WIDTH_MAP) border_error = true;
+						if(TANKS[i].cy() > HEIGHT_MAP) border_error = true;
 						
 						if(border_error == true){
 							TANKS[i].x = last_x;
@@ -226,6 +218,11 @@ function draw_main(){
 					body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, enemy_angle, time_gap);
 					}
 				}
+			
+			//autoskills
+			if(game_mode == 3 && TANKS[i].last_bullet_time + 1000 - Date.now() > 0)
+				try_skills(TANKS[i]);
+			
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
 				auto_scoll_map();
@@ -247,8 +244,8 @@ function draw_main(){
 	
 	//target	
 	if(mouse_click_controll==true){
-		//target
-		draw_image(canvas_main, 'target', mouse_pos[0]-15, mouse_pos[1]-15);
+		if(target_mode[0] == 'target')
+			draw_image(canvas_main, 'target', mouse_pos[0]-15, mouse_pos[1]-15);
 		
 		if(target_range != 0){
 			//circle
@@ -310,7 +307,7 @@ function do_animations(TANK){
 				alpha = round(alpha*100)/100;
 				x = animation.from_x + round(Math.cos(radiance)*(i*gap));
 				y = animation.from_y + round(Math.sin(radiance)*(i*gap));
-				draw_tank_clone(TANK, x, y, animation.angle, alpha);
+				draw_tank_clone(TANK.type, x, y, animation.angle, alpha);
 				}
 			}
 		//fire
@@ -320,8 +317,8 @@ function do_animations(TANK){
 			dist_x = animation.to_x - animation.from_x;
 			dist_y = animation.to_y - animation.from_y;
 			radiance = Math.atan2(dist_y, dist_x);
-			explode_x = animation.from_x + Math.cos(radiance)*(TANK.size()/2+10);
-			explode_y = animation.from_y + Math.sin(radiance)*(TANK.size()/2+10);
+			explode_x = animation.from_x + Math.cos(radiance)*(TANK.width()/2+10);
+			explode_y = animation.from_y + Math.sin(radiance)*(TANK.height()/2+10);
 			canvas_main.save();
 			canvas_main.globalAlpha = alpha;
 			canvas_main.translate(explode_x+map_offset[0], explode_y+map_offset[1]);
@@ -760,26 +757,9 @@ function draw_logo_tanks(left, top, change_logo){
 		if(TYPES[t].type == 'tank') n++;
 	for(var t in TYPES){
 		if(TYPES[t].type != 'tank') continue;
-		var tank_size = TYPES[t].size[1];
-		//base
-		if(TYPES[t].size[1] < max_size){	
-			//original size
-			draw_image(canvas_backround, TYPES[t].name,
-				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, TYPES[t].size[1], TYPES[t].size[1],
-				100, 0, TYPES[t].size[1], TYPES[t].size[1]);
-				}	
-		else{	
-			//resized
-			draw_image(canvas_backround, TYPES[t].name,
-				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, max_size, max_size,
-				100, 0, TYPES[t].size[1], TYPES[t].size[1]);
-			}
-		//turret
-		if(TYPES[t].icon_top != false){
-			draw_image(canvas_backround, TYPES[t].name,
-				left+t*round(477/n)+(50-tank_size)/2, top+52-tank_size, TYPES[t].size[1], TYPES[t].size[1],
-				150, 0, TYPES[t].size[1], TYPES[t].size[1]);
-			}
+		var pos_left = left+t*round(477/n)+(50-TYPES[t].size[1])/2;
+		var pos_top = top+52-TYPES[t].size[2];
+		draw_tank_clone(t, pos_left, pos_top, 0, 1, canvas_backround);
 		}
 	}
 var score_button_pos = new Array();
@@ -1124,12 +1104,9 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 			var pos1 = 15+j*(preview_x+gap);
 			var pos2 = y;
 			var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
-			var pos_top = pos2 + (preview_y-TYPES[i].size[1])/2;
-			if(locked==false){
-				draw_tank_clone(
-					{type: i, size: function(){ return TYPES[i].size[1]; }},
-					pos_left, pos_top, 0, 1, canvas_backround);
-					}
+			var pos_top = pos2 + (preview_y-TYPES[i].size[2])/2;
+			if(locked==false)
+				draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
 			else
 				draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
 		
@@ -1444,6 +1421,8 @@ function body_rotation(obj, str, speed, rot, time_diff){
 	return false;
 	}
 function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w, clip_h){
+	x = round(x);
+	y = round(y);
 	if(offset_x == undefined) offset_x = 0;
 	if(offset_y == undefined) offset_y = 0;	
 		

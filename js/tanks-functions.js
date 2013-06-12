@@ -329,12 +329,14 @@ function Missile(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){	
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -364,12 +366,14 @@ function Mortar(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 	 		mouse_click_controll = false;
 	 		target_range=0;
+			target_mode='';
 	 		}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = splash_range;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_bomb = {
@@ -399,12 +403,14 @@ function MM_Missile(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){	
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -440,12 +446,14 @@ function Strike(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -485,7 +493,7 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 			if(TANKS[i].team == TANK.team) continue; //same team
 			var distance = get_distance_between_tanks(TANKS[i], TANK);
 			var min_range = TANKS[i].sight;
-			min_range = min_range - TANK.size()/2;
+			min_range = min_range - TANK.width()/2;
 			if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
 				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 			if(distance < min_range){	
@@ -549,10 +557,9 @@ function Mine(TANK, descrition_only, settings_only, ai){
 	
 	//add
 	TANK.abilities_reuse[0] = Date.now() + reuse;
-	var tank_size_half = TYPES[TANK.type].size[1]/2;
 	MINES.push({
-		x: round(TANK.x+tank_size_half),
-		y: round(TANK.y+tank_size_half),
+		x: round(TANK.cx()),
+		y: round(TANK.cy()),
 		damage: power,
 		splash_range: splash_range,
 		team: TANK.team,
@@ -575,10 +582,10 @@ function Explode(TANK, descrition_only, settings_only, ai){
 	
 	for(var m=0; m < MINES.length; m++){
 		//get range
-		dist_x = MINES[m].x+mine_size_half - (TANK.x+TYPES[TANK.type].size[1]/2);
-		dist_y = MINES[m].y+mine_size_half - (TANK.y+TYPES[TANK.type].size[1]/2);
+		dist_x = MINES[m].x + mine_size_half - TANK.cx();
+		dist_y = MINES[m].y + mine_size_half - TANK.cy();
 		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - TYPES[TANK.type].size[1]/2;
+		distance = distance - TANK.width();
 		if(distance > range) continue; // mine too far
 		
 		//explode
@@ -643,8 +650,8 @@ function SAM(TANK, descrition_only, settings_only, ai){
 			
 		//bullet	
 		var tmp = new Array();
-		tmp['x'] = TANK.x+TYPES[TANK.type].size[1]/2;
-		tmp['y'] = TANK.y+TYPES[TANK.type].size[1]/2;
+		tmp['x'] = TANK.cx();
+		tmp['y'] = TANK.cy();
 		tmp['bullet_to_target'] = enemy;
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = power;
@@ -685,9 +692,10 @@ function check_mines(tank_id){
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
 			if(game_mode != 2 && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
-			var size = TYPES[TANKS[i].type].size[1];
-			if(TANKS[i].x+size > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
-				if(TANKS[i].y+size > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){
+			var sizew = TANKS[i].width();
+			var sizeh = TANKS[i].height();
+			if(TANKS[i].x+sizew > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
+				if(TANKS[i].y+sizeh > MINES[m].y-mine_size_half && TANKS[i].y < MINES[m].y+mine_size_half){
 					//explode
 					var tank = get_tank_by_id(MINES[m].tank_id);
 					var tmp = new Array();
@@ -729,12 +737,14 @@ function Virus(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -764,12 +774,14 @@ function EMP_Bomb(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 	 		mouse_click_controll = false;
 	 		target_range=0;
+			target_mode='';
 	 		}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = splash_range;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_bomb = {
@@ -848,6 +860,7 @@ function Fire_bomb(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 	 		mouse_click_controll = false;
 	 		target_range=0;
+			target_mode='';
 	 		}
 		return 0;
 		}
@@ -855,6 +868,7 @@ function Fire_bomb(TANK, descrition_only, settings_only, ai){
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = splash_range;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_bomb = {
@@ -972,12 +986,14 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -1008,12 +1024,14 @@ function Jump(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_jump = {
@@ -1068,7 +1086,8 @@ function do_jump(tank_id, skip_broadcast){
 		mouseX = TANK.jump_x;
 		mouseY = TANK.jump_y;
 		}
-	var tank_size = TYPES[TANK.type].size[1]/2;		
+	var tank_size_w = TANK.width()/2;		
+	var tank_size_h = TANK.height()/2;
 	
 	dist_x = mouseX - (TANK.cx());
 	dist_y = mouseY - (TANK.cy());
@@ -1105,6 +1124,7 @@ function do_jump(tank_id, skip_broadcast){
 		delete TANK.try_jump;
 		mouse_click_controll = false;
 		target_range=0;
+		target_mode='';
 		return false;
 		}
 	
@@ -1116,8 +1136,8 @@ function do_jump(tank_id, skip_broadcast){
 	//animation
 	TANK.animations.push({
 		name: 'jump',
-		to_x: move_x - tank_size,
-		to_y: move_y - tank_size,
+		to_x: move_x - tank_size_w,
+		to_y: move_y - tank_size_h,
 		from_x: TANK.x,
 		from_y: TANK.y,
 		angle: angle,
@@ -1125,8 +1145,8 @@ function do_jump(tank_id, skip_broadcast){
 		duration: 1000,	
 		});
 	
-	TANK.x = move_x - tank_size;
-	TANK.y = move_y - tank_size;
+	TANK.x = move_x - tank_size_w;
+	TANK.y = move_y - tank_size_h;
 	TANK.move = 0;
 	TANK.angle = angle;
 	TANK.fire_angle = angle;
@@ -1147,6 +1167,7 @@ function do_jump(tank_id, skip_broadcast){
 	delete TANK.try_jump;
 	mouse_click_controll = false;
 	target_range=0;
+	target_mode='';
 	}
 
 //====== Apache ================================================================
@@ -1165,12 +1186,14 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -1197,7 +1220,7 @@ function Scout(TANK, descrition_only, settings_only, ai){	//multi
 		return 'Increase sight by '+power+' for '+(duration/1000)+'s.';
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2) + power;
+	TANK.sight = TYPES[TANK.type].scout + round(TANK.width()/2) + power;
 	
 	TANK.abilities_reuse[ability_nr] = Date.now() + reuse;
 		
@@ -1219,7 +1242,7 @@ function Scout(TANK, descrition_only, settings_only, ai){	//multi
 	}
 function Scout_stop(object){
 	var TANK = object.tank;
-	TANK.sight = TYPES[TANK.type].scout + round(TYPES[TANK.type].size[1]/2);
+	TANK.sight = TYPES[TANK.type].scout + round(TANK.width()/2);
 	}
 
 //====== Bomber ================================================================
@@ -1239,12 +1262,14 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){
 		mouse_click_controll = true;
 		target_range = splash_range;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_bomb = {
@@ -1273,12 +1298,14 @@ function AA_bomb(TANK, descrition_only, settings_only, ai){
 		if(TANK.id == MY_TANK.id){
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			}
 		return 0;
 		}
 	if(TANK.id == MY_TANK.id){	
 		mouse_click_controll = true;
 		target_range = 0;
+		target_mode = ['target'];
 		}
 	//init
 	TANK.try_missile = {
@@ -1294,6 +1321,260 @@ function AA_bomb(TANK, descrition_only, settings_only, ai){
 	return 0;
 	}
 
+//====== Tower =================================================================
+
+function Freak_out(TANK, descrition_only, settings_only, ai){
+	var cost = 50;
+	var power = 0.5;
+	var reuse = 30000;
+	var duration = 5000;
+	
+	if(descrition_only != undefined)
+		return 'Eextremely increase attack speed by '+((1-power)*100)+'% for '+(duration/1000)+'s. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	TANK.abilities_reuse[0] = Date.now() + reuse;	
+	//damage buff
+	TANK.buffs.push({
+		name: 'hit_reuse',
+		power: power,
+		lifetime: Date.now()+duration,
+		circle: '#c10000',
+		});
+		
+	return reuse;
+	}
+
+//====== Base ==================================================================
+
+function Factory(TANK, descrition_only, settings_only, ai){
+	var cost = 10;
+	var reuse = 100;
+	var range = 100;
+	var tank_type = 'Factory';
+	
+	if(descrition_only != undefined)
+		return 'Construct factory to create land, air, defence units. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	if(TANK.try_construct != undefined){
+		delete TANK.try_construct;
+		if(TANK.id == MY_TANK.id){
+	 		mouse_click_controll = false;
+	 		}
+		return 0;
+		}
+	//get type
+	var type = 0;
+	for(var t in TYPES){
+		if(TYPES[t].name == tank_type){ 
+			type = t;
+			break;
+			}
+		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = 0;
+		target_mode = '';
+		//hover f-tion
+		var found = false;
+		for(var f in pre_draw_functions)
+			if(pre_draw_functions[0]=='construct_hover')
+				found = true;
+		if(found == false)
+			pre_draw_functions.push(['construct_hover']);
+		}
+	//init
+	TANK.try_construct = {
+		cost: cost,
+		reuse: reuse,
+		range: range,
+		tank_type: type,
+		ability_nr: 0,
+		};
+		
+	//return reuse - later, on use
+	return 0;
+	}
+function Research(TANK, descrition_only, settings_only, ai){
+	var cost = 10;
+	var reuse = 100;
+	var range = 100;
+	var tank_type = 'Research';
+	
+	if(descrition_only != undefined)
+		return 'Construct research station. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	if(TANK.try_construct != undefined){
+		delete TANK.try_construct;
+		if(TANK.id == MY_TANK.id){
+	 		mouse_click_controll = false;
+	 		}
+		return 0;
+		}
+	//get type
+	var type = 0;
+	for(var t in TYPES){
+		if(TYPES[t].name == tank_type){
+			type = t;
+			break;
+			}
+		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = 0;
+		target_mode = '';
+		//hover f-tion
+		var found = false;
+		for(var f in pre_draw_functions)
+			if(pre_draw_functions[0]=='construct_hover')
+				found = true;
+		if(found == false)
+			pre_draw_functions.push(['construct_hover']);
+		}
+	//init
+	TANK.try_construct = {
+		cost: cost,
+		reuse: reuse,
+		range: range,
+		tank_type: type,
+		ability_nr: 0,
+		};
+		
+	//return reuse - later, on use
+	return 0;
+	}
+function construct_hover(){
+	if(MY_TANK.try_construct == undefined) return false;
+	var type = MY_TANK.try_construct.tank_type;
+	
+	//check range
+	var valid = false;
+	for (i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'tank') continue;
+		if(TANKS[i].team != MY_TANK.team) continue;
+		
+		dist_x = TANKS[i].cx() - mouse_pos[0];
+		dist_y = TANKS[i].cy() - mouse_pos[1];
+		var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+		distance = distance - TANKS[i].width()/2 - TYPES[type].size[1]/2;
+		distance = round(distance);		
+		if(distance < MY_TANK.try_construct.range){
+			valid = true;
+			break;
+			}
+		}
+	
+	//check collisions
+	if(valid == true){
+		valid = true;
+		if(check_collisions(mouse_pos[0], mouse_pos[1], {type:type}, true)==true) valid = false;
+		if(check_collisions(mouse_pos[0]-TYPES[type].size[1]/2, mouse_pos[1]-TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
+		if(check_collisions(mouse_pos[0]-TYPES[type].size[1]/2, mouse_pos[1]+TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
+		if(check_collisions(mouse_pos[0]+TYPES[type].size[1]/2, mouse_pos[1]-TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
+		if(check_collisions(mouse_pos[0]+TYPES[type].size[1]/2, mouse_pos[1]+TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
+		}
+	//draw
+	if(valid == true)
+		canvas_main.fillStyle = "#576b35";
+	else
+		canvas_main.fillStyle = "#b12525";
+	canvas_main.fillRect(mouse_pos[0]-round(TYPES[type].size[1]/2), mouse_pos[1]-round(TYPES[type].size[2]/2), 
+		TYPES[type].size[1], TYPES[type].size[2]);
+	}
+
+//====== Factory ===============================================================	
+
+function War_units(TANK, descrition_only, settings_only, ai){
+	var reuse = 5000;
+	
+	if(descrition_only != undefined)
+		return 'Construct land or air unit. Costs H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	return reuse;
+	}
+function Tower(TANK, descrition_only, settings_only, ai){
+	var cost = 10;
+	var reuse = 100;
+	var range = 100;
+	var tank_type = 'Tower';
+	
+	if(descrition_only != undefined)
+		return 'Construct factory to create land, air, defence units. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	if(TANK.try_construct != undefined){
+		delete TANK.try_construct;
+		if(TANK.id == MY_TANK.id){
+	 		mouse_click_controll = false;
+	 		}
+		return 0;
+		}
+	//get type
+	var type = 0;
+	for(var t in TYPES){
+		if(TYPES[t].name == tank_type){ 
+			type = t;
+			break;
+			}
+		}
+	if(TANK.id == MY_TANK.id){
+		mouse_click_controll = true;
+		target_range = 0;
+		target_mode = '';
+		//hover f-tion
+		var found = false;
+		for(var f in pre_draw_functions)
+			if(pre_draw_functions[0]=='construct_hover')
+				found = true;
+		if(found == false)
+			pre_draw_functions.push(['construct_hover']);
+		}
+	//init
+	TANK.try_construct = {
+		cost: cost,
+		reuse: reuse,
+		range: range,
+		tank_type: type,
+		ability_nr: 0,
+		};
+		
+	//return reuse - later, on use
+	return 0;
+	}
+
+//====== Research ==============================================================
+
+function Weapons(TANK, descrition_only, settings_only, ai){
+	var cost = 20;
+	var reuse = 100;
+	
+	if(descrition_only != undefined)
+		return 'Upgrades units weapons. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+		
+	return reuse;
+	}
+function Armor(TANK, descrition_only, settings_only, ai){
+	var cost = 20;
+	var reuse = 100;
+	
+	if(descrition_only != undefined)
+		return 'Upgrades units armor. Costs '+cost+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+		
+	return reuse;
+	}
+
 //====== General ===============================================================
 
 function do_missile(tank_id, enemy_id, skip_broadcast){
@@ -1307,7 +1588,8 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 		mouseX = TANK.missile_x;
 		mouseY = TANK.missile_y;
 		}
-	var tank_size = TYPES[TANK.type].size[1]/2;		
+	var tank_size_w = TANK.width()/2;		
+	var tank_size_h = TANK.height()/2;		
 
 	//find target
 	if(enemy_id==undefined){
@@ -1323,6 +1605,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 			//too far - move to target
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			if(game_mode == 2 && skip_broadcast !== true){
 				//broadcast
 				DATA = {
@@ -1331,7 +1614,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 					tank_params: [
 						{key: 'target_move_lock', value: enemy.id},
 						{key: 'move', value: 1},
-						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'move_to', value: [mouseX-tank_size_w, mouseY-tank_size_h]},
 						{key: 'reach_tank_and_execute', value: [TANK.try_missile.range, 'do_missile', tank_id]},
 						{key: 'try_missile', value: TANK.try_missile},
 						{key: 'missile_x', value: mouse_click_pos[0]},
@@ -1345,7 +1628,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 				delete TANK.target_move_lock;
 				TANK.target_move_lock = enemy.id;
 				TANK.move = 1;
-				TANK.move_to = [mouseX-tank_size, mouseY-tank_size];
+				TANK.move_to = [mouseX-tank_size_w, mouseY-tank_size_h];
 				TANK.reach_tank_and_execute = [TANK.try_missile.range, 'do_missile', tank_id];
 				}
 			return false;
@@ -1380,6 +1663,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 		delete TANK.try_missile;
 		mouse_click_controll = false;
 		target_range=0;
+		target_mode='';
 		return false;
 		}
 		
@@ -1390,8 +1674,8 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 		
 	//bullet	
 	var tmp = new Array();
-	tmp['x'] = TANK.x+tank_size;
-	tmp['y'] = TANK.y+tank_size;
+	tmp['x'] = TANK.cx();
+	tmp['y'] = TANK.cy();
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_missile.power;
@@ -1416,6 +1700,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	delete TANK.try_missile;
 	mouse_click_controll = false;
 	target_range=0;
+	target_mode='';
 	}
 function do_bomb(tank_id, distance_ok, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
@@ -1428,18 +1713,20 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 		mouseX = TANK.bomb_x;
 		mouseY = TANK.bomb_y;
 		}
-	var tank_size = TYPES[TANK.type].size[1]/2;
+	var tank_size_w = TANK.width()/2;		
+	var tank_size_h = TANK.height()/2;
 
 	if(distance_ok !== true){
 		//get explosion position
-		dist_x = mouseX - (TANK.x+tank_size);
-		dist_y = mouseY - (TANK.y+tank_size);
+		dist_x = mouseX - TANK.cx();
+		dist_y = mouseY - TANK.cy();
 		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - tank_size;
+		distance = distance - tank_size_w;
 		if(distance > TANK.try_bomb.range){
 			//too far - move to target
 			mouse_click_controll = false;
 			target_range=0;
+			target_mode='';
 			if(game_mode == 2 && skip_broadcast !== true){
 				//broadcast
 				DATA = {
@@ -1447,7 +1734,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 					fparam: [tank_id, true, true],
 					tank_params: [
 						{key: 'move', value: 1},
-						{key: 'move_to', value: [mouseX-tank_size, mouseY-tank_size]},
+						{key: 'move_to', value: [mouseX-tank_size_w, mouseY-tank_size_h]},
 						{key: 'reach_pos_and_execute', value: [TANK.try_bomb.range, 'do_bomb', mouseX, mouseY, tank_id]},
 						{key: 'try_bomb', value: TANK.try_bomb},
 						{key: 'bomb_x', value: mouse_click_pos[0]},
@@ -1460,7 +1747,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 			else{
 				delete TANK.target_move_lock;
 				TANK.move = 1;
-				TANK['move_to'] = [mouseX-tank_size, mouseY-tank_size];
+				TANK['move_to'] = [mouseX-tank_size_w, mouseY-tank_size_h];
 				TANK.reach_pos_and_execute = [TANK.try_bomb.range, 'do_bomb', mouseX, mouseY, tank_id];
 				}
 			return false;
@@ -1481,6 +1768,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 		delete TANK.try_bomb;
 		mouse_click_controll = false;
 		target_range=0;
+		target_mode='';
 		return false;
 		}
 		
@@ -1491,8 +1779,8 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	
 	//bullet	
 	var tmp = new Array();
-	tmp['x'] = TANK.x+tank_size;
-	tmp['y'] = TANK.y+tank_size;
+	tmp['x'] = TANK.cx();
+	tmp['y'] = TANK.cy();
 	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_bomb.power;
@@ -1519,5 +1807,84 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	
 	delete TANK.try_bomb;
 	mouse_click_controll = false;
-	target_range=0;	
+	target_range=0;
+	target_mode='';
+	}
+function do_construct(tank_id){
+	TANK = get_tank_by_id(tank_id);
+	if(TANK.try_construct == undefined)  return false;
+	mouseX = mouse_click_pos[0];
+	mouseY = mouse_click_pos[1];
+	var type = TANK.try_construct.tank_type;
+	
+	var tank_size_w = TANK.width()/2;		
+	var tank_size_h = TANK.height()/2;
+	
+	//check range
+	var valid = false;
+	for (i in TANKS){
+		if(TYPES[TANKS[i].type].type == 'tank') continue;
+		if(TANKS[i].team != MY_TANK.team) continue;
+		
+		dist_x = TANKS[i].cx() - mouse_pos[0];
+		dist_y = TANKS[i].cy() - mouse_pos[1];
+		var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+		distance = distance - TANKS[i].width()/2 - TYPES[type].size[1]/2;
+		distance = round(distance);		
+		if(distance < MY_TANK.try_construct.range){
+			valid = true;
+			break;
+			}
+		}
+	if(valid == false) return false;
+	
+	//check collisions	
+	if(check_collisions(mouseX, mouseY, {type:type}, true)==true) return false;
+	if(check_collisions(mouseX-TYPES[type].size[1]/2, mouseY-TYPES[type].size[2]/2, {type:type}, true)==true) return false;
+	if(check_collisions(mouseX-TYPES[type].size[1]/2, mouseY+TYPES[type].size[2]/2, {type:type}, true)==true) return false;
+	if(check_collisions(mouseX+TYPES[type].size[1]/2, mouseY-TYPES[type].size[2]/2, {type:type}, true)==true) return false;
+	if(check_collisions(mouseX+TYPES[type].size[1]/2, mouseY+TYPES[type].size[2]/2, {type:type}, true)==true) return false;
+	
+	//control
+	if(TANK.try_construct == undefined)  return false;
+	nr = TANK.try_construct.ability_nr;
+	if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
+	TANK.abilities_reuse[nr] = Date.now() + TANK.try_construct.reuse;
+	
+	var x = mouseX - round(TYPES[type].size[1]/2);
+	var y = mouseY - round(TYPES[type].size[2]/2);
+	var angle = 180;
+	if(TANK.team != 'B')
+		angle = 0;
+	var nation = get_nation_by_team(TANK.team);
+	//add
+	add_tank(1, 'builing-'+TANK.team+mouseX+"."+mouseY, '', type, TANK.team, nation, x, y, angle);
+	
+	//animation
+	/*TANK.animations.push({
+		name: 'jump',
+		to_x: move_x - tank_size_w,
+		to_y: move_y - tank_size_h,
+		from_x: TANK.x,
+		from_y: TANK.y,
+		angle: angle,
+		lifetime: Date.now() + 1000,
+		duration: 1000,	
+		});*/
+	
+			
+	//init reuse
+	if(game_mode != 2 || TANK.name == name){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_construct.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_construct.ability_nr;	
+		tmp['max'] = TANK.try_construct.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
+	
+	delete TANK.try_construct;
+	mouse_click_controll = false;
 	}

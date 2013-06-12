@@ -14,14 +14,30 @@ function init_game(first_time){
 	
 	if(socket_live == true)
 		room_controller();
-	if(getCookie("mute_fx") != '0')
-		MUTE_FX=true;
-	if(getCookie("mute_music") != '0')
-		MUTE_MUSIC=true;
+	
+	//sound effects
+	var cookie = getCookie("mute_fx");
+	if(cookie == '0')
+		MUTE_FX = true;
+	else{
+		MUTE_FX = false;
+		FX_VOLUME = cookie;
+		}
+	
+	//music	
+	var cookie = getCookie("mute_music");	
+	if(cookie == '0')
+		MUTE_MUSIC = true;
+	else{
+		MUTE_MUSIC = false;
+		MUSIC_VOLUME = cookie;
+		}
+
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;
 		START_GAME_COUNT_MULTI = 5;
 		}
+		
 	if(getCookie("nointro") == '1')
 		intro_enabled = 0;
 	unique_id = 0;
@@ -183,7 +199,6 @@ function init_action(map_nr, my_team){
 	dynamic_title();
 	room_controller();
 	CHAT_LINES = [];
-	
 	level = map_nr;
 	
 	check_canvas_sizes();
@@ -196,14 +211,6 @@ function init_action(map_nr, my_team){
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 		
-	var requestAnimationFrame = window.requestAnimationFrame 
-				|| window.mozRequestAnimationFrame 
-				|| window.webkitRequestAnimationFrame 
-				|| window.msRequestAnimationFrame
-				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
-	window.requestAnimationFrame = requestAnimationFrame;
-	draw_interval_id = requestAnimationFrame(draw_main);
-
 	//sound
 	if(MUTE_MUSIC==false){
 		audio_main = document.createElement('audio');
@@ -216,11 +223,36 @@ function init_action(map_nr, my_team){
 		catch(error){}
 		}
 	
-	//create ... me
-	if(game_mode==1 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
-		my_tank_nr = 0;
 	if(game_mode==2)
 		my_nation = get_nation_by_team(my_team);
+		
+	//findenemy team
+	enemy_team = 'B';
+	if(enemy_team == my_team)
+		enemy_team = 'R';
+		
+	//find enemy nation
+	if(game_mode != 2){
+		enemy_nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != my_nation)
+				enemy_nation_tmp.push(n);
+			}
+		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
+		}
+	else
+		var enemy_nation = get_nation_by_team(enemy_team);
+	
+	//add towers
+	add_towers(my_team, my_nation);	
+	if(my_team == 'R')
+		add_towers("B", enemy_nation);	
+	else
+		add_towers("R", enemy_nation);	
+	
+	//create ... me
+	if(game_mode != 2 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
+		my_tank_nr = 0;
 	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	
@@ -251,33 +283,19 @@ function init_action(map_nr, my_team){
 					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
 				}
 			}
-		
 		//enemies
-		enemy_team = 'B';
-		if(enemy_team == my_team)
-			enemy_team = 'R';
-		//find nation
-		enemy_nation_tmp = [];
-		for(var n in COUNTRIES){
-			if(n != my_nation)
-				enemy_nation_tmp.push(n);
-			}
-		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
-		//create
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-				//random_type = 4;
+				//random_type = 3;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
-			if(game_mode == 3); break;
+			if(game_mode == 3) break;
 			i++;
 			}
 		}
 		
-	add_towers();
-
 	sync_multiplayers();
 	
 	//auto add 1 lvl upgrade
@@ -315,6 +333,14 @@ function init_action(map_nr, my_team){
 		
 	draw_map(false);
 	
+	var requestAnimationFrame = window.requestAnimationFrame 
+				|| window.mozRequestAnimationFrame 
+				|| window.webkitRequestAnimationFrame 
+				|| window.msRequestAnimationFrame
+				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
+	window.requestAnimationFrame = requestAnimationFrame;
+	draw_interval_id = requestAnimationFrame(draw_main);
+
 	if(game_mode != 3)	
 		bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
@@ -362,9 +388,11 @@ var IMAGES_SETTINGS = {
 		Apache:	{ x:0,	y:800,	w:90,	h:80 },
 		Bomber:	{ x:0,	y:900,	w:90,	h:80 },
 		Soldier:	{ x:0,	y:1000,	w:90,	h:80 },
-		Tower:	{ x:0,	y:1100,	w:90,	h:80 },
-		Base:		{ x:0,	y:1200,	w:90,	h:80 },
 		TRex:		{ x:0,	y:1300,	w:90,	h:80 },
+		Tower:		{ x:0,	y:1100,	w:90,	h:80 },
+		Base:		{ x:0,	y:1200,	w:90,	h:80 },
+		Factory:	{ x:0,	y:1400,	w:68,	h:56 },
+		Research:	{ x:0,	y:1500,	w:50,	h:42 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
@@ -538,6 +566,7 @@ function quit_game(init_next_game){
 	intro_page = 0;
 	my_team = undefined;
 	map_offset = [0, 0];
+	target_mode = '';
 	
 	if(init_next_game != false){
 		init_game(false);

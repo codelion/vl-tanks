@@ -2,13 +2,14 @@
 function draw_tank(tank){
 	if(PLACE != 'game' || tank == undefined) return false;
 	if(tank.invisibility != undefined && tank.team != MY_TANK.team) return false; //enemy in hide mode
-	var tank_size =  TYPES[tank.type].size[1];
+	var tank_size_w =  tank.width();
+	var tank_size_h =  tank.height();
 	var visibility = 0;
 	var alpha = 1;
 	var padding = 20;
 	var fade_duration = 300;
 	
-	if(FS==false && (tank.y > -1*map_offset[1] + HEIGHT_SCROLL || tank.y+tank_size < -1*map_offset[1] || tank.x > -1*map_offset[0] + WIDTH_SCROLL || tank.x+tank_size < -1*map_offset[0])){
+	if(FS==false && (tank.y > -1*map_offset[1] + HEIGHT_SCROLL || tank.y+tank_size_h < -1*map_offset[1] || tank.x > -1*map_offset[0] + WIDTH_SCROLL || tank.x+tank_size_w < -1*map_offset[0])){
 		//not in screen zone
 		if(tank.visible.state == true){
 			tank.visible.state = false;
@@ -28,7 +29,7 @@ function draw_tank(tank){
 				alpha = round(alpha*100)/100;
 				alpha = 1 - alpha;	//reverse fade
 				//draw clone
-				draw_tank_clone(tank, tank.x, tank.y, tank.angle, alpha);
+				draw_tank_clone(tank.type, tank.x, tank.y, tank.angle, alpha);
 				}
 			return false; //out of sight
 			}
@@ -59,7 +60,7 @@ function draw_tank(tank){
 		cache_id += "NA:"+tank.nation+',';
 		cache_id += "A:"+tank.angle+',';
 		cache_id += "FA:"+tank.fire_angle+',';
-		cache_id += "Si:"+tank_size+',';
+		cache_id += "Si:"+tank_size_w+'x'+tank_size_h+',';
 		cache_id += "AL:"+alpha+',';
 		for (i in tank.buffs)
 			cache_id += "E:"+tank.buffs[i].name+',';
@@ -75,6 +76,8 @@ function draw_tank(tank){
 			if(tank.clicked_on == 0)
 				delete tank.clicked_on;
 			}
+		if(tank.selected != undefined)
+			cache_id += 'SE,';
 		if(TYPES[tank.type].icon_top[0] != undefined)
 			cache_id += "SA:"+tank.fire_angle+',';
 		
@@ -100,8 +103,8 @@ function draw_tank(tank){
 			//draw stun
 			if(tank.stun != undefined){
 				tmp_object.beginPath();
-				radius = tank_size/2;
-				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
+				radius = tank_size_w/2;
+				tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 1;
 				tmp_object.fillStyle = "#545454";
 				tmp_object.fill();
@@ -112,16 +115,16 @@ function draw_tank(tank){
 				//draw without rotation
 				draw_image(tmp_object, TYPES[tank.type].name,
 					padding, padding, undefined, undefined,	
-					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
-				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
+					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[2]);
+				tmp_object.translate(round(tank_size_w/2)+padding, round(tank_size_h/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
 				}
 			else{
-				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
+				tmp_object.translate(round(tank_size_w/2)+padding, round(tank_size_h/2)+padding);
 				tmp_object.rotate(tank.angle * TO_RADIANS);
 				draw_image(tmp_object, TYPES[tank.type].name,
-					-1*round(tank_size/2), -1*round(tank_size/2), tank_size, tank_size,
-					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
+					-1*round(tank_size_w/2), -1*round(tank_size_h/2), tank_size_w, tank_size_h,
+					100, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[2]);
 				}
 			tmp_object.restore();
 			
@@ -130,11 +133,11 @@ function draw_tank(tank){
 				tmp_object.save();
 				if(alpha != 1 && QUALITY > 1)
 					tmp_object.globalAlpha = alpha;
-				tmp_object.translate(round(tank_size/2)+padding, round(tank_size/2)+padding);
+				tmp_object.translate(round(tank_size_w/2)+padding, round(tank_size_h/2)+padding);
 				tmp_object.rotate(tank.fire_angle * TO_RADIANS);
 				draw_image(tmp_object, TYPES[tank.type].name,
-					-(tank_size/2), -(tank_size/2), tank_size, tank_size, 
-					150, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[1]);
+					-(tank_size_w/2), -(tank_size_h/2), tank_size_w, tank_size_h, 
+					150, 0, TYPES[tank.type].size[1], TYPES[tank.type].size[2]);
 				tmp_object.restore();
 				}
 
@@ -142,27 +145,38 @@ function draw_tank(tank){
 			for (i in tank.buffs){
 				if(tank.buffs[i].icon != undefined){
 					draw_image(tmp_object, tank.buffs[i].icon,
-						padding+tank_size/2-tank.buffs[i].icon_size[0]/2,
-						padding+tank_size/2-tank.buffs[i].icon_size[1]/2);
+						padding+tank_size_w/2-tank.buffs[i].icon_size[0]/2,
+						padding+tank_size_h/2-tank.buffs[i].icon_size[1]/2);
 					}
 				if(tank.buffs[i].circle != undefined){
 					tmp_object.beginPath();
-					var radius = tank_size/2;
+					var radius = tank_size_w/2;
 					if(radius>35) radius=35;
 					radius = radius + radius_extra;
-					tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
+					tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
 					tmp_object.lineWidth = 3;
 					tmp_object.strokeStyle = tank.buffs[i].circle;
 					tmp_object.stroke();
 					radius_extra = radius_extra + 5;
 					}	
 				}
+			
+			//selected ally
+			if(tank.selected != undefined){
+				tmp_object.beginPath();
+				radius = tank_size_w/2 + radius_extra;
+				tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
+				tmp_object.lineWidth = 2;
+				tmp_object.strokeStyle = "#770f10";
+				tmp_object.stroke();
+				radius_extra = radius_extra + 5;
+				}
 
 			//enemy checked
 			if(tank.clicked_on != undefined){
 				tmp_object.beginPath();
-				radius = tank_size/2 + radius_extra;
-				tmp_object.arc(tank_size/2+padding, tank_size/2+padding, radius, 0 , 2 * Math.PI, false);	
+				radius = tank_size_w/2 + radius_extra;
+				tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
 				tmp_object.lineWidth = 3;
 				tmp_object.strokeStyle = "#d9d900";
 				tmp_object.stroke();
@@ -197,39 +211,41 @@ function draw_tank(tank){
 	update_radar(tank);
 	}
 //draw selected tank on selected place
-function draw_tank_clone(CLONE, x, y, angle, alpha, canvas){
+function draw_tank_clone(type, x, y, angle, alpha, canvas){
 	x = x + map_offset[0];
-	y = y + map_offset[1];		
+	y = y + map_offset[1];
+	var W = TYPES[type].size[1];
+	var H = TYPES[type].size[2];
 	if(alpha == undefined) alpha = 1;
 	if(canvas == undefined) canvas = canvas_main;
 
 	//draw tank base
 	canvas.save();
 	canvas.globalAlpha = alpha;
-	if(TYPES[CLONE.type].no_base_rotate === true || angle == 0){
+	if(TYPES[type].no_base_rotate === true || angle == 0){
 		//without rotation
-		draw_image(canvas, TYPES[CLONE.type].name,
-			x, y, CLONE.size(), CLONE.size(),	
-			100, 0, TYPES[CLONE.type].size[1], TYPES[CLONE.type].size[1]);
+		draw_image(canvas, TYPES[type].name,
+			x, y, W, H,	
+			100, 0, W, H);
 		}
 	else{
-		canvas.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
+		canvas.translate(round(W/2)+x, round(H/2)+y);
 		canvas.rotate(angle * TO_RADIANS);
-		draw_image(canvas, TYPES[CLONE.type].name,
-			-1*round(CLONE.size()/2), -1*round(CLONE.size()/2), CLONE.size(), CLONE.size(),
-			100, 0, TYPES[CLONE.type].size[1], TYPES[CLONE.type].size[1]);
+		draw_image(canvas, TYPES[type].name,
+			-1*round(W/2), -1*round(H/2), W, H,
+			100, 0, W, H);
 		}
 	canvas.restore();
 	
 	//draw top
-	if(TYPES[CLONE.type].icon_top != false){
+	if(TYPES[type].icon_top != false){
 		canvas.save();
 		canvas.globalAlpha = alpha;
-		canvas.translate(round(CLONE.size()/2)+x, round(CLONE.size()/2)+y);
+		canvas.translate(round(W/2)+x, round(H/2)+y);
 		canvas.rotate(angle * TO_RADIANS);
-		draw_image(canvas, TYPES[CLONE.type].name,
-			-(CLONE.size()/2), -(CLONE.size()/2), CLONE.size(), CLONE.size(), 
-			150, 0, CLONE.size(), CLONE.size());
+		draw_image(canvas, TYPES[type].name,
+			-(W/2), -(H/2), W, H, 
+			150, 0, W, H);
 		canvas.restore();
 		}
 	}
@@ -249,9 +265,9 @@ function add_hp_bar(tank){
 	
 	life = tank.hp * 100 / max_life;
 	canvas_main.fillStyle = "#c10000";
-	hp_width = round(TYPES[tank.type].size[1]*80/100);	//%80
-	padding_left = round((TYPES[tank.type].size[1] - hp_width)/2);
-	padding_top = round(TYPES[tank.type].size[1]*7/100);
+	hp_width = round(tank.width()*80/100);	//%80
+	padding_left = round((tank.width() - hp_width)/2);
+	padding_top = round(tank.height()*7/100);
 	yy = yy - 13;
 	hp_height = 5;
 	if(TYPES[tank.type].type == 'human')
@@ -315,9 +331,10 @@ function draw_bullets(TANK, time_gap){
 		TANK.last_bullet_time = Date.now();
 		//follows tank
 		if(BULLETS[b].bullet_to_target != undefined){
-			var bullet_to_target_tank_size_to = TYPES[BULLETS[b].bullet_to_target.type].size[1];
-			b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to/2)) - BULLETS[b].x;
-  			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to/2)) - BULLETS[b].y; 
+			var bullet_to_target_tank_size_to_w = TYPES[BULLETS[b].bullet_to_target.type].size[1];
+			var bullet_to_target_tank_size_to_h = TYPES[BULLETS[b].bullet_to_target.type].size[2];
+			b_dist_x = (BULLETS[b].bullet_to_target.x+(bullet_to_target_tank_size_to_w/2)) - BULLETS[b].x;
+  			b_dist_y = (BULLETS[b].bullet_to_target.y+(bullet_to_target_tank_size_to_h/2)) - BULLETS[b].y; 
   			}
   		else if(BULLETS[b].bullet_to_area != undefined){
   			//bullet with coordinates instead of target
@@ -384,10 +401,10 @@ function draw_bullets(TANK, time_gap){
 					//check range
 					var enemy_x = BULLETS[b].bullet_to_area[0];
 					var enemy_y = BULLETS[b].bullet_to_area[1];
-					dist_x_b = TANKS[ii].x+TYPES[TANKS[ii].type].size[1]/2 - enemy_x;
-					dist_y_b = TANKS[ii].y+TYPES[TANKS[ii].type].size[1]/2 - enemy_y;
+					dist_x_b = TANKS[ii].cx() - enemy_x;
+					dist_y_b = TANKS[ii].cy() - enemy_y;
 					var distance_b = Math.sqrt((dist_x_b*dist_x_b)+(dist_y_b*dist_y_b));
-					distance_b = distance_b - TYPES[TANKS[ii].type].size[1]/2;
+					distance_b = distance_b - TANKS[ii].width()/2;
 							
 					if(distance_b > BULLETS[b].aoe_splash_range)	continue;	//too far
 					
@@ -509,6 +526,7 @@ function draw_tank_move(mouseX, mouseY){
 		do_missile(MY_TANK.id);
 		do_bomb(MY_TANK.id);
 		do_jump(MY_TANK.id);
+		do_construct(MY_TANK.id);
 		
 		//external click functions
 		for (i in on_click_functions)
@@ -517,8 +535,9 @@ function draw_tank_move(mouseX, mouseY){
 	else{
 		//delete other handlers
 		delete MY_TANK.try_missile;
-		delete MY_TANK.try_jump;
 		delete MY_TANK.try_bomb;
+		delete MY_TANK.try_jump;
+		delete MY_TANK.try_construct;
 		
 		if(MY_TANK.death_respan != undefined) return false;
 			
@@ -529,19 +548,32 @@ function draw_tank_move(mouseX, mouseY){
 			delete MY_TANK.target_move_lock;
 		if(MY_TANK.respan_time == undefined){
 			for(var i in TANKS){
-				var tank_size =  0.9*TYPES[TANKS[i].type].size[1];
+				var tank_size_w =  0.9*TANKS[i].width();
+				var tank_size_h =  0.9*TANKS[i].height();
 				if(TANKS[i].team == MY_TANK.team){
-					if(Math.abs(TANKS[i].x+tank_size/2 - mouseX) < tank_size/2 && Math.abs(TANKS[i].y+tank_size/2 - mouseY) < tank_size/2){
+					if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
 						if(TANKS[i].name != name)
 							return false; //clicked on allies, but not youself
 						}
 					}
 				if(TANKS[i].team != MY_TANK.team){
-					if(Math.abs(TANKS[i].x+tank_size/2 - mouseX) < tank_size/2 && Math.abs(TANKS[i].y+tank_size/2 - mouseY) < tank_size/2){
+					if(Math.abs(TANKS[i].cx - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
 						//clicked on enemy
 						TANKS[i].clicked_on = 10;	// will draw circle on enemies
-						MY_TANK.target_move_lock = TANKS[i].id;
-						MY_TANK.target_shoot_lock = TANKS[i].id;
+						if(game_mode != 3){
+							MY_TANK.target_move_lock = TANKS[i].id;
+							MY_TANK.target_shoot_lock = TANKS[i].id;
+							}
+						else{
+							for(var s in TANKS){
+								if(TANKS[s].team != MY_TANK.team) continue;
+								if(TANKS[s].dead == 1) continue;
+								if(TANKS[s].selected == 1){
+									TANKS[s].target_move_lock = TANKS[i].id;
+									TANKS[s].target_shoot_lock = TANKS[i].id;
+									}
+								}
+							}
 						target_lock_id = TANKS[i].id;
 						found_something = true;
 						break;
@@ -553,9 +585,8 @@ function draw_tank_move(mouseX, mouseY){
 		if(found_something==false)
 			MY_TANK.clicked = [mouseX,mouseY,8];
 	
-		var tank_size = TYPES[MY_TANK.type].size[1];
-		mouseX = mouseX-tank_size/2;	
-		mouseY = mouseY-tank_size/2;
+		mouseX = mouseX-MY_TANK.width()/2;	
+		mouseY = mouseY-MY_TANK.height()/2;
 		mouseX = Math.floor(mouseX);
 		mouseY = Math.floor(mouseY);
 		
@@ -576,12 +607,16 @@ function draw_tank_move(mouseX, mouseY){
 		else{
 			if(found_something==false){
 				if(game_mode == 3){
+					var gap_rand = 50;
 					for(var i in TANKS){
 						if(TANKS[i].team != MY_TANK.team) continue;
 						if(TANKS[i].dead == 1) continue;
 						if(TANKS[i].selected == 1){
+							//randomize
+							mouseX_rand = mouseX + getRandomInt(-gap_rand, gap_rand);
+							mouseY_rand = mouseY + getRandomInt(-gap_rand, gap_rand);
 							TANKS[i].move = 1;
-							TANKS[i].move_to = [mouseX, mouseY];
+							TANKS[i].move_to = [mouseX_rand, mouseY_rand];
 							}
 						}
 					}
@@ -604,12 +639,11 @@ function draw_tank_move(mouseX, mouseY){
 		}
 	}
 //check collisions
-function check_collisions(xx, yy, TANK){
-	if(TYPES[TANK.type].no_collisions != undefined) return false;
+function check_collisions(xx, yy, TANK, full_check){
+	if(full_check == undefined && TYPES[TANK.type].no_collisions != undefined) return false;
 	if(TANK.automove != undefined) return false;
 	xx = Math.round(xx);
 	yy = Math.round(yy);
-	var tank_size_half = round(TYPES[TANK.type].size[1]/2);	
 
 	//borders
 	if(xx < 0 || yy < 0) return true;
@@ -641,18 +675,22 @@ function check_collisions(xx, yy, TANK){
 	//other tanks
 	if(TYPES[TANK.type].types != 'tower'){
 		for (i in TANKS){
-			if(TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'tower') continue;
+			if(game_mode == 3 && full_check == undefined && TYPES[TANKS[i].type].type != 'building') continue;
+			if(full_check == undefined && TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'tower') continue;
 			if(TANKS[i].id == TANK.id) continue;			//same tank
-			if(TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
+			if(full_check == undefined && TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
 			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
 			if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
 			if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
 			if(TANKS[i].dead == 1) continue;		//tank dead
-			var size2 = TYPES[TANKS[i].type].size[1];
-			if(TYPES[TANKS[i].type].type == 'human')	
-				size2 = round(size2/2);	//soldiers small
-			if(xx > TANKS[i].x && xx < TANKS[i].x+size2){
-				if(yy > TANKS[i].y && yy < TANKS[i].y+size2){
+			var size2_w = TANKS[i].width();
+			var size2_h = TANKS[i].height();
+			if(TYPES[TANKS[i].type].type == 'human'){	//soldiers small	
+				size2_w = round(size2_w/2);	
+				size2_h = round(size2_h/2);
+				}
+			if(xx > TANKS[i].x && xx < TANKS[i].x+size2_w){
+				if(yy > TANKS[i].y && yy < TANKS[i].y+size2_h){
 					return true;
 					}
 				}
@@ -663,6 +701,7 @@ function check_collisions(xx, yy, TANK){
 	}
 //checks tanks levels
 function tank_level_handler(){		//once per second
+	if(game_mode == 3) return false;
 	//check level-up
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tower') continue;
@@ -768,7 +807,12 @@ function get_ability_to_ugrade(TANK){
 function check_enemies(TANK){
 	if(TANK.dead == 1) return false;	//dead
 	if(TANK.stun != undefined) return false;	//stuned
-	if(TANK.hit_reuse == undefined) TANK.hit_reuse = TANK.attack_delay*1000+Date.now();
+	if(TANK.hit_reuse == undefined){
+		var hit_reuse = TANK.attack_delay*1000;
+		hit_reuse = apply_buff(TANK, 'hit_reuse', hit_reuse);
+		TANK.hit_reuse = hit_reuse + Date.now();
+		}
+	
 	if(TANK.hit_reuse - Date.now() > 0)
 		return false;	//hit reuse
 	if(TANK.check_enemies_reuse - Date.now() > 0)
@@ -777,7 +821,8 @@ function check_enemies(TANK){
 		
 	range = TYPES[TANK.type].range;
 	var found = false;
-	var tank_size_from = TYPES[TANK.type].size[1]/2;
+	var tank_size_from_w = TANK.width()/2;
+	var tank_size_from_h = TANK.height()/2;
 	
 	//check if target_lock
 	var i_locked = false;
@@ -804,7 +849,7 @@ function check_enemies(TANK){
 		f_angle = (radiance*180.0)/Math.PI+90;
 		
 		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - TYPES[TANKS[i].type].size[1]/2 - tank_size_from;
+		distance = distance - TANKS[i].width()/2 - tank_size_from_w;
 		
 		if(distance < range){
 			do_shoot(TANK, TANKS[i], f_angle);
@@ -865,14 +910,13 @@ function check_enemies(TANK){
 			dist_x = TANKS[i].cx() - (TANK.cx());
 			dist_y = TANKS[i].cy() - (TANK.cy());
 			distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-			distance = distance - TYPES[TANKS[i].type].size[1]/2 - tank_size_from;
+			distance = distance - TANKS[i].width()/2 - tank_size_from_w;
 			
 			if(range < distance){	
 				continue;	//target too far
 				}
 			
 			//start shooting
-			var tank_size_from = TYPES[TANK.type].size[1];
 			var radiance = Math.atan2(dist_y, dist_x);
 			f_angle = (radiance*180.0)/Math.PI+90;
 			
@@ -964,7 +1008,9 @@ function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
 	else
 		send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle)]);
 	
-	TANK.hit_reuse = TANK.attack_delay*1000+Date.now();	
+	var hit_reuse = TANK.attack_delay*1000;
+	hit_reuse = apply_buff(TANK, 'hit_reuse', hit_reuse);
+	TANK.hit_reuse = hit_reuse + Date.now();	
 	TANK.check_enemies_reuse = 0;
 	}
 //draw tank shooting fire
@@ -1164,7 +1210,7 @@ function death(tank){
 	tank.hp = 0;
 	tank.move = 0;
 	tank.death_respan = 2*1000+Date.now();
-	tank.dead = 1;
+	tank.dead = 1;	
 	
 	tank.abilities_reuse = [0, 0, 0];
 	delete tank.target_move_lock;
@@ -1179,12 +1225,15 @@ function death(tank){
 	else
 		respan_time = tank.level*1000;
 	respan_time = apply_buff(tank, 'respawn', respan_time);
+	if(respan_time < 3*1000)
+		respan_time = 3*1000;
 	respan_time = respan_time + Date.now();
 	tank.respan_time = respan_time;
 	}
 //add towers to map
-function add_towers(){
+function add_towers(team, nation){
 	for (var i in MAPS[level-1].towers){
+		if(MAPS[level-1]['towers'][i][0] != team) continue;
 		//get type
 		var type = '';
 		for(var t in TYPES){
@@ -1194,12 +1243,10 @@ function add_towers(){
 				}
 			}
 		if(type=='') alert('Error: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
-		var team = MAPS[level-1]['towers'][i][0];
-		var nation = get_nation_by_team(team);
 		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
-		var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
+		var height_tmp = HEIGHT_MAP - TYPES[type].size[2];
 		var x = MAPS[level-1]['towers'][i][1] - round(TYPES[type].size[1]/2);
-		var y = MAPS[level-1]['towers'][i][2] - round(TYPES[type].size[1]/2);
+		var y = MAPS[level-1]['towers'][i][2] - round(TYPES[type].size[2]/2);
 		var angle = 180;
 		if(team != 'B')
 			angle = 0;
@@ -1293,7 +1340,6 @@ function check_enemy_visibility(tank){
 	if(tank.cache_scouted_reuse - Date.now() > 0)
 		return tank.cache_scouted;	
 	
-	var tank_size_from = TYPES[tank.type].size[1]/2;
 	for (i in TANKS){
 		if(TANKS[i].team == tank.team)
 			continue;	//same team
@@ -1302,7 +1348,7 @@ function check_enemy_visibility(tank){
 		
 		//exact range
 		distance = get_distance_between_tanks(TANKS[i], tank);
-		if(distance + TANKS[i].size()/2 < TANKS[i].sight){
+		if(distance + TANKS[i].width()/2 < TANKS[i].sight){
 			tank.cache_scouted_reuse = 500+Date.now();
 			tank.cache_scouted = true;
 			return true;	//found by enemy
@@ -1418,11 +1464,11 @@ function get_bullet(filename){
 	}
 //returns tank by coordinates
 function get_tank_by_coords(mouseX, mouseY, team, tank_from){
-	var size_from_half = round(TYPES[tank_from.type].size[1]/2);
 	for(var i in TANKS){
-		var size_to_half = round(TYPES[TANKS[i].type].size[1]/2);
+		var size_to_half_w = round(TANKS[i].width()/2);
+		var size_to_half_h = round(TANKS[i].height()/2);
 		if(team != undefined && TANKS[i].team != team) continue;
-		if(Math.abs(TANKS[i].x+size_to_half - mouseX) < size_to_half && Math.abs(TANKS[i].y+size_to_half - mouseY) < size_to_half){
+		if(Math.abs(TANKS[i].cx() - mouseX) < size_to_half_w && Math.abs(TANKS[i].cy() - mouseY) < size_to_half_h){
 			distance = get_distance_between_tanks(TANKS[i], tank_from);
 			TANKS[i].tmp_range = distance;
 			return TANKS[i];
@@ -1447,7 +1493,7 @@ function get_distance_between_tanks(id1, id2){
 	dist_y = tank1.cy() - (tank2.cy());
 	
 	distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-	distance = distance - TYPES[tank1.type].size[1]/2 - TYPES[tank2.type].size[1]/2;
+	distance = distance - tank1.width()/2 - tank2.width()/2;
 	distance = round(distance);
 	if(distance<0) distance = 0;
 	return distance;
@@ -1468,8 +1514,8 @@ function sync_movement(TANK, xx, yy){
 	if(TYPES[TANK.type].type == 'tower') return false;
 	if(TANK.id != MY_TANK.id){
 		//get distance
-		dist_x = TANK.x+TYPES[TANK.type].size[1]/2 - (xx+TYPES[TANK.type].size[1]/2);
-		dist_y = TANK.y+TYPES[TANK.type].size[1]/2 - (yy+TYPES[TANK.type].size[1]/2);
+		dist_x = TANK.cx() - (xx + TANK.width()/2);
+		dist_y = TANK.cy() - (yy + TANK.height()/2);
 		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 		if(distance > MAX_ALLOED_DIFFERENCE){
 			TANK.x = xx;
@@ -1507,7 +1553,7 @@ function add_bots(random_id){
 			type = t;
 		}
 	var width_tmp = WIDTH_MAP - TYPES[type].size[1];
-	var height_tmp = HEIGHT_MAP - TYPES[type].size[1];
+	var height_tmp = HEIGHT_MAP - TYPES[type].size[2];
 	
 	var bot_nr = 0;
 	for (i in MAPS[level-1].bots){
@@ -1545,7 +1591,7 @@ function check_invisibility(TANK, force_check){
 		if(TANK.move == 0 && TANKS[i].move == 0 && force_check == undefined) continue; //no changes here
 		var distance = get_distance_between_tanks(TANKS[i], TANK);
 		var min_range = TANKS[i].sight;
-		min_range = min_range - TANK.size()/2;
+		min_range = min_range - TANK.width()/2;
 		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
 			min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 		if(distance < min_range){	
@@ -1562,33 +1608,49 @@ function apply_buff(TANK, buff_name, original_value){
 			if(TANK.buffs[b].type == 'static'){
 				original_value = original_value + TANK.buffs[b].power;
 				}
-			else
+			else{
 				original_value = original_value * TANK.buffs[b].power;
+				original_value = round(original_value*100)/100;
+				}
 			}
 		}
 	if(original_value < 0) original_value = 0;
 	return original_value;
 	}
+function set_spawn_coordinates(tank){
+	var space = 35;
+	if(tank.team=='B'){	//blue top
+		tank.y = 20;
+		tank.angle = 180;
+		}
+	else{		//red bottom 
+		tank.y = HEIGHT_MAP - 20 - tank.height();
+		angle = 0;
+		}
+	
+	center_x = round(WIDTH_MAP/2);
+	for(var i=1; i<20; i++){
+		var min = center_x - 150 - i*10;
+		var max = center_x + 150 + i*10;
+		if(min < 50) min = 50;
+		if(max > WIDTH_MAP-50) max = WIDTH_MAP-50;
+		
+		var x = getRandomInt(min, max);
+		if(check_collisions(x, tank.y+tank.width()/2, tank, true)==true) continue;
+		if(check_collisions(x+tank.width(), tank.y+tank.height()/2, tank, true)==true) continue;
+		
+		tank.x = x - round(tank.width()/2);
+		return false;
+		}
+	tank.x = 100;
+	}
 //adds new tank
 function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_tank, begin_time){
 	if(type==undefined) type = 0;
-	var space = 35;
 	
-	//default coordinates
-	if(x==undefined && y==undefined && angle==undefined){
-		if(team=='B'){	//blue top
-			x = round(APP_SIZE_CACHE[0]*5.5/10);
-			x = x + get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
-			y = 20;
-			angle = 180;
-			}
-		else{		//red bottom 
-			x = round(APP_SIZE_CACHE[0]*4/10);
-			x = x - get_team_tanks_count(team)*space; //x = getRandomInt(0, APP_SIZE_CACHE[0]);
-			y = HEIGHT_MAP-20-TYPES[type].size[1];
-			angle = 0;
-			}
-		}
+	//angle
+	if(angle==undefined)
+		angle = 0;
 	//modifiers
 	var hp_mod = 1;
 	var damage_mod = 1;
@@ -1644,14 +1706,11 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 		TANK_tmp.master = master_tank;	
 	if(begin_time != undefined)
 		TANK_tmp.begin_time = begin_time;
-	TANK_tmp.cx = function(){ 
-		return this.x + TYPES[this.type].size[1]/2;
-		}
-	TANK_tmp.cy = function(){
-		return this.y + TYPES[this.type].size[1]/2;
-		}
-	TANK_tmp.size = function(){
-		return TYPES[this.type].size[1];
-		}
+	TANK_tmp.cx = function(){ 	return this.x + round(TYPES[this.type].size[1]/2);	}
+	TANK_tmp.cy = function(){	return this.y + round(TYPES[this.type].size[2]/2);	}
+	TANK_tmp.width = function(){	return TYPES[this.type].size[1];		}
+	TANK_tmp.height = function(){	return TYPES[this.type].size[2];		}
+	if(TANK_tmp.x == undefined || TANK_tmp.y == undefined)
+		set_spawn_coordinates(TANK_tmp);
 	TANKS.push(TANK_tmp);
 	}

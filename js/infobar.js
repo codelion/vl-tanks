@@ -273,6 +273,8 @@ function draw_ability_reuse(object){
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
 	
 	if(object != undefined){
+		if(object.tank.id != MY_TANK.id) return false;	//another tank
+		
 		var i = object.nr;
 		var ability_reuse = object.tank.abilities_reuse[i] - Date.now();
 		if(TYPES[MY_TANK.type].abilities[i] == undefined) return false;
@@ -488,9 +490,8 @@ function update_radar(tank){
 		msize = 3;
 		if(TYPES[tank.type].type == 'human')
 			msize = 2;
-		size_half = TYPES[tank.type].size[1]/2;
-		var tank_x = tank.x+size_half;
-		var tank_y = tank.y+size_half;	
+		var tank_x = tank.x + tank.width()/2;
+		var tank_y = tank.y + tank.height()/2;
 		if(tank_x<0)	tank_x=0;
 		if(tank_y<0)	tank_y=0;
 		if(tank_x>MAPS[level-1].width)	tank_x=MAPS[level-1].width;

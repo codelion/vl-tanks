@@ -108,10 +108,8 @@ function draw_library_units(selected_tank){
 		var pos1 = 10+j*(preview_x+gap);
 		var pos2 = y;
 		var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
-		var pos_top = pos2 + (preview_y-TYPES[i].size[1])/2;
-		draw_tank_clone(
-			{type: i, size: function(){ return TYPES[i].size[1]; }},
-			pos_left, pos_top, 0, 1, canvas_backround);
+		var pos_top = pos2 + (preview_y-TYPES[i].size[2])/2;
+		draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
 		
 		//register button
 		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){

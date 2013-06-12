@@ -752,8 +752,8 @@ function get_packet(fromClient, message){
 		
 		//create bullet
 		var tmp = new Array();
-		tmp.x = TANK.x + TYPES[TANK.type].size[1]/2;
-		tmp.y = TANK.y + TYPES[TANK.type].size[1]/2;
+		tmp.x = TANK.cx();
+		tmp.y = TANK.cy();
 		tmp.bullet_to_target = TANK_TO; 
 		tmp.bullet_from_target = TANK;
 		tmp.angle = DATA[2];

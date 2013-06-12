@@ -207,7 +207,7 @@ function on_mousemove(event){
 	}	
 var selection = false;
 //mouse right click
-function on_mouse_right_click(event){				//////////////////
+function on_mouse_right_click(event){
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX-map_offset[0];
@@ -235,12 +235,24 @@ function on_mouse_right_click(event){				//////////////////
 			TANKS[i].selected = 1;
 			}
 		}
+	if(game_mode == 3 && selection.drag != true){
+		//select 1
+		for(var i in TANKS){
+			if(MY_TANK.team != TANKS[i].team) continue;
+			if(Math.abs(TANKS[i].cx() - mouseX) < TANKS[i].width()/2 && Math.abs(TANKS[i].cy() - mouseY) < TANKS[i].height()/2){
+				TANKS[i].selected = 1;
+				MY_TANK = TANKS[i];
+				draw_infobar();
+				break;
+				}
+			}
+		}
 	if(PLACE == 'game')
 		soldiers_move(mouseX, mouseY);
 	return false;
 	}
 //mouse click 
-function on_mousedown(event){					////////////////////
+function on_mousedown(event){
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX;
