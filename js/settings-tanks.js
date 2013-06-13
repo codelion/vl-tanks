@@ -415,6 +415,7 @@ TYPES.push({
 	abilities: [
 		{name: 'Factory',		passive: false,		broadcast: 0}, 
 		{name: 'Research',		passive: false,		broadcast: 0}, 
+		{name: 'Silo',			passive: false,		broadcast: 0}, 
 		],
 	size: ['L', 90, 90],
 	preview: false,
@@ -441,8 +442,8 @@ TYPES.push({
 	turn_speed: 0,
 	no_repawn: 1,
 	abilities: [
-		{name: 'War units',	passive: false,		broadcast: 0}, 
 		{name: 'Tower',		passive: false,		broadcast: 0}, 
+		{name: 'War units',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 68, 56],
 	preview: false,
@@ -470,6 +471,28 @@ TYPES.push({
 		{name: 'Armor',		passive: false,		broadcast: 1},
 		],
 	size: ['M', 50, 42],
+	preview: false,
+	icon_top: false,
+	icon_base: true,
+	no_base_rotate: true,
+	});
+
+//Silo
+TYPES.push({
+	name: 'Silo',
+	type: 'building',
+	description: ["Structure for storing Helium-3."],
+	life: [400,0],
+	damage: [0, 0],		//0 dps
+	range: 0,
+	scout: 70,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [],
+	size: ['M', 46, 46],
 	preview: false,
 	icon_top: false,
 	icon_base: true,

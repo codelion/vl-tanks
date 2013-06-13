@@ -101,6 +101,7 @@ function on_keyboard_action(event){
 	//disable some keys
 	if(k >= 37 && k <= 40 && chat_mode != 1) return false;	//scroll with left, rigth, up and down
 	if(k==9)	return false;	//TAB
+	if(k==32 && chat_mode != 1) 	return false;	//space
 		
 	return true;
 	}
@@ -217,30 +218,51 @@ function on_mouse_right_click(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
-	if(selection.drag == true){
-		selection.drag = false;
-		selection.x2 = mouseX;
-		selection.y2 = mouseY;
-		
-		//unselect all
-		for(var i in TANKS)
-			delete TANKS[i].selected;
-		//select some
-		for(var i in TANKS){
-			if(TANKS[i].team != MY_TANK.team) continue;
-			if(TANKS[i].dead == 1) continue;
-			if(TYPES[TANKS[i].type].type != 'tank') continue;
-			if(TANKS[i].cx() < selection.x || TANKS[i].cx() > selection.x2 ) continue;
-			if(TANKS[i].cy() < selection.y || TANKS[i].cy() > selection.y2 ) continue;
-			TANKS[i].selected = 1;
-			}
-		}
-	if(game_mode == 3 && selection.drag != true){
-		//select 1
-		for(var i in TANKS){
-			if(MY_TANK.team != TANKS[i].team) continue;
-			if(Math.abs(TANKS[i].cx() - mouseX) < TANKS[i].width()/2 && Math.abs(TANKS[i].cy() - mouseY) < TANKS[i].height()/2){
+	if(game_mode == 3){
+		var selected_n = 0;
+		var last_selected_i; 
+		if(selection.drag == true){
+			selection.drag = false;
+			selection.x2 = mouseX;
+			selection.y2 = mouseY;
+			
+			//unselect all
+			for(var i in TANKS)
+				delete TANKS[i].selected;
+			//select some
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TANKS[i].dead == 1) continue;
+				if(TYPES[TANKS[i].type].type != 'tank') continue;
+				if(TANKS[i].cx() < selection.x || TANKS[i].cx() > selection.x2 ) continue;
+				if(TANKS[i].cy() < selection.y || TANKS[i].cy() > selection.y2 ) continue;
 				TANKS[i].selected = 1;
+				selected_n++;
+				last_selected_i = i;
+				}
+			if(selected_n == 1){
+				MY_TANK = TANKS[last_selected_i];
+				draw_infobar();
+				}
+			}
+		if(selection.drag != true){
+			//select 1
+			for(var i in TANKS){
+				if(MY_TANK.team != TANKS[i].team) continue;
+				if(Math.abs(TANKS[i].cx() - mouseX) < TANKS[i].width()/2 && Math.abs(TANKS[i].cy() - mouseY) < TANKS[i].height()/2){
+					TANKS[i].selected = 1;
+					MY_TANK = TANKS[i];
+					draw_infobar();
+					selected_n++;
+					break;
+					}
+				}
+			}
+		if(selected_n == 0){
+			//select base
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TYPES[TANKS[i].type].name != 'Base') continue;
 				MY_TANK = TANKS[i];
 				draw_infobar();
 				break;

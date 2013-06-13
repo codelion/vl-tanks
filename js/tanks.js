@@ -88,8 +88,8 @@ function draw_tank(tank){
 		else{
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
-			tmp_canvas.width = 105
-			tmp_canvas.height = 105;
+			tmp_canvas.width = 110;
+			tmp_canvas.height = 110;
 			var tmp_object = tmp_canvas.getContext("2d");
 			var radius_extra = 0;
 			
@@ -181,6 +181,11 @@ function draw_tank(tank){
 				tmp_object.strokeStyle = "#d9d900";
 				tmp_object.stroke();
 				radius_extra = radius_extra + 5;
+				}
+			
+			//flag
+			if(TYPES[tank.type].type == 'building' || TYPES[tank.type].name == 'Base'){
+				draw_image(tmp_object, COUNTRIES[tank.nation].file, 8, padding - 15 + round(tank.height()*7/100));
 				}
 			
 			//save to cache
@@ -287,7 +292,8 @@ function add_player_name(tank){
 	var yy = round(tank.y+map_offset[1]);
 	var name_padding = 20;
 	var player_name = tank.name.substring(0, 10);
-	player_name = player_name+" "+tank.level;
+	if(game_mode != 3)
+		player_name = player_name+" "+tank.level;
 	
 	
 	if(tank.cache_name != undefined && tank.cache_name.level == tank.level){
@@ -557,9 +563,10 @@ function draw_tank_move(mouseX, mouseY){
 						}
 					}
 				if(TANKS[i].team != MY_TANK.team){
-					if(Math.abs(TANKS[i].cx - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
+					if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
 						//clicked on enemy
 						TANKS[i].clicked_on = 10;	// will draw circle on enemies
+							
 						if(game_mode != 3){
 							MY_TANK.target_move_lock = TANKS[i].id;
 							MY_TANK.target_shoot_lock = TANKS[i].id;
@@ -1234,6 +1241,7 @@ function death(tank){
 function add_towers(team, nation){
 	for (var i in MAPS[level-1].towers){
 		if(MAPS[level-1]['towers'][i][0] != team) continue;
+		if(game_mode == 3 && MAPS[level-1].towers[i][3] != 'Base') continue;
 		//get type
 		var type = '';
 		for(var t in TYPES){
@@ -1277,6 +1285,7 @@ function get_nation_by_team(team){
 	}
 //tank special ability activated	
 function do_ability(nr, TANK){
+	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;
 	if(TANK.dead == 1 || TANK.stun != undefined) return false; //dead or stuned
 	if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;

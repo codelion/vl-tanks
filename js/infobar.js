@@ -39,6 +39,7 @@ function redraw_tank_stats(){
 	var gap = 19;
 	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
 	
+	//counter mode - death
 	if(game_mode == 2 && MY_TANK.dead == 1){
 		ROOM = get_room_by_id(opened_room_id);
 		if(ROOM.settings[0] == 'counter'){
@@ -46,135 +47,155 @@ function redraw_tank_stats(){
 			return false;
 			}
 		}
+	//commander mode - Factory
+	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory'){
+		draw_counter_tank_selection();
+		return false;
+		}
 	
 	//clear
 	draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
 		245, 10, 330, 83);
-		
-	//sublevel clear
-	var max_width = 85;
-	canvas_backround.lineWidth = 2;
-	canvas_backround.beginPath();
-	canvas_backround.moveTo(status_x+130, status_y+36);
-	canvas_backround.lineTo(status_x+130+max_width, status_y+36);
-	canvas_backround.strokeStyle = '#2a4214';
-	canvas_backround.stroke();
-	//sublevel draw
-	canvas_backround.beginPath();
-	canvas_backround.moveTo(status_x+130, status_y+36);
-	canvas_backround.lineTo(status_x+130+round(MY_TANK.sublevel*max_width/100), status_y+36);
-	canvas_backround.strokeStyle = '#4a7c0d';
-	canvas_backround.stroke();
-	//level
-	canvas_backround.fillStyle = "#182605";
-	canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
-	//draw
-	var text = Math.floor(MY_TANK.level);
-	canvas_backround.fillStyle = "#c10000";
-	canvas_backround.font = "normal 18px Verdana";
-	if(text>99)
-		canvas_backround.font = "normal 11px Verdana";
-	if(text>999)
-		canvas_backround.font = "normal 8px Verdana";
-	var text_length = canvas_backround.measureText(text).width;
-	canvas_backround.fillText(text, status_x+218-text_length, status_y+28);
 	
-	//damage
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Damage", left_x, top_y);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var damage_string = MY_TANK.damage;
-	damage_string = apply_buff(MY_TANK, 'damage', damage_string);
-	damage_string = Math.floor(damage_string);
-	canvas_backround.fillText(damage_string, left_x_values, top_y);
+	if(game_mode == 3 && MY_TANK.selected == undefined){
+		draw_image(canvas_backround, 'statusbar', status_x, status_y);
+		return false;
+		}
 	
-	//armor
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Armor", left_x, top_y+28);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var armor_text = MY_TANK.armor;
-	armor_text = apply_buff(MY_TANK, 'shield', armor_text);
-	if(armor_text > 100) armor_text = 100;
-	if(armor_text < 0) armor_text = 0;
-	armor_text = Math.floor(armor_text);
-	canvas_backround.fillText(armor_text+"%", left_x_values, top_y+28);
+	if(game_mode != 3){	
+		//sublevel clear
+		var max_width = 85;
+		canvas_backround.lineWidth = 2;
+		canvas_backround.beginPath();
+		canvas_backround.moveTo(status_x+130, status_y+36);
+		canvas_backround.lineTo(status_x+130+max_width, status_y+36);
+		canvas_backround.strokeStyle = '#2a4214';
+		canvas_backround.stroke();
+		//sublevel draw
+		canvas_backround.beginPath();
+		canvas_backround.moveTo(status_x+130, status_y+36);
+		canvas_backround.lineTo(status_x+130+round(MY_TANK.sublevel*max_width/100), status_y+36);
+		canvas_backround.strokeStyle = '#4a7c0d';
+		canvas_backround.stroke();
+		//level
+		canvas_backround.fillStyle = "#182605";
+		canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
+		//draw
+		var text = Math.floor(MY_TANK.level);
+		canvas_backround.fillStyle = "#c10000";
+		canvas_backround.font = "normal 18px Verdana";
+		if(text>99)
+			canvas_backround.font = "normal 11px Verdana";
+		if(text>999)
+			canvas_backround.font = "normal 8px Verdana";
+		var text_length = canvas_backround.measureText(text).width;
+		canvas_backround.fillText(text, status_x+218-text_length, status_y+28);
+		}
+	
+	if(TYPES[MY_TANK.type].damage[0] != '0'){
+		//damage
+		canvas_backround.fillStyle = "#7b8a69";
+		canvas_backround.font = "normal 10px Verdana";
+		canvas_backround.fillText("Damage", left_x, top_y);
+		//value
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var damage_string = MY_TANK.damage;
+		damage_string = apply_buff(MY_TANK, 'damage', damage_string);
+		damage_string = Math.floor(damage_string);
+		canvas_backround.fillText(damage_string, left_x_values, top_y);
+
+		//armor
+		canvas_backround.fillStyle = "#7b8a69";
+		canvas_backround.font = "normal 10px Verdana";
+		canvas_backround.fillText("Armor", left_x, top_y+28);
+		//value
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var armor_text = MY_TANK.armor;
+		armor_text = apply_buff(MY_TANK, 'shield', armor_text);
+		if(armor_text > 100) armor_text = 100;
+		if(armor_text < 0) armor_text = 0;
+		armor_text = Math.floor(armor_text);
+		canvas_backround.fillText(armor_text+"%", left_x_values, top_y+28);
+		}
 	
 	left_x = status_x+370;
 	left_x_values = status_x+414;
 	
-	//range
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Range", left_x, top_y);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	canvas_backround.fillText(TYPES[MY_TANK.type].range+" m.", left_x_values, top_y);
+	if(TYPES[MY_TANK.type].range != '0'){
+		//range
+		canvas_backround.fillStyle = "#7b8a69";
+		canvas_backround.font = "normal 10px Verdana";
+		canvas_backround.fillText("Range", left_x, top_y);
+		//value
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		canvas_backround.fillText(TYPES[MY_TANK.type].range+" m.", left_x_values, top_y);
+		}
 	
-	//speed
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Speed", left_x, top_y+28);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var speed_text = MY_TANK.speed;
-	speed_text = apply_buff(MY_TANK, 'speed', speed_text);
-	speed_text = Math.floor(speed_text)+" km/h";
-	canvas_backround.fillText(speed_text, left_x_values, top_y+28);
+	if(TYPES[MY_TANK.type].speed != '0'){
+		//speed
+		canvas_backround.fillStyle = "#7b8a69";
+		canvas_backround.font = "normal 10px Verdana";
+		canvas_backround.fillText("Speed", left_x, top_y+28);
+		//value
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var speed_text = MY_TANK.speed;
+		speed_text = apply_buff(MY_TANK, 'speed', speed_text);
+		speed_text = Math.floor(speed_text)+" km/h";
+		canvas_backround.fillText(speed_text, left_x_values, top_y+28);
+		}
 	
 	left_x = status_x+492;
 	left_x_values = status_x+535;
 	
-	//kills
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Kills", left_x, top_y);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var text;
-	text = MY_TANK.kills;
-	canvas_backround.fillText(text, left_x_values, top_y);
-	
-	if(game_mode == 2)
-		death_padding = 20;
-	else
-		death_padding = 28;
-	
-	//deaths
-	canvas_backround.fillStyle = "#7b8a69";
-	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText("Deaths", left_x, top_y+death_padding);
-	//value
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var text = MY_TANK.deaths;
-	canvas_backround.fillText(text, left_x_values, top_y+death_padding);
-	
-	//players
-	if(game_mode == 2){
+	if(TYPES[MY_TANK.type].damage[0] != '0'){
+		//kills
 		canvas_backround.fillStyle = "#7b8a69";
 		canvas_backround.font = "normal 10px Verdana";
-		canvas_backround.fillText("Players", left_x, top_y+40);
+		canvas_backround.fillText("Kills", left_x, top_y);
 		//value
 		canvas_backround.fillStyle = "#a3ad16";
 		canvas_backround.font = "bold 10px Verdana";
-		ROOM = get_room_by_id(opened_room_id);
-		p_n = 0;
-		timeout_interval = 20;	//in seconds
-		for(var p in ROOM.players){
-			if(ROOM.players[p].ping + timeout_interval*1000 > Date.now())
-				p_n++;	
+		var text;
+		text = MY_TANK.kills;
+		canvas_backround.fillText(text, left_x_values, top_y);
+		
+		if(game_mode == 2)
+			death_padding = 20;
+		else
+			death_padding = 28;
+		
+		//deaths
+		canvas_backround.fillStyle = "#7b8a69";
+		canvas_backround.font = "normal 10px Verdana";
+		canvas_backround.fillText("Deaths", left_x, top_y+death_padding);
+		//value
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var text = MY_TANK.deaths;
+		canvas_backround.fillText(text, left_x_values, top_y+death_padding);
+		
+		//players
+		if(game_mode == 2){
+			canvas_backround.fillStyle = "#7b8a69";
+			canvas_backround.font = "normal 10px Verdana";
+			canvas_backround.fillText("Players", left_x, top_y+40);
+			//value
+			canvas_backround.fillStyle = "#a3ad16";
+			canvas_backround.font = "bold 10px Verdana";
+			ROOM = get_room_by_id(opened_room_id);
+			p_n = 0;
+			timeout_interval = 20;	//in seconds
+			for(var p in ROOM.players){
+				if(ROOM.players[p].ping + timeout_interval*1000 > Date.now())
+					p_n++;	
+				}
+			var text = p_n+"/"+ROOM.players_max;
+			canvas_backround.fillText(text, left_x_values, top_y+40);
 			}
-		var text = p_n+"/"+ROOM.players_max;
-		canvas_backround.fillText(text, left_x_values, top_y+40);
 		}
 	
 	//logo
@@ -196,9 +217,9 @@ function redraw_tank_stats(){
 		
 	//text
 	var text = hp+"/"+hp_max;
-	var text_width = canvas_backround.measureText(text).width;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "normal 9px Verdana";
+	var text_width = canvas_backround.measureText(text).width;
 	canvas_backround.fillText(text, life_x+life_width-text_width-5, life_y+life_height-5);
 
 	//show fps
@@ -206,6 +227,7 @@ function redraw_tank_stats(){
 	}
 //redraw tank skills
 function draw_tank_abilities(){
+	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
@@ -231,10 +253,12 @@ function draw_tank_abilities(){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		var value = MY_TANK.abilities_lvl[i];
-		canvas_backround.font = "normal 8px Verdana";
-		canvas_backround.fillStyle = "#2f391c";
-		canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+		if(game_mode != 3){
+			var value = MY_TANK.abilities_lvl[i];
+			canvas_backround.font = "normal 8px Verdana";
+			canvas_backround.fillStyle = "#2f391c";
+			canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+			}
 		
 		//ability to upgrade
 		if(i==ABILITIES_MODE-1){
@@ -268,6 +292,7 @@ function draw_tank_abilities(){
 	}
 //draw tanks skill reuse animation
 function draw_ability_reuse(object){
+	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
@@ -317,10 +342,12 @@ function draw_ability_reuse(object){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		var value = MY_TANK.abilities_lvl[i];
-		canvas_backround.font = "normal 8px Verdana";
-		canvas_backround.fillStyle = "#2f391c";
-		canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+		if(game_mode != 3){
+			var value = MY_TANK.abilities_lvl[i];
+			canvas_backround.font = "normal 8px Verdana";
+			canvas_backround.fillStyle = "#2f391c";
+			canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
+			}
 		
 		//ability to upgrade
 		if(i==ABILITIES_MODE-1){
@@ -513,8 +540,10 @@ function draw_counter_tank_selection(selected_tank){
 	var max_width = 325;
 	var max_height = 80;
 	var gap = 3;
-	var msize;
+	var msize = 37;
 	var first_time = false;
+	
+	/* //auto size
 	var n = 0;
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
@@ -523,18 +552,18 @@ function draw_counter_tank_selection(selected_tank){
 	n1 = Math.ceil(n/2);
 	msize = round((430-gap*(n1-1))/n1);
 	if(msize*2+gap > max_height)
-		msize = round((max_height-gap)/2);
+		msize = round((max_height-gap)/2);*/
 	
 	if(selected_tank == undefined){
 		selected_tank = MY_TANK.type;
 		first_time = true;
 		}
 	
-	if(selected_tank==last_selected_counter)
+	if(game_mode != 3 && selected_tank==last_selected_counter)
 		return false;
 		
 	//tank icon
-	if(TYPES[MY_TANK.type].preview != false){
+	if(TYPES[MY_TANK.type].preview != false && game_mode != 3){
 		//clear
 		draw_image(canvas_backround, 'statusbar', status_x+140, status_y+40, 90, 80, status_x+140, status_y+40, 90, 80);
 		//draw
@@ -548,40 +577,48 @@ function draw_counter_tank_selection(selected_tank){
 	for(var i in TYPES){
 		if(TYPES[i].type != 'tank') continue;
 		if(check_nation_tank(TYPES[i].name, nation)==false) continue;
-		if(i == selected_tank || i == last_selected_counter || last_selected_counter==-1){
-			//reset background
-			var back_color = '';
-			if(selected_tank != undefined && selected_tank == i || i == MY_TANK.type)
-				back_color = "#8fc74c"; //selected
-			else
-				back_color = "#dbd9da";
-			canvas_backround.fillStyle = back_color;
-			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
-			
-			//logo
-			draw_image(canvas_backround, TYPES[i].name, 
-				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), msize, msize,
-				undefined, undefined, 90, 90);
-			
-			//register button
-			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
-				if(game_mode == 2 && MY_TANK.dead == 1){
-					ROOM = get_room_by_id(opened_room_id);
-					if(ROOM.settings[0]=='counter'){
-						register_tank_action('change_tank', opened_room_id, name, index, true);
-						return true;
-						}
-					else
-						return false;
+		//reset background
+		var back_color = '';
+		if(selected_tank != undefined && selected_tank == i || i == MY_TANK.type)
+			back_color = "#8fc74c"; //selected
+		else
+			back_color = "#dbd9da";
+		canvas_backround.fillStyle = back_color;
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
+		
+		//logo
+		var sizer = 0.7;
+		draw_image(canvas_backround, TYPES[i].name, 
+			pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+			100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+		draw_image(canvas_backround, TYPES[i].name, 
+			pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+			150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+		
+		//register button
+		register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+			if(game_mode == 2 && MY_TANK.dead == 1){
+				ROOM = get_room_by_id(opened_room_id);
+				if(ROOM.settings[0]=='counter'){
+					register_tank_action('change_tank', opened_room_id, name, index, true);
+					return true;
 					}
-				}, i);
-			}
+				else
+					return false;
+				}
+			else if(game_mode == 3){
+				var gap_rand = 100;
+				var x = MY_TANK.x + getRandomInt(-gap_rand, gap_rand);
+				var y = MY_TANK.y + getRandomInt(-gap_rand, gap_rand);
+				var angle = 180;
+				if(MY_TANK.team != 'B')
+					angle = 0;
+				add_tank(1, 'unit-'+MY_TANK.team+x+"."+y, generatePassword(6), index, MY_TANK.team, MY_TANK.nation, x, y, angle);
+				}
+			}, i);
 		j++;
-		if(j==n1){
-			row++; 
-			j=0;
-			}
+		/*if(j==n1){	row++; 	j=0;	}*/
 		}
 	last_selected_counter = selected_tank;
 	}

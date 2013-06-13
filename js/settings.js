@@ -2,6 +2,8 @@
 var VERSION = "1.5.1";			//app version
 var DEBUG = false;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
+var APP_URL = 'http://viliusle.github.io/vl-tanks/';
+var APP_EMAIL = 'www.viliusl@gmail.com';
 var FPS = 25;				//frames per second
 var settings_font="bold 18px Helvetica";//default font for settings buttons
 var START_GAME_COUNT_SINGLE = 15;	//second how much to count in singleplayer
@@ -25,8 +27,7 @@ var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
 var MAX_ABILITY_LEVEL = 20;		//max ability level
 var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invisibility wanishes.
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
-var APP_URL = 'http://viliusle.github.io/vl-tanks/';
-var APP_EMAIL = 'www.viliusl@gmail.com';
+var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -92,6 +93,8 @@ var chat_shifted = false;		//if chat was activated with shift
 var intro_page = 0;			//intro page
 var intro_enabled = 1;			//if show intro
 var time_gap;				//time difference between frames
+var weapons_bonus = 0;			//in commander mode weappon bonus
+var armor_bonus = 0;			//in commander mode armor bonus
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

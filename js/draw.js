@@ -765,6 +765,7 @@ function draw_logo_tanks(left, top, change_logo){
 var score_button_pos = new Array();
 //final scores after game ended
 function draw_final_score(live, lost_team){
+	if(live==true && game_mode == 3) return false;
 	var button_width = WIDTH_SCROLL-40;
 	var button_height = 15;
 	var buttons_gap = 5;

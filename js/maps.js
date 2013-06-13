@@ -136,11 +136,8 @@ var maps_positions = [];
 function show_maps_selection(canvas_this, top_height, can_select_map){
 	if(game_mode == 2) return false;
 	var gap = 8;
-	var button_width = 81;
-	var button_height = 81;
-				button_width = 90;
-				button_height = 80;
-	
+	var button_width = 90;
+	var button_height = 80;
 	maps_positions = [];
 	
 	//clear name area
@@ -167,6 +164,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		//paint towers
 		msize = 3;
 		for (ii in MAPS[i].towers){
+			if(game_mode == 3 && MAPS[i].towers[ii][3] != 'Base') continue;
 			if(MAPS[i].towers[ii][0]=="B")
 				canvas_this.fillStyle = "#0000aa";
 			else

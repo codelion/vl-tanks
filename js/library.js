@@ -87,8 +87,8 @@ function draw_library_units(selected_tank){
 	if(selected_tank==undefined) selected_tank = 0;
 	//show all possible tanks
 	j = 0;
-	preview_x = 90;
-	preview_y = 80;
+	preview_x = 80;
+	preview_y = 70;
 	for(var i in TYPES){
 		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
 			y = y + preview_y+gap;
@@ -109,7 +109,17 @@ function draw_library_units(selected_tank){
 		var pos2 = y;
 		var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
 		var pos_top = pos2 + (preview_y-TYPES[i].size[2])/2;
-		draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
+		if(TYPES[i].size[1] < preview_x && TYPES[i].size[2] < preview_y)
+			draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
+		else{
+			//image too big - draw only inside active zone
+			canvas_backround.save();
+			canvas_backround.beginPath();
+			canvas_backround.rect(pos1, pos2, preview_x, preview_y);
+			canvas_backround.clip();
+			draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
+			canvas_backround.restore();
+			}
 		
 		//register button
 		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
@@ -119,7 +129,7 @@ function draw_library_units(selected_tank){
 		j++;
 		}
 	last_selected = selected_tank;
-	y = y + preview_y+20;	
+	y = y + preview_y+gap;	
 	
 	//tank info block
 	var info_left = 10;

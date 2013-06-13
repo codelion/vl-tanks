@@ -259,7 +259,7 @@ function init_action(map_nr, my_team){
 	auto_scoll_map();
 	
 	//add bots if single player
-	if(game_mode != 2){
+	if(game_mode == 1){
 		//get random type
 		var possible_types = [];
 		var random_type=0;
@@ -393,6 +393,7 @@ var IMAGES_SETTINGS = {
 		Base:		{ x:0,	y:1200,	w:90,	h:80 },
 		Factory:	{ x:0,	y:1400,	w:68,	h:56 },
 		Research:	{ x:0,	y:1500,	w:50,	h:42 },
+		Silo:		{ x:0,	y:1600,	w:46,	h:46 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
@@ -567,6 +568,8 @@ function quit_game(init_next_game){
 	my_team = undefined;
 	map_offset = [0, 0];
 	target_mode = '';
+	weapons_bonus = 0;
+	armor_bonus = 0;
 	
 	if(init_next_game != false){
 		init_game(false);
