@@ -274,6 +274,10 @@ function draw_main(){
 		canvas_main.stroke();
 		}
 	
+	//h3 status
+	if(game_mode == 3)
+		draw_he3_info();
+	
 	show_chat();
 	
 	//fps
@@ -336,6 +340,17 @@ function do_animations(TANK){
 			canvas_main.restore();
 			}	
 		}
+	}
+var HE3 = 200;
+function draw_he3_info(){
+	var left = WIDTH_APP-100;
+	var top = 8;
+	var value = HE3;
+	
+	draw_image(canvas_main, 'he3',left, top);
+	canvas_main.fillStyle = "#ffffff";
+	canvas_main.font = "Bold 10px Verdana";
+	canvas_main.fillText(value, left+10+12, top+12);
 	}
 function add_first_screen_elements(){
 	add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"]);

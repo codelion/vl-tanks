@@ -375,7 +375,7 @@ TYPES.push({
 //Tower
 TYPES.push({
 	name: 'Tower',
-	type: 'tower',
+	type: 'building',
 	description: ["Tower for defence"],
 	life: [1200,0],
 	damage: [30, 0],	//30 dps
@@ -401,7 +401,7 @@ TYPES.push({
 //Base
 TYPES.push({
 	name: 'Base',
-	type: 'tower',
+	type: 'building',
 	description: ["Main base"],
 	life: [2500, 0],
 	damage: [45, 0],	//45 dps
@@ -445,7 +445,7 @@ TYPES.push({
 		{name: 'Tower',		passive: false,		broadcast: 0}, 
 		{name: 'War units',	passive: true,		broadcast: 0}, 
 		],
-	size: ['M', 68, 56],
+	size: ['L', 68, 56],
 	preview: false,
 	icon_top: false,
 	icon_base: true,
@@ -470,7 +470,7 @@ TYPES.push({
 		{name: 'Weapons',	passive: false,		broadcast: 1}, 
 		{name: 'Armor',		passive: false,		broadcast: 1},
 		],
-	size: ['M', 50, 42],
+	size: ['L', 50, 42],
 	preview: false,
 	icon_top: false,
 	icon_base: true,
@@ -492,7 +492,7 @@ TYPES.push({
 	turn_speed: 0,
 	no_repawn: 1,
 	abilities: [],
-	size: ['M', 46, 46],
+	size: ['L', 46, 46],
 	preview: false,
 	icon_top: false,
 	icon_base: true,

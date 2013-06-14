@@ -165,7 +165,7 @@ MAPS.push({
 	description: "You, enemy, 4 towers, 2 bases and no time and space. Victory or defeat will come fast!",
 	towers: [
 			//team x,	 y, 	name
-			['B',	50,	55,	'Base'],
+			['B',	60,	55,	'Base'],
 			['B',	150,	50,	'Tower'],
 			['B',	50,	160,	'Tower'],
 			['R',	750,	210,	'Tower'],

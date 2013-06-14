@@ -374,7 +374,8 @@ var IMAGES_SETTINGS = {
 		skill_off:	{ x:0,	y:150,w:65,	h:65 },
 		skill_on:	{ x:0,	y:250,w:65,	h:65 },
 		statusbar:	{ x:0,	y:350,w:800,h:130 },
-		he3:	{ x:100,	y:100,w:13,h:20 },
+		he3_:	{ x:100,	y:100,w:13,h:20 },
+		he3:	{ x:100,	y:150,w:18,h:20 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },

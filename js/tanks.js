@@ -24,7 +24,7 @@ function draw_tank(tank){
 				tank.visible.time = Date.now();
 				}
 			//fade out effect
-			if(TYPES[tank.type].type != "tower" && tank.visible.time + fade_duration > Date.now()){
+			if(TYPES[tank.type].type != "building" && tank.visible.time + fade_duration > Date.now()){
 				alpha = (Date.now()-tank.visible.time) / fade_duration;
 				alpha = round(alpha*100)/100;
 				alpha = 1 - alpha;	//reverse fade
@@ -48,7 +48,7 @@ function draw_tank(tank){
 			else if(tank.invisibility == 1)	
 				alpha = 0.6;	
 			//fade in effect
-			if(TYPES[tank.type].type != "tower" && tank.visible.time + fade_duration > Date.now()){
+			if(TYPES[tank.type].type != "building" && tank.visible.time + fade_duration > Date.now()){
 				alpha = (Date.now()-tank.visible.time) / fade_duration;
 				alpha = round(alpha*100)/100;
 				}
@@ -261,7 +261,7 @@ function add_hp_bar(tank){
 	var max_life = get_tank_max_hp(tank);
 	
 	//check hp modifiers
-	if(game_mode == 2 && TYPES[tank.type].type == 'tower'){
+	if(game_mode == 2 && (TYPES[tank.type].name == 'Tower' || TYPES[tank.type].name == 'Base')){
 		ROOM = get_room_by_id(opened_room_id);
 		if(ROOM.players.length < 3){
 			max_life = max_life * TOWER_HP_DAMAGE_IN_1VS1[0];
@@ -380,7 +380,7 @@ function draw_bullets(TANK, time_gap){
 					do_damage(TANK, bullet_target, BULLETS[b]);
 							
 					//extra effects for non tower
-					if(bullet_target.team != TANK.team && TYPES[bullet_target.type].type!='tower'){
+					if(bullet_target.team != TANK.team && TYPES[bullet_target.type].type!='building'){
 						//stun
 						if(BULLETS[b].stun_effect != undefined)
 							bullet_target.stun = Date.now() + BULLETS[b].stun_effect;
@@ -415,7 +415,7 @@ function draw_bullets(TANK, time_gap){
 					if(distance_b > BULLETS[b].aoe_splash_range)	continue;	//too far
 					
 					//stun
-					if(BULLETS[b].stun_effect != undefined && TYPES[TANKS[ii].type].type!='tower')
+					if(BULLETS[b].stun_effect != undefined && TYPES[TANKS[ii].type].type!='building')
 						TANKS[ii].stun = Date.now() + BULLETS[b].stun_effect;
 					
 					//do damage
@@ -680,10 +680,10 @@ function check_collisions(xx, yy, TANK, full_check){
 		}
 
 	//other tanks
-	if(TYPES[TANK.type].types != 'tower'){
+	if(TYPES[TANK.type].types != 'building'){
 		for (i in TANKS){
 			if(game_mode == 3 && full_check == undefined && TYPES[TANKS[i].type].type != 'building') continue;
-			if(full_check == undefined && TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'tower') continue;
+			if(full_check == undefined && TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'building') continue;
 			if(TANKS[i].id == TANK.id) continue;			//same tank
 			if(full_check == undefined && TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
 			if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
@@ -708,10 +708,21 @@ function check_collisions(xx, yy, TANK, full_check){
 	}
 //checks tanks levels
 function tank_level_handler(){		//once per second
-	if(game_mode == 3) return false;
+	if(game_mode == 3){
+		//update silo
+		var silo_power = 2;
+		silo_count = 0;
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TYPES[TANKS[i].type].name != 'Silo') continue;
+			silo_count++;
+			}
+		HE3 = HE3 + silo_count*silo_power;
+		return false;
+		}
 	//check level-up
 	for (i in TANKS){
-		if(TYPES[TANKS[i].type].type == 'tower') continue;
+		if(TYPES[TANKS[i].type].type == 'building') continue;
 		if(TYPES[TANKS[i].type].type == 'human') continue;
 		if(game_mode == 2 && TANKS[i].id != MY_TANK.id)	continue;	//not our business
 		if(TANKS[i].dead == 1)	continue; //dead
@@ -770,7 +781,7 @@ function tank_level_handler(){		//once per second
 //checks tanks hp regen
 function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
 	for (i in TANKS){
-		if(TANKS[i].dead == 1 || TYPES[TANKS[i].type].type == 'tower') continue;
+		if(TANKS[i].dead == 1 || TYPES[TANKS[i].type].type == 'building') continue;
 		var max_hp = get_tank_max_hp(TANKS[i]);
 		//passive hp regain - 2.2%/s
 		var extra_hp = round(max_hp * 2.2 / 100);
@@ -1096,8 +1107,8 @@ function do_damage(TANK, TANK_TO, BULLET){
 	
 	damage = round( damage*(100-armor)/100 );
 	
-	//mines do less damage on ally towers
-	if(BULLET.damage_all_teams != undefined && TYPES[TANK_TO.type].type=="tower" && BULLET.bullet_from_target.team == TANK_TO.team)
+	//mines do less damage on ally building
+	if(BULLET.damage_all_teams != undefined && TYPES[TANK_TO.type].type=="building" && BULLET.bullet_from_target.team == TANK_TO.team)
 		damage = damage/2;
 	
 	//check invisibility
@@ -1205,7 +1216,7 @@ function check_if_broadcast(KILLER){
 	if(KILLER.name == name) return true;	
 	
 	//only host broadcast tower/autobots actions
-	if(ROOM.host == name && (TYPES[KILLER.type].type == 'tower' || KILLER.automove==1) ) return true; 
+	if(ROOM.host == name && (TYPES[KILLER.type].type == 'building' || KILLER.automove==1) ) return true; 
 	
 	//my soldier - me broadcast
 	if(KILLER.master != undefined && KILLER.master.id == MY_TANK.id) return true; 
@@ -1341,8 +1352,8 @@ function do_ability(nr, TANK){
 	}
 //check if enemy visible
 function check_enemy_visibility(tank){		
-	if(TYPES[tank.type].type == 'tower')
-		return true;	//tower
+	if(TYPES[tank.type].type == 'building')
+		return true;	//building
 	if(tank.team==MY_TANK.team)
 		return true;	//friend
 	//wait for reuse
@@ -1520,7 +1531,7 @@ function get_team_tanks_count(team){
 function sync_movement(TANK, xx, yy){
 	var MAX_ALLOED_DIFFERENCE = 100;
 	if(TANK===false) return false;
-	if(TYPES[TANK.type].type == 'tower') return false;
+	if(TYPES[TANK.type].type == 'building') return false;
 	if(TANK.id != MY_TANK.id){
 		//get distance
 		dist_x = TANK.cx() - (xx + TANK.width()/2);
@@ -1601,7 +1612,7 @@ function check_invisibility(TANK, force_check){
 		var distance = get_distance_between_tanks(TANKS[i], TANK);
 		var min_range = TANKS[i].sight;
 		min_range = min_range - TANK.width()/2;
-		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
+		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "building")
 			min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 		if(distance < min_range){	
 			if(game_mode == 2)
@@ -1663,7 +1674,7 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 	//modifiers
 	var hp_mod = 1;
 	var damage_mod = 1;
-	if(game_mode == 2 && TYPES[type].type == 'tower'){
+	if(game_mode == 2 && (TYPES[type].name == 'Tower' || TYPES[type].name == 'Base')){
 		ROOM = get_room_by_id(opened_room_id);
 		if(ROOM.players.length < 3){
 			hp_mod = TOWER_HP_DAMAGE_IN_1VS1[0];

@@ -222,7 +222,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 
 	TANK.abilities_reuse[1] = Date.now() + reuse;
 	for (ii in TANKS){
-		if(TYPES[TANKS[ii].type].type == 'tower')		continue; //tower
+		if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
@@ -281,7 +281,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 	
 	TANK.abilities_reuse[2] = Date.now() + reuse; 
 	for (ii in TANKS){
-		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
+		if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
@@ -494,7 +494,7 @@ function Camouflage(TANK, descrition_only, settings_only, ai){
 			var distance = get_distance_between_tanks(TANKS[i], TANK);
 			var min_range = TANKS[i].sight;
 			min_range = min_range - TANK.width()/2;
-			if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "tower")
+			if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].name != "Tower")
 				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 			if(distance < min_range){	
 				return false;	//too close to somebody
@@ -809,7 +809,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 	
 	TANK.abilities_reuse[2] = Date.now() + reuse;
 	for (ii in TANKS){
-		if(TYPES[TANKS[ii].type].type == 'tower')	continue; //tower
+		if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 		if(TANKS[ii].team != TANK.team)			continue; //enemy
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
@@ -1334,6 +1334,9 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
+	if(HE3 < cost) return false;
+	HE3 = HE3 - cost;
+	
 	TANK.abilities_reuse[0] = Date.now() + reuse;	
 	//damage buff
 	TANK.buffs.push({
@@ -1404,6 +1407,9 @@ function construct_prepare(TANK, cost, reuse, range, tank_type, ability_nr){
 	 		}
 		return 0;
 		}
+	
+	if(HE3 < cost) return false;
+	
 	//get type
 	var type = 0;
 	for(var t in TYPES){
@@ -1517,6 +1523,9 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse, power: power};
 	
+	if(HE3 < cost) return false;
+	HE3 = HE3 - cost;
+	
 	if(weapons_bonus < power * levels)
 		weapons_bonus = weapons_bonus + power;
 	else
@@ -1534,6 +1543,9 @@ function Armor(TANK, descrition_only, settings_only, ai){
 		return 'Upgrades units armor. Costs '+cost+' H3.';
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse, power: power};
+	
+	if(HE3 < cost) return false;
+	HE3 = HE3 - cost;
 	
 	if(armor_bonus < power * levels)
 		armor_bonus = armor_bonus + power;
@@ -1790,6 +1802,9 @@ function do_construct(tank_id){
 	
 	//check
 	if(validate_construction(mouseX, mouseY)==false) return false;
+	
+	if(HE3 < TANK.try_construct.cost) return false;
+	HE3 = HE3 - TANK.try_construct.cost;
 	
 	//control
 	if(TANK.try_construct == undefined)  return false;

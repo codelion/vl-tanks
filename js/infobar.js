@@ -502,7 +502,7 @@ function redraw_mini_map(){
 	}
 //draw tank in mini-map
 function update_radar(tank){
-	if(TYPES[tank.type].type=='tower' ||( tank.dead != 1 && check_enemy_visibility(tank)==true)){
+	if(TYPES[tank.type].type == 'building' ||( tank.dead != 1 && check_enemy_visibility(tank)==true)){
 		//settings
 		var button_width = MINI_MAP_PLACE[2];
 		var button_height = MINI_MAP_PLACE[3];
@@ -515,8 +515,10 @@ function update_radar(tank){
 		else
 			canvas_backround.fillStyle = "#b12525";
 		msize = 3;
-		if(TYPES[tank.type].type == 'human')
+		if(TYPES[tank.type].size[0] == 'S')
 			msize = 2;
+		else if(TYPES[tank.type].size[0] == 'L')
+			msize = 4;	
 		var tank_x = tank.x + tank.width()/2;
 		var tank_y = tank.y + tank.height()/2;
 		if(tank_x<0)	tank_x=0;
@@ -608,6 +610,9 @@ function draw_counter_tank_selection(selected_tank){
 					return false;
 				}
 			else if(game_mode == 3){
+				var unit_cost = 50;
+				if(HE3 < unit_cost) return false;
+				HE3 = HE3 - unit_cost;
 				var gap_rand = 100;
 				var x = MY_TANK.x + getRandomInt(-gap_rand, gap_rand);
 				var y = MY_TANK.y + getRandomInt(-gap_rand, gap_rand);
