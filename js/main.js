@@ -4,6 +4,29 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	clicks
+		left select
+		always somebody selected
+		right click move/attack
+		double left click - select all same units, but only in screen
+		shift/ctrl click
+	fabric
+		training progress
+		spawn tank location
+	multiplayer
+		creating room, rooms, select adjust for game_mode = 3
+		move he3 to team, initial he3
+		implement weapons_bonus and armor_bonus
+		weapon/armor upgrades 100, 200, 300
+	misc
+		hide enemy buildings till scouted
+		SAM tower 
+			simple tower ignore air units
+			bomber
+		scout tower
+		add he3 limit from 1 silo
+		fix lots of silo in 1 place exploit
+		when group moves - they only go to that direction, sides units remain in side
 */
 
 //init hello screen
@@ -17,7 +40,7 @@ function init_game(first_time){
 	
 	//sound effects
 	var cookie = getCookie("mute_fx");
-	if(cookie == '0')
+	if(cookie == '0' || cookie == '')
 		MUTE_FX = true;
 	else{
 		MUTE_FX = false;
@@ -25,13 +48,13 @@ function init_game(first_time){
 		}
 	
 	//music	
-	var cookie = getCookie("mute_music");	
-	if(cookie == '0')
+	var cookie = getCookie("mute_music");
+	if(cookie == '0' || cookie == '')
 		MUTE_MUSIC = true;
 	else{
 		MUTE_MUSIC = false;
 		MUSIC_VOLUME = cookie;
-		}
+		}		
 
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;

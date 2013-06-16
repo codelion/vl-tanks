@@ -48,7 +48,7 @@ function redraw_tank_stats(){
 			}
 		}
 	//commander mode - Factory
-	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory'){
+	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
 		draw_counter_tank_selection();
 		return false;
 		}
@@ -535,20 +535,20 @@ var last_selected_counter = -1;
 //lets select new tank on counter mode
 function draw_counter_tank_selection(selected_tank){
 	var padding_left = 250;
-	var padding_top = 10;
+	var padding_top = 15;
 	var pos1 = status_x+padding_left;
 	var pos2 = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+padding_top;
 	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
 	var max_width = 325;
 	var max_height = 80;
 	var gap = 3;
-	var msize = 37;
+	var msize = 33;
 	var first_time = false;
 	
 	/* //auto size
 	var n = 0;
 	for(var i in TYPES){
-		if(TYPES[i].type != 'tank') continue;
+		if(TYPES[i].type == 'building') continue;
 		n++;
 		}
 	n1 = Math.ceil(n/2);
@@ -577,7 +577,7 @@ function draw_counter_tank_selection(selected_tank){
 	var row = 0;
 	var nation = get_nation_by_team(MY_TANK.team);
 	for(var i in TYPES){
-		if(TYPES[i].type != 'tank') continue;
+		if(TYPES[i].type == 'building') continue;
 		if(check_nation_tank(TYPES[i].name, nation)==false) continue;
 		//reset background
 		var back_color = '';
@@ -590,7 +590,7 @@ function draw_counter_tank_selection(selected_tank){
 		roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
 		
 		//logo
-		var sizer = 0.7;
+		var sizer = 0.6;
 		draw_image(canvas_backround, TYPES[i].name, 
 			pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 			100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
@@ -611,6 +611,7 @@ function draw_counter_tank_selection(selected_tank){
 				}
 			else if(game_mode == 3){
 				var unit_cost = 50;
+				if(TYPES[index].type == 'human') unit_cost = round(unit_cost/2);
 				if(HE3 < unit_cost) return false;
 				HE3 = HE3 - unit_cost;
 				var gap_rand = 100;

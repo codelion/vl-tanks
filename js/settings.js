@@ -1,6 +1,6 @@
 //game settings
 var VERSION = "1.5.1";			//app version
-var DEBUG = false;			//show debug info
+var DEBUG = true;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var APP_URL = 'http://viliusle.github.io/vl-tanks/';
 var APP_EMAIL = 'www.viliusl@gmail.com';
@@ -125,7 +125,6 @@ canvas_base.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 canvas_base.addEventListener('mousedown', on_mousedown, false);
-canvas_base.addEventListener('mouseup', on_mouse_up, false);
 document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
 //document.onmousedown = function(e) {return on_mousedown(e); }
 

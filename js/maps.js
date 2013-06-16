@@ -75,7 +75,8 @@ function lighten_pixels(tank){
 	if(QUALITY !=3) return false;
 	if(PLACE != 'game') return false;
 	if(tank.team != MY_TANK.team) return false;
-			
+	if(tank.constructing != undefined) return false;	
+	
 	var xx = round(tank.cx() + map_offset[0]);
 	var yy = round(tank.cy() + map_offset[1]);
 	
@@ -98,6 +99,7 @@ function lighten_pixels_all(tank){
 	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
 	for(var i in TANKS){
 		if(TANKS[i].team != MY_TANK.team) continue;
+		if(TANKS[i].constructing != undefined) continue;
 		
 		var xx = round(TANKS[i].cx() + map_offset[0]);
 		var yy = round(TANKS[i].cy() + map_offset[1]);

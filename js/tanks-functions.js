@@ -1334,6 +1334,7 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
+	if(TANK.constructing != undefined) return false;
 	if(HE3 < cost) return false;
 	HE3 = HE3 - cost;
 	
@@ -1352,9 +1353,8 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 //====== Base ==================================================================
 
 function Factory(TANK, descrition_only, settings_only, ai){
-	var cost = 100;
+	var cost = 150;
 	var reuse = 100;
-	var range = 100;
 	var tank_type = 'Factory';
 	
 	if(descrition_only != undefined)
@@ -1362,15 +1362,14 @@ function Factory(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	construct_prepare(TANK, cost, reuse, range, tank_type, 0);
+	construct_prepare(TANK, cost, reuse, tank_type, 0);
 	
 	//return reuse - later, on use
 	return 0;
 	}
 function Research(TANK, descrition_only, settings_only, ai){
-	var cost = 150;
+	var cost = 125;
 	var reuse = 100;
-	var range = 100;
 	var tank_type = 'Research';
 	
 	if(descrition_only != undefined)
@@ -1378,28 +1377,27 @@ function Research(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	construct_prepare(TANK, cost, reuse, range, tank_type, 1);
+	construct_prepare(TANK, cost, reuse, tank_type, 1);
 		
 	//return reuse - later, on use
 	return 0;
 	}
 function Silo(TANK, descrition_only, settings_only, ai){
-	var cost = 70;
+	var cost = 60;
 	var reuse = 100;
-	var range = 100;
 	var tank_type = 'Silo';
 	
 	if(descrition_only != undefined)
 		return 'Construct structure for storing Helium-3. Costs '+cost+' H3.';
 	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse};
+	if(settings_only != undefined) return {reuse: reuse, cost: cost};
 	
-	construct_prepare(TANK, cost, reuse, range, tank_type, 2);
+	construct_prepare(TANK, cost, reuse, tank_type, 2);
 		
 	//return reuse - later, on use
 	return 0;
 	}
-function construct_prepare(TANK, cost, reuse, range, tank_type, ability_nr){
+function construct_prepare(TANK, cost, reuse, tank_type, ability_nr){
 	if(TANK.try_construct != undefined){
 		delete TANK.try_construct;
 		if(TANK.id == MY_TANK.id){
@@ -1409,6 +1407,17 @@ function construct_prepare(TANK, cost, reuse, range, tank_type, ability_nr){
 		}
 	
 	if(HE3 < cost) return false;
+	
+	//check if enough energy for silo
+	var silo_count = 0;
+	for (i in TANKS){
+		if(TYPES[TANKS[i].type].name != 'Silo') continue;
+		if(TANKS[i].team != TANK.team) continue;
+		silo_count++;
+		}
+	var silo_cost = Silo(undefined, undefined, true); 
+	silo_cost = silo_cost.cost;
+	if(tank_type != 'Silo' && silo_count == 0 && HE3 - silo_cost - cost < 0) return false;
 	
 	//get type
 	var type = 0;
@@ -1434,7 +1443,6 @@ function construct_prepare(TANK, cost, reuse, range, tank_type, ability_nr){
 	TANK.try_construct = {
 		cost: cost,
 		reuse: reuse,
-		range: range,
 		tank_type: type,
 		ability_nr: ability_nr,
 		};
@@ -1450,22 +1458,25 @@ function construct_hover(){
 		canvas_main.fillStyle = "#b12525";
 	canvas_main.fillRect(mouse_pos[0]-round(TYPES[type].size[1]/2), mouse_pos[1]-round(TYPES[type].size[2]/2), 
 		TYPES[type].size[1], TYPES[type].size[2]);
+	var x = mouse_pos[0] - round(TYPES[type].size[1]/2) - map_offset[0];
+	var y = mouse_pos[1] - round(TYPES[type].size[2]/2) - map_offset[1];
+	draw_tank_clone(type, x, y, 0, 0.5, canvas_main);
 	}
 function validate_construction(xx, yy){
 	var type = MY_TANK.try_construct.tank_type;
-	
+
 	//check range
 	var valid = false;
 	for (i in TANKS){
 		if(TYPES[TANKS[i].type].type == 'tank') continue;
 		if(TANKS[i].team != MY_TANK.team) continue;
-		
-		dist_x = TANKS[i].cx() - mouse_pos[0];
-		dist_y = TANKS[i].cy() - mouse_pos[1];
+		if(TANKS[i].constructing != undefined) continue;
+
+		dist_x = TANKS[i].cx() - (mouse_pos[0] - map_offset[0]);
+		dist_y = TANKS[i].cy() - (mouse_pos[1] - map_offset[1]);
 		var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - TANKS[i].width()/2 - TYPES[type].size[1]/2;
-		distance = round(distance);	
-		if(distance < MY_TANK.try_construct.range)
+		distance = distance - TANKS[i].width()/2 + TYPES[type].size[1]/2;
+		if(distance < TANKS[i].sight)
 			valid = true;
 		}
 	if(valid == false) return false;
@@ -1485,7 +1496,6 @@ function validate_construction(xx, yy){
 function Tower(TANK, descrition_only, settings_only, ai){
 	var cost = 100;
 	var reuse = 100;
-	var range = 100;
 	var tank_type = 'Tower';
 	
 	if(descrition_only != undefined)
@@ -1493,17 +1503,18 @@ function Tower(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	construct_prepare(TANK, cost, reuse, range, tank_type, 0);
+	if(TANK.constructing != undefined) return false;
+	construct_prepare(TANK, cost, reuse, tank_type, 0);
 		
 	//return reuse - later, on use
 	return 0;
 	}
 function War_units(TANK, descrition_only, settings_only, ai){
-	var cost = 30;
+	var cost = 50;
 	var reuse = 5000;
 	
 	if(descrition_only != undefined)
-		return 'Construct land or air unit. Costs '+cost+' H3.';
+		return 'Construct land or air unit with cost of '+cost+' H3. Soldiers -  '+round(cost/2)+' H3.';
 	if(settings_only != undefined) return {reuse: reuse, cost: cost};
 	
 	//passive
@@ -1513,7 +1524,7 @@ function War_units(TANK, descrition_only, settings_only, ai){
 //====== Research ==============================================================
 
 function Weapons(TANK, descrition_only, settings_only, ai){
-	var cost = 300;
+	var cost = 100;	//100, 200, 300
 	var reuse = 1000;
 	var power = 10; //%
 	var levels = 3;
@@ -1523,6 +1534,7 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse, power: power};
 	
+	if(TANK.constructing != undefined) return false;
 	if(HE3 < cost) return false;
 	HE3 = HE3 - cost;
 	
@@ -1534,7 +1546,7 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	return reuse;
 	}
 function Armor(TANK, descrition_only, settings_only, ai){
-	var cost = 300;
+	var cost = 100;	//100, 200, 300
 	var reuse = 1000;
 	var power = 5; //static
 	var levels = 3;
@@ -1544,6 +1556,7 @@ function Armor(TANK, descrition_only, settings_only, ai){
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse, power: power};
 	
+	if(TANK.constructing != undefined) return false;
 	if(HE3 < cost) return false;
 	HE3 = HE3 - cost;
 	
@@ -1819,7 +1832,19 @@ function do_construct(tank_id){
 		angle = 0;
 	var nation = get_nation_by_team(TANK.team);
 	//add
-	add_tank(1, 'builing-'+TANK.team+mouseX+"."+mouseY, '', type, TANK.team, nation, x, y, angle);
+	var unit_id = 'builing-'+TANK.team+mouseX+"."+mouseY;
+	add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
+	for(var i in TANKS){
+		if(TANKS[i].id == unit_id){
+			var duration = 15*1000;
+			if(DEBUG == true) duration = 5*1000;
+			TANKS[i].constructing = {
+				duration: duration,
+				start: Date.now(),
+				}
+			break;
+			}
+		}
 	
 	//init reuse
 	if(game_mode != 2 || TANK.name == name){

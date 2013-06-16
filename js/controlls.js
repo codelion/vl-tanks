@@ -1,7 +1,8 @@
 //check support
 if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
 
-//keyboard actions
+//=== keyboard =================================================================
+
 function on_keyboard_action(event){
 	k = event.keyCode;	//log(k);
 	
@@ -111,7 +112,9 @@ function on_keyboardup_action(event){
 	if(k==16)
 		shift_pressed = false; //shift
 	}
-//mouse scroll
+
+//=== mouse scroll =============================================================
+
 function MouseWheelHandler(e){
 	var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 	if(PLACE != 'game') return true;
@@ -130,7 +133,9 @@ function MouseWheelHandler(e){
 	e.preventDefault()
 	return false;
 	}
-//mouse move on background
+
+//=== mouse move ===============================================================
+
 function on_mousemove_background(event){
 	if(event.offsetX) {
 		mouseX = event.offsetX;
@@ -205,7 +210,10 @@ function on_mousemove(event){
 		selection.y2 = mouseY;
 		}
 	mouse_pos = [mouseX, mouseY];
-	}	
+	}
+	
+//=== mouse right ==============================================================
+
 var selection = false;
 //mouse right click
 function on_mouse_right_click(event){
@@ -222,20 +230,21 @@ function on_mouse_right_click(event){
 		var selected_n = 0;
 		var last_selected_i; 
 		if(selection.drag == true){
-			selection.drag = false;
 			selection.x2 = mouseX;
 			selection.y2 = mouseY;
-			
+			if(selection.x == selection.x2+map_offset[0] && selection.y == selection.y2 + map_offset[1])
+				selection.drag = false;	
+		
 			//unselect all
 			for(var i in TANKS)
 				delete TANKS[i].selected;
 			//select some
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TYPES[TANKS[i].type].type == 'building') continue;
 				if(TANKS[i].dead == 1) continue;
-				if(TYPES[TANKS[i].type].type != 'tank') continue;
-				if(TANKS[i].cx() < selection.x || TANKS[i].cx() > selection.x2 ) continue;
-				if(TANKS[i].cy() < selection.y || TANKS[i].cy() > selection.y2 ) continue;
+				if(TANKS[i].cx() < Math.min(selection.x, selection.x2) || TANKS[i].cx() > Math.max(selection.x, selection.x2) ) continue;
+				if(TANKS[i].cy() < Math.min(selection.y, selection.y2) || TANKS[i].cy() > Math.max(selection.y, selection.y2) ) continue;
 				TANKS[i].selected = 1;
 				selected_n++;
 				last_selected_i = i;
@@ -245,7 +254,7 @@ function on_mouse_right_click(event){
 				draw_infobar();
 				}
 			}
-		if(selection.drag != true){
+		if(selection.drag == false){
 			//select 1
 			for(var i in TANKS){
 				if(MY_TANK.team != TANKS[i].team) continue;
@@ -253,7 +262,6 @@ function on_mouse_right_click(event){
 					TANKS[i].selected = 1;
 					MY_TANK = TANKS[i];
 					draw_infobar();
-					selected_n++;
 					break;
 					}
 				}
@@ -268,12 +276,15 @@ function on_mouse_right_click(event){
 				break;
 				}
 			}
+		selection.drag = false;
 		}
 	if(PLACE == 'game')
 		soldiers_move(mouseX, mouseY);
 	return false;
 	}
-//mouse click 
+
+//=== mouse click ==============================================================
+
 function on_mousedown(event){
 	//mouse position
 	if(event.offsetX) {
@@ -317,9 +328,6 @@ function on_mousedown(event){
 		draw_tank_move(mouseX, mouseY);
 		}
 	}
-function on_mouse_up(event){
-	
-	}
 //mouse click on background
 function on_mousedown_back(event){
 	if(event.offsetX) {
@@ -356,7 +364,9 @@ function on_mouseup_back(event){
 			move_to_place_reset();
 		}
 	}
-//fullscreen on modern browsers
+
+//=== fullscreen ===============================================================
+
 function fullscreen(object){
 	if(FS==false){
 		//turn on
@@ -401,6 +411,9 @@ function full_screenchange_handler(event){
 			}	
 		}
 	}
+
+//=== popup ====================================================================
+
 function popup_save(){
 	document.getElementById("popup").style.display="none";
 	var response={};

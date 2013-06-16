@@ -267,10 +267,19 @@ function draw_main(){
 	
 	//selection
 	if(selection.drag == true){
+		//fill
+		canvas_main.save();
+		canvas_main.globalAlpha = 0.4;
+		canvas_main.beginPath();
+		canvas_main.rect(selection.x+0.5, selection.y+0.5, selection.x2-selection.x, selection.y2-selection.y);
+		canvas_main.fillStyle = "#558a54";
+		canvas_main.fill();
+		canvas_main.restore();
+		//border
 		canvas_main.beginPath();
 		canvas_main.rect(selection.x+0.5, selection.y+0.5, selection.x2-selection.x, selection.y2-selection.y);
 		canvas_main.lineWidth = 1;
-		canvas_main.strokeStyle = "#196119";
+		canvas_main.strokeStyle = "#558a54";
 		canvas_main.stroke();
 		}
 	
@@ -341,11 +350,19 @@ function do_animations(TANK){
 			}	
 		}
 	}
-var HE3 = 200;
+var HE3 = 260;
 function draw_he3_info(){
 	var left = WIDTH_APP-100;
 	var top = 8;
-	var value = HE3;
+	var value = HE3;	value = 123456789;	
+	
+	if(HE3 < 300 && DEBUG == true)
+		HE3 = 1000000;
+	var value2 = '';
+	var str = ""+value;
+	for(var i=10; i<str.length; i=i+3)
+		value2 += str[i]+str[i+1]+str[i+2]+" ";
+	value = value2;
 	
 	draw_image(canvas_main, 'he3',left, top);
 	canvas_main.fillStyle = "#ffffff";

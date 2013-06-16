@@ -485,7 +485,7 @@ TYPES.push({
 	life: [400,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
-	scout: 70,
+	scout: 10,
 	armor: [0, 0, 0],
 	speed: 0,
 	attack_delay: 999,
