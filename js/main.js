@@ -4,12 +4,6 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	clicks
-		left select
-		always somebody selected
-		right click move/attack
-		double left click - select all same units, but only in screen
-		shift/ctrl click
 	fabric
 		training progress
 		spawn tank location
@@ -19,14 +13,15 @@ TODO:
 		implement weapons_bonus and armor_bonus
 		weapon/armor upgrades 100, 200, 300
 	misc
+		mode 3 controlls
+		special score for mode 3
 		hide enemy buildings till scouted
-		SAM tower 
-			simple tower ignore air units
-			bomber
-		scout tower
-		add he3 limit from 1 silo
-		fix lots of silo in 1 place exploit
-		when group moves - they only go to that direction, sides units remain in side
+		towers
+			SAM tower, simple tower ignore air units
+			scout tower
+		silo
+			add he3 limit from 1 silo
+			fix lots of silo in 1 place exploit
 */
 
 //init hello screen
@@ -392,13 +387,16 @@ var IMAGES_SETTINGS = {
 		us:		{ x:300,	y:0,	w:15,	h:9 },
 		ru:		{ x:350,	y:0,	w:15,	h:9 },
 		ch:		{ x:400,	y:0,	w:15,	h:9 },
-		level:	{ x:0,	y:50,	w:150,h:15 },
-		logo_small:	{ x:0,	y:100,w:76,	h:25 },
-		skill_off:	{ x:0,	y:150,w:65,	h:65 },
-		skill_on:	{ x:0,	y:250,w:65,	h:65 },
-		statusbar:	{ x:0,	y:350,w:800,h:130 },
-		he3_:	{ x:100,	y:100,w:13,h:20 },
-		he3:	{ x:100,	y:150,w:18,h:20 },
+		level:	{ x:0,	y:50,	w:150, h:15 },
+		logo_small:	{ x:0,	y:100, w:76,	h:25 },
+		skill_off:	{ x:0,	y:150, w:65,	h:65 },
+		skill_on:	{ x:0,	y:250, w:65,	h:65 },
+		statusbar:	{ x:0,	y:350, w:800, h:128 },
+		he3:	{ x:100,	y:150,w:18, h:20 },
+		fire:	{ x:150,	y:50, w:16, h:16 },
+		shield:	{ x:200,	y:50, w:16, h:16 },
+		alert:	{ x:300,	y:50, w:16, h:16 },
+		bonus:	{ x:350,	y:50, w:16, h:15 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },

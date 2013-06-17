@@ -144,11 +144,25 @@ function draw_tank(tank){
 				}
 
 			//draw extra layer
+			icons_n = 0;
+			for (i in tank.buffs){
+				if(tank.buffs[i].icon != undefined)
+					icons_n++;
+				}
+			var icon_i = 0;
 			for (i in tank.buffs){
 				if(tank.buffs[i].icon != undefined){
-					draw_image(tmp_object, tank.buffs[i].icon,
-						padding+tank_size_w/2-tank.buffs[i].icon_size[0]/2,
-						padding+tank_size_h/2-tank.buffs[i].icon_size[1]/2);
+					icon_i++;
+					var icon_w = IMAGES_SETTINGS.general[tank.buffs[i].icon].w;
+					var icon_h = IMAGES_SETTINGS.general[tank.buffs[i].icon].h;
+					var left = padding + tank_size_w/2 - icon_w/2;
+					var top = padding + tank_size_h/2 - icon_h/2;	//if 1 buff
+					if(icons_n == 2)
+						top = padding + tank_size_h/3*icon_i - icon_h/2; //2 buffs
+					else if(icons_n > 2)
+						top = padding + tank_size_h/4*icon_i - icon_h/2; //3+ buffs
+					//draw
+					draw_image(tmp_object, tank.buffs[i].icon, left, top);
 					}
 				if(tank.buffs[i].circle != undefined){
 					tmp_object.beginPath();
@@ -543,122 +557,121 @@ function draw_bullets(TANK, time_gap){
 			}
 		}
 	}
+function prepare_tank_move(tank){
+	delete tank.try_missile;
+	delete tank.try_bomb;
+	delete tank.try_jump;
+	delete tank.try_construct;
+	delete tank.target_move_lock;
+	}
 //tank move rgistration and graphics
 function draw_tank_move(mouseX, mouseY){
-	if(mouse_click_controll==true){
-		do_missile(MY_TANK.id);
-		do_bomb(MY_TANK.id);
-		do_jump(MY_TANK.id);
-		do_construct(MY_TANK.id);
-		
-		//external click functions
-		for (i in on_click_functions)
-			window[on_click_functions[i][0]](on_click_functions[i][1]);
+	//remove some handlers
+	prepare_tank_move(MY_TANK);
+	if(game_mode == 3){
+		for(var s in TANKS){
+			if(TANKS[s].team != MY_TANK.team) continue;
+			if(TANKS[s].selected != 1) continue;
+			prepare_tank_move(TANKS[s]);
+			}
 		}
-	else{
-		//delete other handlers
-		delete MY_TANK.try_missile;
-		delete MY_TANK.try_bomb;
-		delete MY_TANK.try_jump;
-		delete MY_TANK.try_construct;
+	
+	if(MY_TANK.death_respan != undefined) return false;
 		
-		if(MY_TANK.death_respan != undefined) return false;
-			
-		//check clicks
-		var found_something = false;
-		target_lock_id=0;
-		if(MY_TANK.target_move_lock != undefined)
-			delete MY_TANK.target_move_lock;
-		if(MY_TANK.respan_time == undefined){
-			for(var i in TANKS){
-				var tank_size_w =  0.9*TANKS[i].width();
-				var tank_size_h =  0.9*TANKS[i].height();
-				if(TANKS[i].team == MY_TANK.team){
-					if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
-						if(TANKS[i].name != name)
-							return false; //clicked on allies, but not youself
-						}
+	//check clicks
+	var found_something = false;
+	target_lock_id=0;
+	if(MY_TANK.respan_time == undefined || game_mode == 3){
+		for(var i in TANKS){
+			var tank_size_w =  0.9*TANKS[i].width();
+			var tank_size_h =  0.9*TANKS[i].height();
+			//clicks on allies
+			if(TANKS[i].team == MY_TANK.team){
+				if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
+					if(TANKS[i].name != name)
+						return false;
 					}
-				if(TANKS[i].team != MY_TANK.team){
-					if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
-						//clicked on enemy
-						TANKS[i].clicked_on = 10;	// will draw circle on enemies
-							
-						if(game_mode != 3){
-							MY_TANK.target_move_lock = TANKS[i].id;
-							MY_TANK.target_shoot_lock = TANKS[i].id;
-							}
-						else{
-							for(var s in TANKS){
-								if(TANKS[s].team != MY_TANK.team) continue;
-								if(TANKS[s].dead == 1) continue;
-								if(TANKS[s].selected == 1){
-									TANKS[s].target_move_lock = TANKS[i].id;
-									TANKS[s].target_shoot_lock = TANKS[i].id;
-									}
+				}
+			//click on enemies
+			if(TANKS[i].team != MY_TANK.team){
+				if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
+					//clicked on enemy
+					TANKS[i].clicked_on = 10;	// will draw circle on enemies
+						
+					if(game_mode != 3){
+						MY_TANK.target_move_lock = TANKS[i].id;
+						MY_TANK.target_shoot_lock = TANKS[i].id;
+						}
+					else{
+						for(var s in TANKS){
+							if(TANKS[s].team != MY_TANK.team) continue;
+							if(TANKS[s].dead == 1) continue;
+							if(TANKS[s].selected == 1){
+								TANKS[s].target_move_lock = TANKS[i].id;
+								TANKS[s].target_shoot_lock = TANKS[i].id;
 								}
 							}
-						target_lock_id = TANKS[i].id;
-						found_something = true;
-						break;
 						}
+					target_lock_id = TANKS[i].id;
+					found_something = true;
+					break;
 					}
 				}
 			}
-		//ok, lets show where was clicked
-		if(found_something==false)
-			MY_TANK.clicked = [mouseX,mouseY, 15];
+		}
+	//ok, lets show where was clicked
+	if(found_something==false)
+		MY_TANK.clicked = [mouseX,mouseY, 15];
+
+	mouseX = mouseX-MY_TANK.width()/2;	
+	mouseY = mouseY-MY_TANK.height()/2;
+	mouseX = Math.floor(mouseX);
+	mouseY = Math.floor(mouseY);
 	
-		mouseX = mouseX-MY_TANK.width()/2;	
-		mouseY = mouseY-MY_TANK.height()/2;
-		mouseX = Math.floor(mouseX);
-		mouseY = Math.floor(mouseY);
-		
-		//register
-		if(game_mode == 2){
-			if(found_something==true){
-				var params = [
-					{key: 'target_move_lock', value: target_lock_id	},
-					{key: 'target_shoot_lock', value: target_lock_id },
-					];
-				send_packet('tank_update', [MY_TANK.id, params]);
-				}
-			else
-				register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
-			//MY_TANK.move = 0;
-			return false;
+	//register
+	if(game_mode == 2){
+		if(found_something==true){
+			var params = [
+				{key: 'target_move_lock', value: target_lock_id	},
+				{key: 'target_shoot_lock', value: target_lock_id },
+				];
+			send_packet('tank_update', [MY_TANK.id, params]);
 			}
-		else{
-			if(found_something==false){
-				if(game_mode == 3){
-					var gap_rand = 50;
-					for(var i in TANKS){
-						if(TANKS[i].team != MY_TANK.team) continue;
-						if(TANKS[i].dead == 1) continue;
-						if(TANKS[i].selected == 1){
-							//randomize
-							mouseX_rand = mouseX + getRandomInt(-gap_rand, gap_rand);
-							mouseY_rand = mouseY + getRandomInt(-gap_rand, gap_rand);
-							TANKS[i].move = 1;
-							TANKS[i].move_to = [mouseX_rand, mouseY_rand];
-							}
+		else
+			register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
+		//MY_TANK.move = 0;
+		return false;
+		}
+	else{
+		if(found_something==false){
+			if(game_mode == 3){
+				var gap_rand = 50;
+				for(var i in TANKS){
+					if(TANKS[i].team != MY_TANK.team) continue;
+					if(TANKS[i].dead == 1) continue;
+					if(TANKS[i].selected == 1){
+						//randomize
+						mouseX_rand = mouseX + getRandomInt(-gap_rand, gap_rand);
+						mouseY_rand = mouseY + getRandomInt(-gap_rand, gap_rand);
+						TANKS[i].move = 1;
+						TANKS[i].move_to = [mouseX_rand, mouseY_rand];
 						}
 					}
-				else{
-					MY_TANK.move = 1;
-					MY_TANK.move_to = [mouseX, mouseY];
-					}
 				}
-			
-			if(MUTE_FX==false){
-				try{
-					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
-					audio_finish.volume = FX_VOLUME;
-					audio_finish.play();
-					}
-				catch(error){}
+			else{
+				MY_TANK.move = 1;
+				MY_TANK.move_to = [mouseX, mouseY];
 				}
+			}
+		
+		if(MUTE_FX==false){
+			try{
+				audio_finish = document.createElement('audio');
+				audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+				audio_finish.volume = FX_VOLUME;
+				audio_finish.play();
+				}
+			catch(error){}
 			}
 		}
 	}
@@ -1257,7 +1270,12 @@ function death(tank){
 	delete tank.target_shoot_lock;
 	mouse_click_controll = false;
 	target_range=0;	
-	//tank.buffs = [];	//removing buffs?
+	//removing short buffs
+	for(var i=0; i < tank.buffs.length; i++){
+		if(tank.buffs[i].lifetime != undefined){
+			tank.buffs.splice(i, 1); i--;
+			}
+		}
 	
 	var respan_time;
 	if(tank.level < 3)

@@ -1,3 +1,90 @@
+//====== Tiger =================================================================
+
+function Blitzkrieg(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var duration = 5000;
+	var power_speed = 1.2;
+	var power_damage = 1.2 + 0.02* (TANK.abilities_lvl[0]-1);
+	var power_armor = -100;
+	
+	if(descrition_only != undefined)
+		return 'Attack with '+round(power_damage*100)+'% damage and '+round(power_speed*100)+'% speed, but no armor.';
+	if(settings_only != undefined) return {reuse: reuse};
+	if(ai != undefined){
+		var max_hp = get_tank_max_hp(TANK);
+		if(TANK.hp < max_hp/2) return false;
+		}
+	
+	TANK.abilities_reuse[0] = Date.now() + reuse;
+	//speed buff
+	TANK.buffs.push({
+		name: 'speed',
+		power: power_speed,
+		lifetime: Date.now()+duration,
+		});
+	//damage buff
+	TANK.buffs.push({
+		name: 'damage',
+		power: power_damage,
+		lifetime: Date.now()+duration,
+		icon: 'alert',
+		});
+	//armor debuff
+	TANK.buffs.push({
+		name: 'shield',
+		type: 'static',
+		power: power_armor,
+		lifetime: Date.now()+duration,
+		});
+	
+	return reuse;
+	}
+function Frenzy(TANK, descrition_only, settings_only, ai){
+	var reuse = 20000;
+	var duration = 5000;
+	var power = 2.05 + 0.05* (TANK.abilities_lvl[1]-1);
+	var hp_level = 30;	//%
+	
+	if(descrition_only != undefined)
+		return 'Increase damage by '+round((power-1)*100)+'% if hp lower then '+hp_level+'%.';
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	//check
+	var max_hp = get_tank_max_hp(TANK);
+	if(TANK.hp > max_hp*hp_level/100){ 
+		TANK.abilities_reuse[1] = Date.now();
+		return false;
+		}						
+
+	//do
+	TANK.abilities_reuse[1] = Date.now() + reuse;
+	//damage buff
+	TANK.buffs.push({
+		name: 'damage',
+		power: power,
+		lifetime: Date.now()+duration,
+		icon: 'fire',
+		});
+	
+	return reuse;
+	}
+function AA_Bullets(TANK, descrition_only, settings_only, ai){
+	var power = 6 + (TANK.abilities_lvl[2]-1);
+	
+	if(descrition_only != undefined)
+		return 'Use armor piercing bullets that decrease enemy armor by '+power+'%.';
+	
+	TANK.pierce_armor = power;
+	
+	//passive
+	return 0;
+	}
+function AA_Bullets_once(TANK, descrition_only, settings_only, ai){
+	var power = 6 + (TANK.abilities_lvl[2]-1);
+	
+	TANK.pierce_armor = power;
+	}
+
 //====== Heavy =================================================================
 
 function Rest(TANK, descrition_only, settings_only, ai){
@@ -26,7 +113,6 @@ function Rest(TANK, descrition_only, settings_only, ai){
 		power: power,
 		lifetime: Date.now()+duration,
 		icon: 'repair',
-		icon_size: [16,16],
 		});
 	//speed debuff
 	TANK.buffs.push({
@@ -67,7 +153,7 @@ function Rage(TANK, descrition_only, settings_only, ai){
 		name: 'damage',
 		power: power_damage,
 		lifetime: Date.now()+duration,
-		circle: '#ffff00',
+		icon: 'alert',
 		});
 	
 	return reuse;
@@ -96,93 +182,6 @@ function Health_once(TANK, descrition_only, settings_only, ai){
 		name: 'health',
 		power: power,
 		});
-	}
-
-//====== Tiger =================================================================
-
-function Blitzkrieg(TANK, descrition_only, settings_only, ai){
-	var reuse = 20000;
-	var duration = 5000;
-	var power_speed = 1.2;
-	var power_damage = 1.2 + 0.02* (TANK.abilities_lvl[0]-1);
-	var power_armor = -100;
-	
-	if(descrition_only != undefined)
-		return 'Attack with '+round(power_damage*100)+'% damage and '+round(power_speed*100)+'% speed, but no armor.';
-	if(settings_only != undefined) return {reuse: reuse};
-	if(ai != undefined){
-		var max_hp = get_tank_max_hp(TANK);
-		if(TANK.hp < max_hp/2) return false;
-		}
-	
-	TANK.abilities_reuse[0] = Date.now() + reuse;
-	//speed buff
-	TANK.buffs.push({
-		name: 'speed',
-		power: power_speed,
-		lifetime: Date.now()+duration,
-		});
-	//damage buff
-	TANK.buffs.push({
-		name: 'damage',
-		power: power_damage,
-		lifetime: Date.now()+duration,
-		circle: '#ffff00',
-		});
-	//armor debuff
-	TANK.buffs.push({
-		name: 'shield',
-		type: 'static',
-		power: power_armor,
-		lifetime: Date.now()+duration,
-		});
-	
-	return reuse;
-	}
-function Frenzy(TANK, descrition_only, settings_only, ai){
-	var reuse = 20000;
-	var duration = 5000;
-	var power = 2.05 + 0.05* (TANK.abilities_lvl[1]-1);
-	var hp_level = 30;	//%
-	
-	if(descrition_only != undefined)
-		return 'Increase damage by '+round((power-1)*100)+'% if hp lower then '+hp_level+'%.';
-	if(settings_only != undefined) return {reuse: reuse};
-	
-	//check
-	var max_hp = get_tank_max_hp(TANK);
-	if(TANK.hp > max_hp*hp_level/100){ 
-		TANK.abilities_reuse[1] = Date.now();
-		return false;
-		}						
-
-	//do
-	TANK.abilities_reuse[1] = Date.now() + reuse;
-	//damage buff
-	TANK.buffs.push({
-		name: 'damage',
-		power: power,
-		lifetime: Date.now()+duration,
-		circle: '#c10000',
-		});
-	
-	return reuse;
-	}
-function AA_Bullets(TANK, descrition_only, settings_only, ai){
-	var power = 6 + (TANK.abilities_lvl[2]-1);
-	
-	if(descrition_only != undefined)
-		return 'Use armor piercing bullets that decrease enemy armor by '+power+'%.';
-	
-	TANK.pierce_armor = power;
-	
-	//passive
-	return 0;
-	}
-function AA_Bullets_once(TANK, descrition_only, settings_only, ai){
-	var power = 6 + (TANK.abilities_lvl[2]-1);
-	
-	TANK.pierce_armor = power;
 	}
 
 //====== Cruiser ===============================================================
@@ -246,7 +245,6 @@ function Repair(TANK, descrition_only, settings_only, ai){
 				power: power,
 				lifetime: Date.now()+duration,
 				icon: 'repair',
-				icon_size: [16,16],
 				id: TANK.id,
 				});
 			}
@@ -258,7 +256,6 @@ function Repair(TANK, descrition_only, settings_only, ai){
 						power: power,
 						lifetime: Date.now()+duration,
 						icon: 'repair',
-						icon_size: [16,16],
 						id: TANK.id,
 						}
 					},
@@ -292,7 +289,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 				name: 'damage',
 				power: power,
 				lifetime: Date.now()+duration,
-				circle: '#196119',
+				icon: 'bonus',
 				});
 			}
 		else{
@@ -302,7 +299,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 						name: 'damage',
 						power: power,
 						lifetime: Date.now()+duration,
-						circle: '#196119',
+						icon: 'bonus',
 						}
 					},
 				];
@@ -821,7 +818,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 				type: 'static',
 				power: power,
 				lifetime: Date.now()+duration,
-				circle: '#196119',
+				icon: 'shield',
 				});
 			}
 		else{
@@ -832,7 +829,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 						type: 'static',
 						power: power,
 						lifetime: Date.now()+duration,
-						circle: '#196119',
+						icon: 'shield',
 						}
 					},
 				];
@@ -944,7 +941,6 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 				power: power,
 				lifetime: Date.now()+duration,
 				icon: 'repair',
-				icon_size: [16,16],
 				id: TANK.id,
 				});
 			}
@@ -956,7 +952,6 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 						power: power,
 						lifetime: Date.now()+duration,
 						icon: 'repair',
-						icon_size: [16,16],
 						id: TANK.id,
 						}
 					},
@@ -1069,7 +1064,7 @@ function PL_Shield(TANK, descrition_only, settings_only, ai){
 		type: 'static',
 		power: power,
 		lifetime: Date.now()+duration,
-		circle: '#196119',
+		icon: 'shield',
 		});
 		
 	return reuse;
@@ -1344,7 +1339,7 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 		name: 'hit_reuse',
 		power: power,
 		lifetime: Date.now()+duration,
-		circle: '#c10000',
+		icon: 'fire',
 		});
 		
 	return reuse;
@@ -1452,7 +1447,7 @@ function construct_hover(){
 	if(MY_TANK.try_construct == undefined) return false;
 	var type = MY_TANK.try_construct.tank_type;
 	
-	if(validate_construction(mouse_pos[0], mouse_pos[1])==true)
+	if(validate_construction(mouse_pos[0]-map_offset[0], mouse_pos[1]-map_offset[1])==true)
 		canvas_main.fillStyle = "#576b35";
 	else
 		canvas_main.fillStyle = "#b12525";
@@ -1573,7 +1568,7 @@ function Armor(TANK, descrition_only, settings_only, ai){
 function do_missile(tank_id, enemy_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_missile == undefined) return false;
-	if(TANK.name == name){
+	if(TANK.name == name || (game_mode == 3 && TANK.team == MY_TANK.team)){
 		var mouseX = mouse_click_pos[0];
 		var mouseY = mouse_click_pos[1];
 		}
@@ -1695,10 +1690,10 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	target_range=0;
 	target_mode='';
 	}
-function do_bomb(tank_id, distance_ok, skip_broadcast){
+function do_bomb(tank_id, distance_ok, skip_broadcast){	
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_bomb == undefined) return false;
-	if(TANK.name == name){
+	if(TANK.name == name || (game_mode == 3 && TANK.team == MY_TANK.team)){
 		mouseX = mouse_click_pos[0];
 		mouseY = mouse_click_pos[1];
 		}

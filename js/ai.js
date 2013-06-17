@@ -101,7 +101,15 @@ function do_ai_move(TANK, xx, yy, direction){
 		}
 	}
 function try_skills(TANK_AI){
-	if(TANK_AI.id == MY_TANK.id) return false;
+	if(game_mode == 3){
+		var selected_n = 0;
+		for(var i in TANKS){
+			if(TANKS[i].team != TANK_AI.team) continue;
+			if(TANKS[i].selected != 1) continue;
+			selected_n++;
+			}
+		if(selected_n == 1 && TANK_AI.id == MY_TANK.id) return false;
+		}
 	for(i in TYPES[TANK_AI.type].abilities){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');

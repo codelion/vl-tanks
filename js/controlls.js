@@ -1,10 +1,24 @@
 //check support
 if(document.getElementById("canvas_map").getContex==false) alert('Error, your browser does not support canvas.');
 
+var ctrl_pressed = false;
+var alt_pressed = false;
+var shift_pressed = false;
+
 //=== keyboard =================================================================
 
 function on_keyboard_action(event){
 	k = event.keyCode;	//log(k);
+	
+	//shift
+	if(k==16)
+		shift_pressed = true; 
+	//ctrl
+	else if(k==17)
+		ctrl_pressed = true; 
+	//alt
+	else if(k==18)
+		alt_pressed = true;
 	
 	//add shortcuts
 	if(PLACE == 'game'){
@@ -63,8 +77,6 @@ function on_keyboard_action(event){
 			draw_tank_abilities();
 			}
 		}
-	if(k==16)
-		shift_pressed = true; //shift
 	if(k==13){
 		//enter
 		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
@@ -109,8 +121,15 @@ function on_keyboard_action(event){
 //keyboard release
 function on_keyboardup_action(event){
 	k = event.keyCode;
+	//shift
 	if(k==16)
-		shift_pressed = false; //shift
+		shift_pressed = false; 
+	//ctrl
+	else if(k==17)
+		ctrl_pressed = false; 
+	//alt
+	else if(k==18)
+		alt_pressed = false; 
 	}
 
 //=== mouse scroll =============================================================
@@ -226,60 +245,14 @@ function on_mouse_right_click(event){
 		mouseX = event.layerX-map_offset[0];
 		mouseY = event.layerY-map_offset[1];
 		}
-	if(game_mode == 3){
-		var selected_n = 0;
-		var last_selected_i; 
-		if(selection.drag == true){
-			selection.x2 = mouseX;
-			selection.y2 = mouseY;
-			if(selection.x == selection.x2+map_offset[0] && selection.y == selection.y2 + map_offset[1])
-				selection.drag = false;	
-		
-			//unselect all
-			for(var i in TANKS)
-				delete TANKS[i].selected;
-			//select some
-			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TYPES[TANKS[i].type].type == 'building') continue;
-				if(TANKS[i].dead == 1) continue;
-				if(TANKS[i].cx() < Math.min(selection.x, selection.x2) || TANKS[i].cx() > Math.max(selection.x, selection.x2) ) continue;
-				if(TANKS[i].cy() < Math.min(selection.y, selection.y2) || TANKS[i].cy() > Math.max(selection.y, selection.y2) ) continue;
-				TANKS[i].selected = 1;
-				selected_n++;
-				last_selected_i = i;
-				}
-			if(selected_n == 1){
-				MY_TANK = TANKS[last_selected_i];
-				draw_infobar();
-				}
+	if(PLACE == 'game'){
+		if(game_mode == 3){
+			//move tank
+			draw_tank_move(mouseX, mouseY);
 			}
-		if(selection.drag == false){
-			//select 1
-			for(var i in TANKS){
-				if(MY_TANK.team != TANKS[i].team) continue;
-				if(Math.abs(TANKS[i].cx() - mouseX) < TANKS[i].width()/2 && Math.abs(TANKS[i].cy() - mouseY) < TANKS[i].height()/2){
-					TANKS[i].selected = 1;
-					MY_TANK = TANKS[i];
-					draw_infobar();
-					break;
-					}
-				}
-			}
-		if(selected_n == 0){
-			//select base
-			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TYPES[TANKS[i].type].name != 'Base') continue;
-				MY_TANK = TANKS[i];
-				draw_infobar();
-				break;
-				}
-			}
-		selection.drag = false;
+		else
+			soldiers_move(mouseX, mouseY);
 		}
-	if(PLACE == 'game')
-		soldiers_move(mouseX, mouseY);
 	return false;
 	}
 
@@ -295,8 +268,8 @@ function on_mousedown(event){
 		mouseX = event.layerX;
 		mouseY = event.layerY;
 		}
-	if(event.which == 3){	//right click
-		if(game_mode == 3){
+	if(event.which != 3){	//not right click
+		if(PLACE == 'game' && game_mode == 3 && mouse_click_controll == false){
 			selection = {
 				x: mouseX, 
 				y: mouseY,
@@ -305,9 +278,29 @@ function on_mousedown(event){
 				drag: true,
 				};
 			}
-		return false;
 		}
-	if(PLACE != 'game'){
+	if(PLACE == 'game'){
+		mouseX = mouseX-map_offset[0];
+		mouseY = mouseY-map_offset[1];
+		mouse_click_pos = [mouseX, mouseY];
+		if(mouse_click_controll==true){
+			do_missile(MY_TANK.id);
+			do_bomb(MY_TANK.id);
+			do_jump(MY_TANK.id);
+			do_construct(MY_TANK.id);
+			
+			//external click functions
+			for (i in on_click_functions)
+				window[on_click_functions[i][0]](on_click_functions[i][1]);
+			return true;
+			}
+	
+		if(game_mode != 3){
+			//move tank
+			draw_tank_move(mouseX, mouseY);
+			}
+		}
+	else{
 		menu_pressed = false;	
 		for(var i in BUTTONS){
 			if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
@@ -319,13 +312,6 @@ function on_mousedown(event){
 				BUTTONS[i].function(mouseX, mouseY, BUTTONS[i].extra);
 			break;
 			}
-		}
-	//move tank
-	if(PLACE == 'game'){
-		mouseX = mouseX-map_offset[0];
-		mouseY = mouseY-map_offset[1];
-		mouse_click_pos = [mouseX, mouseY];
-		draw_tank_move(mouseX, mouseY);
 		}
 	}
 //mouse click on background
@@ -356,6 +342,94 @@ function on_mousedown_back(event){
 		break;
 		}
 	}
+var last_click_time = Date.now();
+//mouse click release
+function on_mouseup(event){
+	if(event.offsetX) {
+		mouseX = event.offsetX-map_offset[0];
+		mouseY = event.offsetY-map_offset[1];
+		}
+	else if(event.layerX) {
+		mouseX = event.layerX-map_offset[0];
+		mouseY = event.layerY-map_offset[1];
+		}
+	if(mouse_click_controll==true){
+		selection.drag = false;
+		return true;
+		}
+	if(event.which == 3) return true;	//right click release
+	if(PLACE=='game'){
+		if(game_mode == 3){
+			//select object
+			var selected_n = 0;
+			var last_selected_i; 
+			if(selection.drag == true){
+				selection.x2 = mouseX + map_offset[0];
+				selection.y2 = mouseY + map_offset[1];
+				if(Math.abs(selection.x - selection.x2) < 10 && Math.abs(selection.y - selection.y2) < 10)
+					selection.drag = false;	
+			
+				//unselect?
+				if(shift_pressed == false){
+					for(var i in TANKS){
+						if(TANKS[i].team != MY_TANK.team) continue;
+						if(TYPES[TANKS[i].type].type == 'building') continue;
+						if(TANKS[i].dead == 1) continue;
+						if(TANKS[i].cx() + map_offset[0] < Math.min(selection.x, selection.x2) || TANKS[i].cx() + map_offset[0] > Math.max(selection.x, selection.x2) ) continue;
+						if(TANKS[i].cy() + map_offset[1] < Math.min(selection.y, selection.y2) || TANKS[i].cy() + map_offset[1] > Math.max(selection.y, selection.y2) ) continue;
+						for(var j in TANKS) delete TANKS[j].selected; //unselect all
+						break
+						}
+					}
+				//select area
+				for(var i in TANKS){
+					if(TANKS[i].team != MY_TANK.team) continue;
+					if(TYPES[TANKS[i].type].type == 'building') continue;
+					if(TANKS[i].dead == 1) continue;
+					if(TANKS[i].cx() + map_offset[0] < Math.min(selection.x, selection.x2) || TANKS[i].cx() + map_offset[0] > Math.max(selection.x, selection.x2) ) continue;
+					if(TANKS[i].cy() + map_offset[1] < Math.min(selection.y, selection.y2) || TANKS[i].cy() + map_offset[1] > Math.max(selection.y, selection.y2) ) continue;
+					TANKS[i].selected = 1;
+					selected_n++;
+					last_selected_i = i;
+					}
+				if(selected_n == 1){
+					MY_TANK = TANKS[last_selected_i];
+					draw_infobar();
+					}
+				}
+			if(selection.drag == false){
+				//select 1
+				for(var i in TANKS){
+					if(MY_TANK.team != TANKS[i].team) continue;
+					if(TANKS[i].constructing != undefined) continue;
+					if(Math.abs(TANKS[i].cx() - mouseX) < TANKS[i].width()/2 && Math.abs(TANKS[i].cy() - mouseY) < TANKS[i].height()/2){
+						if(shift_pressed == false){
+							for(var j in TANKS) delete TANKS[j].selected; //unselect all
+							}
+						TANKS[i].selected = 1;
+						selected_n++;
+						MY_TANK = TANKS[i];
+						draw_infobar();
+						break;
+						}
+					}
+				if(Date.now() - last_click_time < 500 && selected_n == 1){
+					//double click - selecting all units with same type
+					for(var i in TANKS){
+						if(MY_TANK.team != TANKS[i].team) continue;
+						if(MY_TANK.type != TANKS[i].type) continue;
+						//if not in screen
+						if(TANKS[i].y > -1*map_offset[1] + HEIGHT_SCROLL || TANKS[i].y+TANKS[i].height < -1*map_offset[1] || TANKS[i].x > -1*map_offset[0] + WIDTH_SCROLL || TANKS[i].x+TANKS[i].width < -1*map_offset[0]) continue;
+						
+						TANKS[i].selected = 1;
+						}
+					}
+				}
+			}
+		selection.drag = false;
+		}
+	last_click_time = Date.now();
+	}	
 //mouse click release on background
 function on_mouseup_back(event){
 	if(PLACE=='game' && MAP_SCROLL_CONTROLL==true){

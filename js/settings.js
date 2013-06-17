@@ -88,7 +88,6 @@ var render_mode='requestAnimationFrame';//render mode
 var page_title_copy = 'Moon wars';	//copy of original title
 var packets_used = 0;			//sent packets count in 1 game, there is limit...
 var packets_all = 0;			//received packets count in 1 game
-var shift_pressed = false;		//if shift is pressed
 var chat_shifted = false;		//if chat was activated with shift
 var intro_page = 0;			//intro page
 var intro_enabled = 1;			//if show intro
@@ -123,6 +122,7 @@ canvas_base.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
 
 //mouse click handlers
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
+canvas_base.addEventListener('mouseup', on_mouseup, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 document.oncontextmenu = function(e) {return on_mouse_right_click(e); }

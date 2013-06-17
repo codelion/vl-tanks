@@ -352,17 +352,14 @@ function do_animations(TANK){
 	}
 var HE3 = 260;
 function draw_he3_info(){
+	if(PLACE != 'game') return false;
 	var left = WIDTH_APP-100;
 	var top = 8;
-	var value = HE3;	value = 123456789;	
+	var value = HE3;
 	
 	if(HE3 < 300 && DEBUG == true)
-		HE3 = 1000000;
-	var value2 = '';
-	var str = ""+value;
-	for(var i=10; i<str.length; i=i+3)
-		value2 += str[i]+str[i+1]+str[i+2]+" ";
-	value = value2;
+		HE3 += 1000000;
+	value = format("#,##0.####", value);
 	
 	draw_image(canvas_main, 'he3',left, top);
 	canvas_main.fillStyle = "#ffffff";
@@ -899,6 +896,7 @@ function draw_final_score(live, lost_team){
 		canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
 		roundRect(canvas_main, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
 		}
+	if(game_mode == 3) return false;
 	
 	canvas.font = "bold 12px Helvetica";
 	
