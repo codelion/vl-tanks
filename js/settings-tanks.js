@@ -488,8 +488,8 @@ TYPES.push({
 	turn_speed: 0,
 	no_repawn: 1,
 	abilities: [
-		{name: 'Tower',		passive: false,		broadcast: 0}, 
 		{name: 'War units',	passive: true,		broadcast: 0}, 
+		{name: 'Towers',	passive: true,		broadcast: 0}, 
 		],
 	size: ['L', 68, 56],
 	preview: false,

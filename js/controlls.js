@@ -51,6 +51,11 @@ function on_keyboard_action(event){
 						MAP_SCROLL_MODE = 1;
 						auto_scoll_map();
 						}
+					//
+					if(mouse_click_controll == true){
+						prepare_tank_move(MY_TANK);
+						mouse_click_controll = false;
+						}
 					}	
 				}
 			}
@@ -246,6 +251,7 @@ function on_mouse_right_click(event){
 		mouseY = event.layerY-map_offset[1];
 		}
 	if(PLACE == 'game'){
+		mouse_click_controll = false;
 		if(game_mode == 3){
 			//move tank
 			draw_tank_move(mouseX, mouseY);

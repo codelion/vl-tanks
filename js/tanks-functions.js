@@ -200,6 +200,7 @@ function Turbo(TANK, descrition_only, settings_only, ai){
 	TANK.buffs.push({
 		name: 'speed',
 		power: power,
+		icon: 'bolt',
 		lifetime: Date.now()+duration,
 		});
 	
@@ -1488,30 +1489,27 @@ function validate_construction(xx, yy){
 
 //====== Factory ===============================================================	
 
-function Tower(TANK, descrition_only, settings_only, ai){
-	var cost = 100;
-	var reuse = 100;
-	var tank_type = 'Tower';
-	
-	if(descrition_only != undefined)
-		return 'Construct factory to create land, air, defence units. Costs '+cost+' H3.';
-	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse};
-	
-	if(TANK.constructing != undefined) return false;
-	construct_prepare(TANK, cost, reuse, tank_type, 0);
-		
-	//return reuse - later, on use
-	return 0;
-	}
 function War_units(TANK, descrition_only, settings_only, ai){
 	var cost = 50;
-	var reuse = 5000;
 	
 	if(descrition_only != undefined)
 		return 'Construct land or air unit with cost of '+cost+' H3. Soldiers -  '+round(cost/2)+' H3.';
 	if(settings_only != undefined) return {reuse: reuse, cost: cost};
 	
+	//passive
+	return 0;
+	}
+function Towers(TANK, descrition_only, settings_only, ai){
+	var cost = 100;
+	
+	if(descrition_only != undefined)
+		return 'Construct various towers. Costs '+cost+' H3. Scout towers - '+round(cost/2)+' H3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse, cost: cost};
+	
+	if(TANK.constructing != undefined) return false;
+	construct_prepare(TANK, cost, reuse, tank_type, 0);
+		
 	//passive
 	return 0;
 	}

@@ -20,7 +20,6 @@ function draw_library_list(next){
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_units();
 		});
-	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Helvetica";
 	text = "Units";
@@ -35,7 +34,6 @@ function draw_library_list(next){
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_maps();
 		});
-	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Helvetica";
 	text = "Maps";
@@ -50,10 +48,23 @@ function draw_library_list(next){
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_countries();
 		});
-	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Helvetica";
 	text = "Countries";
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+	x = x + 100+10;
+	
+	//elements button
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#69a126";
+	roundRect(canvas_backround, x, y, width, height, 5, true);
+	register_button(x, y, width, height, PLACE, function(xx, yy){
+		draw_library_elements();
+		});
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "Bold 13px Helvetica";
+	text = "Elements";
 	text_width = canvas_backround.measureText(text).width;
 	canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
 	x = x + 100+10;
@@ -67,7 +78,6 @@ function draw_library_list(next){
 		last_selected = -1;
 		init_game(false);
 		});
-	//text
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Bold 13px Helvetica";
 	text = "Back";
@@ -87,7 +97,7 @@ function draw_library_units(selected_tank){
 	if(selected_tank==undefined) selected_tank = 0;
 	//show all possible tanks
 	j = 0;
-	preview_x = 80;
+	preview_x = 70;
 	preview_y = 70;
 	for(var i in TYPES){
 		if(15+j*(preview_x+gap)+ preview_x > WIDTH_APP){
@@ -322,7 +332,7 @@ function draw_library_countries(selected_item){
 	
 	//tank info block
 	var info_left = 10;
-	var info_block_height = HEIGHT_APP-27-y-10;
+	var info_block_height = 150; //HEIGHT_APP-27-y-10;
 	var info_block_width = WIDTH_APP-20;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.strokeStyle = "#196119";
@@ -349,4 +359,98 @@ function draw_library_countries(selected_item){
 	lib_show_stats("Cons", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
 	lib_show_stats("Unique unit", COUNTRIES[country].tank_unique, xx, y+50+st*height_space, 90); st++;
 	lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
+	}
+function draw_library_elements(selected_item){
+	draw_library_list(false);
+	var y = TOP;
+	var gap = 8;
+	
+	if(selected_item==undefined) selected_item = 0;
+	//show list
+	preview_x = 90;
+	preview_y = 80;
+	var j=0;
+	var element;
+	for(var i in ELEMENTS){
+		if(selected_item == j)
+			element = i;
+		
+		//reset background
+		var back_color = '';
+		if(selected_item == j)
+			back_color = "#8fc74c"; //selected
+		else
+			back_color = "#dbd9da";
+		canvas_backround.fillStyle = back_color;
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+		
+		//logo
+		element_w = IMAGES_SETTINGS.elements[ELEMENTS[i].name].w;
+		element_h = IMAGES_SETTINGS.elements[ELEMENTS[i].name].h;
+		var pos1 = 10+j*(preview_x+gap) + round((preview_x-element_w)/2);
+		var pos2 = y + round((preview_y-element_h)/2);
+		if(element_w < preview_x && element_h < preview_y)
+			draw_image(canvas_backround, ELEMENTS[i].name, pos1, pos2);
+		else{
+			//image too big - draw only inside active zone
+			pos1 = 10+j*(preview_x+gap);
+			pos2 = y;
+			canvas_backround.save();
+			canvas_backround.beginPath();
+			canvas_backround.rect(pos1, pos2, preview_x, preview_y);
+			canvas_backround.clip();
+			draw_image(canvas_backround, ELEMENTS[i].name, 
+				pos1, pos2, Math.min(preview_x, element_w), Math.min(preview_y, element_h), 
+				undefined, undefined, element_w, element_h);
+			canvas_backround.restore();
+			}
+		
+		//name
+		if(selected_item == j)
+			canvas_backround.fillStyle = "#c10000"; //selected
+		else
+			canvas_backround.fillStyle = "#196119";
+		canvas_backround.font = "bold 14px Helvetica";
+		var letters_width = canvas_backround.measureText(ELEMENTS[i].name).width;
+		var padding_left = Math.round((preview_x-letters_width)/2);
+		canvas_backround.fillText(ELEMENTS[i].name, 10+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
+		
+		//register button
+		register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			//index;
+			draw_library_elements(index);
+			}, j);
+		j++;
+		}
+	y = y + preview_y+40;	
+	
+	//info block
+	var info_left = 10;
+	var info_block_height = 150; //HEIGHT_APP-27-y-10;
+	var info_block_width = WIDTH_APP-20;
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.strokeStyle = "#196119";
+	roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
+
+	//stats
+	element_w = IMAGES_SETTINGS.elements[ELEMENTS[element].name].w;
+	element_h = IMAGES_SETTINGS.elements[ELEMENTS[element].name].h;
+	
+	//flag
+	draw_image(canvas_backround, ELEMENTS[element].name, info_left+200, y+13);
+	
+	//name
+	canvas_backround.font = "bold 18px Verdana";
+	canvas_backround.fillStyle = "#196119";
+	text = ELEMENTS[element].name;
+	text_width = canvas_backround.measureText(text).width;
+	canvas_backround.fillText(text, info_left+30, y+25);
+	
+	//description	
+	var height_space = 16;
+	var st=0;
+	var xx = info_left+10;
+	lib_show_stats("Collission", ELEMENTS[element].collission, xx, y+50+st*height_space, 90); st++;
+	lib_show_stats("Dimensions", element_w+"x"+element_h, xx, y+50+st*height_space, 90, true); st++;
 	}

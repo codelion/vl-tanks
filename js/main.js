@@ -4,24 +4,20 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	sam - only air, simple - only ground
+	silo
+		add he3 limit from 1 silo
+		fix lots of silo in 1 place exploit
 	fabric
 		training progress
 		spawn tank location
+	hide enemy buildings till scouted
+	special score for mode 3
 	multiplayer
 		creating room, rooms, select adjust for game_mode = 3
 		move he3 to team, initial he3
 		implement weapons_bonus and armor_bonus
 		weapon/armor upgrades 100, 200, 300
-	misc
-		mode 3 controlls
-		special score for mode 3
-		hide enemy buildings till scouted
-		towers
-			SAM tower, simple tower ignore air units
-			scout tower
-		silo
-			add he3 limit from 1 silo
-			fix lots of silo in 1 place exploit
 */
 
 //init hello screen
@@ -397,6 +393,8 @@ var IMAGES_SETTINGS = {
 		shield:	{ x:200,	y:50, w:16, h:16 },
 		alert:	{ x:300,	y:50, w:16, h:16 },
 		bonus:	{ x:350,	y:50, w:16, h:15 },
+		bolt:	{ x:250,	y:50, w:14, h:20 },
+		error:	{ x:400,	y:50, w:16, h:16 },	
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },
@@ -432,10 +430,11 @@ var IMAGES_SETTINGS = {
 		vfence:	{ x:0,	y:100,	w:26,	h:100 }, 
 		mine:		{ x:0,	y:200,	w:15,	h:15 }, 
 		block:	{ x:0,	y:300,	w:21,	h:21 },
-		hill:	{ x:0,	y:100,	w:136,	h:118 },
-		rocks1:	{ x:0,	y:250,	w:184,	h:108 },
+		hill:	{ x:100,y:0,	w:136,	h:118 },
+		rocks1:	{ x:250,y:0,	w:184,	h:108 },
 		rocks2:	{ x:50,	y:150,	w:184,	h:108 },
 		bones:	{ x:250,y:150,	w:136,	h:86 },
+		oil:	{ x:0,y:50,	w:20,	h:20 },
 		},
 	}
 	

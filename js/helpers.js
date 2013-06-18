@@ -158,3 +158,7 @@ window.format=function(b,a){
 	a[1]=b[1]&&a[1]?h+a[1]:"";
 	return(j?"-":"")+a[0]+a[1];
 	};
+function strpos(haystack, needle, offset) {
+	var i = (haystack+'').indexOf(needle, (offset || 0));
+	return i === -1 ? false : i;
+	}

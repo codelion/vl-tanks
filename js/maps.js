@@ -33,17 +33,19 @@ function draw_map(map_only){
 	//elements
 	for(var e in MAPS[level-1].elements){
 		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		element.w = IMAGES_SETTINGS.elements[element.name].w;
+		element.h = IMAGES_SETTINGS.elements[element.name].h;
 		x = MAPS[level-1].elements[e][1];
 		y = MAPS[level-1].elements[e][2];
-		if(element.size[0]<30)	x = x - round(element.size[0]/2);
-		if(element.size[1]<30)	y = y - round(element.size[1]/2);
-		max_w = element.size[0];
+		if(element.w<30)	x = x - round(element.w/2);
+		if(element.h<30)	y = y - round(element.h/2);
+		max_w = element.w;
 		if(MAPS[level-1].elements[e][3]!=0)
 			max_w = MAPS[level-1].elements[e][3];
-		max_h = element.size[1];
+		max_h = element.h;
 		if(MAPS[level-1].elements[e][4]!=0)
 			max_h = MAPS[level-1].elements[e][4];
-		draw_image(canvas_map, element.name, x, y, max_w, max_h);
+		draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
 		}
 	
 	if(map_only==false)
@@ -179,14 +181,16 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		//elements
 		for(var e in MAPS[i].elements){
 			var element = get_element_by_name(MAPS[i].elements[e][0]);
+			element.w = IMAGES_SETTINGS.elements[element.name].w;
+			element.h = IMAGES_SETTINGS.elements[element.name].h;
 			x = MAPS[i].elements[e][1];
 			y = MAPS[i].elements[e][2];
-			if(element.size[0]<30)	x = x - round(element.size[0]/2);
-			if(element.size[1]<30)	y = y - round(element.size[1]/2);
-			max_w = element.size[0];
+			if(element.w<30)	x = x - round(element.w/2);
+			if(element.h<30)	y = y - round(element.h/2);
+			max_w = element.w;
 			if(MAPS[i].elements[e][3]!=0)
 				max_w = MAPS[i].elements[e][3];
-			max_h = element.size[1];
+			max_h = element.h;
 			if(MAPS[i].elements[e][4]!=0)
 				max_h = MAPS[i].elements[e][4];
 			//minimize

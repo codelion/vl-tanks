@@ -66,8 +66,6 @@ function draw_tank(tank){
 		cache_id += "AL:"+alpha+',';
 		for (i in tank.buffs)
 			cache_id += "E:"+tank.buffs[i].name+',';
-		if(tank.stun != undefined)	
-			cache_id += 'ST,';
 		if(tank.dead == 1)
 			cache_id += 'DD,';
 		if(tank.invisibility != undefined)
@@ -102,16 +100,6 @@ function draw_tank(tank){
 			if(alpha != 1 && QUALITY > 1)
 				tmp_object.globalAlpha = alpha;
 		
-			//draw stun
-			if(tank.stun != undefined){
-				tmp_object.beginPath();
-				radius = tank_size_w/2;
-				tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
-				tmp_object.lineWidth = 1;
-				tmp_object.fillStyle = "#545454";
-				tmp_object.fill();
-				}
-			
 			//draw tank base
 			if(TYPES[tank.type].no_base_rotate === true){
 				//draw without rotation
@@ -164,17 +152,6 @@ function draw_tank(tank){
 					//draw
 					draw_image(tmp_object, tank.buffs[i].icon, left, top);
 					}
-				if(tank.buffs[i].circle != undefined){
-					tmp_object.beginPath();
-					var radius = tank_size_w/2;
-					if(radius>35) radius=35;
-					radius = radius + radius_extra;
-					tmp_object.arc(tank_size_w/2+padding, tank_size_h/2+padding, radius, 0 , 2 * Math.PI, false);	
-					tmp_object.lineWidth = 3;
-					tmp_object.strokeStyle = tank.buffs[i].circle;
-					tmp_object.stroke();
-					radius_extra = radius_extra + 5;
-					}	
 				}
 			
 			//enemy checked
@@ -363,7 +340,6 @@ function add_player_name(tank){
 function draw_bullets(TANK, time_gap){
 	for (b = 0; b < BULLETS.length; b++){
 		if(BULLETS[b].bullet_from_target.id != TANK.id) continue; // bullet from another tank
-		//if(TANK.stun != undefined && BULLETS[b].skill==undefined) continue; //stun
 		
 		TANK.last_bullet_time = Date.now();
 		//follows tank
@@ -413,8 +389,13 @@ function draw_bullets(TANK, time_gap){
 					//extra effects for non tower
 					if(bullet_target.team != TANK.team && TYPES[bullet_target.type].type!='building'){
 						//stun
-						if(BULLETS[b].stun_effect != undefined)
+						if(BULLETS[b].stun_effect != undefined){
 							bullet_target.stun = Date.now() + BULLETS[b].stun_effect;
+							bullet_target.buffs.push({
+								lifetime: Date.now() + BULLETS[b].stun_effect,
+								icon: 'error',
+								});
+							}
 						//slow
 						if(BULLETS[b].slow_debuff != undefined){
 							bullet_target.buffs.push({
@@ -446,8 +427,13 @@ function draw_bullets(TANK, time_gap){
 					if(distance_b > BULLETS[b].aoe_splash_range)	continue;	//too far
 					
 					//stun
-					if(BULLETS[b].stun_effect != undefined && TYPES[TANKS[ii].type].type!='building')
+					if(BULLETS[b].stun_effect != undefined && TYPES[TANKS[ii].type].type!='building'){
 						TANKS[ii].stun = Date.now() + BULLETS[b].stun_effect;
+						TANKS[ii].buffs.push({
+							lifetime: Date.now() + BULLETS[b].stun_effect,
+							icon: 'error',
+							});
+						}
 					
 					//do damage
 					if(game_mode != 2){
@@ -690,13 +676,12 @@ function check_collisions(xx, yy, TANK, full_check){
 	for(var e in MAPS[level-1].elements){
 		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
 		if(element.collission == false) continue;	
-		
-		var elem_width = element.size[0];
-		var elem_height = element.size[1];
+		var elem_width = IMAGES_SETTINGS.elements[element.name].w;
+		var elem_height = IMAGES_SETTINGS.elements[element.name].h;
 		var elem_x = MAPS[level-1].elements[e][1];
 		var elem_y = MAPS[level-1].elements[e][2];
-		if(element.size[0]<30)	elem_x = elem_x - round(element.size[0]/2);
-		if(element.size[1]<30)	elem_y = elem_y - round(element.size[1]/2);
+		if(elem_width<30)	elem_x = elem_x - round(elem_width/2);
+		if(elem_height<30)	elem_y = elem_y - round(elem_height/2);
 		if(MAPS[level-1].elements[e][3]!=0 && MAPS[level-1].elements[e][3] < elem_width)
 			elem_width = MAPS[level-1].elements[e][3];
 		if(MAPS[level-1].elements[e][4]!=0 && MAPS[level-1].elements[e][4] < elem_height)
@@ -1101,10 +1086,8 @@ function do_damage(TANK, TANK_TO, BULLET){
 	
 	//accuracy
 	/*var accuracy = TYPES[TANK.type].accuracy;
-	if(TANK.move==1)
-		accuracy = accuracy-10;
-	if(TANK_TO.move==1)
-		accuracy = accuracy-10;
+	if(TANK.move==1)	accuracy = accuracy-10;
+	if(TANK_TO.move==1)	accuracy = accuracy-10;
 	if(getRandomInt(1, 10) > accuracy/10) return false;*/
 	
 	//sound	fire_sound - i was hit

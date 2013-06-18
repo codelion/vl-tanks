@@ -15,8 +15,9 @@ function draw_infobar(){
 		
 	//tank name
 	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";	
-	canvas_backround.fillText(TYPES[MY_TANK.type].name, icon_x-5, status_y+25);
+	canvas_backround.font = "bold 10px Verdana";
+	var value = TYPES[MY_TANK.type].name.replace("_"," ");
+	canvas_backround.fillText(value, icon_x-5, status_y+25);
 		
 	redraw_tank_stats();
 	
@@ -480,14 +481,16 @@ function redraw_mini_map(){
 	var mini_h = (button_height-2)/MAPS[level-1].height;
 	for(var e in MAPS[level-1].elements){
 		var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+		element.w = IMAGES_SETTINGS.elements[element.name].w;
+		element.h = IMAGES_SETTINGS.elements[element.name].h;
 		x = MAPS[level-1].elements[e][1];
 		y = MAPS[level-1].elements[e][2];
-		if(element.size[0]<30)	x = x - round(element.size[0]/2);
-		if(element.size[1]<30)	y = y - round(element.size[1]/2);
-		max_w = element.size[0];
+		if(element.w<30)	x = x - round(element.w/2);
+		if(element.h<30)	y = y - round(element.h/2);
+		max_w = element.w;
 		if(MAPS[level-1].elements[e][3]!=0)
 			max_w = MAPS[level-1].elements[e][3];
-		max_h = element.size[1];
+		max_h = element.h;
 		if(MAPS[level-1].elements[e][4]!=0)
 			max_h = MAPS[level-1].elements[e][4];
 		//minimize
@@ -612,7 +615,9 @@ function draw_counter_tank_selection(selected_tank){
 					return false;
 				}
 			else if(game_mode == 3){
-				var unit_cost = 50;
+				var unit_cost;
+				stats = War_units(TANK, undefined, true);
+				unit_cost = stats.cost;
 				if(TYPES[index].type == 'human') unit_cost = round(unit_cost/2);
 				if(HE3 < unit_cost) return false;
 				HE3 = HE3 - unit_cost;
@@ -628,5 +633,50 @@ function draw_counter_tank_selection(selected_tank){
 		j++;
 		/*if(j==n1){	row++; 	j=0;	}*/
 		}
+		
+	//towers
+	if(game_mode == 3){
+		var j=0;
+		var row = 1;
+		var nation = get_nation_by_team(MY_TANK.team);
+		for(var i in TYPES){
+			if(TYPES[i].type != 'building') continue;
+			if(strpos(TYPES[i].name, "ower")==false) continue;
+			if(check_nation_tank(TYPES[i].name, nation)==false) continue;
+			//reset background
+			var back_color = '';
+			if(selected_tank != undefined && selected_tank == i || i == MY_TANK.type)
+				back_color = "#8fc74c"; //selected
+			else
+				back_color = "#dbd9da";
+			canvas_backround.fillStyle = back_color;
+			canvas_backround.strokeStyle = "#196119";
+			roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
+			
+			//logo
+			var sizer = 0.6;
+			draw_image(canvas_backround, TYPES[i].name, 
+				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+			draw_image(canvas_backround, TYPES[i].name, 
+				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+			
+			//register button
+			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+				var unit_cost;
+				stats = Towers(TANK, undefined, true);
+				unit_cost = stats.cost;
+				var reuse = stats.reuse;
+				if(TYPES[index].damage[0] == 0) unit_cost = round(unit_cost/2);
+				if(HE3 < unit_cost) return false;
+				HE3 = HE3 - unit_cost;	log(index);
+				
+				construct_prepare(MY_TANK, unit_cost, reuse, TYPES[index].name, 2);
+				}, i);
+			j++;
+			}
+		}
+		
 	last_selected_counter = selected_tank;
 	}

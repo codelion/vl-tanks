@@ -1,35 +1,10 @@
-ELEMENTS.push({
-	name: 'fence',
-	size: [100, 26],
-	alt_color: '#4e4b44',	
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'vfence',
-	size: [26, 100], 
-	alt_color: '#4e4b44',	
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'hill',
-	size: [136, 118], 
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'rocks1',
-	size: [184, 108], 
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'rocks2',
-	size: [184, 108], 
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'bones',
-	size: [136, 86], 
-	collission: true,	
-	});
+ELEMENTS.push({	name: 'fence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'vfence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'hill',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'rocks1',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'rocks2',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'bones',				collission: false,	alpha: 0.7	});
+ELEMENTS.push({	name: 'oil',	alt_color: '#040000',	collission: true,	alpha: 0.8	});	
 
 //====== Main ==================================================================
 
@@ -61,14 +36,17 @@ MAPS.push({
 			['fence', 	450,	200,	0,	0],
 			['fence', 	550,	200,	0,	0],
 			['fence', 	650,	200,	50,	0],
-			['fence', 	0,	500,	0,	0],
-			['fence', 	700,	500,	0,	0],
 			['fence', 	100,	800,	50,	0],
 			['fence', 	150,	800,	0,	0],
 			['fence', 	250,	800,	0,	0],
 			['fence', 	450,	800,	0,	0],
 			['fence', 	550,	800,	0,	0],
 			['fence', 	650,	800,	50,	0],
+			['rocks1', 	-80,	350,	0,	0],
+			['rocks2', 	700,	550,	0,	0],
+			['bones', 	350,	450,	0,	0],
+			['hill', 	340,	10,	0,	0],
+			['hill', 	340,	900,	0,	0],
 		],
 	bots: [
 			['B',	35,	1,	[[5, 18],[25,50],[25,70],[5,82], [45,99]] ],
@@ -121,6 +99,7 @@ MAPS.push({
 			['fence', 	400,	700,	0,	0],
 			['fence', 	500,	700,	0,	0],
 			['fence', 	600,	700,	0,	0],
+			['bones', 	600,	350,	0,	0],
 		],
 	bots: [
 			['B',	65,	5,	[[95,18],[95,40],[5, 40],[5, 60],[95,60],[95, 82],[50, 95]] ],
@@ -165,6 +144,10 @@ MAPS.push({
 			['vfence', 	650,	600,	0,	0],
 			['vfence', 	650,	700,	0,	0],
 			['vfence', 	650,	800,	0,	0],	
+			['rocks1', 	300,	300,	0,	0],
+			['rocks2', 	300,	550,	0,	0],
+			['bones', 	0,	0,	0,	0],
+			['bones', 	650,	900,	0,	0],			
 		],
 	bots: [
 			['B',	50,	10,	[[30,30],[30,95],[50,95]] ],
@@ -195,9 +178,9 @@ MAPS.push({
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
 			['fence', 	0,	110,	0,	0],
-			['fence', 	100,	110,	0,	0],
-			['fence', 	600,	240,	0,	0],
 			['fence', 	700,	240,	0,	0],
+			['bones', 	330,	100,	0,	0],
+			['bones', 	300,	150,	0,	0],
 		],
 	bots: [
 			['B',	25,	5,	[[95,20],[95,90]] ],
@@ -232,6 +215,10 @@ MAPS.push({
 			['fence', 	540,	300,	0,	0],
 			['fence', 	640,	300,	0,	0],
 			['fence', 	740,	300,	60,	0],
+			['bones', 	50,	500,	0,	0],
+			['bones', 	700,	320,	0,	0],
+			['rocks2', 	600,	480,	0,	0],
+			['hill', 	340,	10,	0,	0],
 		],
 	bots: [],
 	});
@@ -280,19 +267,18 @@ MAPS.push({
 			['fence', 	400,	2825,	0,	0],
 			['fence', 	1500,	2825,	0,	0],
 			['fence', 	1600,	2825,	0,	0],
-			
 			['fence', 	0,	1500,	0,	0],
 			['fence', 	100,	1500,	0,	0],
 			['fence', 	200,	1500,	0,	0],
 			['fence', 	300,	1500,	0,	0],
-			
-			['fence', 	1300,	1500,	0,	0],					
-			['fence', 	1400,	1500,	0,	0],
-			['fence', 	1500,	1500,	0,	0],
 			['fence', 	1600,	1500,	0,	0],
 			['fence', 	1700,	1500,	0,	0],
 			['fence', 	1800,	1500,	0,	0],
 			['fence', 	1900,	1500,	0,	0],
+			['hill', 	400,	1300,	0,	0],
+			['rocks1', 	900,	700,	0,	0],
+			['rocks2', 	200,	2000,	0,	0],
+			['bones', 	1500,	200,	0,	0],
 		],
 	bots: [],
 	});

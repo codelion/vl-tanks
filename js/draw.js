@@ -576,7 +576,7 @@ function draw_right_buttons(clean){
 		var height_space = 16;
 		var st=0;
 		lib_show_stats("move and target", "Mouse", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("control soldiers", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
+		lib_show_stats("additional movements", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
 		lib_show_stats("skills", "1, 2, 3", padding+20+90, padding+20+st*height_space, -90); st++;
 		lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
 		lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
@@ -1487,9 +1487,18 @@ function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w
 		if(max_h == undefined)	max_h = IMAGES_SETTINGS.elements[name].h;
 		if(clip_w == undefined)	clip_w = max_w;
 		if(clip_h == undefined)	clip_h = max_h;
+		var element = get_element_by_name(name);
+		var alpha = element.alpha;
+		if(PLACE == 'library') alpha = 1;
+		if(alpha != 1){
+			canvas.save();
+			canvas.globalAlpha = alpha;
+			}
 		canvas.drawImage(IMAGES_ELEMENTS, 
 			IMAGES_SETTINGS.elements[name].x+offset_x, IMAGES_SETTINGS.elements[name].y+offset_y, clip_w, clip_h, 
 			x, y, max_w, max_h); 
+		if(alpha != 1)
+			canvas.restore();
 		return true;
 		}
 		
