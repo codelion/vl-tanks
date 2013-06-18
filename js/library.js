@@ -150,7 +150,7 @@ function draw_library_units(selected_tank){
 		//name
 		canvas_backround.font = "bold 18px Verdana";
 		canvas_backround.fillStyle = "#196119";
-		text = TYPES[selected_tank].name;
+		text = TYPES[selected_tank].name.replace("_"," ");
 		text_width = canvas_backround.measureText(text).width;
 		canvas_backround.fillText(text, info_left+preview_x+40, y+25);
 		

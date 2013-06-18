@@ -195,8 +195,10 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 			x = pos1 + Math.ceil(x*button_width/MAPS[i].width);
 			y = pos2 + Math.ceil(y*button_height/MAPS[i].height);
 			//draw
-			canvas_this.fillStyle = element.alt_color;
-			canvas_this.fillRect(x, y, max_w, max_h);
+			if(element.alt_color != undefined){
+				canvas_this.fillStyle = element.alt_color;
+				canvas_this.fillRect(x, y, max_w, max_h);
+				}
 			}
 			
 		//name

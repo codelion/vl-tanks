@@ -496,8 +496,10 @@ function redraw_mini_map(){
 		x = pos1 + Math.ceil(x*button_width/MAPS[level-1].width);
 		y = pos2 + Math.ceil(y*button_height/MAPS[level-1].height);
 		//draw
-		canvas_backround.fillStyle = element.alt_color;
-		canvas_backround.fillRect(x, y, max_w, max_h);
+		if(element.alt_color != undefined){
+			canvas_backround.fillStyle = element.alt_color;
+			canvas_backround.fillRect(x, y, max_w, max_h);
+			}
 		}
 	}
 //draw tank in mini-map

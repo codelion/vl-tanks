@@ -857,6 +857,7 @@ function check_enemies(TANK){
 	if(TANK.dead == 1) return false;	//dead
 	if(TANK.constructing != undefined) return false;	//still not ready
 	if(TANK.stun != undefined) return false;	//stuned
+	if(TANK.damage == 0) return false;	//not war unit?
 	if(TANK.hit_reuse == undefined){
 		var hit_reuse = TANK.attack_delay*1000;
 		hit_reuse = apply_buff(TANK, 'hit_reuse', hit_reuse);

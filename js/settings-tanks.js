@@ -363,7 +363,7 @@ TYPES.push({
 	turn_speed: 4,
 	no_repawn: 1,
 	abilities: [],
-	size: ['S', 30, 30],
+	size: ['S', 20, 22],
 	preview: true,
 	icon_top: false,
 	icon_base: true,
@@ -396,6 +396,52 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	accuracy: 90,
+	});
+	
+//SAM Tower
+TYPES.push({
+	name: 'SAM_Tower',
+	type: 'building',
+	description: ["Tower for air defence"],
+	life: [1000,0],
+	damage: [40, 0],	//30 dps
+	range: 110,
+	scout: 110,
+	armor: [20, 0, 20],
+	speed: 0,
+	attack_delay: 1.1,
+	turn_speed: 2.5,
+	no_repawn: 1,
+	abilities: [],
+	size: ['L', 50, 50],
+	preview: false,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
+	fire_sound: 'shoot',
+	accuracy: 90,
+	});
+
+//Scout Tower
+TYPES.push({
+	name: 'Scout_Tower',
+	type: 'building',
+	description: ["Tower for scouting"],
+	life: [500,0],
+	damage: [0, 0],	//0 dps
+	range: 110,
+	scout: 110,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [],
+	size: ['L', 22, 20],
+	preview: false,
+	icon_top: true,
+	icon_base: false,
+	no_base_rotate: true,
 	});
 
 //Base

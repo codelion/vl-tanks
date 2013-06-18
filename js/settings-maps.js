@@ -10,6 +10,26 @@ ELEMENTS.push({
 	alt_color: '#4e4b44',	
 	collission: true,	
 	});
+ELEMENTS.push({
+	name: 'hill',
+	size: [136, 118], 
+	collission: true,	
+	});
+ELEMENTS.push({
+	name: 'rocks1',
+	size: [184, 108], 
+	collission: true,	
+	});
+ELEMENTS.push({
+	name: 'rocks2',
+	size: [184, 108], 
+	collission: true,	
+	});
+ELEMENTS.push({
+	name: 'bones',
+	size: [136, 86], 
+	collission: true,	
+	});
 
 //====== Main ==================================================================
 

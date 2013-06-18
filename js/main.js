@@ -409,9 +409,11 @@ var IMAGES_SETTINGS = {
 		Truck:	{ x:0,	y:700,	w:90,	h:80 },
 		Apache:	{ x:0,	y:800,	w:90,	h:80 },
 		Bomber:	{ x:0,	y:900,	w:90,	h:80 },
-		Soldier:	{ x:0,	y:1000,	w:90,	h:80 },
+		Soldier:	{ x:0,	y:1000,	w:20,	h:22 },
 		TRex:		{ x:0,	y:1300,	w:90,	h:80 },
 		Tower:		{ x:0,	y:1100,	w:90,	h:80 },
+		Scout_Tower:	{ x:0,	y:1150,	w:22,	h:20 },
+		SAM_Tower:	{ x:0,	y:1550,	w:90,	h:80 },
 		Base:		{ x:0,	y:1200,	w:90,	h:80 },
 		Factory:	{ x:0,	y:1400,	w:68,	h:56 },
 		Research:	{ x:0,	y:1500,	w:50,	h:42 },
@@ -430,6 +432,10 @@ var IMAGES_SETTINGS = {
 		vfence:	{ x:0,	y:100,	w:26,	h:100 }, 
 		mine:		{ x:0,	y:200,	w:15,	h:15 }, 
 		block:	{ x:0,	y:300,	w:21,	h:21 },
+		hill:	{ x:0,	y:100,	w:136,	h:118 },
+		rocks1:	{ x:0,	y:250,	w:184,	h:108 },
+		rocks2:	{ x:50,	y:150,	w:184,	h:108 },
+		bones:	{ x:250,y:150,	w:136,	h:86 },
 		},
 	}
 	
