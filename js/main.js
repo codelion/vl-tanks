@@ -4,6 +4,11 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	FS
+		constructing
+		buttons dont work
+		normal - FS - normal - button dont work
+		center
 	sam - only air, simple - only ground
 	silo
 		add he3 limit from 1 silo

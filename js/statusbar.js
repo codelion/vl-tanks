@@ -1,12 +1,12 @@
 //draw statusbar
 function draw_status_bar(){	
 	//background
-	canvas_backround.fillStyle = "#dbd9da";
+	canvas_backround.fillStyle = "#686868";
 	canvas_backround.fillRect (0, HEIGHT_APP-27, WIDTH_APP, 27);
 	
 	//top border
 	canvas_backround.beginPath();
-	canvas_backround.strokeStyle='#999069';
+	canvas_backround.strokeStyle='#292929';
 	canvas_backround.moveTo(0, HEIGHT_APP-26.5);
 	canvas_backround.lineTo(WIDTH_APP, HEIGHT_APP-26.5);
 	canvas_backround.lineWidth = 1;
@@ -14,7 +14,7 @@ function draw_status_bar(){
 	
 	//bottom border
 	canvas_backround.beginPath();
-	canvas_backround.strokeStyle='#96b4a3';
+	canvas_backround.strokeStyle='#000000';
 	canvas_backround.moveTo(0, HEIGHT_APP);
 	canvas_backround.lineTo(WIDTH_APP, HEIGHT_APP);
 	canvas_backround.stroke();
@@ -31,15 +31,20 @@ function draw_status_bar(){
 function draw_mute_music_button(){
 	PADDING = 55;
 	var width = 48;
+	var height = 18;
+
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#414141";
+	roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 	
-	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
 	fs_text = "Music";
 	if(MUTE_MUSIC == true)
-		canvas_backround.fillStyle = "#8A8A8A";
+		canvas_backround.fillStyle = "#686868";
 	else
-		canvas_backround.fillStyle = "#196119";
-	canvas_backround.font = "Bold 11px Arial";
-	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+9, HEIGHT_APP-18-5+14);
+		canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "normal 11px Arial";
+	var tmp = round((width - canvas_backround.measureText(fs_text).width)/2);
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	//line
 	if(MUTE_MUSIC == false){
@@ -50,7 +55,7 @@ function draw_mute_music_button(){
 		canvas_backround.moveTo(min, HEIGHT_APP-7+0.5);
 		canvas_backround.lineTo(length, HEIGHT_APP-7+0.5);
 		canvas_backround.lineWidth = 1;
-		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.strokeStyle = "#ffffff";
 		canvas_backround.stroke();
 		}
       
@@ -60,15 +65,19 @@ function draw_mute_music_button(){
 function draw_mute_fx_button(){
 	PADDING = 108;
 	var width = 48;
+	var height = 18;
 	
-	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#414141";
+	roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 	fs_text = "Sound";
 	if(MUTE_FX == true)
-		canvas_backround.fillStyle = "#8A8A8A";
+		canvas_backround.fillStyle = "#686868";
 	else
-		canvas_backround.fillStyle = "#196119";
-	canvas_backround.font = "Bold 11px Arial";
-	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+5, HEIGHT_APP-18-5+14);
+		canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "normal 11px Arial";
+	var tmp = round((width - canvas_backround.measureText(fs_text).width)/2);
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	//line
 	if(MUTE_FX == false){
@@ -79,7 +88,7 @@ function draw_mute_fx_button(){
 		canvas_backround.moveTo(min, HEIGHT_APP-7+0.5);
 		canvas_backround.lineTo(length, HEIGHT_APP-7+0.5);
 		canvas_backround.lineWidth = 1;
-		canvas_backround.strokeStyle = "#196119";
+		canvas_backround.strokeStyle = "#ffffff";
 		canvas_backround.stroke();
 		}
 	
@@ -88,8 +97,12 @@ function draw_mute_fx_button(){
 //show quality button in statusbar
 function draw_quality_button(first_run){
 	PADDING = 161;
+	var width = 48;
+	var height = 18;
 	
-	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#414141";
+	roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 	quality_cookie = getCookie("quality");
 	if(quality_cookie != '')
 		QUALITY = quality_cookie;
@@ -105,9 +118,10 @@ function draw_quality_button(first_run){
 	if(PLACE=='game' && first_run==false)
 		draw_map(true);
 	
-	canvas_backround.fillStyle = "#8A8A8A";
-	canvas_backround.font = "Bold 11px Arial";
-	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+12, HEIGHT_APP-18-5+14);
+	canvas_backround.fillStyle = "#ffffff";
+	canvas_backround.font = "normal 11px Arial";
+	var tmp = round((width - canvas_backround.measureText(q_text).width)/2);
+	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', function(){
 		QUALITY++;
@@ -125,12 +139,17 @@ function draw_quality_button(first_run){
 //quit button in statusbar
 function draw_quit_button(){
 	PADDING = 214;
+	var width = 48;
+	var height = 18;
 	
-	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#414141";
+	roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 	q_text = "Quit";
-	canvas_backround.fillStyle = "#c10000";
+	canvas_backround.fillStyle = "#f3676f";
 	canvas_backround.font = "Bold 11px Helvetica";
-	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+12, HEIGHT_APP-18-5+14);
+	var tmp = round((width - canvas_backround.measureText(q_text).width)/2);
+	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game');
 	}
@@ -138,12 +157,17 @@ function draw_quit_button(){
 function draw_fs_button(){
 	if(PLACE != 'game' ) return false;
 	PADDING = 267;
+	var width = 48;
+	var height = 18;
 	
-	draw_image(canvas_backround, 'button', WIDTH_APP-PADDING, HEIGHT_APP-23);
+	canvas_backround.strokeStyle = "#000000";
+	canvas_backround.fillStyle = "#414141";
+	roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 	fs_text = "Full Scr.";
-	canvas_backround.fillStyle = "#8A8A8A";
+	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Normal 11px Arial";
-	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+5, HEIGHT_APP-18-5+14);
+	var tmp = round((width - canvas_backround.measureText(fs_text).width)/2);
+	canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
 		fullscreen('canvas_area');
@@ -152,7 +176,7 @@ function draw_fs_button(){
 //show version instatus bar
 function draw_version(){
 	PADDING = 10;
-	canvas_backround.fillStyle = "#8A8A8A";
+	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.font = "Normal 11px Helvetica";
 	canvas_backround.fillText("v"+VERSION, PADDING, HEIGHT_APP-18-5+14);
 	}
