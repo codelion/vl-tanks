@@ -6,8 +6,7 @@ var APP_URL = 'http://viliusle.github.io/vl-tanks/';
 var APP_EMAIL = 'www.viliusl@gmail.com';
 var FPS = 25;				//frames per second
 var settings_font="bold 18px Helvetica";//default font for settings buttons
-var START_GAME_COUNT_SINGLE = 15;	//second how much to count in singleplayer
-var START_GAME_COUNT_MULTI = 20;	//second how much to count in multiplayer
+var START_GAME_COUNT = 20;	//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
@@ -28,6 +27,10 @@ var MAX_ABILITY_LEVEL = 20;		//max ability level
 var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invisibility wanishes.
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
 var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
+var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
+var CRYSTAL_THREADS = 5;		//max silos for 1 crystal
+var CRYSTAL_RANGE = 80;			//crystal/silo orange
+var SILO_POWER = 100;			//how much he3 silo generates per 1s
 
 //other global variables
 var TANKS = new Array();		//tanks array
@@ -36,6 +39,7 @@ var BULLETS_TYPES = new Array();	//bullets types config
 var BULLETS = new Array();		//tanks bullets
 var MAPS = new Array();			//maps config
 var ELEMENTS = new Array();		//maps elements
+var MAP_CRYSTALS = new Array();		//crystals array for map
 var COUNTRIES = new Array();		//countries
 var MINES = [];				//mines
 var BUTTONS = new Array();		//buttons array
@@ -94,6 +98,7 @@ var intro_enabled = 1;			//if show intro
 var time_gap;				//time difference between frames
 var weapons_bonus = 0;			//in commander mode weappon bonus
 var armor_bonus = 0;			//in commander mode armor bonus
+var screen_message = {};		//message to show on screen
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop

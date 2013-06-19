@@ -384,17 +384,20 @@ function draw_create_room(game_players, game_mode, game_type, game_map, nation1,
 	button_width = button_width + 30;
 	j=0;
 	for(var i in COUNTRIES){
-		if(COUNTRIES[i].file == nation2){
-			j++;
-			continue;
-			}
 		//block
 		canvas_backround.strokeStyle = "#000000";
 		if(COUNTRIES[i].file == nation1)
 			canvas_backround.fillStyle = button_active_color;
+		else if(COUNTRIES[i].file == nation2)
+			canvas_backround.fillStyle = "#f0f9e4";
 		else
 			canvas_backround.fillStyle = button_inactive_color;
 		roundRect(canvas_backround, 10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
+		
+		if(COUNTRIES[i].file == nation2){
+			j++;
+			continue;
+			}
 		
 		//action
 		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){
@@ -425,17 +428,20 @@ function draw_create_room(game_players, game_mode, game_type, game_map, nation1,
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	j=0;
 	for(var i in COUNTRIES){
-		if(COUNTRIES[i].file == nation1){
-			j++;
-			continue;
-			}
 		//block
 		canvas_backround.strokeStyle = "#000000";
 		if(COUNTRIES[i].file == nation2)
 			canvas_backround.fillStyle = button_active_color;
+		else if(COUNTRIES[i].file == nation1)
+			canvas_backround.fillStyle = "#f0f9e4";
 		else
 			canvas_backround.fillStyle = button_inactive_color;
 		roundRect(canvas_backround, 10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, 2, true);
+		
+		if(COUNTRIES[i].file == nation1){
+			j++;
+			continue;
+			}
 		
 		//action
 		register_button(10+offset_left+j*(button_width+button_gap), 60+offset_top+10, button_width, button_height, PLACE, function(xx, yy, extra){

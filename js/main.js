@@ -4,25 +4,16 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	FS
-		constructing
-		buttons dont work
-		normal - FS - normal - button dont work
-		center
-	sam - only air, simple - only ground
-	silo
-		add he3 limit from 1 silo
-		fix lots of silo in 1 place exploit
 	fabric
 		training progress
-		spawn tank location
+		spawn tank location flag
 	hide enemy buildings till scouted
-	special score for mode 3
 	multiplayer
 		creating room, rooms, select adjust for game_mode = 3
 		move he3 to team, initial he3
 		implement weapons_bonus and armor_bonus
 		weapon/armor upgrades 100, 200, 300
+	special score for mode 3
 */
 
 //init hello screen
@@ -54,7 +45,7 @@ function init_game(first_time){
 
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;
-		START_GAME_COUNT_MULTI = 5;
+		START_GAME_COUNT = 5;
 		}
 		
 	if(getCookie("nointro") == '1')
@@ -162,6 +153,7 @@ function check_canvas_sizes(){
 		if(WIDTH_MAP<800)
 			WIDTH_SCROLL = WIDTH_MAP;
 		HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
+		parent.document.getElementById("main_iframe").style.paddingLeft = "0px";
 		}
 	else{
 		//full screen
@@ -194,6 +186,7 @@ function check_canvas_sizes(){
 	//map
 	document.getElementById("canvas_map").width  = WIDTH_MAP;
 	document.getElementById("canvas_map").height = HEIGHT_MAP;
+	
 	//map sight
 	document.getElementById("canvas_map_sight").width  = WIDTH_SCROLL;
 	document.getElementById("canvas_map_sight").height = HEIGHT_SCROLL;
@@ -206,6 +199,11 @@ function check_canvas_sizes(){
 	try{
 		parent.document.getElementById("main_iframe").style.height = HEIGHT_APP+"px";
 		parent.document.getElementById("main_iframe").style.width = WIDTH_APP+"px";
+		//center screen
+		if(WIDTH_MAP < dimensions[0]){
+			var left_margin = round((dimensions[0] - WIDTH_APP)/2);
+			parent.document.getElementById("main_iframe").style.paddingLeft = left_margin + "px";
+			}
 		}catch(error){}
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
@@ -349,8 +347,25 @@ function init_action(map_nr, my_team){
 		MAP_SCROLL_CONTROLL=true; 
 		move_to_place(xx, yy);
 		});
+	if(game_mode == 3)
+		MAP_SCROLL_MODE = 2;
 		
 	draw_map(false);
+	
+	//register crystals
+	if(game_mode == 3){
+		for(var e in MAPS[level-1].elements){
+			if(MAPS[level-1].elements[e][0] != 'crystals') continue;
+			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+			MAP_CRYSTALS.push({
+				x: MAPS[level-1].elements[e][1],
+				y: MAPS[level-1].elements[e][2],
+				cx: MAPS[level-1].elements[e][1] + IMAGES_SETTINGS.elements[element.name].w/2,
+				cy: MAPS[level-1].elements[e][2] + IMAGES_SETTINGS.elements[element.name].h/2,
+				power: CRYSTAL_POWER,
+				});
+			}
+		}
 	
 	var requestAnimationFrame = window.requestAnimationFrame 
 				|| window.mozRequestAnimationFrame 
@@ -394,7 +409,7 @@ var IMAGES_SETTINGS = {
 		skill_on:	{ x:0,	y:250, w:65,	h:65 },
 		statusbar:	{ x:0,	y:350, w:800, h:128 },
 		he3:	{ x:100,	y:150,w:18, h:20 },
-		fire:	{ x:150,	y:50, w:16, h:16 },
+		danger:	{ x:150,	y:50, w:16, h:16 },
 		shield:	{ x:200,	y:50, w:16, h:16 },
 		alert:	{ x:300,	y:50, w:16, h:16 },
 		bonus:	{ x:350,	y:50, w:16, h:15 },
@@ -439,7 +454,7 @@ var IMAGES_SETTINGS = {
 		rocks1:	{ x:250,y:0,	w:184,	h:108 },
 		rocks2:	{ x:50,	y:150,	w:184,	h:108 },
 		bones:	{ x:250,y:150,	w:136,	h:86 },
-		oil:	{ x:0,y:50,	w:20,	h:20 },
+		crystals:{ x:0,y:50,	w:52,	h:44 },
 		},
 	}
 	
@@ -602,6 +617,7 @@ function quit_game(init_next_game){
 	target_mode = '';
 	weapons_bonus = 0;
 	armor_bonus = 0;
+	MAP_CRYSTALS = [];
 	
 	if(init_next_game != false){
 		init_game(false);

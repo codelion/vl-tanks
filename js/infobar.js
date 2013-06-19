@@ -441,7 +441,7 @@ function move_to_place(mouse_x, mouse_y){
 	tmp_x = round(WIDTH_MAP*pos_x_pecentage/100);
 	tmp_y = round(HEIGHT_MAP*pos_y_pecentage/100);
 
-	//scroll map here
+	//scrolling using css - 2x speed gain
 	map_offset[0] = -tmp_x;
 	map_offset[1] = -tmp_y;
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
@@ -619,7 +619,11 @@ function draw_counter_tank_selection(selected_tank){
 				stats = War_units(TANK, undefined, true);
 				unit_cost = stats.cost;
 				if(TYPES[index].type == 'human') unit_cost = round(unit_cost/2);
-				if(HE3 < unit_cost) return false;
+				if(HE3 < unit_cost){
+					screen_message.text = "Not enough HE3.";
+					screen_message.time = Date.now() + 1000;
+					return false;
+					}
 				HE3 = HE3 - unit_cost;
 				var gap_rand = 100;
 				var x = MY_TANK.x + getRandomInt(-gap_rand, gap_rand);
@@ -668,8 +672,12 @@ function draw_counter_tank_selection(selected_tank){
 				stats = Towers(TANK, undefined, true);
 				unit_cost = stats.cost;
 				var reuse = stats.reuse;
-				if(TYPES[index].damage[0] == 0) unit_cost = round(unit_cost/2);
-				if(HE3 < unit_cost) return false;
+				if(TYPES[index].damage[0] == 0) unit_cost = round(unit_cost*4/10);
+				if(HE3 < unit_cost){
+					screen_message.text = "Not enough HE3.";
+					screen_message.time = Date.now() + 1000;
+					return false;
+					}
 				HE3 = HE3 - unit_cost;	log(index);
 				
 				construct_prepare(MY_TANK, unit_cost, reuse, TYPES[index].name, 2);

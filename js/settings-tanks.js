@@ -47,7 +47,7 @@ TYPES.push({
 	life: [210, 12],
 	damage: [30, 1.5],		//30 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [25, 0.5, 50],
 	speed: 28,
 	attack_delay: 1,
@@ -63,7 +63,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Heavy
@@ -74,7 +73,7 @@ TYPES.push({
 	life: [230, 12],  				//[tank life in level 0, life increase in each level]
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
-	scout: 90,					//tank scout range
+	scout: 110,					//tank scout range
 	armor: [40, 0.5, 65],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
@@ -95,7 +94,6 @@ TYPES.push({
 	preview: true,				//tank preview image
 	bullet: 'small_bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
-	accuracy: 90,					//chance to hit target, %
 	});
 
 //Cruiser
@@ -106,7 +104,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [18, 1.3],	//18 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 30,
 	attack_delay: 1,
@@ -122,7 +120,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Launcher
@@ -133,7 +130,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
 	range: 100,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 1,
@@ -149,7 +146,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 100,
 	});
 
 //Stealth
@@ -160,7 +156,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [40, 2],	//20 dps
 	range: 100,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 28,
 	attack_delay: 2,
@@ -177,7 +173,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 80,
 	});
 
 //Miner
@@ -188,7 +183,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
@@ -204,7 +199,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Tech
@@ -215,7 +209,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [20, 1.4],	//20 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
@@ -231,7 +225,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Truck
@@ -242,7 +235,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 1,
@@ -258,7 +251,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //TRex
@@ -269,7 +261,7 @@ TYPES.push({
 	life: [170, 11],
 	damage: [20, 1.4],	//20 dps
 	range: 40,
-	scout: 80,
+	scout: 100,
 	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
@@ -285,7 +277,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Apache
@@ -296,7 +287,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [20, 1.3],	//20 dps
 	range: 90,
-	scout: 100,
+	scout: 120,
 	armor: [20, 0.5, 45],	
 	speed: 32,
 	attack_delay: 1,
@@ -315,7 +306,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Bomber
@@ -326,7 +316,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [20, 1.3],	//20 dps
 	range: 80,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 37,
 	attack_delay: 1,
@@ -345,7 +335,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Soldier
@@ -356,7 +345,7 @@ TYPES.push({
 	life: [130, 6],
 	damage: [11, 0.7],	//11 dps
 	range: 70,
-	scout: 80,
+	scout: 100,
 	armor: [0, 0, 0],
 	speed: 25,
 	attack_delay: 1,
@@ -369,7 +358,6 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Tower
@@ -380,7 +368,7 @@ TYPES.push({
 	life: [1200,0],
 	damage: [30, 0],	//30 dps
 	range: 110,
-	scout: 110,
+	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
@@ -395,7 +383,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	attack_type: 'ground',
 	});
 	
 //SAM Tower
@@ -404,9 +392,9 @@ TYPES.push({
 	type: 'building',
 	description: ["Tower for air defence"],
 	life: [1000,0],
-	damage: [40, 0],	//30 dps
+	damage: [50, 0],	//40 dps
 	range: 110,
-	scout: 110,
+	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
@@ -419,7 +407,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	attack_type: 'air',
 	});
 
 //Scout Tower
@@ -430,7 +418,7 @@ TYPES.push({
 	life: [500,0],
 	damage: [0, 0],	//0 dps
 	range: 110,
-	scout: 110,
+	scout: 140,
 	armor: [0, 0, 0],
 	speed: 0,
 	attack_delay: 999,
@@ -452,7 +440,7 @@ TYPES.push({
 	life: [2500, 0],
 	damage: [45, 0],	//45 dps
 	range: 110,
-	scout: 110,
+	scout: 130,
 	armor: [50, 0, 50],
 	speed: 0,
 	attack_delay: 1.1,
@@ -470,7 +458,6 @@ TYPES.push({
 	no_base_rotate: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
 	});
 
 //Factory
@@ -481,7 +468,7 @@ TYPES.push({
 	life: [500,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
-	scout: 70,
+	scout: 90,
 	armor: [0, 0, 0],
 	speed: 0,
 	attack_delay: 999,
@@ -506,7 +493,7 @@ TYPES.push({
 	life: [700,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
-	scout: 70,
+	scout: 90,
 	armor: [0, 0, 0],
 	speed: 0,
 	attack_delay: 999,
@@ -531,7 +518,7 @@ TYPES.push({
 	life: [400,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
-	scout: 10,
+	scout: 50,
 	armor: [0, 0, 0],
 	speed: 0,
 	attack_delay: 999,

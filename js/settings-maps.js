@@ -4,7 +4,7 @@ ELEMENTS.push({	name: 'hill',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'rocks1',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'rocks2',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'bones',				collission: false,	alpha: 0.7	});
-ELEMENTS.push({	name: 'oil',	alt_color: '#040000',	collission: true,	alpha: 0.8	});	
+ELEMENTS.push({	name: 'crystals',			collission: true,	alpha: 0.8	});	
 
 //====== Main ==================================================================
 
@@ -181,6 +181,8 @@ MAPS.push({
 			['fence', 	700,	240,	0,	0],
 			['bones', 	330,	100,	0,	0],
 			['bones', 	300,	150,	0,	0],
+			['crystals', 	100,	90,	0,	0],
+			['crystals', 	650,	220,	0,	0],
 		],
 	bots: [
 			['B',	25,	5,	[[95,20],[95,90]] ],

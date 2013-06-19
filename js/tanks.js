@@ -725,15 +725,29 @@ function check_collisions(xx, yy, TANK, full_check){
 function tank_level_handler(){		//once per second
 	if(game_mode == 3){
 		//update silo
-		var silo_power = 1;
 		silo_count = 0;
 		for(var i in TANKS){
 			if(TANKS[i].team != MY_TANK.team) continue;
 			if(TYPES[TANKS[i].type].name != 'Silo') continue;
-			if(TANKS[i].constructing != undefined) continue;
+			if(TANKS[i].constructing != undefined) continue;	log(MAP_CRYSTALS[TANKS[i].crystal].power);
+			//if not empty
+			if(MAP_CRYSTALS[TANKS[i].crystal].power > 0)
+				MAP_CRYSTALS[TANKS[i].crystal].power = MAP_CRYSTALS[TANKS[i].crystal].power - SILO_POWER;
+			else{
+				//kill related silos
+				var_empty_crystal_i = TANKS[i].crystal;
+				for(var j=0; j < TANKS.length; j++){
+					if(TYPES[TANKS[j].type].name == "Silo" && TANKS[j].crystal == var_empty_crystal_i){
+						TANKS.splice(j, 1); j--;
+						}
+					}
+				//redraw map
+				draw_map(true);
+				}
 			silo_count++;
 			}
-		HE3 = HE3 + silo_count*silo_power;
+		//increase
+		HE3 = HE3 + silo_count * SILO_POWER;
 		return false;
 		}
 	//check level-up
@@ -1011,6 +1025,18 @@ function check_enemies(TANK){
 function do_shoot(TANK, TANK_TO, shoot_angle, aoe){
 	if(game_mode != 2)
 		TANK.attacking = TANK_TO;
+	if(game_mode == 3){
+		if(TYPES[TANK.type].attack_type == 'ground' && TYPES[TANK_TO.type].flying == true){
+			//some units do not hit air units
+			TANK.hit_reuse = Date.now() + 3600*1000;
+			return false;
+			}
+		if(TYPES[TANK.type].attack_type == 'air' && TYPES[TANK_TO.type].flying == undefined){
+			//some units do not hit ground units
+			TANK.hit_reuse = Date.now() + 3600*1000;	
+			return false;
+			}
+		}
 	
 	//check turret
 	if(body_rotation(TANK, "fire_angle", TANK.turn_speed, shoot_angle, time_gap)==false){
@@ -1391,7 +1417,8 @@ function check_enemy_visibility(tank){
 		
 		//exact range
 		distance = get_distance_between_tanks(TANKS[i], tank);
-		if(distance + TANKS[i].width()/2 < TANKS[i].sight){
+		distance = distance + TANKS[i].width()/2;
+		if(distance < TANKS[i].sight){
 			tank.cache_scouted_reuse = 500+Date.now();
 			tank.cache_scouted = true;
 			return true;	//found by enemy
@@ -1633,9 +1660,9 @@ function check_invisibility(TANK, force_check){
 		if(TANKS[i].team == TANK.team) continue; //same team
 		if(TANK.move == 0 && TANKS[i].move == 0 && force_check == undefined) continue; //no changes here
 		var distance = get_distance_between_tanks(TANKS[i], TANK);
+		distance = distance + TANKS[i].width()/2;
 		var min_range = TANKS[i].sight;
-		min_range = min_range - TANK.width()/2;
-		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].type != "building")
+		if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].name != "Tower" && TYPES[TANKS[i].type].name != "Scout_Tower")
 			min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
 		if(distance < min_range){	
 			if(game_mode == 2)

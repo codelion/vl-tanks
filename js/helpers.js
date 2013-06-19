@@ -162,3 +162,34 @@ function strpos(haystack, needle, offset) {
 	var i = (haystack+'').indexOf(needle, (offset || 0));
 	return i === -1 ? false : i;
 	}
+//dashed objects
+CanvasRenderingContext2D.prototype.dashedRect = function(x1, y1, x2, y2, dashLen, color) {
+	this.dashedLine(x1, y1, x2, y1, dashLen, color);
+	this.dashedLine(x2, y1, x2, y2, dashLen, color);
+	this.dashedLine(x2, y2, x1, y2, dashLen, color);
+	this.dashedLine(x1, y2, x1, y1, dashLen, color);
+	};
+CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen, color) {
+	x1 = x1 + 0.5;
+	y1 = y1 + 0.5;
+	x2 = x2 + 0.5;
+	y2 = y2 + 0.5;
+	this.strokeStyle = color;
+	if (dashLen == undefined) dashLen = 4;
+	this.beginPath();
+	this.moveTo(x1, y1);
+	var dX = x2 - x1;
+	var dY = y2 - y1;
+	var dashes = Math.floor(Math.sqrt(dX * dX + dY * dY) / dashLen);
+	var dashX = dX / dashes;
+	var dashY = dY / dashes;
+	var q = 0;
+	while (q++ < dashes) {
+	x1 += dashX;
+	y1 += dashY;
+	this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x1, y1);
+	}
+	this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
+	this.stroke();
+	this.closePath();
+	};

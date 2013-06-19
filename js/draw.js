@@ -9,8 +9,9 @@ function draw_main(){
 	frame_time = Date.now();
 	time_gap = Date.now() - frame_last_time;
 	
-	//clear
+	//clear main
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+	//redraw sight
 	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 	if(QUALITY>1){
 		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
@@ -59,6 +60,11 @@ function draw_main(){
 			
 			//ghost mode
 			if(TANKS[i].respan_time != undefined){
+				//message
+				if(TANKS[i].id == MY_TANK.id){
+					screen_message.text = "You will respawn in  "+Math.ceil((TANKS[i].respan_time-Date.now())/1000)+" seconds.";
+					screen_message.time = TANKS[i].respan_time;
+					}
 				speed_multiplier = 0.5;
 				if(TANKS[i].respan_time - Date.now() < 0){
 					delete TANKS[i].respan_time;
@@ -258,9 +264,9 @@ function draw_main(){
 		}
 		
 	lighten_pixels_all();
-	if(MY_TANK.dead == 1)	
-		draw_message(canvas_main, "You will respawn in  "+Math.ceil((MY_TANK.respan_time-Date.now())/1000)+" seconds.");
-	
+	if(screen_message.time > Date.now())
+		draw_message(canvas_main, screen_message.text);
+		
 	//show live scores?
 	if(tab_scores==true)
 		draw_final_score(true);
@@ -357,8 +363,6 @@ function draw_he3_info(){
 	var top = 8;
 	var value = HE3;
 	
-	if(HE3 < 300 && DEBUG == true)
-		HE3 += 1000000;
 	value = format("#,##0.####", value);
 	
 	draw_image(canvas_main, 'he3',left, top);
@@ -390,10 +394,6 @@ function add_first_screen_elements(){
 		popup('Player name', 'update_name', popup_settings, false);
 		}
 	
-	counter_tmp = getCookie("start_count");
-	if(counter_tmp != ''){
-		START_GAME_COUNT_SINGLE = counter_tmp;
-		}
 	if(MUTE_MUSIC==false && audio_main != undefined)
 		audio_main.pause();
 	
@@ -406,7 +406,6 @@ function add_first_screen_elements(){
 			if(extra==0){
 				// single player
 				game_mode = 1;
-				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
 				draw_tank_select_screen();
 				}
 			else if(extra==1){
@@ -420,7 +419,6 @@ function add_first_screen_elements(){
 				room_id_to_join = -1;
 				game_mode = 3;
 				//commander mode
-				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
 				draw_tank_select_screen();
 				}	
 			}, i);
@@ -715,30 +713,6 @@ function draw_settings(){
 	offset_top = offset_top + 40;
 	
 	
-	//name - START_GAME_COUNT_SINGLE
-	canvas_backround.fillStyle = "#3f3b30";
-	canvas_backround.font = "Bold 13px Arial";
-	canvas_backround.fillText("Start game counter:", padding+25, offset_top+15);
-	//text box
-	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#e2f4cd";
-	roundRect(canvas_backround, padding+20+value_padding_left, offset_top, 200, 20, 0, true);
-	register_button(padding+20+value_padding_left, offset_top, 200, 20, PLACE, function(){
-		var popup_settings=[];
-		popup_settings.push({
-			name: "number",
-			title: "Enter number (1-30):",
-			value: START_GAME_COUNT_SINGLE,
-			});
-		popup('Start game counter', 'update_counter', popup_settings);
-		});
-	//text
-	canvas_backround.fillStyle = "#000000";
-	canvas_backround.font = "Normal 12px Arial";
-	canvas_backround.fillText(START_GAME_COUNT_SINGLE, padding+25+value_padding_left, offset_top+15);
-	offset_top = offset_top + 40;
-	
-	
 	//back button
 	offset_top = offset_top + 20;
 	canvas_backround.strokeStyle = "#000000";
@@ -1027,9 +1001,15 @@ function draw_final_score(live, lost_team){
 	}
 //message on screen in game
 function draw_message(this_convas, message){
+	this_convas.save();
+	this_convas.shadowOffsetX = 0;
+	this_convas.shadowOffsetY = 0;
+	this_convas.shadowBlur = 4;
+	this_convas.shadowColor = "#ffffff";
 	this_convas.fillStyle = "#b12525";
 	this_convas.font = "bold 18px Helvetica";
 	this_convas.fillText(message, Math.round(WIDTH_APP/2)+50, HEIGHT_SCROLL-20);
+	this_convas.restore();
 	}
 //show FPS
 function update_fps(){
@@ -1309,14 +1289,29 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 		}
 		
 	//time left line
-	red_line_y = y+10;
-	if(starting_timer==-1){
-		if(game_mode == 2)	
-			starting_timer = START_GAME_COUNT_MULTI;
-		else	
-			starting_timer = START_GAME_COUNT_SINGLE;
+	if(game_mode == 2){
+		red_line_y = y+10;
+		if(starting_timer==-1)
+			starting_timer = START_GAME_COUNT;
+		draw_timer_graph();
 		}
-	draw_timer_graph();
+	else{
+		//start button
+		width = 150;
+		height = 40;
+		y = y + 20;
+		canvas_backround.strokeStyle = "#000000";
+		canvas_backround.fillStyle = "#69a126";
+		roundRect(canvas_backround, 15, y, width, height, 5, true);
+		register_button(15, y, width, height, PLACE, function(xx, yy){
+			init_action(level, 'R');
+			});
+		canvas_backround.fillStyle = "#ffffff";
+		canvas_backround.font = "Bold 17px Helvetica";
+		text = "Start";
+		text_width = canvas_backround.measureText(text).width;
+		canvas_backround.fillText(text, 15+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		}	
 	}
 function draw_timer_graph(){
 	graph_width=WIDTH_APP-30;
@@ -1328,9 +1323,7 @@ function draw_timer_graph(){
 	//red block
 	canvas_backround.strokeStyle = "#c10000";
 	canvas_backround.fillStyle = "#c10000";
-	var max_s = START_GAME_COUNT_SINGLE;
-	if(game_mode == 2)	
-		max_s = START_GAME_COUNT_MULTI;
+	var max_s = START_GAME_COUNT;
 	top_x = 15+graph_width*(max_s-starting_timer)/max_s;
 	width = graph_width-graph_width*(max_s-starting_timer)/max_s;
 	roundRect(canvas_backround, 15, red_line_y, width, graph_height, 0, true);
@@ -1398,7 +1391,7 @@ function show_chat(){
 		if(CHAT_LINES[i].author===false)		canvas.fillStyle = "#222222";	//system chat
 		else if(CHAT_LINES[i].team == 'R')		canvas.fillStyle = "#8f0c12";	//team red
 		else if(CHAT_LINES[i].team == 'B')		canvas.fillStyle = "#0000ff";	//team blue
-		else							canvas.fillStyle = "#222222";	//default color
+		else						canvas.fillStyle = "#222222";	//default color
 		
 		//shift
 		if(CHAT_LINES[i].shift==1 && PLACE != 'game'){
@@ -1492,7 +1485,8 @@ function draw_image(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w
 		if(PLACE == 'library') alpha = 1;
 		if(alpha != 1){
 			canvas.save();
-			canvas.globalAlpha = alpha;
+			if(alpha < canvas.globalAlpha)
+				canvas.globalAlpha = alpha;
 			}
 		canvas.drawImage(IMAGES_ELEMENTS, 
 			IMAGES_SETTINGS.elements[name].x+offset_x, IMAGES_SETTINGS.elements[name].y+offset_y, clip_w, clip_h, 

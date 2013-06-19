@@ -45,7 +45,24 @@ function draw_map(map_only){
 		max_h = element.h;
 		if(MAPS[level-1].elements[e][4]!=0)
 			max_h = MAPS[level-1].elements[e][4];
-		draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
+		
+		var full = true;
+		if(MAPS[level-1].elements[e][0] == 'crystals'){
+			for(var t in MAP_CRYSTALS){
+				if(MAP_CRYSTALS[t].x == x && MAP_CRYSTALS[t].y == y && MAP_CRYSTALS[t].power<1){
+					full = false;
+					break;
+					}
+				}
+			}
+		if(full == true)
+			draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
+		else{
+			canvas_map.save();
+			canvas_map.globalAlpha = 0.4;
+			draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
+			canvas_map.restore();
+			}
 		}
 	
 	if(map_only==false)
@@ -85,7 +102,7 @@ function lighten_pixels(tank){
 	canvas_map_sight.beginPath();
 	canvas_map_sight.save();
 	
-	var sight_range = tank.sight + tank.width()/2;
+	var sight_range = tank.sight;// + tank.width()/2;
 	canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 	canvas_map_sight.clip(); 
 	canvas_map_sight.clearRect(xx-sight_range, yy-sight_range, sight_range*2, sight_range*2);
@@ -106,7 +123,8 @@ function lighten_pixels_all(tank){
 		var xx = round(TANKS[i].cx() + map_offset[0]);
 		var yy = round(TANKS[i].cy() + map_offset[1]);
 		canvas_map_sight.beginPath();
-		canvas_map_sight.arc(xx, yy, TANKS[i].sight + TANKS[i].width()/2, 0 , 2 * Math.PI, true);
+		var sight_range = TANKS[i].sight;// + TANKS[i].width()/2;
+		canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 		canvas_map_sight.fill();
 		}
 	canvas_map_sight.restore();	
@@ -131,7 +149,29 @@ function auto_scoll_map(){
 	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
 		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
 			
-	//scroll
+	//scrolling using css - 2x speed gain
+	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
+	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	}
+//scroll map in manual scroll mode
+function scoll_map(xx, yy){
+	if(MAP_SCROLL_MODE==1) return false;
+	
+	var step = 50;
+	
+	//calc
+	map_offset[0] = map_offset[0] + xx * step;
+	map_offset[1] = map_offset[1] + yy * step;
+	
+	//check limits
+	if(map_offset[0]>0)	map_offset[0]=0;
+	if(map_offset[1]>0)	map_offset[1]=0;
+	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
+		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
+	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
+		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
+			
+	//scrolling using css - 2x speed gain
 	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	}
@@ -253,26 +293,4 @@ function get_element_by_name(name){
 			}
 		}
 	return false;
-	}
-//scroll map in manual scroll mode
-function scoll_map(xx, yy){
-	if(MAP_SCROLL_MODE==1) return false;
-	
-	var step = 50;
-	
-	//calc
-	map_offset[0] = map_offset[0] + xx * step;
-	map_offset[1] = map_offset[1] + yy * step;
-	
-	//check limits
-	if(map_offset[0]>0)	map_offset[0]=0;
-	if(map_offset[1]>0)	map_offset[1]=0;
-	if(map_offset[0] < -1*(WIDTH_MAP - WIDTH_SCROLL))
-		map_offset[0] = -1*(WIDTH_MAP - WIDTH_SCROLL);
-	if(map_offset[1] < -1*(HEIGHT_MAP - HEIGHT_SCROLL))
-		map_offset[1] = -1*(HEIGHT_MAP - HEIGHT_SCROLL);
-			
-	//scroll
-	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
-	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	}
