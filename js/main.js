@@ -358,10 +358,13 @@ function init_action(map_nr, my_team){
 			if(MAPS[level-1].elements[e][0] != 'crystals') continue;
 			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
 			MAP_CRYSTALS.push({
+				id: getRandomInt(0, 999999),
 				x: MAPS[level-1].elements[e][1],
 				y: MAPS[level-1].elements[e][2],
 				cx: MAPS[level-1].elements[e][1] + IMAGES_SETTINGS.elements[element.name].w/2,
 				cy: MAPS[level-1].elements[e][2] + IMAGES_SETTINGS.elements[element.name].h/2,
+				w: IMAGES_SETTINGS.elements[element.name].w,
+				h: IMAGES_SETTINGS.elements[element.name].h,
 				power: CRYSTAL_POWER,
 				});
 			}
@@ -415,6 +418,7 @@ var IMAGES_SETTINGS = {
 		bonus:	{ x:350,	y:50, w:16, h:15 },
 		bolt:	{ x:250,	y:50, w:14, h:20 },
 		error:	{ x:400,	y:50, w:16, h:16 },	
+		flag: 	{ x:100,	y:100, w:16, h:16 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },

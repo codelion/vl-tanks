@@ -725,29 +725,29 @@ function check_collisions(xx, yy, TANK, full_check){
 function tank_level_handler(){		//once per second
 	if(game_mode == 3){
 		//update silo
-		silo_count = 0;
-		for(var i in TANKS){
-			if(TANKS[i].team != MY_TANK.team) continue;
+		for(var i=0; i < TANKS.length; i++){
 			if(TYPES[TANKS[i].type].name != 'Silo') continue;
-			if(TANKS[i].constructing != undefined) continue;	log(MAP_CRYSTALS[TANKS[i].crystal].power);
+			if(TANKS[i].constructing != undefined) continue;
+			if(TANKS[i].crystal == undefined) continue;
 			//if not empty
-			if(MAP_CRYSTALS[TANKS[i].crystal].power > 0)
-				MAP_CRYSTALS[TANKS[i].crystal].power = MAP_CRYSTALS[TANKS[i].crystal].power - SILO_POWER;
+			if(TANKS[i].crystal.power > 0){
+				TANKS[i].crystal.power = TANKS[i].crystal.power - SILO_POWER;
+				if(TANKS[i].team == MY_TANK.team)
+					HE3 = HE3 + SILO_POWER;
+				}
 			else{
 				//kill related silos
-				var_empty_crystal_i = TANKS[i].crystal;
+				var cr_id = TANKS[i].crystal.id;
 				for(var j=0; j < TANKS.length; j++){
-					if(TYPES[TANKS[j].type].name == "Silo" && TANKS[j].crystal == var_empty_crystal_i){
+					if(TANKS[j].data.name == "Silo" && TANKS[j].crystal.id == cr_id){
+						if(i>=j) i--;
 						TANKS.splice(j, 1); j--;
 						}
 					}
 				//redraw map
 				draw_map(true);
 				}
-			silo_count++;
 			}
-		//increase
-		HE3 = HE3 + silo_count * SILO_POWER;
 		return false;
 		}
 	//check level-up
@@ -1769,6 +1769,7 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 		buffs: [],	//buffs array
 		last_bullet_time: Date.now()-5000,
 		he3: 0,
+		data: TYPES[type],
 		};
 	if(AI != undefined)
 		TANK_tmp.use_AI = AI;

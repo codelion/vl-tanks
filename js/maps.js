@@ -46,23 +46,21 @@ function draw_map(map_only){
 		if(MAPS[level-1].elements[e][4]!=0)
 			max_h = MAPS[level-1].elements[e][4];
 		
-		var full = true;
+		var visible = true;
 		if(MAPS[level-1].elements[e][0] == 'crystals'){
-			for(var t in MAP_CRYSTALS){
-				if(MAP_CRYSTALS[t].x == x && MAP_CRYSTALS[t].y == y && MAP_CRYSTALS[t].power<1){
-					full = false;
-					break;
+			if(game_mode != 3)
+				visible = false;
+			else{
+				for(var t in MAP_CRYSTALS){
+					if(MAP_CRYSTALS[t].x == x && MAP_CRYSTALS[t].y == y && MAP_CRYSTALS[t].power<1){
+						visible = false;
+						break;
+						}
 					}
 				}
 			}
-		if(full == true)
+		if(visible == true)
 			draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
-		else{
-			canvas_map.save();
-			canvas_map.globalAlpha = 0.4;
-			draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
-			canvas_map.restore();
-			}
 		}
 	
 	if(map_only==false)

@@ -4,7 +4,7 @@ ELEMENTS.push({	name: 'hill',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'rocks1',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'rocks2',				collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'bones',				collission: false,	alpha: 0.7	});
-ELEMENTS.push({	name: 'crystals',			collission: true,	alpha: 0.8	});	
+ELEMENTS.push({	name: 'crystals',			collission: false,	alpha: 0.8	});	
 
 //====== Main ==================================================================
 

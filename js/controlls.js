@@ -233,6 +233,23 @@ function on_mousemove(event){
 		selection.x2 = mouseX;
 		selection.y2 = mouseY;
 		}
+	//info about crystals
+	if(PLACE == 'game' && game_mode == 3){
+		ability_hover_text = '';
+		var found = false;
+		for(var c in MAP_CRYSTALS){
+			if(mouseX < MAP_CRYSTALS[c].x || mouseX > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
+			if(mouseY < MAP_CRYSTALS[c].y || mouseY > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
+			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3 left.";
+			show_skill_description();
+			found = true;
+			break;
+			}
+		if(found == false){
+			ability_hover_text = '';
+			show_skill_description();
+			}
+		}
 	mouse_pos = [mouseX, mouseY];
 	}
 	

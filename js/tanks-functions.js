@@ -1906,20 +1906,22 @@ function do_construct(tank_id){
 	for(var i in TANKS){
 		if(TANKS[i].id == unit_id){
 			var duration = 15*1000;
-			if(DEBUG == true) duration = 5*1000;
+			if(DEBUG == true) duration = 1000;
 			TANKS[i].constructing = {
 				duration: duration,
 				start: Date.now(),
 				}
 			//register crystal
-			var min_distance = 999;
-			for(var c in MAP_CRYSTALS){
-				var dist_x = MAP_CRYSTALS[c].cx - TANKS[i].cx();
-				var dist_y = MAP_CRYSTALS[c].cy - TANKS[i].cy();
-				var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-				if(distance < CRYSTAL_RANGE && MAP_CRYSTALS[c].power > 0){
-					TANKS[i].crystal = c;
-					break;
+			if(TANKS[i].data.name == 'Silo'){
+				var min_distance = 999;
+				for(var c in MAP_CRYSTALS){
+					var dist_x = MAP_CRYSTALS[c].cx - TANKS[i].cx();
+					var dist_y = MAP_CRYSTALS[c].cy - TANKS[i].cy();
+					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+					if(distance < CRYSTAL_RANGE && MAP_CRYSTALS[c].power > 0){
+						TANKS[i].crystal = MAP_CRYSTALS[c];
+						break;
+						}
 					}
 				}
 			break;
