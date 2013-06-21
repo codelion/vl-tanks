@@ -361,7 +361,7 @@ function draw_he3_info(){
 	if(PLACE != 'game') return false;
 	var left = WIDTH_APP-100;
 	var top = 8;
-	var value = HE3;
+	var value = round(HE3);
 	
 	value = format("#,##0.####", value);
 	

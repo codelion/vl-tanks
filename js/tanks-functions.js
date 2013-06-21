@@ -1410,22 +1410,6 @@ function construct_prepare(TANK, cost, reuse, tank_type, ability_nr){
 		return false;
 		}
 	
-	//check if enough energy for silo
-	var silo_count = 0;
-	for (i in TANKS){
-		if(TYPES[TANKS[i].type].name != 'Silo') continue;
-		if(TANKS[i].team != TANK.team) continue;
-		silo_count++;
-		}
-	var silo_cost = Silo(undefined, undefined, true); 
-	silo_cost = silo_cost.cost;
-	if(tank_type != 'Silo' && silo_count == 0 && HE3 - silo_cost - cost < 0){
-		//message
-		screen_message.text = "Not enough HE3 for building Silo.";
-		screen_message.time = Date.now() + 1000;
-		return false;
-		}
-	
 	//get type
 	var type = 0;
 	for(var t in TYPES){
@@ -1509,7 +1493,8 @@ function validate_construction(xx, yy, show_errors){
 		//dashed line
 		canvas_main.lineWidth = 2;
 		canvas_main.strokeStyle = "#363737";
-		canvas_main.dashedLine(mouse_pos[0] - map_offset[0], mouse_pos[1] - map_offset[1], MAP_CRYSTALS[cc].cx, MAP_CRYSTALS[cc].cy);
+		canvas_main.dashedLine(mouse_pos[0] , mouse_pos[1] , MAP_CRYSTALS[cc].cx+map_offset[0], MAP_CRYSTALS[cc].cy+map_offset[1]);
+		
 		//check range
 		if(min_distance > CRYSTAL_RANGE){
 			if(show_errors == true){
@@ -1539,7 +1524,7 @@ function validate_construction(xx, yy, show_errors){
 		
 	//check collisions
 	var valid = true;
-	if(check_collisions(xx, mouse_pos[1], {type:type}, true)==true) valid = false;
+	if(check_collisions(xx, yy, {type:type}, true)==true) valid = false;
 	if(check_collisions(xx - TYPES[type].size[1]/2, yy - TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
 	if(check_collisions(xx - TYPES[type].size[1]/2, yy + TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
 	if(check_collisions(xx + TYPES[type].size[1]/2, yy - TYPES[type].size[2]/2, {type:type}, true)==true) valid = false;
@@ -1596,18 +1581,18 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined) return {reuse: reuse, power: power};
 	
 	if(TANK.constructing != undefined) return false;
+	//check level
+	if(weapons_bonus < power * levels)
+		weapons_bonus = weapons_bonus + power;
+	else
+		return false;
+	//check resources
 	if(HE3 < cost){ 
 		screen_message.text = "Not enough HE3.";
 		screen_message.time = Date.now() + 1000;
 		return false;
 		}
 	HE3 = HE3 - cost;
-	
-	if(weapons_bonus < power * levels)
-		weapons_bonus = weapons_bonus + power;
-	else
-		return false;
-	
 	return reuse;
 	}
 function Armor(TANK, descrition_only, settings_only, ai){
@@ -1622,6 +1607,12 @@ function Armor(TANK, descrition_only, settings_only, ai){
 	if(settings_only != undefined) return {reuse: reuse, power: power};
 	
 	if(TANK.constructing != undefined) return false;
+	//check level
+	if(armor_bonus < power * levels)
+		armor_bonus = armor_bonus + power;
+	else
+		return false;
+	//check resources
 	if(HE3 < cost){ 
 		screen_message.text = "Not enough HE3.";
 		screen_message.time = Date.now() + 1000;
@@ -1629,10 +1620,7 @@ function Armor(TANK, descrition_only, settings_only, ai){
 		}
 	HE3 = HE3 - cost;
 	
-	if(armor_bonus < power * levels)
-		armor_bonus = armor_bonus + power;
-	else
-		return false;
+
 		
 	return reuse;
 	}
@@ -1900,32 +1888,35 @@ function do_construct(tank_id){
 	if(TANK.team != 'B')
 		angle = 0;
 	var nation = get_nation_by_team(TANK.team);
-	//add
 	var unit_id = 'builing-'+TANK.team+mouseX+"."+mouseY;
-	add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
-	for(var i in TANKS){
-		if(TANKS[i].id == unit_id){
-			var duration = 15*1000;
-			if(DEBUG == true) duration = 1000;
-			TANKS[i].constructing = {
-				duration: duration,
-				start: Date.now(),
+	//create tank
+	var new_tank = add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
+	
+	var duration = 15*1000;
+	if(DEBUG == true) duration = 1000;
+	new_tank.constructing = {
+		duration: duration,
+		start: Date.now(),
+		}
+	//register crystal
+	if(new_tank.data.name == 'Silo'){
+		var min_distance = 999;
+		for(var c in MAP_CRYSTALS){
+			var dist_x = MAP_CRYSTALS[c].cx - new_tank.cx();
+			var dist_y = MAP_CRYSTALS[c].cy - new_tank.cy();
+			var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			if(distance < CRYSTAL_RANGE && MAP_CRYSTALS[c].power > 0){
+				new_tank.crystal = MAP_CRYSTALS[c];
+				break;
 				}
-			//register crystal
-			if(TANKS[i].data.name == 'Silo'){
-				var min_distance = 999;
-				for(var c in MAP_CRYSTALS){
-					var dist_x = MAP_CRYSTALS[c].cx - TANKS[i].cx();
-					var dist_y = MAP_CRYSTALS[c].cy - TANKS[i].cy();
-					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-					if(distance < CRYSTAL_RANGE && MAP_CRYSTALS[c].power > 0){
-						TANKS[i].crystal = MAP_CRYSTALS[c];
-						break;
-						}
-					}
-				}
-			break;
 			}
+		}
+	//adding flag
+	if(new_tank.data.name == 'Factory'){
+		if(new_tank.team == 'B') //top
+			new_tank.flag = { x: new_tank.x, y: new_tank.y+60}
+		else //bottom
+			new_tank.flag = { x: new_tank.x, y: new_tank.y-60}
 		}
 	
 	if(shift_pressed == false){

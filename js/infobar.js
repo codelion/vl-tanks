@@ -550,17 +550,6 @@ function draw_counter_tank_selection(selected_tank){
 	var msize = 33;
 	var first_time = false;
 	
-	/* //auto size
-	var n = 0;
-	for(var i in TYPES){
-		if(TYPES[i].type == 'building') continue;
-		n++;
-		}
-	n1 = Math.ceil(n/2);
-	msize = round((430-gap*(n1-1))/n1);
-	if(msize*2+gap > max_height)
-		msize = round((max_height-gap)/2);*/
-	
 	if(selected_tank == undefined){
 		selected_tank = MY_TANK.type;
 		first_time = true;
@@ -619,23 +608,42 @@ function draw_counter_tank_selection(selected_tank){
 				stats = War_units(TANK, undefined, true);
 				unit_cost = stats.cost;
 				if(TYPES[index].type == 'human') unit_cost = round(unit_cost/2);
-				if(HE3 < unit_cost){
-					screen_message.text = "Not enough HE3.";
-					screen_message.time = Date.now() + 1000;
-					return false;
+				for(var i in TANKS){
+					if(TANKS[i].team != MY_TANK.team) continue;
+					if(TANKS[i].data.name != "Factory") continue;
+					if(TANKS[i].selected == undefined) continue;
+					//check he3
+					if(HE3 < unit_cost){
+						screen_message.text = "Not enough HE3.";
+						screen_message.time = Date.now() + 1000;
+						return false;
+						}
+					//check unit limit
+					var team_units = 0;
+					for(var ii in TANKS){
+						if(TANKS[ii].team != MY_TANK.team) continue;
+						if(TANKS[ii].data.type == 'building') continue;
+						team_units++;
+						if(team_units >= MAX_TEAM_TANKS){
+							screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+							screen_message.time = Date.now() + 1000;
+							return false;
+							}					
+						}
+					HE3 = HE3 - unit_cost;
+					//register
+					var duration = round(TYPES[index].life[0]/15)*1000-3000; //15hp/s
+					if(duration < 1000) duration = 1000;
+					if(TANKS[i].training == undefined)
+						TANKS[i].training = new Array();
+					TANKS[i].training.push({
+						duration: duration,
+						type: index,
+						});
 					}
-				HE3 = HE3 - unit_cost;
-				var gap_rand = 100;
-				var x = MY_TANK.x + getRandomInt(-gap_rand, gap_rand);
-				var y = MY_TANK.y + getRandomInt(-gap_rand, gap_rand);
-				var angle = 180;
-				if(MY_TANK.team != 'B')
-					angle = 0;
-				add_tank(1, 'unit-'+MY_TANK.team+x+"."+y, generatePassword(6), index, MY_TANK.team, MY_TANK.nation, x, y, angle);
 				}
 			}, i);
 		j++;
-		/*if(j==n1){	row++; 	j=0;	}*/
 		}
 		
 	//towers
@@ -678,7 +686,7 @@ function draw_counter_tank_selection(selected_tank){
 					screen_message.time = Date.now() + 1000;
 					return false;
 					}
-				HE3 = HE3 - unit_cost;	log(index);
+				HE3 = HE3 - unit_cost;
 				
 				construct_prepare(MY_TANK, unit_cost, reuse, TYPES[index].name, 2);
 				}, i);

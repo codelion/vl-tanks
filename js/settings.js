@@ -1,12 +1,12 @@
 //game settings
 var VERSION = "1.5.1";			//app version
-var DEBUG = true;			//show debug info
+var DEBUG = false;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
 var APP_URL = 'http://viliusle.github.io/vl-tanks/';
 var APP_EMAIL = 'www.viliusl@gmail.com';
 var FPS = 25;				//frames per second
 var settings_font="bold 18px Helvetica";//default font for settings buttons
-var START_GAME_COUNT = 20;	//second how much to count in multiplayer
+var START_GAME_COUNT = 20;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
 var HEIGHT_APP = 525;			//application height
 var HEIGHT_STATUS_AREA = 171;		//status are height
@@ -28,8 +28,8 @@ var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invi
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
 var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
 var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
-var CRYSTAL_THREADS = 5;		//max silos for 1 crystal
-var CRYSTAL_RANGE = 80;			//crystal/silo orange
+var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
+var CRYSTAL_RANGE = 100;		//crystal/silo orange
 var SILO_POWER = 100;			//how much he3 silo generates per 1s
 
 //other global variables
@@ -99,15 +99,16 @@ var time_gap;				//time difference between frames
 var weapons_bonus = 0;			//in commander mode weappon bonus
 var armor_bonus = 0;			//in commander mode armor bonus
 var screen_message = {};		//message to show on screen
+var mouse_last_move = Date.now();	//if mouse moving
 
 //repeative functions handlers
-var draw_interval_id;			//controller for main draw loop
-var level_interval_id;			//controller for level handling function
-var level_hp_regen_id;			//controller for hp regen handling function
-var timed_functions_id;			//controller for timed functions
-var start_game_timer_id;		//controller for timer in select window
-var chat_interval_id;			//controller for chat
-var bots_interval_id;			//controller for adding new bots function
+var draw_interval_id;			//controller for main draw loop, rate: 35/s
+var level_interval_id;			//controller for level handling function, rate: 1/s
+var level_hp_regen_id;			//controller for hp regen handling function, rate: 1/s
+var timed_functions_id;			//controller for timed functions, rate: 10/s
+var start_game_timer_id;		//controller for timer in select window, rate: 1/s
+var chat_interval_id;			//controller for chat, rate: 2/s
+var bots_interval_id;			//controller for adding new bots function, rate: once per 30s
 
 //canvas layers
 var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map

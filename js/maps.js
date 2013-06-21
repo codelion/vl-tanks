@@ -152,10 +152,11 @@ function auto_scoll_map(){
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	}
 //scroll map in manual scroll mode
-function scoll_map(xx, yy){
+function scoll_map(xx, yy, step){
 	if(MAP_SCROLL_MODE==1) return false;
 	
-	var step = 50;
+	if(step == undefined)
+		step = 50;
 	
 	//calc
 	map_offset[0] = map_offset[0] + xx * step;

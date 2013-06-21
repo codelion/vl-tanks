@@ -9,6 +9,16 @@ function draw_tank(tank){
 	var padding = 20;
 	var fade_duration = 300;
 	
+	//draw flag
+	if(tank.selected == true && tank.flag != undefined && tank.constructing == undefined){
+		draw_image(canvas_main, 'flag', tank.flag.x+map_offset[0], tank.flag.y+map_offset[1]);
+		//dashed line
+		canvas_main.lineWidth = 2;
+		canvas_main.strokeStyle = "#363737";
+		var image_stats = IMAGES_SETTINGS.general.flag
+		canvas_main.dashedLine(tank.cx()+map_offset[0], tank.cy()+map_offset[1], tank.flag.x+map_offset[0]+image_stats.w/2, tank.flag.y+map_offset[1]+image_stats.h/2);
+		}
+	
 	if(FS==false && (tank.y > -1*map_offset[1] + HEIGHT_SCROLL || tank.y+tank_size_h < -1*map_offset[1] || tank.x > -1*map_offset[0] + WIDTH_SCROLL || tank.x+tank_size_w < -1*map_offset[0])){
 		//not in screen zone
 		if(tank.visible.state == true){
@@ -286,6 +296,46 @@ function add_hp_bar(tank){
 		canvas_main.fillStyle = "#d9ce00";
 		canvas_main.fillRect(xx+padding_left, yy+padding_top-3-hp_height, length, hp_height);
 		}
+	if(tank.training != undefined){
+		for(var t=0; t < tank.training.length; t++){
+			var type = tank.training[t].type;
+			if(tank.training[t].start == undefined)
+				tank.training[t].start = Date.now();
+			var length = (Date.now() - tank.training[t].start) * hp_width / tank.training[t].duration;
+			length = round(length);
+			if(length >= hp_width){
+				//create
+				var gap_rand = 40;
+				//find tank spawn point and path to flag
+				var dist_x = tank.flag.x - tank.cx();
+				var dist_y = tank.flag.y - tank.cy();
+				var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+				var radiance = Math.atan2(dist_y, dist_x);
+				var x = tank.cx() + Math.floor(Math.cos(radiance)*70) - round(TYPES[type].size[1]/2);
+				var y = tank.cy() + Math.floor(Math.sin(radiance)*70) - round(TYPES[type].size[2]/2);
+				
+				var angle = 180;
+				if(MY_TANK.team != 'B')
+					angle = 0;
+				//create tank
+				var new_tank = add_tank(1, 'unit-'+tank.team+x+"."+y, generatePassword(6), type, tank.team, tank.nation, x, y, angle);
+				new_tank.move = 1;
+				new_tank.move_to = [
+					tank.flag.x + getRandomInt(-gap_rand, gap_rand), 
+					tank.flag.y + getRandomInt(-gap_rand, gap_rand)
+					];
+				//unregister
+				tank.training.splice(t, 1); t--;
+				break;
+				}
+			canvas_main.fillStyle = "#d9ce00";
+			hp_height = 2;
+			var gap = 3*(t+1);
+			canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
+			break;
+			}
+		}	
+		
 	}
 //tank name above
 function add_player_name(tank){
@@ -725,6 +775,7 @@ function check_collisions(xx, yy, TANK, full_check){
 function tank_level_handler(){		//once per second
 	if(game_mode == 3){
 		//update silo
+		var valid = false;
 		for(var i=0; i < TANKS.length; i++){
 			if(TYPES[TANKS[i].type].name != 'Silo') continue;
 			if(TANKS[i].constructing != undefined) continue;
@@ -732,22 +783,32 @@ function tank_level_handler(){		//once per second
 			//if not empty
 			if(TANKS[i].crystal.power > 0){
 				TANKS[i].crystal.power = TANKS[i].crystal.power - SILO_POWER;
-				if(TANKS[i].team == MY_TANK.team)
+				if(TANKS[i].team == MY_TANK.team){
 					HE3 = HE3 + SILO_POWER;
+					valid = true;
+					}
 				}
 			else{
-				//kill related silos
-				var cr_id = TANKS[i].crystal.id;
-				for(var j=0; j < TANKS.length; j++){
-					if(TANKS[j].data.name == "Silo" && TANKS[j].crystal.id == cr_id){
-						if(i>=j) i--;
-						TANKS.splice(j, 1); j--;
+				//relink
+				found = false;
+				for(var c in MAP_CRYSTALS){
+					var dist_x = MAP_CRYSTALS[c].cx - TANKS[i].cx();
+					var dist_y = MAP_CRYSTALS[c].cy - TANKS[i].cy();
+					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+					if(distance < CRYSTAL_RANGE && MAP_CRYSTALS[c].power > 0){
+						TANKS[i].crystal = MAP_CRYSTALS[c];
+						found = true;
+						break;
 						}
 					}
+				if(found == false)
+					delete TANKS[i].crystal;
 				//redraw map
 				draw_map(true);
 				}
 			}
+		if(valid == false)
+			HE3 = HE3 + 0.5; //poor team dont have silo, lets give them a bit
 		return false;
 		}
 	//check level-up
@@ -1197,7 +1258,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 		if(TANK.master != undefined){
 			killer = TANK.master;
 			}
-		if(TYPES[TANK_TO.type].no_repawn != undefined){	//tanks without repawn
+		if(TYPES[TANK_TO.type].no_repawn != undefined  || game_mode == 3){	//tanks without repawn
 			//base dead
 			if(TYPES[TANK_TO.type].name == "Base"){
 				if(game_mode != 2){
@@ -1784,4 +1845,7 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 	if(TANK_tmp.x == undefined || TANK_tmp.y == undefined)
 		set_spawn_coordinates(TANK_tmp);
 	TANKS.push(TANK_tmp);
+	
+	//return last tank
+	return TANKS[TANKS.length-1];
 	}

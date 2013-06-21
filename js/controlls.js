@@ -161,6 +161,7 @@ function MouseWheelHandler(e){
 //=== mouse move ===============================================================
 
 function on_mousemove_background(event){
+	mouse_last_move = Date.now();
 	if(event.offsetX) {
 		mouseX = event.offsetX;
 		mouseY = event.offsetY;
@@ -221,6 +222,7 @@ function on_mousemove_background(event){
 	}
 //mouse move on map
 function on_mousemove(event){
+	mouse_last_move = Date.now();
 	if(event.offsetX) {
 		mouseX = event.offsetX;
 		mouseY = event.offsetY;
@@ -238,9 +240,9 @@ function on_mousemove(event){
 		ability_hover_text = '';
 		var found = false;
 		for(var c in MAP_CRYSTALS){
-			if(mouseX < MAP_CRYSTALS[c].x || mouseX > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
-			if(mouseY < MAP_CRYSTALS[c].y || mouseY > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
-			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3 left.";
+			if(mouseX-map_offset[0] < MAP_CRYSTALS[c].x || mouseX-map_offset[0] > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
+			if(mouseY-map_offset[1] < MAP_CRYSTALS[c].y || mouseY-map_offset[1] > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
+			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3";
 			show_skill_description();
 			found = true;
 			break;
@@ -270,8 +272,17 @@ function on_mouse_right_click(event){
 	if(PLACE == 'game'){
 		mouse_click_controll = false;
 		if(game_mode == 3){
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TANKS[i].data.name != "Factory") continue;
+				if(TANKS[i].selected == undefined) continue;
+				if(TANKS[i].flag != undefined){
+					TANKS[i].flag.x = mouseX;
+					TANKS[i].flag.y = mouseY;
+					}
+				}
 			//move tank
-			draw_tank_move(mouseX, mouseY);
+			draw_tank_move(mouseX, mouseY);	
 			}
 		else
 			soldiers_move(mouseX, mouseY);
@@ -441,6 +452,7 @@ function on_mouseup(event){
 					for(var i in TANKS){
 						if(MY_TANK.team != TANKS[i].team) continue;
 						if(MY_TANK.type != TANKS[i].type) continue;
+						if(TANKS[i].constructing != undefined) continue;
 						//if not in screen
 						if(TANKS[i].y > -1*map_offset[1] + HEIGHT_SCROLL || TANKS[i].y+TANKS[i].height < -1*map_offset[1] || TANKS[i].x > -1*map_offset[0] + WIDTH_SCROLL || TANKS[i].x+TANKS[i].width < -1*map_offset[0]) continue;
 						

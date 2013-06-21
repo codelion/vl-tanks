@@ -680,7 +680,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		//adding kill stats
-		if(TYPES[TANK_TO.type].no_repawn == undefined){
+		if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 3){
 			//player
 			if(TANK_TO.dead != 1)
 				TANK_FROM.kills = TANK_FROM.kills + 1;	

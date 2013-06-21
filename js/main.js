@@ -4,16 +4,17 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	fabric
-		training progress
-		spawn tank location flag
+	research
+		show level
+		disable on max level
+		weapon/armor upgrades 100, 200, 300
+		implement weapons_bonus and armor_bonus
 	hide enemy buildings till scouted
 	multiplayer
-		creating room, rooms, select adjust for game_mode = 3
+		creating room, rooms, select adjust
 		move he3 to team, initial he3
-		implement weapons_bonus and armor_bonus
-		weapon/armor upgrades 100, 200, 300
-	special score for mode 3
+	countries bonus in mode3 ?
+	special score for mode3
 */
 
 //init hello screen
@@ -521,6 +522,22 @@ function speed2pixels(speed, time_diff){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
+	//check map scrolling	//event.target.id
+	if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100){
+		//move map if mouse in corners
+		var gap = 50;
+		var power = 50;
+		if(mouse_pos[0] < gap && mouse_pos[0] > 10)
+			scoll_map(1, 0, power);	//left
+		if(mouse_pos[0] > WIDTH_SCROLL - gap && mouse_pos[0] < WIDTH_SCROLL-10) 
+			scoll_map(-1, 0, power);//right
+		if(mouse_pos[1] < gap && mouse_pos[1] > 10) 
+			scoll_map(0, 1, power);	//up
+		if(mouse_pos[1] > HEIGHT_SCROLL - gap && mouse_pos[1] < HEIGHT_SCROLL-10) 
+			scoll_map(0, -1, power);//down
+		}
+	
+	//exec functions
 	for(var i=0; i<timed_functions.length; i++){		
 		timed_functions[i].duration = timed_functions[i].duration - 100;
 		var duration = 	timed_functions[i].duration				
