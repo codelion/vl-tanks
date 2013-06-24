@@ -1227,19 +1227,12 @@ function Scout(TANK, descrition_only, settings_only, ai){	//multi
 			check_invisibility(TANKS[i], true);
 		}
 	
-	//register stop function	
-	var tmp = new Array();
-	tmp['function'] = "Scout_stop";
-	tmp['duration'] = duration;
-	tmp['type'] = 'ON_END';
-	tmp['tank'] = TANK;
-	timed_functions.push(tmp);
+	//register stop function
+	setTimeout(function(){
+		TANK.sight = TYPES[TANK.type].scout + round(TANK.width()/2);
+		}, duration);
 	
 	return reuse;
-	}
-function Scout_stop(object){
-	var TANK = object.tank;
-	TANK.sight = TYPES[TANK.type].scout + round(TANK.width()/2);
 	}
 
 //====== Bomber ================================================================
@@ -1574,11 +1567,13 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	var reuse = 1000;
 	var power = 10; //%
 	var levels = 3;
+	var active = true;
+	if(weapons_bonus >= power * levels) active = false;
 	
 	if(descrition_only != undefined)
 		return 'Upgrades units weapons. Costs '+cost+' H3.';
 	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse, power: power};
+	if(settings_only != undefined) return {reuse: reuse, power: power, active: active};
 	
 	if(TANK.constructing != undefined) return false;
 	//check level
@@ -1600,11 +1595,13 @@ function Armor(TANK, descrition_only, settings_only, ai){
 	var reuse = 1000;
 	var power = 5; //static
 	var levels = 3;
+	var active = true;
+	if(armor_bonus >= power * levels) active = false;
 	
 	if(descrition_only != undefined)
 		return 'Upgrades units armor. Costs '+cost+' H3.';
 	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse, power: power};
+	if(settings_only != undefined) return {reuse: reuse, power: power, active: active};
 	
 	if(TANK.constructing != undefined) return false;
 	//check level
@@ -1619,8 +1616,6 @@ function Armor(TANK, descrition_only, settings_only, ai){
 		return false;
 		}
 	HE3 = HE3 - cost;
-	
-
 		
 	return reuse;
 	}
@@ -1892,8 +1887,8 @@ function do_construct(tank_id){
 	//create tank
 	var new_tank = add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
 	
-	var duration = 15*1000;
-	if(DEBUG == true) duration = 1000;
+	var duration = 30*1000;
+	if(DEBUG == true) duration = 3000;
 	new_tank.constructing = {
 		duration: duration,
 		start: Date.now(),

@@ -160,6 +160,40 @@ function MouseWheelHandler(e){
 
 //=== mouse move ===============================================================
 
+//mouse move on map
+function on_mousemove(event){
+	mouse_last_move = Date.now();
+	if(event.offsetX) {
+		mouseX = event.offsetX;
+		mouseY = event.offsetY;
+		}
+	else if(event.layerX) {
+		mouseX = event.layerX;
+		mouseY = event.layerY;
+		}
+	if(selection.drag == true){
+		selection.x2 = mouseX;
+		selection.y2 = mouseY;
+		}
+	//info about crystals
+	if(PLACE == 'game' && game_mode == 3){
+		ability_hover_text = '';
+		var found = false;
+		for(var c in MAP_CRYSTALS){
+			if(mouseX-map_offset[0] < MAP_CRYSTALS[c].x || mouseX-map_offset[0] > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
+			if(mouseY-map_offset[1] < MAP_CRYSTALS[c].y || mouseY-map_offset[1] > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
+			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3";
+			show_skill_description();
+			found = true;
+			break;
+			}
+		if(found == false){
+			ability_hover_text = '';
+			show_skill_description();
+			}
+		}
+	mouse_pos = [mouseX, mouseY];
+	}
 function on_mousemove_background(event){
 	mouse_last_move = Date.now();
 	if(event.offsetX) {
@@ -220,40 +254,6 @@ function on_mousemove_background(event){
 			}
 		}		
 	}
-//mouse move on map
-function on_mousemove(event){
-	mouse_last_move = Date.now();
-	if(event.offsetX) {
-		mouseX = event.offsetX;
-		mouseY = event.offsetY;
-		}
-	else if(event.layerX) {
-		mouseX = event.layerX;
-		mouseY = event.layerY;
-		}
-	if(selection.drag == true){
-		selection.x2 = mouseX;
-		selection.y2 = mouseY;
-		}
-	//info about crystals
-	if(PLACE == 'game' && game_mode == 3){
-		ability_hover_text = '';
-		var found = false;
-		for(var c in MAP_CRYSTALS){
-			if(mouseX-map_offset[0] < MAP_CRYSTALS[c].x || mouseX-map_offset[0] > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
-			if(mouseY-map_offset[1] < MAP_CRYSTALS[c].y || mouseY-map_offset[1] > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
-			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3";
-			show_skill_description();
-			found = true;
-			break;
-			}
-		if(found == false){
-			ability_hover_text = '';
-			show_skill_description();
-			}
-		}
-	mouse_pos = [mouseX, mouseY];
-	}
 	
 //=== mouse right ==============================================================
 
@@ -292,7 +292,7 @@ function on_mouse_right_click(event){
 
 //=== mouse click ==============================================================
 
-function on_mousedown(event){
+function on_mousedown(event){	
 	//mouse position
 	if(event.offsetX) {
 		mouseX = event.offsetX;
@@ -447,7 +447,7 @@ function on_mouseup(event){
 						break;
 						}
 					}
-				if(Date.now() - last_click_time < 500 && selected_n == 1){
+				if(Date.now() - last_click_time < 300 && selected_n == 1){
 					//double click - selecting all units with same type
 					for(var i in TANKS){
 						if(MY_TANK.team != TANKS[i].team) continue;

@@ -4,11 +4,15 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	skills 
+		mass usage on same type selected
+		check skills power, effect for mode3
 	research
 		show level
-		disable on max level
 		weapon/armor upgrades 100, 200, 300
+		buld time 200s
 		implement weapons_bonus and armor_bonus
+	real armor?
 	hide enemy buildings till scouted
 	multiplayer
 		creating room, rooms, select adjust
@@ -523,7 +527,7 @@ function speed2pixels(speed, time_diff){
 //repeat some functions in time
 function timed_functions_handler(){
 	//check map scrolling	//event.target.id
-	if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100){
+	/*if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100){
 		//move map if mouse in corners
 		var gap = 50;
 		var power = 50;
@@ -535,7 +539,7 @@ function timed_functions_handler(){
 			scoll_map(0, 1, power);	//up
 		if(mouse_pos[1] > HEIGHT_SCROLL - gap && mouse_pos[1] < HEIGHT_SCROLL-10) 
 			scoll_map(0, -1, power);//down
-		}
+		}*/
 	
 	//exec functions
 	for(var i=0; i<timed_functions.length; i++){		

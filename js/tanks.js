@@ -329,7 +329,7 @@ function add_hp_bar(tank){
 				break;
 				}
 			canvas_main.fillStyle = "#d9ce00";
-			hp_height = 2;
+			hp_height = 3;
 			var gap = 3*(t+1);
 			canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
 			break;
@@ -1733,7 +1733,7 @@ function check_invisibility(TANK, force_check){
 			}
 		}
 	}
-function apply_buff(TANK, buff_name, original_value){
+function apply_buff(TANK, buff_name, original_value){	
 	for(var b in TANK.buffs){
 		if(TANK.buffs[b].name == buff_name){
 			if(TANK.buffs[b].type == 'static'){
@@ -1792,6 +1792,18 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 			damage_mod = TOWER_HP_DAMAGE_IN_1VS1[1];
 			}
 		}
+	var hp = hp_mod * (TYPES[type].life[0]+TYPES[type].life[1]*(level-1));
+	for(var b in COUNTRIES[nation].buffs){
+		var buff = COUNTRIES[nation].buffs[b];
+		if(buff.name == "health"){
+			if(buff.type == 'static')
+				hp = hp + buff.power;
+			else
+				hp = hp * buff.power;
+			}
+		}
+	hp = round(hp);
+	
 	//create
 	TANK_tmp = {
 		id: id,
@@ -1806,7 +1818,7 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 		move: 0,
 		level: level,	
 		sublevel: 0,	
-		hp: hp_mod * (TYPES[type].life[0]+TYPES[type].life[1]*(level-1)),
+		hp: hp,
 		abilities_lvl: [1, 1, 1],
 		abilities_reuse: [0, 0, 0],
 		sight: TYPES[type].scout + round(TYPES[type].size[1]/2),
