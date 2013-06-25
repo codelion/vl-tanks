@@ -208,6 +208,7 @@ function draw_library_units(selected_tank){
 			value = TYPES[selected_tank].abilities[2].name + " - "+window[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
 			}
 		lib_show_stats("3rd ability", value, xx, y+50+st*height_space, 90, true); st++;
+		lib_show_stats("Cost", TYPES[selected_tank].cost+" HE-3", xx, y+50+st*height_space, 90); st++;
 		}
 	}
 function draw_library_maps(){

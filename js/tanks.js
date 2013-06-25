@@ -318,7 +318,8 @@ function add_hp_bar(tank){
 				if(MY_TANK.team != 'B')
 					angle = 0;
 				//create tank
-				var new_tank = add_tank(1, 'unit-'+tank.team+x+"."+y, generatePassword(6), type, tank.team, tank.nation, x, y, angle);
+				var id = 'unit-'+TYPES[type].name+'-'+getRandomInt(0, 999999);
+				var new_tank = add_tank(1, id, generatePassword(6), type, tank.team, tank.nation, x, y, angle);
 				new_tank.move = 1;
 				new_tank.move_to = [
 					tank.flag.x + getRandomInt(-gap_rand, gap_rand), 
@@ -1282,6 +1283,17 @@ function do_damage(TANK, TANK_TO, BULLET){
 					register_tank_action('kill', opened_room_id, killer.id, TANK_TO.id);
 				}
 			else{
+				//find and select base
+				if(game_mode == 3 && TANK_TO.id == MY_TANK.id){
+					for(var x in TANKS){
+						if(TANKS[x].team != MY_TANK.team) continue;
+						if(TANKS[x].data.name != 'Base') continue;
+						MY_TANK = TANKS[x];
+						TANKS[x].selected = 1;
+						draw_infobar();
+						break;
+						}
+					}
 				//remove tank
 				var del_index = false;
 				for(var j=0; j < TANKS.length; j++){
@@ -1509,6 +1521,13 @@ function check_nation_tank(tank_name, nation){
 			return false;
 			}
 		}
+	if(game_mode == 3){
+		for(var i in TYPES){
+			if(TYPES[i].cost == 0 && TYPES[i].name == tank_name)
+				return false;	
+			}
+		}
+		
 	return true;
 	}
 //choose tanks on mirror/random
@@ -1733,7 +1752,7 @@ function check_invisibility(TANK, force_check){
 			}
 		}
 	}
-function apply_buff(TANK, buff_name, original_value){	
+function apply_buff(TANK, buff_name, original_value){
 	for(var b in TANK.buffs){
 		if(TANK.buffs[b].name == buff_name){
 			if(TANK.buffs[b].type == 'static'){
@@ -1856,6 +1875,29 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 	TANK_tmp.height = function(){	return TYPES[this.type].size[2];		}
 	if(TANK_tmp.x == undefined || TANK_tmp.y == undefined)
 		set_spawn_coordinates(TANK_tmp);
+	
+	//racial stats
+	for(var b in COUNTRIES[TANK_tmp.nation].buffs){
+		var buff = COUNTRIES[TANK_tmp.nation].buffs[b];
+		TANK_tmp.buffs.push({
+			name: buff.name,
+			power: buff.power,
+			type: buff.type,
+			});
+		}
+	
+	//auto add 1 lvl upgrade
+	for(jj in TYPES[TANK_tmp.type].abilities){ 
+		var nr = 1+parseInt(jj);
+		var ability_function = TYPES[TANK_tmp.type].abilities[jj].name.replace(/ /g,'_')+"_once";
+		if(ability_function != undefined){
+			try{
+				window[ability_function](TANK_tmp);
+				}
+			catch(err){	}
+			}
+		}
+	
 	TANKS.push(TANK_tmp);
 	
 	//return last tank

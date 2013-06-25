@@ -26,12 +26,12 @@ COUNTRIES = {
 	ch: {
 		name: 'China', 
 		file: 'ch',
-		description: 'Fast attack country. Units have double training speed, 10% more moving speed, but 10% less health.',
+		description: 'Fast attack country. Units have double training speed, 15% more moving speed, but 10% less health.',
 		pros: 'Excel at rush attacks.',
 		cons: 'Units have less health.',
 		buffs: [
 			{ name: 'respawn',	power: 0.5, },
-			{ name: 'speed',		power: 1.1,},
+			{ name: 'speed',		power: 1.15,},
 			{ name: 'health',		power: 0.9,	},
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
@@ -48,7 +48,7 @@ TYPES.push({
 	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
 	life: [210, 12],
 	damage: [30, 1.5],		//30 dps
-	range: 80,
+	range: 80, 
 	scout: 110,
 	armor: [25, 0.5, 50],
 	speed: 28,
@@ -65,6 +65,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 70,
 	});
 
 //Heavy
@@ -96,6 +97,7 @@ TYPES.push({
 	preview: true,				//tank preview image
 	bullet: 'small_bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
+	cost: 60,
 	});
 
 //Cruiser
@@ -122,6 +124,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	cost: 50,
 	});
 
 //Launcher
@@ -148,6 +151,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	cost: 60,
 	});
 
 //Stealth
@@ -175,6 +179,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 50,
 	});
 
 //Miner
@@ -201,6 +206,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	cost: 50,
 	});
 
 //Tech
@@ -227,6 +233,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 50,
 	});
 
 //Truck
@@ -253,6 +260,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	cost: 0,
 	});
 
 //TRex
@@ -279,6 +287,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 50,
 	});
 
 //Apache
@@ -308,6 +317,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 70,
 	});
 
 //Bomber
@@ -337,6 +347,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 60,
 	});
 
 //Soldier
@@ -360,6 +371,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	cost: 30,
 	});
 
 //Tower
@@ -386,6 +398,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'ground',
+	cost: 100,
 	});
 	
 //SAM Tower
@@ -410,6 +423,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'air',
+	cost: 100,
 	});
 
 //Scout Tower
@@ -432,6 +446,7 @@ TYPES.push({
 	icon_top: true,
 	icon_base: false,
 	no_base_rotate: true,
+	cost: 40,
 	});
 
 //Base
@@ -460,6 +475,7 @@ TYPES.push({
 	no_base_rotate: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
+	cost: 500,
 	});
 
 //Factory
@@ -485,6 +501,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
+	cost: 150,
 	});
 
 //Research
@@ -510,6 +527,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
+	cost: 125,
 	});
 
 //Silo
@@ -532,4 +550,5 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
+	cost: 60,
 	});

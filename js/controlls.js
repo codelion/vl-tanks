@@ -182,7 +182,7 @@ function on_mousemove(event){
 		for(var c in MAP_CRYSTALS){
 			if(mouseX-map_offset[0] < MAP_CRYSTALS[c].x || mouseX-map_offset[0] > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
 			if(mouseY-map_offset[1] < MAP_CRYSTALS[c].y || mouseY-map_offset[1] > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
-			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE3";
+			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE-3";
 			show_skill_description();
 			found = true;
 			break;
@@ -228,7 +228,7 @@ function on_mousemove_background(event){
 			add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"], 99);		
 		}
 	if(PLACE=='game'){
-		//mouse hover on abilities
+		//mouse over abilities
 		var new_i;
 		for(var i=0; i<ABILITIES_POS.length; i++){
 			if(mouseX>ABILITIES_POS[i].x && mouseX<ABILITIES_POS[i].x+ABILITIES_POS[i].width){
@@ -247,6 +247,48 @@ function on_mousemove_background(event){
 				ability_hover_text = '';
 			//renew
 			show_skill_description();	
+			}
+		//mouse over training tanks list
+		if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
+			var stats = draw_factory_gui(undefined, true);
+			//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
+			j=0;
+			row=0;
+			//units
+			for(var i in TYPES){
+				if(TYPES[i].type == 'building') continue;
+				if(check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+				var xx = stats.pos1+j*(stats.msize+stats.gap);
+				var yy = stats.pos2+row*(stats.msize+stats.gap);
+				if(mouseX > xx && mouseX < xx + stats.msize){
+					if(mouseY > yy && mouseY < yy + stats.msize){
+						var name = TYPES[i].name.replace("_"," ");
+						ability_hover_text = name+" - "+TYPES[i].cost+" HE-3"
+						}
+					}
+				
+				j++;
+				}
+			//towers
+			j=0;
+			row=1;
+			for(var i in TYPES){
+				if(TYPES[i].type != 'building') continue;
+				if(strpos(TYPES[i].name, "ower")==false) continue;
+				if(check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+				var xx = stats.pos1+j*(stats.msize+stats.gap);
+				var yy = stats.pos2+row*(stats.msize+stats.gap);
+				if(mouseX > xx && mouseX < xx + stats.msize){
+					if(mouseY > yy && mouseY < yy + stats.msize){
+						var name = TYPES[i].name.replace("_"," ");
+						ability_hover_text = name+" - "+TYPES[i].cost+" HE-3"
+						}
+					}
+				
+				j++;
+				}
+			//renew
+			show_skill_description();
 			}
 		//mini map scrolling
 		if(MAP_SCROLL_CONTROLL==true){

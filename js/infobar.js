@@ -40,17 +40,9 @@ function redraw_tank_stats(){
 	var gap = 19;
 	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
 	
-	//counter mode - death
-	if(game_mode == 2 && MY_TANK.dead == 1){
-		ROOM = get_room_by_id(opened_room_id);
-		if(ROOM.settings[0] == 'counter'){
-			draw_counter_tank_selection();
-			return false;
-			}
-		}
 	//commander mode - Factory
 	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
-		draw_counter_tank_selection();
+		draw_factory_gui();
 		return false;
 		}
 	
@@ -235,7 +227,7 @@ function draw_tank_abilities(){
 	
 	for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
 		//check if abilites not in use
-		if(MY_TANK.abilities_reuse[i] > Date.now() ) continue;
+		if(MY_TANK.abilities_reuse[i] > Date.now() )	continue;
 		
 		//button
 		var back_image = 'skill_on';
@@ -258,8 +250,10 @@ function draw_tank_abilities(){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		if(game_mode != 3){
+		if(game_mode != 3 || ability_stats.level != undefined){
 			var value = MY_TANK.abilities_lvl[i];
+			if(ability_stats.level != undefined)
+				value = ability_stats.level;
 			canvas_backround.font = "normal 8px Verdana";
 			canvas_backround.fillStyle = "#2f391c";
 			canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
@@ -360,8 +354,10 @@ function draw_ability_reuse(object){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		if(game_mode != 3){
+		if(game_mode != 3 || ability_stats.level != undefined){
 			var value = MY_TANK.abilities_lvl[i];
+			if(ability_stats.level != undefined)
+				value = ability_stats.level;
 			canvas_backround.font = "normal 8px Verdana";
 			canvas_backround.fillStyle = "#2f391c";
 			canvas_backround.fillText(value, status_x_tmp+i*(SKILL_BUTTON+gap)+5, status_y+11);
@@ -413,13 +409,14 @@ function show_skill_description(){
 	var limit = 193;
 	var ability_hover_text_more = '';
 	active_line = 1;
-	if(ability_hover_text != ''){
-		var words = ability_hover_text.split(" ");
-		ability_hover_text = '';
+	var text = ability_hover_text;
+	if(text != ''){
+		var words = text.split(" ");
+		text = '';
 		for(var i in words){
-			var tmp = ability_hover_text.concat(' ').concat(words[i]);
+			var tmp = text.concat(' ').concat(words[i]);
 			if(active_line == 1 && canvas_backround.measureText(tmp).width < limit)
-				ability_hover_text = ability_hover_text+" "+words[i];
+				text = text+" "+words[i];
 			else{ 
 				ability_hover_text_more = ability_hover_text_more+" "+words[i];
 				active_line=2;
@@ -429,7 +426,7 @@ function show_skill_description(){
 	//show description
 	canvas_backround.fillStyle = "#8f947d";
 	canvas_backround.font = "normal 10px Verdana";
-	canvas_backround.fillText(ability_hover_text, status_x_tmp+5, status_y+13);
+	canvas_backround.fillText(text, status_x_tmp+5, status_y+13);
 	
 	canvas_backround.fillStyle = "#8f947d";
 	canvas_backround.font = "normal 10px Verdana";
@@ -555,9 +552,7 @@ function update_radar(tank){
 		canvas_backround.fillRect(tank_x, tank_y, msize, msize);
 		}
 	}
-var last_selected_counter = -1;
-//lets select new tank on counter mode
-function draw_counter_tank_selection(selected_tank){
+function draw_factory_gui(selected_tank, get_stats){
 	var padding_left = 250;
 	var padding_top = 15;
 	var pos1 = status_x+padding_left;
@@ -568,22 +563,22 @@ function draw_counter_tank_selection(selected_tank){
 	var gap = 3;
 	var msize = 33;
 	var first_time = false;
+	if(get_stats != undefined)	//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
+		return {
+			msize: msize, 
+			pos1: pos1, 
+			pos2: pos2, 
+			gap: gap, 
+			};
 	
 	if(selected_tank == undefined){
 		selected_tank = MY_TANK.type;
 		first_time = true;
 		}
 	
-	if(game_mode != 3 && selected_tank==last_selected_counter)
-		return false;
-		
-	//tank icon
-	if(TYPES[MY_TANK.type].preview != false && game_mode != 3){
-		//clear
-		draw_image(canvas_backround, 'statusbar', status_x+140, status_y+40, 90, 80, status_x+140, status_y+40, 90, 80);
-		//draw
-		draw_image(canvas_backround, TYPES[MY_TANK.type].name, status_x+140, status_y+40, undefined, undefined);
-		}
+	//clear area
+	draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y+padding_top, max_width, max_height,
+		status_x+padding_left, padding_top, max_width, max_height);
 	
 	//tanks
 	var j=0;
@@ -633,74 +628,61 @@ function draw_counter_tank_selection(selected_tank){
 		
 		//register button
 		register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
-			if(game_mode == 2 && MY_TANK.dead == 1){
-				ROOM = get_room_by_id(opened_room_id);
-				if(ROOM.settings[0]=='counter'){
-					register_tank_action('change_tank', opened_room_id, name, index, true);
-					return true;
-					}
-				else
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TANKS[i].data.name != "Factory") continue;
+				if(TANKS[i].selected == undefined) continue;
+				
+				var unit_cost = TYPES[index].cost;
+				//check he3
+				if(HE3 < unit_cost){
+					screen_message.text = "Not enough HE-3.";
+					screen_message.time = Date.now() + 1000;
 					return false;
-				}
-			else if(game_mode == 3){
-				var unit_cost;
-				stats = War_units(TANK, undefined, true);
-				unit_cost = stats.cost;
-				if(TYPES[index].type == 'human') unit_cost = round(unit_cost/2);
-				for(var i in TANKS){
-					if(TANKS[i].team != MY_TANK.team) continue;
-					if(TANKS[i].data.name != "Factory") continue;
-					if(TANKS[i].selected == undefined) continue;
-					//check he3
-					if(HE3 < unit_cost){
-						screen_message.text = "Not enough HE3.";
-						screen_message.time = Date.now() + 1000;
-						return false;
-						}
-					//check unit limit
-					var team_units = 0;
-					for(var ii in TANKS){
-						if(TANKS[ii].team != MY_TANK.team) continue;
-						if(TANKS[ii].data.type == 'building'){
-							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
-								team_units = team_units + TANKS[ii].training.length;
-							continue;
-							}
-						team_units++;
-						}
-					if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
-					if(team_units >= MAX_TEAM_TANKS){
-						screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
-						screen_message.time = Date.now() + 1000;
-						return false;
-						}
-					HE3 = HE3 - unit_cost;
-					//register
-					var duration = 30*1000;
-					if(TYPES[index].type == 'human')
-						duration = 20*1000;
-					if(DEBUG == true) duration = 3000;
-					//check respawn buff
-					for(var b in COUNTRIES[MY_TANK.nation].buffs){
-						var buff = COUNTRIES[MY_TANK.nation].buffs[b];
-						if(buff.name == "respawn"){
-							if(buff.type == 'static')
-								duration = duration + buff.power;
-							else
-								duration = duration * buff.power;
-							}
-						}
-					
-					if(duration < 1000) duration = 1000;
-					if(TANKS[i].training == undefined)
-						TANKS[i].training = new Array();
-					TANKS[i].training.push({
-						duration: duration,
-						type: index,
-						cost: unit_cost,
-						});
-					draw_counter_tank_selection();
 					}
+				//check unit limit
+				var team_units = 0;
+				for(var ii in TANKS){
+					if(TANKS[ii].team != MY_TANK.team) continue;
+					if(TANKS[ii].data.type == 'building'){
+						if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
+							team_units = team_units + TANKS[ii].training.length;
+						continue;
+						}
+					team_units++;
+					}
+				if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
+				if(team_units >= MAX_TEAM_TANKS){
+					screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+					screen_message.time = Date.now() + 1000;
+					return false;
+					}
+				HE3 = HE3 - unit_cost;
+				//register
+				var duration = 30*1000;
+				if(TYPES[index].type == 'human')
+					duration = 20*1000;
+				if(DEBUG == true) duration = 1000;
+				//check respawn buff
+				for(var b in COUNTRIES[MY_TANK.nation].buffs){
+					var buff = COUNTRIES[MY_TANK.nation].buffs[b];
+					if(buff.name == "respawn"){
+						if(buff.type == 'static')
+							duration = duration + buff.power;
+						else
+							duration = duration * buff.power;
+						}
+					}
+				
+				if(duration < 1000) duration = 1000;
+				if(TANKS[i].training == undefined)
+					TANKS[i].training = new Array();
+				TANKS[i].training.push({
+					duration: duration,
+					type: index,
+					cost: unit_cost,
+					});
+				draw_factory_gui();
 				}
 			}, i);
 		j++;
@@ -736,23 +718,23 @@ function draw_counter_tank_selection(selected_tank){
 			
 			//register button
 			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
-				var unit_cost;
+				var unit_cost = TYPES[index].cost;
 				stats = Towers(TANK, undefined, true);
-				unit_cost = stats.cost;
 				var reuse = stats.reuse;
-				if(TYPES[index].damage[0] == 0) unit_cost = round(unit_cost*4/10);
 				if(HE3 < unit_cost){
-					screen_message.text = "Not enough HE3.";
+					screen_message.text = "Not enough HE-3.";
 					screen_message.time = Date.now() + 1000;
 					return false;
 					}
-				HE3 = HE3 - unit_cost;
 				
-				construct_prepare(MY_TANK, unit_cost, reuse, TYPES[index].name, 2);
+				construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
 				}, i);
 			j++;
 			}
-		//cancel button
+		}
+	
+	//cancel button
+	if(MY_TANK.training != undefined && MY_TANK.training.length > 0){
 		width = 50;
 		height = 23;
 		var xx = status_x+padding_left+max_width-width-9;
@@ -765,7 +747,7 @@ function draw_counter_tank_selection(selected_tank){
 				HE3 = HE3 + MY_TANK.training[i].cost;
 				}
 			MY_TANK.training = [];
-			draw_counter_tank_selection();
+			draw_factory_gui();
 			});
 		//text
 		text = "Stop";
@@ -773,13 +755,5 @@ function draw_counter_tank_selection(selected_tank){
 		canvas_backround.font = "Bold 11px Arial";
 		var text_width = canvas_backround.measureText(text).width;
 		canvas_backround.fillText(text, xx+(width-text_width)/2, yy+(height+font_pixel_to_height(11))/2);
-		/*
-		var padding_left = 250;
-		var padding_top = 15;
-		var max_width = 325;
-		var max_height = 80;
-		*/
 		}
-		
-	last_selected_counter = selected_tank;
 	}

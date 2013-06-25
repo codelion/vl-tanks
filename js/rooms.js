@@ -308,13 +308,13 @@ function draw_create_room(game_players, game_mode, game_type, game_map, nation1,
 	button_width = button_width + 40;
 	offset_top = offset_top + 40;
 	
-	//mode text - normal/random/mirror/counter
+	//mode text - normal/random/mirror
 	canvas_backround.fillStyle = "#3f3b30";
 	canvas_backround.font = "Bold 13px Arial";
 	text = "Game Mode:";
 	canvas_backround.fillText(text, 10+15, 60+25+offset_top);
 	
-	values = ['normal', 'random', 'mirror', 'counter'];
+	values = ['normal', 'random', 'mirror'];
 	for(var i in values){
 		//block
 		canvas_backround.strokeStyle = "#000000";

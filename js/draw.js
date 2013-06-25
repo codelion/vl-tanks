@@ -69,7 +69,6 @@ function draw_main(){
 				if(TANKS[i].respan_time - Date.now() < 0){
 					delete TANKS[i].respan_time;
 					delete TANKS[i].dead;
-					last_selected_counter = -1;
 					}
 				}
 			
@@ -226,8 +225,12 @@ function draw_main(){
 				}
 			
 			//autoskills
-			if(game_mode == 3 && TANKS[i].last_bullet_time + 1000 - Date.now() > 0)
-				try_skills(TANKS[i]);
+			if(game_mode == 3 && TANKS[i].last_bullet_time + 1000 - Date.now() > 0){
+				if(TANKS[i].ai_reuse - Date.now() < 0 || TANKS[i].ai_reuse == undefined){
+					TANKS[i].ai_reuse = 1000/2+Date.now();	//half second pause
+					try_skills(TANKS[i]);
+					}
+				}
 			
 			//map scrolling
 			if(TANKS[i].id==MY_TANK.id && TANKS[i].move == 1 && MAP_SCROLL_CONTROLL==false && MAP_SCROLL_MODE==1){
@@ -1131,7 +1134,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 				register_button(15+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 					if(game_mode == 2){
 						ROOM = get_room_by_id(opened_room_id);
-						if(ROOM.settings[0]=='normal' || ROOM.settings[0]=='counter'){
+						if(ROOM.settings[0]=='normal'){
 							if(TYPES[index].bonus != undefined){
 								return false;
 								}

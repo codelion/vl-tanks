@@ -4,21 +4,13 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	skills 
-		mass usage on same type selected
-		check skills power, effect for mode3
-	research
-		show level
-		weapon/armor upgrades 100, 200, 300
-		buld time 200s
-		implement weapons_bonus and armor_bonus
-	real armor?
+	mass skills usage on same type selected
 	hide enemy buildings till scouted
 	multiplayer
 		creating room, rooms, select adjust
 		move he3 to team, initial he3
-	countries bonus in mode3 ?
-	special score for mode3
+		implement weapons_bonus and armor_bonus
+	special score for mode3: he3 and army graph in time
 */
 
 //init hello screen
@@ -320,33 +312,6 @@ function init_action(map_nr, my_team){
 		
 	sync_multiplayers();
 	
-	//auto add 1 lvl upgrade
-	for(ii in TANKS){
-		for(jj in TYPES[TANKS[ii].type].abilities){ 
-			var nr = 1+parseInt(jj);
-			var ability_function = TYPES[TANKS[ii].type].abilities[jj].name.replace(/ /g,'_')+"_once";
-			if(ability_function != undefined){
-				try{
-					window[ability_function](TANKS[ii]);
-					}
-				catch(err){	}
-				}
-			}
-		}
-	
-	//racial stats
-	for(i in TANKS){
-		if(TYPES[TANKS[i].type].type == 'human') continue;
-		for(var b in COUNTRIES[TANKS[i].nation].buffs){
-			var buff = COUNTRIES[TANKS[i].nation].buffs[b];
-			TANKS[i].buffs.push({
-				name: buff.name,
-				power: buff.power,
-				type: buff.type,
-				});
-			}
-		}	
-	
 	//handler for mini map
 	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
 		MAP_SCROLL_CONTROLL=true; 
@@ -626,7 +591,6 @@ function quit_game(init_next_game){
 	ABILITIES_POS = [];
 	game_mode = 1;
 	last_selected = -1;
-	last_selected_counter = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
 	document.getElementById("chat_box").style.display = 'none';

@@ -422,50 +422,6 @@ function get_packet(fromClient, message){
 					draw_tank_select_screen();
 				}
 			}
-		else if(PLACE=="game" && DATA[3] == true){
-			var ROOM = get_room_by_id(DATA[0]);
-			if(ROOM != false){
-				//update players
-				for(var p in ROOM.players){
-					if(ROOM.players[p].name == DATA[2]){
-						ROOM.players[p].tank = DATA[1];
-						}
-					}
-				for(var i in TANKS){
-					if(TANKS[i].name == DATA[2]){
-						var type = DATA[1];
-						var level = TANKS[i].level;
-						//change stats
-						TANKS[i].type = type;
-						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
-						TANKS[i].sight = TYPES[type].scout + round(TYPES[type].size[1]/2);
-						TANKS[i].speed = TYPES[type].speed;
-						TANKS[i].armor = TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1);
-						TANKS[i].damage = TYPES[type].damage[0] + TYPES[type].damage[1]*(level-1);
-						TANKS[i].attack_delay = TYPES[type].attack_delay;
-						TANKS[i].turn_speed = TYPES[type].turn_speed;
-						}
-					}
-				//if me
-				if(DATA[2]==name){
-					my_tank_nr = DATA[1];
-					draw_counter_tank_selection(my_tank_nr);
-					draw_tank_abilities();
-					
-					//auto add 1 lvl upgrade
-					for(jj in TYPES[MY_TANK.type].abilities){ 
-						var nr = 1+parseInt(jj);
-						var ability_function = TYPES[MY_TANK.type].abilities[jj].name.replace(/ /g,'_')+"_once";
-						if(ability_function != undefined){
-							try{
-								window[ability_function](MY_TANK);
-								}
-							catch(err){}
-							}
-						}
-					}
-				}
-			}
 		}
 	else if(type == 'start_game'){	//start game
 		//DATA = game_id, players_data
@@ -671,6 +627,17 @@ function get_packet(fromClient, message){
 				}
 			}
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			//find and select base
+			if(game_mode == 3 && TANK_TO.id == MY_TANK.id){
+				for(var x in TANKS){
+					if(TANKS[x].team != MY_TANK.team) continue;
+					if(TANKS[x].data.name != 'Base') continue;
+					MY_TANK = TANKS[x]
+					TANKS[x].selected = 1;
+					draw_infobar();
+					break;
+					}
+				}
 			//removing
 			for(var b=0; b < TANKS.length; b++){
 				if(TANKS[b].id==TANK_TO.id){	

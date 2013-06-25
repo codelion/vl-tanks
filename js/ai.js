@@ -257,6 +257,18 @@ function do_auto_missile(tank_id){
 	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
 	BULLETS.push(tmp);
 	
+	//init reuse
+	if(game_mode == 3){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_missile.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_missile.ability_nr;	
+		tmp['max'] = TANK.try_missile.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
+	
 	delete TANK.try_missile;
 	}
 function do_auto_bomb(tank_id){	
@@ -307,6 +319,18 @@ function do_auto_bomb(tank_id){
 		tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
 		}
 	BULLETS.push(tmp);
+	
+	//init reuse
+	if(game_mode == 3){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_bomb.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_bomb.ability_nr;	
+		tmp['max'] = TANK.try_bomb.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_bomb;
 	}

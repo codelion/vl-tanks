@@ -166,7 +166,7 @@ function Health(TANK, descrition_only, settings_only, ai){
 	
 	//update health buff
 	for(var b in TANK.buffs){
-		if(TANK.buffs[b].name == 'health')
+		if(TANK.buffs[b].name == 'health' && TANK.buffs[b].id == 'health_once')
 			TANK.buffs[b].power = power;
 		}
 		
@@ -175,12 +175,13 @@ function Health(TANK, descrition_only, settings_only, ai){
 	}
 function Health_once(TANK, descrition_only, settings_only, ai){
 	var power = 1.1 + 0.01 *(TANK.abilities_lvl[2]-1);
-	if(power > 130) power = 130;
+	if(power > 130) power = 130;		power = 1.2;
 	
 	//health buff
 	TANK.buffs.push({
 		name: 'health',
 		power: power,
+		id: 'health_once',
 		});
 	}
 
@@ -324,14 +325,14 @@ function Missile(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){	
+	if(TANK.id == MY_TANK.id && ai == undefined){	
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -361,14 +362,14 @@ function Mortar(TANK, descrition_only, settings_only, ai){
 		
 	if(TANK.try_bomb != undefined){
 		delete TANK.try_bomb;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 	 		mouse_click_controll = false;
 	 		target_range=0;
 			target_mode='';
 	 		}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = splash_range;
 		target_mode = ['target'];
@@ -398,14 +399,14 @@ function MM_Missile(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){	
+	if(TANK.id == MY_TANK.id && ai == undefined){	
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -432,7 +433,7 @@ function Range(TANK, descrition_only, settings_only, ai){
 
 function Strike(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
-	var power = 40 + 7 * (TANK.abilities_lvl[0]-1);
+	var power = 50 + 7 * (TANK.abilities_lvl[0]-1);
 	var range = 100;
 	
 	if(descrition_only != undefined)
@@ -441,14 +442,14 @@ function Strike(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -733,14 +734,14 @@ function Virus(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -770,14 +771,14 @@ function EMP_Bomb(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_bomb != undefined){
 		delete TANK.try_bomb;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 	 		mouse_click_controll = false;
 	 		target_range=0;
 			target_mode='';
 	 		}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = splash_range;
 		target_mode = ['target'];
@@ -799,6 +800,8 @@ function EMP_Bomb(TANK, descrition_only, settings_only, ai){
 function M7_Shield(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 2000 + 105*(TANK.abilities_lvl[2]-1);
+	if(game_mode == 3)
+		duration = 3000;
 	var power = 5 + 0.5*(TANK.abilities_lvl[2]-1);
 	var range = 80;
 	
@@ -856,7 +859,7 @@ function Fire_bomb(TANK, descrition_only, settings_only, ai){
 		
 	if(TANK.try_bomb != undefined){
 		delete TANK.try_bomb;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 	 		mouse_click_controll = false;
 	 		target_range=0;
 			target_mode='';
@@ -864,7 +867,7 @@ function Fire_bomb(TANK, descrition_only, settings_only, ai){
 		return 0;
 		}
 	
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = splash_range;
 		target_mode = ['target'];
@@ -980,14 +983,14 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -1010,6 +1013,8 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 function Jump(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var range = 100 + 2.7 * (TANK.abilities_lvl[1]-1);
+	if(game_mode == 3)
+		range = 120;
 	
 	if(descrition_only != undefined)
 		return 'Quick jump to free location with '+range+' range.';
@@ -1018,14 +1023,14 @@ function Jump(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_jump != undefined){
 		delete TANK.try_jump;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -1075,19 +1080,19 @@ function do_jump(tank_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_jump == undefined) return false;
 	if(game_mode != 2 && MAPS[level-1].ground_only != undefined) return false;
-	if(TANK.name == name){
+	if(TANK.id == MY_TANK.id){
 		var mouseX = mouse_click_pos[0];
 		var mouseY = mouse_click_pos[1];
 		}
 	else{
-		mouseX = TANK.jump_x;
-		mouseY = TANK.jump_y;
+		var mouseX = TANK.jump_x;
+		var mouseY = TANK.jump_y;
 		}
 	var tank_size_w = TANK.width()/2;		
 	var tank_size_h = TANK.height()/2;
 	
-	dist_x = mouseX - (TANK.cx());
-	dist_y = mouseY - (TANK.cy());
+	dist_x = mouseX - TANK.cx();
+	dist_y = mouseY - TANK.cy();
 	distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
 	var radiance = Math.atan2(dist_y, dist_x);
 	if(distance < TANK.try_jump.range){
@@ -1150,7 +1155,7 @@ function do_jump(tank_id, skip_broadcast){
 	auto_scoll_map();
 		
 	//init reuse
-	if(game_mode != 2 || TANK.name == name){
+	if(game_mode != 2 || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_jump.reuse;
@@ -1180,14 +1185,14 @@ function Airstrike(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -1249,14 +1254,14 @@ function Bomb(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_bomb != undefined){
 		delete TANK.try_bomb;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){
+	if(TANK.id == MY_TANK.id && ai == undefined){
 		mouse_click_controll = true;
 		target_range = splash_range;
 		target_mode = ['target'];
@@ -1285,14 +1290,14 @@ function AA_bomb(TANK, descrition_only, settings_only, ai){
 	
 	if(TANK.try_missile != undefined){
 		delete TANK.try_missile;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
 			}
 		return 0;
 		}
-	if(TANK.id == MY_TANK.id){	
+	if(TANK.id == MY_TANK.id && ai == undefined){	
 		mouse_click_controll = true;
 		target_range = 0;
 		target_mode = ['target'];
@@ -1320,7 +1325,7 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 	var duration = 5000;
 	
 	if(descrition_only != undefined)
-		return 'Increase tower attack speed by '+((1-power)*100)+'% for '+(duration/1000)+'s. Costs '+cost+' H3.';
+		return 'Increase tower attack speed by '+((1-power)*100)+'% for '+(duration/1000)+'s. Costs '+cost+' HE-3.';
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
@@ -1343,54 +1348,67 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 //====== Base ==================================================================
 
 function Factory(TANK, descrition_only, settings_only, ai){
-	var cost = 150;
-	var reuse = 100;
+	var reuse = 0;
 	var tank_type = 'Factory';
 	
+	for(var i in TYPES){
+		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+		}
+	
 	if(descrition_only != undefined)
-		return 'Construct factory to create land, air, defence units. Costs '+cost+' H3.';
+		return 'Construct factory to create land, air, defence units. Costs '+tank_info.cost+' HE-3.';
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	construct_prepare(TANK, cost, reuse, tank_type, 0);
+	construct_prepare(TANK, reuse, tank_type, 0);
 	
 	//return reuse - later, on use
 	return 0;
 	}
 function Research(TANK, descrition_only, settings_only, ai){
-	var cost = 125;
-	var reuse = 100;
+	var reuse = 0;
 	var tank_type = 'Research';
 	
+	for(var i in TYPES){
+		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+		}
+	
 	if(descrition_only != undefined)
-		return 'Construct research station. Costs '+cost+' H3.';
+		return 'Construct research station. Costs '+tank_info.cost+' HE-3.';
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
-	construct_prepare(TANK, cost, reuse, tank_type, 1);
+	construct_prepare(TANK, reuse, tank_type, 1);
 		
 	//return reuse - later, on use
 	return 0;
 	}
 function Silo(TANK, descrition_only, settings_only, ai){
-	var cost = 60;
 	var reuse = 100;
 	var tank_type = 'Silo';
 	
-	if(descrition_only != undefined)
-		return 'Construct structure for storing Helium-3. Costs '+cost+' H3.';
-	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse, cost: cost};
+	for(var i in TYPES){
+		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+		}
 	
-	construct_prepare(TANK, cost, reuse, tank_type, 2);
+	if(descrition_only != undefined)
+		return 'Construct structure for storing Helium-3. Costs '+tank_info.cost+' HE-3.';
+	if(ai != undefined || game_mode != 3) return false;
+	if(settings_only != undefined) return {reuse: reuse};
+	
+	construct_prepare(TANK, reuse, tank_type, 2);
 		
 	//return reuse - later, on use
 	return 0;
 	}
-function construct_prepare(TANK, cost, reuse, tank_type, ability_nr){
+function construct_prepare(TANK, reuse, tank_type, ability_nr){
+	for(var i in TYPES){
+		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+		}
+	var cost = tank_info.cost;
 	if(TANK.try_construct != undefined){
 		delete TANK.try_construct;
-		if(TANK.id == MY_TANK.id){
+		if(TANK.id == MY_TANK.id && ai == undefined){
 	 		mouse_click_controll = false;
 	 		}
 		return 0;
@@ -1398,7 +1416,7 @@ function construct_prepare(TANK, cost, reuse, tank_type, ability_nr){
 	
 	if(HE3 < cost){
 		//message
-		screen_message.text = "Not enough HE3.";
+		screen_message.text = "Not enough HE-3.";
 		screen_message.time = Date.now() + 1000;
 		return false;
 		}
@@ -1491,7 +1509,7 @@ function validate_construction(xx, yy, show_errors){
 		//check range
 		if(min_distance > CRYSTAL_RANGE){
 			if(show_errors == true){
-				screen_message.text = "No He3 in this territory.";
+				screen_message.text = "No He-3 in this territory.";
 				screen_message.time = Date.now() + 1000;
 				}
 			return false;
@@ -1536,26 +1554,18 @@ function validate_construction(xx, yy, show_errors){
 //====== Factory ===============================================================	
 
 function War_units(TANK, descrition_only, settings_only, ai){
-	var cost = 50;
-	
 	if(descrition_only != undefined)
-		return 'Construct land or air unit with cost of '+cost+' H3. Soldiers -  '+round(cost/2)+' H3.';
-	if(settings_only != undefined) return {cost: cost};
+		return 'Construct land or air unit.';
+	if(settings_only != undefined) return {};
 	
 	//passive
 	return 0;
 	}
 function Towers(TANK, descrition_only, settings_only, ai){
-	var cost = 100;
-	
 	if(descrition_only != undefined)
-		return 'Construct various towers. Costs '+cost+' H3. Scout towers - '+round(cost*4/10)+' H3.';
-	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {cost: cost};
+		return 'Construct various towers.';
+	if(settings_only != undefined) return {};
 	
-	if(TANK.constructing != undefined) return false;
-	construct_prepare(TANK, cost, reuse, tank_type, 0);
-		
 	//passive
 	return 0;
 	}
@@ -1563,60 +1573,83 @@ function Towers(TANK, descrition_only, settings_only, ai){
 //====== Research ==============================================================
 
 function Weapons(TANK, descrition_only, settings_only, ai){
-	var cost = 100;	//100, 200, 300
-	var reuse = 1000;
 	var power = 10; //%
+	var level = weapons_bonus/power;
+	var cost = 100*(level+1);
+	var reuse = 180*1000;							reuse = 1000;
 	var levels = 3;
 	var active = true;
 	if(weapons_bonus >= power * levels) active = false;
 	
-	if(descrition_only != undefined)
-		return 'Upgrades units weapons. Costs '+cost+' H3.';
+	if(descrition_only != undefined){
+		if(level < levels)
+			return 'Upgrade units weapons. Costs '+cost+' HE-3.';
+		else
+			return 'Upgrade units weapons. Max level.';
+		}
 	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse, power: power, active: active};
+	if(settings_only != undefined) 
+		return {
+			reuse: reuse, 
+			power: power, 
+			active: active,
+			level: level,
+			};
 	
 	if(TANK.constructing != undefined) return false;
-	//check level
-	if(weapons_bonus < power * levels)
-		weapons_bonus = weapons_bonus + power;
-	else
-		return false;
-	//check resources
+	if(weapons_bonus >= power * levels) return false;
 	if(HE3 < cost){ 
-		screen_message.text = "Not enough HE3.";
+		screen_message.text = "Not enough HE-3.";
 		screen_message.time = Date.now() + 1000;
 		return false;
 		}
 	HE3 = HE3 - cost;
+	
+	//register effect
+	setTimeout(function(){
+		weapons_bonus = weapons_bonus + power;
+		}, reuse);
+	
 	return reuse;
 	}
 function Armor(TANK, descrition_only, settings_only, ai){
-	var cost = 100;	//100, 200, 300
-	var reuse = 1000;
 	var power = 5; //static
+	var level = armor_bonus/power;
+	var cost = 100*(level+1);
+	var reuse = 180*1000;							reuse = 1000;
 	var levels = 3;
 	var active = true;
 	if(armor_bonus >= power * levels) active = false;
 	
-	if(descrition_only != undefined)
-		return 'Upgrades units armor. Costs '+cost+' H3.';
+	if(descrition_only != undefined){
+		if(level < levels)
+			return 'Upgrade units armor. Costs '+cost+' HE-3.';
+		else
+			return 'Upgrade units weapons. Max level.';
+		}
 	if(ai != undefined || game_mode != 3) return false;
-	if(settings_only != undefined) return {reuse: reuse, power: power, active: active};
+	if(settings_only != undefined)
+		return {
+			reuse: reuse, 
+			power: power, 
+			active: active,
+			level: level,
+			};
 	
 	if(TANK.constructing != undefined) return false;
-	//check level
-	if(armor_bonus < power * levels)
-		armor_bonus = armor_bonus + power;
-	else
-		return false;
-	//check resources
+	if(armor_bonus >= power * levels) return false;
 	if(HE3 < cost){ 
-		screen_message.text = "Not enough HE3.";
+		screen_message.text = "Not enough HE-3.";
 		screen_message.time = Date.now() + 1000;
 		return false;
 		}
 	HE3 = HE3 - cost;
-		
+	
+	//register effect
+	setTimeout(function(){
+		armor_bonus = armor_bonus + power;
+		}, reuse);
+	
 	return reuse;
 	}
 
@@ -1731,7 +1764,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode != 2 || TANK.name == name){
+	if(game_mode != 2 || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_missile.reuse;
@@ -1839,7 +1872,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode != 2 || TANK.name == name){
+	if(game_mode != 2 || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_bomb.reuse;
@@ -1888,7 +1921,7 @@ function do_construct(tank_id){
 	var new_tank = add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
 	
 	var duration = 30*1000;
-	if(DEBUG == true) duration = 3000;
+	if(DEBUG == true) duration = 1000;
 	new_tank.constructing = {
 		duration: duration,
 		start: Date.now(),
