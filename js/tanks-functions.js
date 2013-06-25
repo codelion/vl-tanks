@@ -1576,7 +1576,7 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	var power = 10; //%
 	var level = weapons_bonus/power;
 	var cost = 100*(level+1);
-	var reuse = 180*1000;							reuse = 1000;
+	var reuse = 180*1000;							reuse = 5000;
 	var levels = 3;
 	var active = true;
 	if(weapons_bonus >= power * levels) active = false;

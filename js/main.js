@@ -5,6 +5,9 @@ Email: www.viliusl@gmail.com
 
 TODO:
 	mass skills usage on same type selected
+	if all tanks slected, give ability to use some ally skills
+		Repair, Boost, M7_Shield
+	if 2+ selected, show mini icons in statusbar
 	hide enemy buildings till scouted
 	multiplayer
 		creating room, rooms, select adjust

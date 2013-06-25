@@ -23,7 +23,7 @@ function on_keyboard_action(event){
 	//add shortcuts
 	if(PLACE == 'game'){
 		if(MY_TANK.dead != 1 && chat_mode==0){
-			if(k == 49 || k == 97 )	
+			if(k == 49 || k == 97 )
 				do_ability(1, MY_TANK);	//special 1
 			else if(k == 50 || k == 98)
 				do_ability(2, MY_TANK);	//sepcial 2
@@ -468,10 +468,9 @@ function on_mouseup(event){
 					selected_n++;
 					last_selected_i = i;
 					}
-				if(selected_n == 1){
+				if(selected_n > 0)
 					MY_TANK = TANKS[last_selected_i];
-					draw_infobar();
-					}
+				draw_infobar();
 				}
 			if(selection.drag == false){
 				//select 1
@@ -500,6 +499,7 @@ function on_mouseup(event){
 						
 						TANKS[i].selected = 1;
 						}
+					draw_infobar();
 					}
 				}
 			}

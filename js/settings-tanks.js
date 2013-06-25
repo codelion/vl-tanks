@@ -527,7 +527,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 125,
+	cost: 225,
 	});
 
 //Silo

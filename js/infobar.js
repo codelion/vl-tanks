@@ -218,12 +218,34 @@ function redraw_tank_stats(){
 	//show fps
 	update_fps();
 	}
+function check_abilities_visibility(){
+	if(game_mode == 3){
+		selected_n = 0;
+		types_unique = {};
+		types_unique_n = 0;
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].selected == undefined) continue;
+			selected_n++;
+			if (TANKS[i].type in types_unique)
+				types_unique[TANKS[i].type]++;
+			else{
+				types_unique[TANKS[i].type]=1;
+				types_unique_n++;
+				}
+			}
+		if(types_unique_n == 1) return true;
+		if(selected_n > 1) return false;
+		}
+	
+	return true;
+	}
 //redraw tank skills
 function draw_tank_abilities(){
-	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
+	if(check_abilities_visibility() == false) return false;
 	
 	for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
 		//check if abilites not in use
@@ -293,11 +315,11 @@ function draw_tank_abilities(){
 	}
 //draw tanks skill reuse animation
 function draw_ability_reuse(object){
-	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
 	
+	if(check_abilities_visibility() == false) return false;
 	if(object != undefined){
 		if(object.tank.id != MY_TANK.id) return false;	//another tank
 		

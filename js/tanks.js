@@ -1419,6 +1419,7 @@ function get_nation_by_team(team){
 	}
 //tank special ability activated	
 function do_ability(nr, TANK){
+	if(check_abilities_visibility() == false) return false;
 	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
 	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;
 	if(TANK.dead == 1 || TANK.stun != undefined) return false; //dead or stuned
