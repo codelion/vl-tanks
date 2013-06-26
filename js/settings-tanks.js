@@ -398,7 +398,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'ground',
-	cost: 100,
+	cost: 150,
 	});
 	
 //SAM Tower
@@ -423,7 +423,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'air',
-	cost: 100,
+	cost: 120,
 	});
 
 //Scout Tower
@@ -527,7 +527,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 225,
+	cost: 185,
 	});
 
 //Silo

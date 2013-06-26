@@ -2,13 +2,14 @@ var ABILITIES_POS = [];
 //draw infobar
 function draw_infobar(first){
 	//image
-	if(first != undefined)
+	if(first != undefined){
 		draw_image(canvas_backround, 'statusbar', status_x, status_y );
+		}
 	else{
 		padding_left = MINI_MAP_PLACE[0]+MINI_MAP_PLACE[2];
 		w_tmp = IMAGES_SETTINGS.general.statusbar.w;
 		h_tmp = IMAGES_SETTINGS.general.statusbar.h;
-		draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y, w_tmp, h_tmp,
+		draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y, w_tmp-padding_left, h_tmp,
 			padding_left, 0, w_tmp, h_tmp);
 		}
 	

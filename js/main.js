@@ -4,7 +4,6 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	initial add 3 soldiers?
 	initial randomize base?
 		check hill
 		check cr reach
@@ -111,7 +110,6 @@ function intro(force){
 		return false;
 		}
 	//draw
-	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	IMAGES_INRO.onload = function(){
 		canvas_backround.drawImage(IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 		//draw text
@@ -131,6 +129,7 @@ function intro(force){
 		canvas_backround.strokeStyle = '#ffffff';
 		canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
 		}
+	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	
 	if(intro_page==0){
 		//register skip button
@@ -227,6 +226,11 @@ function init_action(map_nr, my_team){
 	
 	if(my_tank_nr == -1)
 		my_tank_nr=0;
+	if(game_mode == 3){
+		for(var i in TYPES)
+			if(TYPES[i].name == 'Soldier')
+				my_tank_nr = i;
+		}
 	
 	if(my_team=='B')
 		map_offset = [0, 0];
@@ -278,6 +282,12 @@ function init_action(map_nr, my_team){
 	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	MY_TANK.selected = 1;
+	
+	if(game_mode == 3){
+		//add few more me
+		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+		}
 	
 	auto_scoll_map();
 	
@@ -454,13 +464,13 @@ function preload_all_files(){
 	preload_total = preload_left;
 	
 	//preload images
-	IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	IMAGE_BACK.onload = function(){ update_preload(1); }
-	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	IMAGE_LOGO.onload = function(){ update_preload(1); }
-	IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	IMAGE_MOON.onload = function(){ update_preload(1); }
-	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	IMAGES_GENERAL.onload = function(){ update_preload(1); }
-	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	IMAGES_TANKS.onload = function(){ update_preload(1); }
-	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	IMAGES_BULLETS.onload = function(){ update_preload(1); }
-	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
+	IMAGE_BACK.onload = function(){ update_preload(1); };		IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	
+	IMAGE_LOGO.onload = function(){ update_preload(1); };		IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	
+	IMAGE_MOON.onload = function(){ update_preload(1); };		IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	
+	IMAGES_GENERAL.onload = function(){ update_preload(1); };	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	
+	IMAGES_TANKS.onload = function(){ update_preload(1); };	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	
+	IMAGES_BULLETS.onload = function(){ update_preload(1); };	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	
+	IMAGES_ELEMENTS.onload = function(){ update_preload(1); };	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;
 	
 	//prelaod sound
 	for(var i in audio_to_preload){
@@ -471,10 +481,10 @@ function preload_all_files(){
 function preload(file, type){
 	if(type=='image' || type==undefined){
 		var imageObj = new Image();
-		imageObj.src=file;
 		imageObj.onload = function(){
 			update_preload(1);
 			}
+		imageObj.src=file;
 		}
 	else if(type=="audio"){
 		try{

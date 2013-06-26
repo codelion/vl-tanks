@@ -483,10 +483,12 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
 	
 	//logo
-	var left = (WIDTH_APP-598)/2;	
-	canvas_backround.drawImage(IMAGE_LOGO, left, 15);
+	IMAGE_LOGO.onload = function(){ 
+		canvas_backround.drawImage(IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
+		}
+	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;
 
-	draw_right_buttons();	
+	draw_right_buttons();					
 	
 	for (i in text_array){
 		//background
@@ -528,7 +530,10 @@ function draw_right_buttons(clean){
 	//intro button
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.strokeStyle = "#686868";
+	canvas_backround.fillStyle = "#f5f5f5";
+	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
+	
 	canvas_backround.fillStyle = "#0c2c0c";
 	canvas_backround.font = "Bold 10px Arial";
 	text = "Intro";
@@ -544,7 +549,10 @@ function draw_right_buttons(clean){
 	//library
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.strokeStyle = "#686868";
+	canvas_backround.fillStyle = "#f5f5f5";
+	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
+	
 	canvas_backround.fillStyle = "#0c2c0c";
 	canvas_backround.font = "Bold 10px Arial";
 	text = "Library";
@@ -558,7 +566,10 @@ function draw_right_buttons(clean){
 	//Controls
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.strokeStyle = "#686868";
+	canvas_backround.fillStyle = "#f5f5f5";
+	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
+	
 	canvas_backround.fillStyle = "#0c2c0c";
 	canvas_backround.font = "Bold 10px Arial";
 	text = "Controls";
@@ -610,7 +621,10 @@ function draw_right_buttons(clean){
 	//settings
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.strokeStyle = "#686868";
+	canvas_backround.fillStyle = "#f5f5f5";
+	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
+	
 	canvas_backround.fillStyle = "#0c2c0c";
 	canvas_backround.font = "Bold 10px Arial";
 	text = "Settings";
@@ -622,7 +636,10 @@ function draw_right_buttons(clean){
 	//About
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	draw_image(canvas_backround, 'button', mini_x, mini_y);
+	canvas_backround.strokeStyle = "#686868";
+	canvas_backround.fillStyle = "#f5f5f5";
+	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
+	
 	canvas_backround.fillStyle = "#0c2c0c";
 	canvas_backround.font = "Bold 10px Arial";
 	text = "About";
