@@ -627,17 +627,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	
-			//find and select base
-			if(game_mode == 3 && TANK_TO.id == MY_TANK.id){
-				for(var x in TANKS){
-					if(TANKS[x].team != MY_TANK.team) continue;
-					if(TANKS[x].data.name != 'Base') continue;
-					MY_TANK = TANKS[x]
-					TANKS[x].selected = 1;
-					draw_infobar();
-					break;
-					}
-				}
+			check_selection(TANK_TO);
 			//removing
 			for(var b=0; b < TANKS.length; b++){
 				if(TANKS[b].id==TANK_TO.id){	

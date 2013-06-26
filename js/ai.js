@@ -102,12 +102,7 @@ function do_ai_move(TANK, xx, yy, direction){
 	}
 function try_skills(TANK_AI){
 	if(game_mode == 3){
-		var selected_n = 0;
-		for(var i in TANKS){
-			if(TANKS[i].team != TANK_AI.team) continue;
-			if(TANKS[i].selected != 1) continue;
-			selected_n++;
-			}
+		var selected_n = get_selected_count(TANK_AI.team);
 		if(selected_n == 1 && TANK_AI.id == MY_TANK.id) return false;
 		}
 	for(i in TYPES[TANK_AI.type].abilities){
@@ -120,6 +115,16 @@ function try_skills(TANK_AI){
 		try{
 			//execute
 			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
+			if(reuse != undefined && reuse != 0 && game_mode == 3 && TANK_AI.team == MY_TANK.team){
+				var tmp = new Array();
+				tmp['function'] = "draw_ability_reuse";
+				tmp['duration'] = reuse;
+				tmp['type'] = 'REPEAT';
+				tmp['nr'] = nr-1;	
+				tmp['max'] = reuse;
+				tmp['tank'] = TANK_AI;
+				timed_functions.push(tmp);
+				}
 			if(reuse !== false)
 				break;
 			}

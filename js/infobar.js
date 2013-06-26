@@ -1,36 +1,62 @@
 var ABILITIES_POS = [];
 //draw infobar
-function draw_infobar(){
-	//background background
-	canvas_backround.fillStyle = "#233012";
-	canvas_backround.fillRect(0, status_y, WIDTH_APP, INFO_HEIGHT);
-	
+function draw_infobar(first){
 	//image
-	draw_image(canvas_backround, 'statusbar', status_x, status_y);
+	if(first != undefined)
+		draw_image(canvas_backround, 'statusbar', status_x, status_y );
+	else{
+		padding_left = MINI_MAP_PLACE[0]+MINI_MAP_PLACE[2];
+		w_tmp = IMAGES_SETTINGS.general.statusbar.w;
+		h_tmp = IMAGES_SETTINGS.general.statusbar.h;
+		draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y, w_tmp, h_tmp,
+			padding_left, 0, w_tmp, h_tmp);
+		}
 	
-	//tank icon
 	var icon_x = status_x+140;
-	if(TYPES[MY_TANK.type].preview != false)
-		draw_image(canvas_backround, TYPES[MY_TANK.type].name, icon_x, status_y+40, 100, 100);
+	var ns = get_selected_count(MY_TANK.team);
+	var only_factory = true;
+	for(var i in TANKS){
+		if(TANKS[i].team != MY_TANK.team) continue;
+		if(TANKS[i].selected == undefined) continue;
+		if(TANKS[i].data.name == "Factory") continue;
+		only_factory = false;
+		break;
+		}
+	if(ns == 1 || only_factory == true){
+		//tank icon
+		if(TYPES[MY_TANK.type].preview != false)
+			draw_image(canvas_backround, TYPES[MY_TANK.type].name, icon_x, status_y+40, 100, 100);
+			
+		//tank name
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var value = TYPES[MY_TANK.type].name.replace("_"," ");
+		canvas_backround.fillText(value, icon_x-5, status_y+25);
 		
-	//tank name
-	canvas_backround.fillStyle = "#a3ad16";
-	canvas_backround.font = "bold 10px Verdana";
-	var value = TYPES[MY_TANK.type].name.replace("_"," ");
-	canvas_backround.fillText(value, icon_x-5, status_y+25);
+		redraw_tank_stats(true);
+		}
+	else{
+		//nation name
+		canvas_backround.fillStyle = "#a3ad16";
+		canvas_backround.font = "bold 10px Verdana";
+		var value = COUNTRIES[MY_TANK.nation].name;
+		canvas_backround.fillText(value, icon_x-5, status_y+25);
 		
-	redraw_tank_stats();
-	
+		draw_units_gui();
+		}
+		
 	//abilities skills
 	draw_tank_abilities();
 	
-	for(var i=0; i<ABILITIES_POS.length; i++){
-		//register skill button
-		register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
-			do_ability(ABILITIES_POS[i].nr, MY_TANK);
-			}, i);
-		}	
-	draw_status_bar();
+	if(first != undefined){
+		for(var i=0; i<ABILITIES_POS.length; i++){
+			//register skill button
+			register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
+				do_abilities(ABILITIES_POS[i].nr, MY_TANK);
+				}, i);
+			}	
+		draw_status_bar();
+		}
 	}
 //redrwar tanks stats in status bar
 function redraw_tank_stats(){
@@ -40,12 +66,24 @@ function redraw_tank_stats(){
 	var gap = 19;
 	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
 	
+	//check
+	var ns = get_selected_count(MY_TANK.team);
+	var only_factory = true;
+	for(var i in TANKS){
+		if(TANKS[i].team != MY_TANK.team) continue;
+		if(TANKS[i].selected == undefined) continue;
+		if(TANKS[i].data.name == "Factory") continue;
+		only_factory = false;
+		break;
+		}
+	
+	if(ns > 1 && only_factory == false) return false;
+	
 	//commander mode - Factory
 	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
 		draw_factory_gui();
 		return false;
 		}
-	
 	//clear
 	draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
 		245, 10, 330, 83);
@@ -70,6 +108,8 @@ function redraw_tank_stats(){
 		canvas_backround.lineTo(status_x+130+round(MY_TANK.sublevel*max_width/100), status_y+36);
 		canvas_backround.strokeStyle = '#4a7c0d';
 		canvas_backround.stroke();
+		}
+	if(game_mode != 3 || MY_TANK.level > 1){
 		//level
 		canvas_backround.fillStyle = "#182605";
 		canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
@@ -241,7 +281,7 @@ function check_abilities_visibility(){
 	return true;
 	}
 //redraw tank skills
-function draw_tank_abilities(){
+function draw_tank_abilities(){	
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
@@ -249,7 +289,7 @@ function draw_tank_abilities(){
 	
 	for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
 		//check if abilites not in use
-		if(MY_TANK.abilities_reuse[i] > Date.now() )	continue;
+		if(MY_TANK.abilities_reuse[i] > Date.now() ) continue;
 		
 		//button
 		var back_image = 'skill_on';
@@ -585,7 +625,7 @@ function draw_factory_gui(selected_tank, get_stats){
 	var gap = 3;
 	var msize = 33;
 	var first_time = false;
-	if(get_stats != undefined)	//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
+	if(get_stats != undefined)
 		return {
 			msize: msize, 
 			pos1: pos1, 
@@ -629,13 +669,19 @@ function draw_factory_gui(selected_tank, get_stats){
 		canvas_backround.strokeStyle = "#196119";
 		roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
 		
+		//detect size
+		var sizer = msize * 100 / (TYPES[i].size[1]+4) / 100;
+		if(sizer>1) sizer = 1;
+		var pad_tmp = 2;
+		if(sizer == 1)
+			pad_tmp = Math.floor((msize - TYPES[i].size[1])/2);
+
 		//logo
-		var sizer = 0.6;
 		draw_image(canvas_backround, TYPES[i].name, 
-			pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+			pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 			100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 		draw_image(canvas_backround, TYPES[i].name, 
-			pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+			pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 			150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 		
 		//ability to upgrade
@@ -647,65 +693,9 @@ function draw_factory_gui(selected_tank, get_stats){
 				canvas_backround.fill();
 				}
 			}
-		
 		//register button
 		register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
-			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TANKS[i].data.name != "Factory") continue;
-				if(TANKS[i].selected == undefined) continue;
-				
-				var unit_cost = TYPES[index].cost;
-				//check he3
-				if(HE3 < unit_cost){
-					screen_message.text = "Not enough HE-3.";
-					screen_message.time = Date.now() + 1000;
-					return false;
-					}
-				//check unit limit
-				var team_units = 0;
-				for(var ii in TANKS){
-					if(TANKS[ii].team != MY_TANK.team) continue;
-					if(TANKS[ii].data.type == 'building'){
-						if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
-							team_units = team_units + TANKS[ii].training.length;
-						continue;
-						}
-					team_units++;
-					}
-				if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
-				if(team_units >= MAX_TEAM_TANKS){
-					screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
-					screen_message.time = Date.now() + 1000;
-					return false;
-					}
-				HE3 = HE3 - unit_cost;
-				//register
-				var duration = 30*1000;
-				if(TYPES[index].type == 'human')
-					duration = 20*1000;
-				if(DEBUG == true) duration = 1000;
-				//check respawn buff
-				for(var b in COUNTRIES[MY_TANK.nation].buffs){
-					var buff = COUNTRIES[MY_TANK.nation].buffs[b];
-					if(buff.name == "respawn"){
-						if(buff.type == 'static')
-							duration = duration + buff.power;
-						else
-							duration = duration * buff.power;
-						}
-					}
-				
-				if(duration < 1000) duration = 1000;
-				if(TANKS[i].training == undefined)
-					TANKS[i].training = new Array();
-				TANKS[i].training.push({
-					duration: duration,
-					type: index,
-					cost: unit_cost,
-					});
-				draw_factory_gui();
-				}
+			gui_action(index, 'units');
 			}, i);
 		j++;
 		}
@@ -729,27 +719,24 @@ function draw_factory_gui(selected_tank, get_stats){
 			canvas_backround.strokeStyle = "#196119";
 			roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
 			
+			//detect size
+			var sizer = msize * 100 / TYPES[i].size[1] / 100;
+			if(sizer>1) sizer = 1;
+			var pad_tmp = 2;
+			if(sizer == 1)
+				pad_tmp = Math.floor((msize - TYPES[i].size[1])/2);
+			
 			//logo
-			var sizer = 0.6;
 			draw_image(canvas_backround, TYPES[i].name, 
-				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 				100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 			draw_image(canvas_backround, TYPES[i].name, 
-				pos1+j*(msize+gap)+2, pos2+2+row*(msize+gap), TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 			
 			//register button
 			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
-				var unit_cost = TYPES[index].cost;
-				stats = Towers(TANK, undefined, true);
-				var reuse = stats.reuse;
-				if(HE3 < unit_cost){
-					screen_message.text = "Not enough HE-3.";
-					screen_message.time = Date.now() + 1000;
-					return false;
-					}
-				
-				construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
+				gui_action(index, 'towers');
 				}, i);
 			j++;
 			}
@@ -765,10 +752,19 @@ function draw_factory_gui(selected_tank, get_stats){
 		canvas_backround.fillStyle = "#c50000";
 		roundRect(canvas_backround, xx, yy, width, height, 3, true);
 		register_button(xx, yy, width, height, PLACE, function(xx, yy){
-			for(var i in MY_TANK.training){
-				HE3 = HE3 + MY_TANK.training[i].cost;
+			if(MY_TANK.data.name != 'Factory'){
+				gui_action(-1);
+				return true;
 				}
-			MY_TANK.training = [];
+			for(var x in TANKS){
+				if(TANKS[x].team != MY_TANK.team) continue;
+				if(TANKS[x].selected == undefined) continue;
+				if(TANKS[x].data.name != 'Factory') continue;
+				for(var i in TANKS[x].training){
+					HE3 = HE3 + TANKS[x].training[i].cost;
+					}
+				TANKS[x].training = [];
+				}
 			draw_factory_gui();
 			});
 		//text
@@ -777,5 +773,179 @@ function draw_factory_gui(selected_tank, get_stats){
 		canvas_backround.font = "Bold 11px Arial";
 		var text_width = canvas_backround.measureText(text).width;
 		canvas_backround.fillText(text, xx+(width-text_width)/2, yy+(height+font_pixel_to_height(11))/2);
+		}
+	}
+function draw_units_gui(){
+	var padding_left = 250;
+	var padding_top = 15;
+	var pos1 = status_x+padding_left;
+	var pos2 = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+padding_top;
+	var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
+	var max_width = 325;
+	var max_height = 80;
+	var gap = 3;
+	var ns = get_selected_count(MY_TANK.team);
+	var msize = 33;
+
+	//draw tanks
+	var j=0;
+	var row = 0;
+	var k = 0;
+	for(var i in TANKS){
+		if(TANKS[i].team != MY_TANK.team) continue; //enemy
+		if(TANKS[i].selected == undefined) continue; //not selected
+		
+		//check
+		if(pos1+j*(msize+gap)+msize > pos1+max_width){
+			j = -3;
+			row++;
+			}
+		
+		//reset background
+		canvas_backround.fillStyle = "#dbd9da";
+		canvas_backround.strokeStyle = "#196119";
+		roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
+		
+		//detect size
+		var sizer = msize * 100 / (TANKS[i].width()+10) / 100;
+		if(sizer>1) sizer = 1;
+		var pad_tmp = 2;
+		if(sizer == 1)
+			pad_tmp = Math.floor((msize - TANKS[i].width())/2);
+			
+		//logo
+		draw_image(canvas_backround, TANKS[i].data.name, 
+			pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TANKS[i].width()*sizer, TANKS[i].height()*sizer,
+			100, undefined, TANKS[i].width(), TANKS[i].height());
+		draw_image(canvas_backround, TANKS[i].data.name, 
+			pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TANKS[i].width()*sizer, TANKS[i].height()*sizer,
+			150, undefined, TANKS[i].width(), TANKS[i].height());
+		
+		//hp bar
+		var hp = round(TANKS[i].hp);
+		var hp_max = get_tank_max_hp(TANKS[i]);
+		if(hp < hp_max){
+			var pad_line = 3;
+			var life_width = msize - pad_line*2;
+			var width = round(life_width*hp/hp_max);
+			canvas_backround.beginPath();
+			canvas_backround.rect(pos1+j*(msize+gap)+pad_line, pos2+row*(msize+gap)+msize-3, width, 2);
+			if(hp < hp_max*2/3)
+				canvas_backround.fillStyle = "#d02b21";
+			else
+				canvas_backround.fillStyle = "#19290a";
+			canvas_backround.fill();
+			}
+		
+		//register button
+		register_button(pos1+j*(msize+gap)+1*0, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+			gui_action(index, 'selection');
+			}, k);
+		j++;
+		k++;
+		if(k>=33) return false;
+		}
+	}
+function gui_action(index, type){
+	//units training
+	if(MY_TANK.data.name == 'Factory' && type == 'units'){
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].data.name != "Factory") continue;
+			if(TANKS[i].selected == undefined) continue;
+			
+			var unit_cost = TYPES[index].cost;
+			//check he3
+			if(HE3 < unit_cost){
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			//check unit limit
+			var team_units = 0;
+			for(var ii in TANKS){
+				if(TANKS[ii].team != MY_TANK.team) continue;
+				if(TANKS[ii].data.type == 'building'){
+					if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
+						team_units = team_units + TANKS[ii].training.length;
+					continue;
+					}
+				team_units++;
+				}
+			if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
+			if(team_units >= MAX_TEAM_TANKS){
+				screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			HE3 = HE3 - unit_cost;
+			//register
+			var duration = 30*1000;
+			if(TYPES[index].type == 'human')
+				duration = 20*1000;
+			if(DEBUG == true) duration = 1000;
+			//check respawn buff
+			for(var b in COUNTRIES[MY_TANK.nation].buffs){
+				var buff = COUNTRIES[MY_TANK.nation].buffs[b];
+				if(buff.name == "respawn"){
+					if(buff.type == 'static')
+						duration = duration + buff.power;
+					else
+						duration = duration * buff.power;
+					}
+				}
+			
+			if(duration < 1000) duration = 1000;
+			if(TANKS[i].training == undefined)
+				TANKS[i].training = new Array();
+			TANKS[i].training.push({
+				duration: duration,
+				type: index,
+				cost: unit_cost,
+				});
+			draw_factory_gui();
+			}
+		}
+	//towers build
+	if(MY_TANK.data.name == 'Factory' && type == 'towers'){
+		var unit_cost = TYPES[index].cost;
+		stats = Towers(TANK, undefined, true);
+		var reuse = stats.reuse;
+		if(HE3 < unit_cost){
+			screen_message.text = "Not enough HE-3.";
+			screen_message.time = Date.now() + 1000;
+			return false;
+			}
+		construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
+		}
+	//multliple selection
+	if(MY_TANK.data.name != 'Factory' && type == 'selection'){
+		var k = 0;
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue; //enemy
+			if(TANKS[i].selected == undefined) continue; //not selected
+			k++;
+			if(k-1 != index) continue;
+			for(var j in TANKS) delete TANKS[j].selected; //unselect all
+			
+			if(ctrl_pressed==true){
+				//select group
+				for(var j in TANKS){
+					if(MY_TANK.team != TANKS[j].team) continue;
+					if(TANKS[i].type != TANKS[j].type) continue;
+					if(TANKS[j].constructing != undefined) continue;
+					TANKS[j].selected = 1;
+					if(MY_TANK.selected == undefined)
+						MY_TANK = TANKS[j];
+					}
+				}
+			else{
+				//select 1
+				TANKS[i].selected = 1;
+				MY_TANK = TANKS[i];
+				}
+			draw_infobar();
+			return true;
+			}
 		}
 	}

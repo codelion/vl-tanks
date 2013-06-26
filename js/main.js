@@ -4,15 +4,20 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	mass skills usage on same type selected
-	if all tanks slected, give ability to use some ally skills
-		Repair, Boost, M7_Shield
-	if 2+ selected, show mini icons in statusbar
-	hide enemy buildings till scouted
+	initial add 3 soldiers?
+	initial randomize base?
+		check hill
+		check cr reach
+	selection - smart move
 	multiplayer
 		creating room, rooms, select adjust
 		move he3 to team, initial he3
 		implement weapons_bonus and armor_bonus
+		optimize network packets in mode3:
+			tank_move
+			bullet
+			skill_do
+			skill_advanced
 	special score for mode3: he3 and army graph in time
 */
 
@@ -243,7 +248,7 @@ function init_action(map_nr, my_team){
 	if(game_mode==2)
 		my_nation = get_nation_by_team(my_team);
 		
-	//findenemy team
+	//find enemy team
 	enemy_team = 'B';
 	if(enemy_team == my_team)
 		enemy_team = 'R';
@@ -272,6 +277,7 @@ function init_action(map_nr, my_team){
 		my_tank_nr = 0;
 	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
+	MY_TANK.selected = 1;
 	
 	auto_scoll_map();
 	
@@ -495,19 +501,19 @@ function speed2pixels(speed, time_diff){
 //repeat some functions in time
 function timed_functions_handler(){
 	//check map scrolling	//event.target.id
-	/*if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100){
+	if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100 && mouse_inside == true){
 		//move map if mouse in corners
 		var gap = 50;
 		var power = 50;
-		if(mouse_pos[0] < gap && mouse_pos[0] > 10)
+		if(mouse_pos[0] < gap)
 			scoll_map(1, 0, power);	//left
-		if(mouse_pos[0] > WIDTH_SCROLL - gap && mouse_pos[0] < WIDTH_SCROLL-10) 
+		if(mouse_pos[0] > WIDTH_SCROLL - gap) 
 			scoll_map(-1, 0, power);//right
-		if(mouse_pos[1] < gap && mouse_pos[1] > 10) 
+		if(mouse_pos[1] < gap) 
 			scoll_map(0, 1, power);	//up
-		if(mouse_pos[1] > HEIGHT_SCROLL - gap && mouse_pos[1] < HEIGHT_SCROLL-10) 
+		if(mouse_pos[1] > HEIGHT_SCROLL - gap) 
 			scoll_map(0, -1, power);//down
-		}*/
+		}
 	
 	//exec functions
 	for(var i=0; i<timed_functions.length; i++){		

@@ -389,7 +389,7 @@ TYPES.push({
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
-		{name: 'Freak out',		passive: false,		broadcast: 0}, 
+		{name: 'Freak out',		passive: false,		broadcast: 1}, 
 		],
 	size: ['L', 50, 50],
 	preview: false,
@@ -464,9 +464,9 @@ TYPES.push({
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
-		{name: 'Factory',		passive: false,		broadcast: 0}, 
-		{name: 'Research',		passive: false,		broadcast: 0}, 
-		{name: 'Silo',			passive: false,		broadcast: 0}, 
+		{name: 'Factory',		passive: false,		broadcast: 2}, 
+		{name: 'Research',		passive: false,		broadcast: 2}, 
+		{name: 'Silo',			passive: false,		broadcast: 2}, 
 		],
 	size: ['L', 90, 90],
 	preview: false,

@@ -9,6 +9,9 @@ function draw_tank(tank){
 	var padding = 20;
 	var fade_duration = 300;
 	
+	if(game_mode == 3 && tank.team != MY_TANK.team && tank.data.type == 'building' && tank.scouted == false)
+		return false; //not scouted yet
+	
 	//draw flag
 	if(tank.selected == true && tank.flag != undefined && tank.constructing == undefined){
 		draw_image(canvas_main, 'flag', tank.flag.x+map_offset[0], tank.flag.y+map_offset[1]);
@@ -892,7 +895,7 @@ function level_hp_regen_handler(){		//once per 1 second - 2.2%/s
 				}
 			}
 		}
-	redraw_tank_stats();
+	draw_infobar();
 	}
 function get_ability_to_ugrade(TANK){
 	var nr = 0;
@@ -913,22 +916,46 @@ function get_ability_to_ugrade(TANK){
 	else
 		return nr;
 	}
+//scout enemies buildings
+function scout_enemies_buildings(TANK){		
+	if(game_mode != 3) return false;	
+	if(TANK.skip_scout != undefined) return false; //both dont move - why scout again?
+	
+	for (i in TANKS){				
+		if(TANKS[i].team == TANK.team)	continue;	//same team
+		if(TANKS[i].data.type != 'building') continue;	//not building
+		if(TANKS[i].scouted == true) continue;	//already scouted
+
+		distance = get_distance_between_tanks(TANKS[i], TANK);
+		distance = distance + TANK.width()/2;
+		if(distance > TANK.sight) continue; //too far
+		
+		//range ok
+		TANKS[i].scouted = true;
+		}
+	if(TANK.data.type == 'building')
+		TANK.skip_scout = 1;
+	}
 //actions on enemies
 function check_enemies(TANK){
 	if(TANK.dead == 1) return false;	//dead
 	if(TANK.constructing != undefined) return false;	//still not ready
 	if(TANK.stun != undefined) return false;	//stuned
-	if(TANK.damage == 0) return false;	//not war unit?
+
 	if(TANK.hit_reuse == undefined){
 		var hit_reuse = TANK.attack_delay*1000;
 		hit_reuse = apply_buff(TANK, 'hit_reuse', hit_reuse);
 		TANK.hit_reuse = hit_reuse + Date.now();
 		}
 	
-	if(TANK.hit_reuse - Date.now() > 0)
-		return false;	//hit reuse
 	if(TANK.check_enemies_reuse - Date.now() > 0)
 		return false;	//check reuse
+	scout_enemies_buildings(TANK);
+	if(TANK.damage == 0) return false;	//not war unit, no more check
+		
+	if(TANK.hit_reuse - Date.now() > 0)
+		return false;	//hit reuse
+
 	if(game_mode==2 && check_if_broadcast(TANK)==false) return false; //not our business
 		
 	range = TYPES[TANK.type].range;
@@ -1243,8 +1270,9 @@ function do_damage(TANK, TANK_TO, BULLET){
 	life_total = TANK_TO.hp;
 	if(life_total-damage>0){
 		TANK_TO.hp = TANK_TO.hp - damage;
-		if(TANK_TO.id == TANK_TO.id)
-			redraw_tank_stats();
+		if(TANK_TO.id == TANK_TO.id){
+			draw_infobar();
+			}
 		}
 	//death	
 	else{	
@@ -1283,17 +1311,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 					register_tank_action('kill', opened_room_id, killer.id, TANK_TO.id);
 				}
 			else{
-				//find and select base
-				if(game_mode == 3 && TANK_TO.id == MY_TANK.id){
-					for(var x in TANKS){
-						if(TANKS[x].team != MY_TANK.team) continue;
-						if(TANKS[x].data.name != 'Base') continue;
-						MY_TANK = TANKS[x];
-						TANKS[x].selected = 1;
-						draw_infobar();
-						break;
-						}
-					}
+				check_selection(TANK_TO);
 				//remove tank
 				var del_index = false;
 				for(var j=0; j < TANKS.length; j++){
@@ -1325,6 +1343,29 @@ function do_damage(TANK, TANK_TO, BULLET){
 			}
 		}
 	return false;
+	}
+//find and select other tank
+function check_selection(TANK_TO){
+	if(game_mode == 3 && TANK_TO.id == MY_TANK.id && TANK_TO.team == MY_TANK.team){
+		//next selected
+		for(var x in TANKS){
+			if(TANKS[x].team != MY_TANK.team) continue;
+			if(TANKS[x].selected == undefined) continue;
+			if(TANKS[x].id == TANK_TO.id) continue; //must select other
+			MY_TANK = TANKS[x];
+			draw_infobar();
+			return false;
+			}
+		//base
+		for(var x in TANKS){
+			if(TANKS[x].team != MY_TANK.team) continue;
+			if(TANKS[x].data.name != 'Base') continue;
+			MY_TANK = TANKS[x];
+			TANKS[x].selected = 1;
+			draw_infobar();
+			return false;
+			}
+		}
 	}
 //check if broadcast other tank shooting, kill
 function check_if_broadcast(KILLER){
@@ -1417,21 +1458,45 @@ function get_nation_by_team(team){
 		}
 	log('Error: can not find nation.');
 	}
-//tank special ability activated	
+//do ability an all selected tanks
+function do_abilities(nr, TANK){
+	if(check_abilities_visibility() == false) return false;		//few different tanks selected
+	if(game_mode != 3)
+		do_ability(nr, TANK);
+	else{
+		//find all selected tanks
+		var selected_n = get_selected_count(TANK.team);
+		if(selected_n == 0)
+			return false;
+		else if(selected_n == 1)
+			do_ability(nr, TANK);
+		else{
+			for(var i in TANKS){
+				if(TANKS[i].team != TANK.team) continue;
+				if(TANKS[i].selected == undefined) continue;
+				if(TANKS[i].data.abilities[nr-1] == undefined) return false;
+				if(TANKS[i].data.abilities[nr-1].passive == true) continue;
+				if(TANKS[i].data.abilities[nr-1].broadcast == 2) continue;
+				//if(TYPES[TANKS[i].type].type == 'building') continue;
+				
+				do_ability(nr, TANKS[i]);
+				}
+			}
+		}
+	}
+//do ability on 1 tank	
 function do_ability(nr, TANK){
-	if(check_abilities_visibility() == false) return false;
-	if(game_mode == 3 && MY_TANK.selected == undefined) return false;
-	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;
-	if(TANK.dead == 1 || TANK.stun != undefined) return false; //dead or stuned
-	if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;
-	if(TYPES[TANK.type].abilities[nr-1].passive == true) return false;
+	if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;	//not ready yet
+	if(TANK.dead == 1 || TANK.stun != undefined) return false; 	//dead or stuned
+	if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;	//no such ability
+	if(TYPES[TANK.type].abilities[nr-1].passive == true) return false; //passive ability - nothing to execute
 	
 	var ability_function = TYPES[TANK.type].abilities[nr-1].name.replace(/ /g,'_');
 	var broadcast_mode = TYPES[TANK.type].abilities[nr-1].broadcast;
 	if(ability_function != undefined){
 		if(game_mode != 2){
-			//execute
-			var ability_reuse = window[ability_function](TANK);
+			//local ability
+			var ability_reuse = window[ability_function](TANK); //exec here
 			if(ability_reuse != undefined && ability_reuse != 0){
 				TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 				var tmp = new Array();
@@ -1446,8 +1511,8 @@ function do_ability(nr, TANK){
 			}
 		else{ //broadcasting
 			if(broadcast_mode==0){
-				//execute
-				var ability_reuse = window[ability_function](TANK);
+				//local
+				var ability_reuse = window[ability_function](TANK); //exec here
 				if(ability_reuse != undefined && ability_reuse != 0){
 					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 					var tmp = new Array();
@@ -1461,6 +1526,7 @@ function do_ability(nr, TANK){
 					}
 				}
 			else if(broadcast_mode==1){
+				//instant broadcast
 				var ability_reuse = window[ability_function](TANK, undefined, true);
 				ability_reuse = ability_reuse.reuse;
 				if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
@@ -1468,7 +1534,7 @@ function do_ability(nr, TANK){
 				register_tank_action('skill_do', opened_room_id, name,  nr, getRandomInt(1, 999999));
 				}
 			else if(broadcast_mode==2){
-				//broadcast later
+				//no broadcast - do it later
 				var ability_reuse = window[ability_function](TANK);
 				}
 			}
@@ -1795,6 +1861,16 @@ function set_spawn_coordinates(tank){
 		}
 	tank.x = 100;
 	}
+function get_selected_count(team){
+	if(game_mode != 3) return 1;
+	var selected_n = 0;
+	for(var i in TANKS){
+		if(TANKS[i].team != team) continue;
+		if(TANKS[i].selected == undefined) continue;
+		selected_n++;
+		}
+	return selected_n;
+	}
 //adds new tank
 function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_tank, begin_time){
 	if(type==undefined) type = 0;
@@ -1898,6 +1974,8 @@ function add_tank(level, id, name, type, team, nation, x, y, angle, AI, master_t
 			catch(err){	}
 			}
 		}
+	if(game_mode == 3 && TANK_tmp.data.type == 'building')
+		TANK_tmp.scouted = false;
 	
 	TANKS.push(TANK_tmp);
 	

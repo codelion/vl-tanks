@@ -26,7 +26,7 @@ var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
 var MAX_ABILITY_LEVEL = 20;		//max ability level
 var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invisibility wanishes.
 var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
-var MAX_TEAM_TANKS = 30;		//max tanks for 1 team in commander mode
+var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
 var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
 var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
 var CRYSTAL_RANGE = 100;		//crystal/silo orange
@@ -125,6 +125,7 @@ canvas_base.addEventListener('mousemove', on_mousemove, false);
 document.getElementById("canvas_backround").addEventListener('mousemove', on_mousemove_background, false);
 canvas_base.addEventListener("mousewheel", MouseWheelHandler, false);
 canvas_base.addEventListener("DOMMouseScroll", MouseWheelHandler, false);
+parent.document.addEventListener('mousemove', on_mousemove_parent, false);
 
 //mouse click handlers
 document.getElementById("canvas_backround").addEventListener('mousedown', on_mousedown_back, false);
@@ -132,7 +133,6 @@ canvas_base.addEventListener('mouseup', on_mouseup, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 canvas_base.addEventListener('mousedown', on_mousedown, false);
 document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
-//document.onmousedown = function(e) {return on_mousedown(e); }
 
 //keyboard handlers
 document.onkeydown = function(e) {return on_keyboard_action(e); }

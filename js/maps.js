@@ -64,7 +64,7 @@ function draw_map(map_only){
 		}
 	
 	if(map_only==false)
-		draw_infobar();
+		draw_infobar(true);
 	
 	//darken all
 	darken_map();

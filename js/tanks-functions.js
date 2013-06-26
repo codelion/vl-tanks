@@ -217,8 +217,31 @@ function Repair(TANK, descrition_only, settings_only, ai){
 		return 'Slowly repair yourself and allies with '+(power*duration/1000)+' power.';
 	if(settings_only != undefined) return {reuse: reuse};
 	if(ai != undefined){
-		var max_hp = get_tank_max_hp(TANK);
-		if(TANK.hp > max_hp/2) return false;
+		//check allies
+		var found = false;
+		for (ii in TANKS){
+			if(TYPES[TANKS[ii].type].type == 'building') continue; //building
+			if(TANKS[ii].team != TANK.team) continue; //enemy
+			if(TANKS[ii].dead == 1) continue; //dead
+			distance = get_distance_between_tanks(TANK, TANKS[ii]);
+			if(distance > range) continue; //too far
+			var max_hp = get_tank_max_hp(TANKS[ii]);
+			if(TANKS[ii].hp > max_hp*2/3) continue; //still has hp
+			
+			//check for unit already with heals
+			var valid = true;
+			for (b in TANKS[ii].buffs){
+				if(TANKS[ii].buffs[b].name == 'repair'){
+					if(TANKS[ii].hp > max_hp/3){
+						valid = false;
+						break;
+						}
+					}
+				}
+			if(valid==false) continue; //already have heal
+			found = true;
+			}
+		if(found == false) return false;
 		}
 
 	TANK.abilities_reuse[1] = Date.now() + reuse;
@@ -1408,7 +1431,7 @@ function construct_prepare(TANK, reuse, tank_type, ability_nr){
 	var cost = tank_info.cost;
 	if(TANK.try_construct != undefined){
 		delete TANK.try_construct;
-		if(TANK.id == MY_TANK.id && ai == undefined){
+		if(TANK.id == MY_TANK.id){
 	 		mouse_click_controll = false;
 	 		}
 		return 0;
