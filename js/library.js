@@ -1,9 +1,10 @@
 //library list - tanks, maps, countries
 var TOP = 0;
-function draw_library_list(next){
+function draw_library_list(next, type){
 	PLACE = 'library';
 	unregister_buttons(PLACE);
 	map_offset = [0, 0];
+	var selected_color = "#196119";
 	
 	x = 10;
 	y = 10;
@@ -15,7 +16,9 @@ function draw_library_list(next){
 	width = 100;
 	height = 30;
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#69a126";		
+	if(type == 'Units')
+		canvas_backround.fillStyle = selected_color;
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_units();
@@ -29,7 +32,9 @@ function draw_library_list(next){
 	
 	//maps button
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#69a126";		
+	if(type == 'Maps')
+		canvas_backround.fillStyle = selected_color;
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_maps();
@@ -43,7 +48,9 @@ function draw_library_list(next){
 	
 	//countries button
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#69a126";		
+	if(type == 'Countries')
+		canvas_backround.fillStyle = selected_color;
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_countries();
@@ -57,7 +64,9 @@ function draw_library_list(next){
 	
 	//elements button
 	canvas_backround.strokeStyle = "#000000";
-	canvas_backround.fillStyle = "#69a126";
+	canvas_backround.fillStyle = "#69a126";		
+	if(type == 'Elements')
+		canvas_backround.fillStyle = selected_color;
 	roundRect(canvas_backround, x, y, width, height, 5, true);
 	register_button(x, y, width, height, PLACE, function(xx, yy){
 		draw_library_elements();
@@ -90,7 +99,7 @@ function draw_library_list(next){
 		draw_library_units();	
 	}
 function draw_library_units(selected_tank){
-	draw_library_list(false);
+	draw_library_list(false, 'Units');
 	var y = TOP;
 	var gap = 8;
 	
@@ -212,7 +221,7 @@ function draw_library_units(selected_tank){
 		}
 	}
 function draw_library_maps(){
-	draw_library_list(false);
+	draw_library_list(false, 'Maps');
 	var y = TOP;
 	var gap = 8;
 	
@@ -282,7 +291,7 @@ function lib_show_stats(name, value, x, y, gap, nobold, min_char_value, max_char
 		}
 	}
 function draw_library_countries(selected_item){
-	draw_library_list(false);
+	draw_library_list(false, 'Countries');
 	var y = TOP;
 	var gap = 8;
 	
@@ -333,7 +342,7 @@ function draw_library_countries(selected_item){
 	
 	//tank info block
 	var info_left = 10;
-	var info_block_height = 150; //HEIGHT_APP-27-y-10;
+	var info_block_height = 220; //HEIGHT_APP-27-y-10;
 	var info_block_width = WIDTH_APP-20;
 	canvas_backround.fillStyle = "#ffffff";
 	canvas_backround.strokeStyle = "#196119";
@@ -355,14 +364,25 @@ function draw_library_countries(selected_item){
 	var height_space = 16;
 	var st=0;
 	var xx = info_left+10;
-	lib_show_stats("Description", COUNTRIES[country].description, xx, y+50+st*height_space, 90); st++;
-	lib_show_stats("Pros", COUNTRIES[country].pros, xx, y+50+st*height_space, 90, true); st++;
-	lib_show_stats("Cons", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
+	lib_show_stats("Description", COUNTRIES[country].description, xx, y+50+st*height_space, 90); st++;st++;
+	for(var b in COUNTRIES[country].buffs){
+		var title = "Changes";
+		if(b!="0") title = '';
+		var value = ucfirst(COUNTRIES[country].buffs[b].name);
+		value_tmp = round((COUNTRIES[country].buffs[b].power)*100-100);
+		if(value_tmp > 0)
+			value += ": +"+value_tmp+"%";
+		else
+			value += ": "+value_tmp+"%";
+		lib_show_stats(title, value, xx, y+50+st*height_space, 90); st++;
+		}
+	st++;
+	lib_show_stats("Weak point", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
 	lib_show_stats("Unique unit", COUNTRIES[country].tank_unique, xx, y+50+st*height_space, 90); st++;
 	lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
 	}
 function draw_library_elements(selected_item){
-	draw_library_list(false);
+	draw_library_list(false, 'Elements');
 	var y = TOP;
 	var gap = 8;
 	

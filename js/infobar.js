@@ -872,6 +872,7 @@ function gui_action(index, type){
 			if(TANKS[i].selected == undefined) continue;
 			
 			var unit_cost = TYPES[index].cost;
+			unit_cost = apply_buff(MY_TANK, 'cost', unit_cost);
 			//check he3
 			if(HE3 < unit_cost){
 				screen_message.text = "Not enough HE-3.";

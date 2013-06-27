@@ -469,29 +469,31 @@ function preload_all_files(){
 	IMAGES_BULLETS.onload = function(){ update_preload(1); };	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	
 	IMAGES_ELEMENTS.onload = function(){ update_preload(1); };	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;
 	
-	//prelaod sound
+	//preload sound
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
 		}
 	}
 //preloading files	
-function preload(file, type){
+function preload(file, type){	
 	if(type=='image' || type==undefined){
 		var imageObj = new Image();
 		imageObj.onload = function(){
-			update_preload(1);
+			update_preload(10);	
 			}
 		imageObj.src=file;
 		}
-	else if(type=="audio"){
+	else if(type=="audio"){	
+		update_preload(1);	//preload is buggy
 		try{
 			var audio_object = new Audio();
-			audio_object.addEventListener('canplaythrough', function(){update_preload(1);}, false);
+			audio_object.addEventListener('canplaythrough', function(event){	/*update_preload(1);*/ }, false);
 			audio_object.src = file;
 			}
 		catch(err){
 			update_preload(1);
 			}
+		
 		}	
 	else
 		alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');

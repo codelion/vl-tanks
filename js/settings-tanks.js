@@ -2,7 +2,7 @@ COUNTRIES = {
 	us: {
 		name: 'United States', 
 		file: 'us',
-		description: 'Strong offensive country. Units have 10% more dps.',
+		description: 'Strong offensive country. High damage units per second will allow you to shine at offensive strategy.',
 		pros: 'High damage units per second will allow you to shine at offensive strategy.',
 		cons: 'Enemy mines',
 		buffs: [
@@ -14,7 +14,7 @@ COUNTRIES = {
 	ru: {
 		name: 'Russia',
 		file: 'ru',
-		description: 'Defensive country. Units have 15% more health.',
+		description: 'Defensive country. Units will excel at defence.',
 		pros: 'Units will excel at defence.',
 		cons: 'Issues in offensive strategy',
 		buffs: [
@@ -26,13 +26,14 @@ COUNTRIES = {
 	ch: {
 		name: 'China', 
 		file: 'ch',
-		description: 'Fast attack country. Units have double training speed, 15% more moving speed, but 10% less health.',
+		description: 'Rush-attack country.',
 		pros: 'Excel at rush attacks.',
 		cons: 'Units have less health.',
 		buffs: [
 			{ name: 'respawn',	power: 0.5, },
 			{ name: 'speed',		power: 1.15,},
 			{ name: 'health',		power: 0.9,	},
+			{ name: 'cost',		power: 0.9,	},
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		tank_unique: 'TRex',
@@ -475,7 +476,7 @@ TYPES.push({
 	no_base_rotate: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	cost: 500,
+	cost: 450,
 	});
 
 //Factory

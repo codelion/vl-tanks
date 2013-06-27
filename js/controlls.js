@@ -271,7 +271,9 @@ function on_mousemove_background(event){
 				if(mouseX > xx && mouseX < xx + stats.msize){
 					if(mouseY > yy && mouseY < yy + stats.msize){
 						var name = TYPES[i].name.replace("_"," ");
-						ability_hover_text = name+" - "+TYPES[i].cost+" HE-3"
+						var cost = TYPES[i].cost;
+						cost = apply_buff(MY_TANK, 'cost', cost);
+						ability_hover_text = name+" - "+cost+" HE-3"
 						}
 					}
 				
@@ -289,7 +291,9 @@ function on_mousemove_background(event){
 				if(mouseX > xx && mouseX < xx + stats.msize){
 					if(mouseY > yy && mouseY < yy + stats.msize){
 						var name = TYPES[i].name.replace("_"," ");
-						ability_hover_text = name+" - "+TYPES[i].cost+" HE-3"
+						var cost = TYPES[i].cost;
+						cost = apply_buff(MY_TANK, 'cost', cost);
+						ability_hover_text = name+" - "+cost+" HE-3"
 						}
 					}
 				

@@ -253,6 +253,7 @@ MAPS.push({
 			//team x,	 y, 	name
 			['B',	'rand',	60,	'Base'],
 			['B',	150,	150,	'Scout_Tower'],
+			['B',	1350,	150,	'Scout_Tower'],
 			['B',	550,	430,	'Tower'],
 			['B',	950,	430,	'Tower'],
 			['B',	650,	640,	'Tower'],
@@ -263,6 +264,7 @@ MAPS.push({
 			['R',	850,	1360,	'Tower'],
 			['R',	550,	1570,	'Tower'],
 			['R',	950,	1570,	'Tower'],
+			['R',	150,	1850,	'Scout_Tower'],
 			['R',	1350,	1850,	'Scout_Tower'],
 			['R',	'rand',	1940,	'Base'],
 		],

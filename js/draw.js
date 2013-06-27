@@ -408,11 +408,10 @@ function add_first_screen_elements(){
 	//on click event
 	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
 	
-	canvas_backround.drawImage(IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
-	draw_right_buttons();	
-
+	draw_right_buttons();
+	draw_status_bar();	
 	add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"]);
-	
+
 	name_tmp = getCookie("name");
 	if(name_tmp != ''){
 		name = name_tmp;
@@ -437,7 +436,6 @@ function add_first_screen_elements(){
 	if(MUTE_MUSIC==false && audio_main != undefined)
 		audio_main.pause();
 	
-	draw_status_bar();
 	PLACE == 'init';
 	
 	for (i in settings_positions){
@@ -463,6 +461,7 @@ function add_first_screen_elements(){
 				}	
 			}, i);
 		}
+	canvas_backround.drawImage(IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
 	}
 var settings_positions = [];
 var last_active_tab = -1;

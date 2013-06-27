@@ -1342,7 +1342,7 @@ function AA_bomb(TANK, descrition_only, settings_only, ai){
 //====== Tower =================================================================
 
 function Freak_out(TANK, descrition_only, settings_only, ai){
-	var cost = 50;
+	var cost = 50;	cost = apply_buff(TANK, 'cost', cost);
 	var power = 0.5;
 	var reuse = 30000;
 	var duration = 5000;
@@ -1378,8 +1378,11 @@ function Factory(TANK, descrition_only, settings_only, ai){
 		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
 		}
 	
-	if(descrition_only != undefined)
-		return 'Construct factory to create land, air, defence units. Costs '+tank_info.cost+' HE-3.';
+	if(descrition_only != undefined){
+		var cost = tank_info.cost;
+		cost = apply_buff(TANK, 'cost', cost);
+		return 'Construct factory to create land, air, defence units. Costs '+cost+' HE-3.';
+		}
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
@@ -1396,8 +1399,11 @@ function Research(TANK, descrition_only, settings_only, ai){
 		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
 		}
 	
-	if(descrition_only != undefined)
-		return 'Construct research station. Costs '+tank_info.cost+' HE-3.';
+	if(descrition_only != undefined){
+		var cost = tank_info.cost;
+		cost = apply_buff(TANK, 'cost', cost);
+		return 'Construct research station. Costs '+cost+' HE-3.';
+		}
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
@@ -1414,8 +1420,11 @@ function Silo(TANK, descrition_only, settings_only, ai){
 		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
 		}
 	
-	if(descrition_only != undefined)
-		return 'Construct structure for storing Helium-3. Costs '+tank_info.cost+' HE-3.';
+	if(descrition_only != undefined){
+		var cost = tank_info.cost;
+		cost = apply_buff(TANK, 'cost', cost);
+		return 'Construct structure for storing Helium-3. Costs '+cost+' HE-3.';
+		}
 	if(ai != undefined || game_mode != 3) return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
@@ -1429,6 +1438,7 @@ function construct_prepare(TANK, reuse, tank_type, ability_nr){
 		if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
 		}
 	var cost = tank_info.cost;
+	cost = apply_buff(TANK, 'cost', cost);
 	if(TANK.try_construct != undefined){
 		delete TANK.try_construct;
 		if(TANK.id == MY_TANK.id){
@@ -1603,6 +1613,7 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 	var levels = 3;
 	var active = true;
 	if(weapons_bonus >= power * levels) active = false;
+	cost = apply_buff(TANK, 'cost', cost);
 	
 	if(descrition_only != undefined){
 		if(level < levels)
@@ -1643,6 +1654,7 @@ function Armor(TANK, descrition_only, settings_only, ai){
 	var levels = 3;
 	var active = true;
 	if(armor_bonus >= power * levels) active = false;
+	cost = apply_buff(TANK, 'cost', cost);
 	
 	if(descrition_only != undefined){
 		if(level < levels)
@@ -1924,6 +1936,7 @@ function do_construct(tank_id){
 	//check
 	if(validate_construction(mouseX, mouseY, true)==false) return false;
 	
+	TANK.try_construct.cost = apply_buff(TANK, 'cost', TANK.try_construct.cost);
 	if(HE3 < TANK.try_construct.cost) return false;
 	HE3 = HE3 - TANK.try_construct.cost;
 	
