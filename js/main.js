@@ -4,9 +4,6 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	initial randomize base?
-		check hill
-		check cr reach
 	selection - smart move
 	multiplayer
 		creating room, rooms, select adjust

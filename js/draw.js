@@ -374,13 +374,50 @@ function draw_he3_info(){
 	canvas_main.fillText(value, left+10+12, top+12);
 	}
 function add_first_screen_elements(){
+	//logo background color
+	canvas_backround.fillStyle = "#676767";
+	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
+		
+	//back image
+	backround_width = 400;
+	backround_height = 400;
+	for(var i=0; i<Math.ceil((HEIGHT_APP-27)/backround_height); i++){ 
+		for(var j=0; j<Math.ceil(WIDTH_APP/backround_width); j++){
+			var xx = j*backround_width;
+			var yy = i*backround_height;
+			var bwidth = backround_width;
+			var bheight = backround_height;
+			if(xx+bwidth > WIDTH_APP)
+				bwidth = WIDTH_APP-xx;
+			if(yy+bheight > HEIGHT_APP-27)
+				bheight = HEIGHT_APP-27-yy;
+			canvas_backround.drawImage(IMAGE_MOON, 0, 0, backround_width, backround_height, xx, yy, bwidth, bheight);
+			}
+		}
+	
+	//text
+	if(logo_visible==1){
+		var text = "Moon wars".split("").join(String.fromCharCode(8201))
+		canvas_backround.font = "Bold 70px Arial";
+		canvas_backround.strokeStyle = '#ffffff';
+		canvas_backround.strokeText(text, 160, 340);
+		}
+	else{
+		draw_logo_tanks(160, 340-52, false);
+		}
+	//on click event
+	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
+	
+	canvas_backround.drawImage(IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
+	draw_right_buttons();	
+
 	add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"]);
 	
 	name_tmp = getCookie("name");
 	if(name_tmp != ''){
 		name = name_tmp;
 		if(DEBUG==true)
-			name = name_tmp+Math.floor(Math.random()*99);
+			name = name_tmp+getRandomInt(10, 99);
 		}
 	if(name != ''){
 		name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
@@ -434,8 +471,8 @@ var logo_visible = 1;
 function add_settings_buttons(canvas_this, text_array, active_i){
 	var button_width = 300;
 	var button_height = 35;
-	var buttons_gap = 3;
-	var top_margin = 370;
+	var buttons_gap = 5;
+	var top_margin = 365;
 	var button_i=0;
 	var letter_height = 9;
 	var padding = 5;
@@ -448,53 +485,11 @@ function add_settings_buttons(canvas_this, text_array, active_i){
 	last_active_tab = active_i;
 	settings_positions = [];
 	
-	//logo background color
-	canvas_backround.fillStyle = "#676767";
-	canvas_backround.fillRect(0, 0, WIDTH_APP, HEIGHT_APP-27);
-		
-	//back image
-	backround_width = 400;
-	backround_height = 400;
-	for(var i=0; i<Math.ceil((HEIGHT_APP-27)/backround_height); i++){ 
-		for(var j=0; j<Math.ceil(WIDTH_APP/backround_width); j++){
-			var xx = j*backround_width;
-			var yy = i*backround_height;
-			var bwidth = backround_width;
-			var bheight = backround_height;
-			if(xx+bwidth > WIDTH_APP)
-				bwidth = WIDTH_APP-xx;
-			if(yy+bheight > HEIGHT_APP-27)
-				bheight = HEIGHT_APP-27-yy;
-			canvas_backround.drawImage(IMAGE_MOON, 0, 0, backround_width, backround_height, xx, yy, bwidth, bheight);
-			}
-		}
-	
-	//text
-	if(logo_visible==1){
-		var text = "Moon wars".split("").join(String.fromCharCode(8201))
-		canvas_backround.font = "Bold 70px Arial";
-		canvas_backround.strokeStyle = '#ffffff';
-		canvas_backround.strokeText(text, 160, 340);
-		}
-	else{
-		draw_logo_tanks(160, 340-52, false);
-		}
-	//on click event
-	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
-	
-	//logo
-	IMAGE_LOGO.onload = function(){ 
-		canvas_backround.drawImage(IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
-		}
-	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;
-
-	draw_right_buttons();					
-	
 	for (i in text_array){
 		//background
 		canvas_this.strokeStyle = "#000000";
 		if(i != active_i)
-			canvas_this.fillStyle = "rgba(32, 123, 32, 0.7)";
+			canvas_this.fillStyle = "rgba(32, 123, 32, 1)";
 		else
 			canvas_this.fillStyle = "rgba(25, 97, 25, 1)";
 		roundRect(canvas_this, Math.round((WIDTH_APP-button_width)/2), top_margin+(button_height+buttons_gap)*button_i, button_width, button_height, 5, true);

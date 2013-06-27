@@ -3,14 +3,18 @@ var ABILITIES_POS = [];
 function draw_infobar(first){
 	//image
 	if(first != undefined){
+		//background background
+		canvas_backround.fillStyle = "#233012";
+		canvas_backround.fillRect(0, status_y, WIDTH_APP, INFO_HEIGHT);
+	
 		draw_image(canvas_backround, 'statusbar', status_x, status_y );
 		}
 	else{
 		padding_left = MINI_MAP_PLACE[0]+MINI_MAP_PLACE[2];
 		w_tmp = IMAGES_SETTINGS.general.statusbar.w;
 		h_tmp = IMAGES_SETTINGS.general.statusbar.h;
-		draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y, w_tmp-padding_left, h_tmp,
-			padding_left, 0, w_tmp, h_tmp);
+		draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y, w_tmp-padding_left-220, h_tmp,
+			padding_left, 0, w_tmp-padding_left-220, h_tmp);
 		}
 	
 	var icon_x = status_x+140;
@@ -40,19 +44,22 @@ function draw_infobar(first){
 		//nation name
 		canvas_backround.fillStyle = "#a3ad16";
 		canvas_backround.font = "bold 10px Verdana";
-		var value = COUNTRIES[MY_TANK.nation].name;
+		var value = ns+" units";
 		canvas_backround.fillText(value, icon_x-5, status_y+25);
 		
 		draw_units_gui();
 		}
 		
 	//abilities skills
-	draw_tank_abilities();
+	draw_tank_abilities();		
 	
-	if(first != undefined){
+	if(first != undefined){		
 		for(var i=0; i<ABILITIES_POS.length; i++){
 			//register skill button
-			register_button(ABILITIES_POS[i].x, ABILITIES_POS[i].y, ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
+			register_button(
+				ABILITIES_POS[i].x,
+				ABILITIES_POS[i].y,
+				ABILITIES_POS[i].width, ABILITIES_POS[i].height, PLACE, function(xx, yy, i){
 				do_abilities(ABILITIES_POS[i].nr, MY_TANK);
 				}, i);
 			}	
@@ -282,10 +289,24 @@ function check_abilities_visibility(){
 	return true;
 	}
 //redraw tank skills
-function draw_tank_abilities(){	
+function draw_tank_abilities(){
 	var gap = 15;
 	var status_x_tmp = status_x+590;
 	var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
+	
+	//save abilities position
+	for (var i=0; i<3; i++){	
+		if(ABILITIES_POS.length < 3){
+			var tmp = new Array();
+			tmp['x'] = status_x_tmp+i*70 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2);
+			tmp['y'] = status_y + APP_SIZE_CACHE[1] - HEIGHT_APP;
+			tmp['width'] = SKILL_BUTTON;
+			tmp['height'] = SKILL_BUTTON;
+			tmp['nr'] = parseInt(i)+1;
+			ABILITIES_POS.push(tmp);
+			}
+		}
+	
 	if(check_abilities_visibility() == false) return false;
 	
 	for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
@@ -336,17 +357,6 @@ function draw_tank_abilities(){
 				canvas_backround.fillStyle = "#1d2e0b";
 				canvas_backround.fill();
 				}
-			}
-		
-		//save position
-		if(ABILITIES_POS.length < TYPES[MY_TANK.type].abilities.length){
-			var tmp = new Array();
-			tmp['x'] = status_x_tmp+i*70;
-			tmp['y'] = status_y;
-			tmp['width'] = SKILL_BUTTON;
-			tmp['height'] = SKILL_BUTTON;
-			tmp['nr'] = parseInt(i)+1;
-			ABILITIES_POS.push(tmp);
 			}
 		}
 	//clear areas if less then 3 skills
@@ -695,7 +705,9 @@ function draw_factory_gui(selected_tank, get_stats){
 				}
 			}
 		//register button
-		register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+		register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+			pos2+row*(msize+gap)+ APP_SIZE_CACHE[1] - HEIGHT_APP,
+			msize, msize, PLACE, function(mouseX, mouseY, index){
 			gui_action(index, 'units');
 			}, i);
 		j++;
@@ -736,7 +748,9 @@ function draw_factory_gui(selected_tank, get_stats){
 				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 			
 			//register button
-			register_button(pos1+j*(msize+gap)+1, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+			register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+				pos2+row*(msize+gap) + APP_SIZE_CACHE[1] - HEIGHT_APP, 
+				msize, msize, PLACE, function(mouseX, mouseY, index){
 				gui_action(index, 'towers');
 				}, i);
 			j++;
@@ -752,7 +766,7 @@ function draw_factory_gui(selected_tank, get_stats){
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#c50000";
 		roundRect(canvas_backround, xx, yy, width, height, 3, true);
-		register_button(xx, yy, width, height, PLACE, function(xx, yy){
+		register_button(xx - round((WIDTH_APP-APP_SIZE_CACHE[0])/2), yy + APP_SIZE_CACHE[1] - HEIGHT_APP, width, height, PLACE, function(xx, yy){
 			if(MY_TANK.data.name != 'Factory'){
 				gui_action(-1);
 				return true;
@@ -839,7 +853,9 @@ function draw_units_gui(){
 			}
 		
 		//register button
-		register_button(pos1+j*(msize+gap)+1*0, pos2+row*(msize+gap), msize, msize, PLACE, function(mouseX, mouseY, index){
+		register_button(pos1+j*(msize+gap)+1*0 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+			pos2+row*(msize+gap) + APP_SIZE_CACHE[1] - HEIGHT_APP, 
+			msize, msize, PLACE, function(mouseX, mouseY, index){
 			gui_action(index, 'selection');
 			}, k);
 		j++;

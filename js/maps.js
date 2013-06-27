@@ -16,7 +16,7 @@ function draw_map(map_only){
 		canvas_map.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 		status_x = 0;
 		if(FS==true){
-			status_x = round((WIDTH_APP-800)/2);
+			status_x = round((WIDTH_APP-APP_SIZE_CACHE[0])/2);
 			if(status_x<0) status_x=0;
 			}
 		status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
@@ -208,12 +208,26 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		msize = 3;
 		for (ii in MAPS[i].towers){
 			if(game_mode == 3 && MAPS[i].towers[ii][3] != 'Base') continue;
+			var type_info;
+			for(var t in TYPES){
+				if(TYPES[t].name == MAPS[i].towers[ii][3]){
+					type_info = TYPES[t];
+					break;
+					}
+				}
+			
 			if(MAPS[i].towers[ii][0]=="B")
 				canvas_this.fillStyle = "#0000aa";
 			else
 				canvas_this.fillStyle = "#b12525";
-			tank_x = pos1 + round((MAPS[i].towers[ii][1]) * button_width / round(MAPS[i].width));
-			tank_y = pos2 + round((MAPS[i].towers[ii][2]) * button_height /(MAPS[i].height));
+			var xx = MAPS[i].towers[ii][1];
+			var yy = MAPS[i].towers[ii][2];
+			if(xx == 'rand')
+				xx = getRandomInt(type_info.size[1], MAPS[i].width-type_info.size[1]);
+			if(yy == 'rand')
+				yy = getRandomInt(type_info.size[2], MAPS[i].height-type_info.size[2]);
+			tank_x = pos1 + round((xx) * button_width / round(MAPS[i].width));
+			tank_y = pos2 + round((yy) * button_height /(MAPS[i].height));
 			canvas_this.fillRect(tank_x, tank_y, msize, msize);
 			}
 		

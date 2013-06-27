@@ -316,6 +316,10 @@ function add_hp_bar(tank){
 				var radiance = Math.atan2(dist_y, dist_x);
 				var x = tank.cx() + Math.floor(Math.cos(radiance)*70) - round(TYPES[type].size[1]/2);
 				var y = tank.cy() + Math.floor(Math.sin(radiance)*70) - round(TYPES[type].size[2]/2);
+				if(x < 0) x = 0;
+				if(y < 0) y = 0;
+				if(x > WIDTH_MAP) x = WIDTH_MAP;
+				if(y > HEIGHT_MAP) y = HEIGHT_MAP;
 				
 				var angle = 180;
 				if(MY_TANK.team != 'B')
@@ -325,6 +329,7 @@ function add_hp_bar(tank){
 				var new_tank = add_tank(1, id, generatePassword(6), type, tank.team, tank.nation, x, y, angle);
 				new_tank.move = 1;
 				new_tank.move_to = [
+					//randomize position
 					tank.flag.x + getRandomInt(-gap_rand, gap_rand), 
 					tank.flag.y + getRandomInt(-gap_rand, gap_rand)
 					];
@@ -690,7 +695,7 @@ function draw_tank_move(mouseX, mouseY){
 					if(TANKS[i].team != MY_TANK.team) continue;
 					if(TANKS[i].dead == 1) continue;
 					if(TANKS[i].selected == 1){
-						//randomize
+						//randomize position
 						mouseX_rand = mouseX + getRandomInt(-gap_rand, gap_rand);
 						mouseY_rand = mouseY + getRandomInt(-gap_rand, gap_rand);
 						TANKS[i].move = 1;
@@ -1199,12 +1204,6 @@ function do_damage(TANK, TANK_TO, BULLET){
 	if(TANK_TO == undefined) return false;
 	if(TANK_TO.dead == 1) return false;
 	
-	//accuracy
-	/*var accuracy = TYPES[TANK.type].accuracy;
-	if(TANK.move==1)	accuracy = accuracy-10;
-	if(TANK_TO.move==1)	accuracy = accuracy-10;
-	if(getRandomInt(1, 10) > accuracy/10) return false;*/
-	
 	//sound	fire_sound - i was hit
 	if(TANK_TO.id == MY_TANK.id && MUTE_FX==false){
 		try{
@@ -1270,7 +1269,7 @@ function do_damage(TANK, TANK_TO, BULLET){
 	life_total = TANK_TO.hp;
 	if(life_total-damage>0){
 		TANK_TO.hp = TANK_TO.hp - damage;
-		if(TANK_TO.id == TANK_TO.id){
+		if(TANK_TO.id == MY_TANK.id){
 			draw_infobar();
 			}
 		}
@@ -1416,7 +1415,7 @@ function death(tank){
 function add_towers(team, nation){
 	for (var i in MAPS[level-1].towers){
 		if(MAPS[level-1]['towers'][i][0] != team) continue;
-		if(game_mode == 3 && MAPS[level-1].towers[i][3] != 'Base') continue;
+		if(game_mode == 3 && MAPS[level-1].towers[i][3] == 'Tower') continue;
 		//get type
 		var type = '';
 		for(var t in TYPES){
@@ -1428,8 +1427,18 @@ function add_towers(team, nation){
 		if(type=='') alert('Error: wrong type "'+MAPS[level-1]['towers'][i][3]+'" in maps definition.');
 		var width_tmp = WIDTH_MAP - TYPES[type].size[1];
 		var height_tmp = HEIGHT_MAP - TYPES[type].size[2];
-		var x = MAPS[level-1]['towers'][i][1] - round(TYPES[type].size[1]/2);
-		var y = MAPS[level-1]['towers'][i][2] - round(TYPES[type].size[2]/2);
+		var x;
+		var y;
+		if(MAPS[level-1]['towers'][i][1] == 'rand'){
+			x = getRandomInt(TYPES[type].size[1], WIDTH_MAP-TYPES[type].size[1]);
+			}
+		else
+			x = MAPS[level-1]['towers'][i][1] - TYPES[type].size[1]/2;
+		if(MAPS[level-1]['towers'][i][2] == 'rand'){
+			y = getRandomInt(TYPES[type].size[2], HEIGHT_MAP-TYPES[type].size[2]);
+			}
+		else
+			y = MAPS[level-1]['towers'][i][2] - TYPES[type].size[2]/2;
 		var angle = 180;
 		if(team != 'B')
 			angle = 0;
@@ -1852,7 +1861,7 @@ function set_spawn_coordinates(tank){
 		if(min < 50) min = 50;
 		if(max > WIDTH_MAP-50) max = WIDTH_MAP-50;
 		
-		var x = getRandomInt(min, max);
+		var x = getRandomInt(min, max);	//random line
 		if(check_collisions(x, tank.y+tank.width()/2, tank, true)==true) continue;
 		if(check_collisions(x+tank.width(), tank.y+tank.height()/2, tank, true)==true) continue;
 		
