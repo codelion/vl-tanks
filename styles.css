@@ -91,6 +91,10 @@ canvas{
 	-ms-user-select: none;
 	-o-user-select: none;
 	user-select: none;
+	
+	position: absolute;
+	top     : 0px;
+	left    : 0px;
 	}
 /*========== MAIN ============================================================*/
 #wrapper {

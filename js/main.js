@@ -1,3 +1,76 @@
+/*<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<img src="http://img.clubic.com/photo/02024672.jpg">
+<canvas id="aa" width="1280" height="800"></canvas>
+<canvas id="bb" width="1280" height="800"></canvas>
+
+<style>
+canvas{
+  position: absolute;
+  top     : 0px;
+  left    : 0px;
+}
+</style>
+
+<script>
+var        ctx = document.getElementById("aa").getContext("2d"); // world
+var       ctx2 = document.getElementById("bb").getContext("2d"); // fog
+var         r1 = 50;
+var         r2 = 200;
+
+document.getElementById("bb").addEventListener('mousemove', on_mousemove, false);
+
+//fill canvas
+ctx.fillStyle = 'rgba( 0, 255, 0, 1 )';
+ctx.fillRect(0, 0, 1280, 800);
+
+ctx.globalCompositeOperation = 'destination-out';
+
+function on_mousemove(ev){
+	var pX = ev.pageX;
+	var pY = ev.pageY;
+	var r1 = 75;
+	var r2 = 150;
+	
+	// reveal wherever we drag
+	var radGrd = ctx.createRadialGradient( pX, pY, r1, pX, pY, r2 );
+	radGrd.addColorStop(       0, 'rgba( 0, 0, 0,  1 )' );
+	radGrd.addColorStop( 0.6, 'rgba( 0, 0, 0, .1 )' );
+	radGrd.addColorStop(       1, 'rgba( 0, 0, 0,  0 )' );
+	ctx.fillStyle = radGrd;
+	ctx.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
+	
+	// partially hide the entire map and re-reval where we are now
+	ctx2.globalCompositeOperation = 'source-over';
+	ctx2.clearRect( 0, 0, 1280, 800 );
+	ctx2.fillStyle = 'rgba( 0, 0, 0, .7 )';
+	ctx2.fillRect ( 0, 0, 1280, 800 );
+	
+	var radGrd = ctx.createRadialGradient( pX, pY, r1, pX, pY, r2 );
+	radGrd.addColorStop(  0, 'rgba( 0, 0, 0,  1 )' );
+	radGrd.addColorStop( .8, 'rgba( 0, 0, 0, .1 )' );
+	radGrd.addColorStop(  1, 'rgba( 0, 0, 0,  0 )' );
+	ctx2.globalCompositeOperation = 'destination-out';
+	ctx2.fillStyle = radGrd;
+	ctx2.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
+	}
+</script>
+*/
+
+
+
+
+
+
+
+
+
+
 /*
 Name: Moon wars
 Author: Vilius

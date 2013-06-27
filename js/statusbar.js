@@ -130,6 +130,9 @@ function draw_quality_button(first_run){
 		setCookie("quality", QUALITY, 30);
 		draw_quality_button(false);
 		
+		if(PLACE == 'game' && QUALITY == 1)
+			canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+		
 		//reset tanks image cache 
 		for(var i in TANKS){
 			TANKS[i].cache_tank_verified = 0;

@@ -50,7 +50,6 @@ function draw_tank(tank){
 			tank.visible.state = true;
 			tank.visible.time = Date.now();
 			}
-		lighten_pixels(tank);
 		
 		//set transparency
 		if(QUALITY > 1){

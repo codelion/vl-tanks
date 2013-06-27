@@ -12,8 +12,8 @@ function draw_main(){
 	//clear main
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 	//redraw sight
-	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-	if(QUALITY>1){
+	if(QUALITY == 2){
+		canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
 		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
 		}

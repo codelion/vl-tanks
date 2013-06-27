@@ -20,6 +20,13 @@ function draw_map(map_only){
 			if(status_x<0) status_x=0;
 			}
 		status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
+		
+		if(QUALITY == 3){
+			canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+			canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
+			canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+			canvas_map_sight.globalCompositeOperation = 'destination-out';
+			}
 		}
 	
 	//background
@@ -86,33 +93,33 @@ function darken_map(){
 		console.log("ERROR: "+err.message);
 		}
 	}
-//visible tank area in map are light
-//there is some ugly bug for some firefox browsers - so they can use lighten_pixels_all instead by increasing game quality.
-function lighten_pixels(tank){
-	if(QUALITY !=3) return false;
-	if(PLACE != 'game') return false;
-	if(tank.team != MY_TANK.team) return false;
-	if(tank.constructing != undefined) return false;	
-	
-	var xx = round(tank.cx() + map_offset[0]);
-	var yy = round(tank.cy() + map_offset[1]);
-	
-	canvas_map_sight.beginPath();
-	canvas_map_sight.save();
-	
-	var sight_range = tank.sight;// + tank.width()/2;
-	canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
-	canvas_map_sight.clip(); 
-	canvas_map_sight.clearRect(xx-sight_range, yy-sight_range, sight_range*2, sight_range*2);
-	
-	canvas_map_sight.restore();
-	}
 //visible all tanks areas are light
 function lighten_pixels_all(tank){
-	if(QUALITY != 2) return false;
 	if(PLACE != 'game') return false;
+	if(QUALITY == 1) return false;
+	if(QUALITY == 3){
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].constructing != undefined) continue;
+			
+			var pX = TANKS[i].cx();
+			var pY = TANKS[i].cy();
+			var r1 = round(TANKS[i].sight/2);
+			var r2 = TANKS[i].sight;
+		
+			var radGrd = canvas_map_sight.createRadialGradient( pX, pY, r1, pX, pY, r2 );
+			radGrd.addColorStop(       0, 'rgba( 0, 0, 0,  1 )' );
+			radGrd.addColorStop( 0.6, 'rgba( 0, 0, 0, .1 )' );
+			radGrd.addColorStop(       1, 'rgba( 0, 0, 0,  0 )' );
+			canvas_map_sight.fillStyle = radGrd;
+			canvas_map_sight.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
+			}
+		return false;
+		}
 	
 	canvas_map_sight.save();
+	if(QUALITY == 3)
+		canvas_map_sight.fillStyle = "#ffffff";
 	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
 	for(var i in TANKS){
 		if(TANKS[i].team != MY_TANK.team) continue;
