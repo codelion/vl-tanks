@@ -1,4 +1,4 @@
-var ABILITIES_POS = [];
+var ABILITIES_POS = []; 
 //draw infobar
 function draw_infobar(first){
 	//image
@@ -88,7 +88,7 @@ function redraw_tank_stats(){
 	if(ns > 1 && only_factory == false) return false;
 	
 	//commander mode - Factory
-	if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
+	if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
 		draw_factory_gui();
 		return false;
 		}
@@ -96,12 +96,12 @@ function redraw_tank_stats(){
 	draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
 		245, 10, 330, 83);
 	
-	if(game_mode == 3 && MY_TANK.selected == undefined){
+	if((game_mode == 'single_craft' || game_mode == 'multi_craft') && MY_TANK.selected == undefined){
 		draw_image(canvas_backround, 'statusbar', status_x, status_y);
 		return false;
 		}
 	
-	if(game_mode != 3){	
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick'){	
 		//sublevel clear
 		var max_width = 85;
 		canvas_backround.lineWidth = 2;
@@ -117,7 +117,7 @@ function redraw_tank_stats(){
 		canvas_backround.strokeStyle = '#4a7c0d';
 		canvas_backround.stroke();
 		}
-	if(game_mode != 3 || MY_TANK.level > 1){
+	if((game_mode == 'single_quick' || game_mode == 'multi_quick') || MY_TANK.level > 1){
 		//level
 		canvas_backround.fillStyle = "#182605";
 		canvas_backround.fillRect(status_x+195, status_y+15, 23, 15);
@@ -204,7 +204,7 @@ function redraw_tank_stats(){
 		text = MY_TANK.kills;
 		canvas_backround.fillText(text, left_x_values, top_y);
 		
-		if(game_mode == 2)
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 			death_padding = 20;
 		else
 			death_padding = 28;
@@ -220,7 +220,7 @@ function redraw_tank_stats(){
 		canvas_backround.fillText(text, left_x_values, top_y+death_padding);
 		
 		//players
-		if(game_mode == 2){
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			canvas_backround.fillStyle = "#7b8a69";
 			canvas_backround.font = "normal 10px Verdana";
 			canvas_backround.fillText("Players", left_x, top_y+40);
@@ -267,7 +267,7 @@ function redraw_tank_stats(){
 	update_fps();
 	}
 function check_abilities_visibility(){
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		selected_n = 0;
 		types_unique = {};
 		types_unique_n = 0;
@@ -334,7 +334,7 @@ function draw_tank_abilities(){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		if(game_mode != 3 || ability_stats.level != undefined){
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick' || ability_stats.level != undefined){
 			var value = MY_TANK.abilities_lvl[i];
 			if(ability_stats.level != undefined)
 				value = ability_stats.level;
@@ -344,7 +344,7 @@ function draw_tank_abilities(){
 			}
 		
 		//ability to upgrade
-		if(game_mode != 3){
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 			if(i==ABILITIES_MODE-1){
 				canvas_backround.beginPath();
 				canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 3, 0, 2*Math.PI);	
@@ -427,7 +427,7 @@ function draw_ability_reuse(object){
 		canvas_backround.fillText(ability_text, status_x_tmp+i*(SKILL_BUTTON+gap)+letter_padding, status_y+SKILL_BUTTON/2+3);
 		
 		//level
-		if(game_mode != 3 || ability_stats.level != undefined){
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick' || ability_stats.level != undefined){
 			var value = MY_TANK.abilities_lvl[i];
 			if(ability_stats.level != undefined)
 				value = ability_stats.level;
@@ -437,7 +437,7 @@ function draw_ability_reuse(object){
 			}
 		
 		//ability to upgrade
-		if(game_mode != 3){
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 			if(i==ABILITIES_MODE-1){
 				canvas_backround.beginPath();
 				canvas_backround.arc(status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5, status_y+5, 3, 0, 2*Math.PI);	
@@ -535,6 +535,10 @@ function move_to_place(mouse_x, mouse_y){
 	map_offset[1] = -tmp_y;
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
 	document.getElementById("canvas_map").style.marginTop = map_offset[1]+"px";
+	if(QUALITY == 3){
+		document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
+		document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
+		}
 	}
 //mini map in status bar
 function redraw_mini_map(){
@@ -565,6 +569,10 @@ function redraw_mini_map(){
 			);
 		}
 		
+	//show mini-fog
+	if(QUALITY == 3)
+		canvas_backround.drawImage(MINI_FOG, pos1, pos2);
+		
 	//elements
 	var mini_w = (button_width-2)/MAPS[level-1].width;
 	var mini_h = (button_height-2)/MAPS[level-1].height;
@@ -591,6 +599,28 @@ function redraw_mini_map(){
 		if(element.alt_color != undefined){
 			canvas_backround.fillStyle = element.alt_color;
 			canvas_backround.fillRect(x, y, max_w, max_h);
+			}
+		}
+	
+	//update mini-fog
+	if(QUALITY == 3){
+		if(SCOUT_FOG_REUSE - Date.now() > 0) return false; //not so fast, wait a little
+		for(var i in TANKS){
+			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].constructing != undefined) continue;
+			if(TANKS[i].dead == 1) continue;
+			
+			var xx = round(TANKS[i].cx());
+			var yy = round(TANKS[i].cy());
+			
+			xx = round(xx * button_width / MAPS[level-1].width);
+			yy = round(yy * button_height /(MAPS[level-1].height));
+			
+			MINI_FOG.getContext("2d").beginPath();
+			var sight_range = round(TANKS[i].sight * button_width / MAPS[level-1].width);
+
+			MINI_FOG.getContext("2d").arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
+			MINI_FOG.getContext("2d").fill();
 			}
 		}
 	}
@@ -620,7 +650,7 @@ function update_radar(tank){
 		if(tank_x>MAPS[level-1].width)	tank_x=MAPS[level-1].width;
 		if(tank_y>MAPS[level-1].height)	tank_y=MAPS[level-1].height;
 		
-		tank_x = pos1 + Math.round(tank_x * button_width / round(MAPS[level-1].width));
+		tank_x = pos1 + round(tank_x * button_width / round(MAPS[level-1].width));
 		tank_y = pos2 + round(tank_y * button_height /(MAPS[level-1].height));
 		canvas_backround.fillRect(tank_x, tank_y, msize, msize);
 		}
@@ -667,7 +697,7 @@ function draw_factory_gui(selected_tank, get_stats){
 		else{
 			//default
 			back_color = "#dbd9da";
-			if(game_mode == 3){
+			if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 				var type_n = 0;
 				for(var t in MY_TANK.training){
 					if(MY_TANK.training[t].type != i) continue;
@@ -696,7 +726,7 @@ function draw_factory_gui(selected_tank, get_stats){
 			150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 		
 		//ability to upgrade
-		if(game_mode == 3){
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var x=0; x<type_n; x++){
 				canvas_backround.beginPath();
 				canvas_backround.arc(pos1+j*(msize+gap)+msize-5, pos2+row*(msize+gap)+5+x*5, 2, 0, 2*Math.PI);	
@@ -714,7 +744,7 @@ function draw_factory_gui(selected_tank, get_stats){
 		}
 		
 	//towers
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		var j=0;
 		var row = 1;
 		var nation = get_nation_by_team(MY_TANK.team);

@@ -195,7 +195,7 @@ function draw_create_room(game_players, game_mode, game_type, game_map, nation1,
 	if(game_players==undefined)
 		game_players='14';
 	if(game_mode==undefined)
-		game_mode='normal';	
+		game_mode='single_quick';	
 	if(game_type==undefined)
 		game_type='';
 	if(game_map==undefined)
@@ -516,7 +516,7 @@ function draw_room(room_id){
 	unregister_buttons('room');
 	
 	ROOM = get_room_by_id(room_id);
-	game_mode = 2;
+	game_mode = 'multi_quick';
 	opened_room_id = ROOM.id;
 	players = ROOM.players;
 	
@@ -579,7 +579,7 @@ function draw_room(room_id){
 					}
 				//count teams
 				//show select tanks room
-				game_mode = 2;
+				game_mode = 'multi_quick';
 				host_enemy_name = '';
 				host_team = '';
 				ROOM = get_room_by_id(room_id);

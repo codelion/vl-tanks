@@ -58,8 +58,7 @@ function draw_mute_music_button(){
 		canvas_backround.strokeStyle = "#ffffff";
 		canvas_backround.stroke();
 		}
-      
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music', WIDTH_APP-PADDING);
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_music', WIDTH_APP-PADDING, 'nofix');
 	}
 //draw mute effects button in statusbar
 function draw_mute_fx_button(){
@@ -92,7 +91,7 @@ function draw_mute_fx_button(){
 		canvas_backround.stroke();
 		}
 	
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx', WIDTH_APP-PADDING);
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'mute_unmute_fx', WIDTH_APP-PADDING, 'nofix');
 	}
 //show quality button in statusbar
 function draw_quality_button(first_run){
@@ -124,20 +123,9 @@ function draw_quality_button(first_run){
 	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', function(){
-		QUALITY++;
-		if(QUALITY==4)
-			QUALITY = 1;
-		setCookie("quality", QUALITY, 30);
+		change_quality();
 		draw_quality_button(false);
-		
-		if(PLACE == 'game' && QUALITY == 1)
-			canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		
-		//reset tanks image cache 
-		for(var i in TANKS){
-			TANKS[i].cache_tank_verified = 0;
-			}
-		});
+		}, false, 'nofix');
 	}
 //quit button in statusbar
 function draw_quit_button(){
@@ -154,7 +142,7 @@ function draw_quit_button(){
 	var tmp = round((width - canvas_backround.measureText(q_text).width)/2);
 	canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 	
-	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game');
+	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game', false, 'nofix');
 	}
 //show fullscreen button in statusbar
 function draw_fs_button(){
@@ -174,7 +162,7 @@ function draw_fs_button(){
 	
 	register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
 		fullscreen('canvas_area');
-		});
+		}, false, 'nofix');
 	}
 //show version instatus bar
 function draw_version(){

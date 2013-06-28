@@ -1,84 +1,12 @@
-/*<!DOCTYPE html>
-<html dir="ltr" lang="en-US">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-</head>
-<body>
-
-<img src="http://img.clubic.com/photo/02024672.jpg">
-<canvas id="aa" width="1280" height="800"></canvas>
-<canvas id="bb" width="1280" height="800"></canvas>
-
-<style>
-canvas{
-  position: absolute;
-  top     : 0px;
-  left    : 0px;
-}
-</style>
-
-<script>
-var        ctx = document.getElementById("aa").getContext("2d"); // world
-var       ctx2 = document.getElementById("bb").getContext("2d"); // fog
-var         r1 = 50;
-var         r2 = 200;
-
-document.getElementById("bb").addEventListener('mousemove', on_mousemove, false);
-
-//fill canvas
-ctx.fillStyle = 'rgba( 0, 255, 0, 1 )';
-ctx.fillRect(0, 0, 1280, 800);
-
-ctx.globalCompositeOperation = 'destination-out';
-
-function on_mousemove(ev){
-	var pX = ev.pageX;
-	var pY = ev.pageY;
-	var r1 = 75;
-	var r2 = 150;
-	
-	// reveal wherever we drag
-	var radGrd = ctx.createRadialGradient( pX, pY, r1, pX, pY, r2 );
-	radGrd.addColorStop(       0, 'rgba( 0, 0, 0,  1 )' );
-	radGrd.addColorStop( 0.6, 'rgba( 0, 0, 0, .1 )' );
-	radGrd.addColorStop(       1, 'rgba( 0, 0, 0,  0 )' );
-	ctx.fillStyle = radGrd;
-	ctx.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
-	
-	// partially hide the entire map and re-reval where we are now
-	ctx2.globalCompositeOperation = 'source-over';
-	ctx2.clearRect( 0, 0, 1280, 800 );
-	ctx2.fillStyle = 'rgba( 0, 0, 0, .7 )';
-	ctx2.fillRect ( 0, 0, 1280, 800 );
-	
-	var radGrd = ctx.createRadialGradient( pX, pY, r1, pX, pY, r2 );
-	radGrd.addColorStop(  0, 'rgba( 0, 0, 0,  1 )' );
-	radGrd.addColorStop( .8, 'rgba( 0, 0, 0, .1 )' );
-	radGrd.addColorStop(  1, 'rgba( 0, 0, 0,  0 )' );
-	ctx2.globalCompositeOperation = 'destination-out';
-	ctx2.fillStyle = radGrd;
-	ctx2.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
-	}
-</script>
-*/
-
-
-
-
-
-
-
-
-
-
 /*
 Name: Moon wars
 Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	selection - smart move
+	road?
 	multiplayer
+		game_mode = single_quick   single_craft   multi_quick   multi_craft
 		creating room, rooms, select adjust
 		move he3 to team, initial he3
 		implement weapons_bonus and armor_bonus
@@ -261,9 +189,14 @@ function check_canvas_sizes(){
 	document.getElementById("canvas_map").width  = WIDTH_MAP;
 	document.getElementById("canvas_map").height = HEIGHT_MAP;
 	
+	//fog
+	document.getElementById("canvas_fog").width  = WIDTH_MAP;
+	document.getElementById("canvas_fog").height = HEIGHT_MAP;
+	
 	//map sight
 	document.getElementById("canvas_map_sight").width  = WIDTH_SCROLL;
 	document.getElementById("canvas_map_sight").height = HEIGHT_SCROLL;
+	
 	//objects
 	canvas_base.width  = WIDTH_SCROLL;
 	canvas_base.height = HEIGHT_SCROLL;
@@ -296,7 +229,7 @@ function init_action(map_nr, my_team){
 	
 	if(my_tank_nr == -1)
 		my_tank_nr=0;
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		for(var i in TYPES)
 			if(TYPES[i].name == 'Soldier')
 				my_tank_nr = i;
@@ -319,7 +252,7 @@ function init_action(map_nr, my_team){
 		catch(error){}
 		}
 	
-	if(game_mode==2)
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 		my_nation = get_nation_by_team(my_team);
 		
 	//find enemy team
@@ -328,7 +261,7 @@ function init_action(map_nr, my_team){
 		enemy_team = 'R';
 		
 	//find enemy nation
-	if(game_mode != 2){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 		enemy_nation_tmp = [];
 		for(var n in COUNTRIES){
 			if(n != my_nation)
@@ -347,13 +280,13 @@ function init_action(map_nr, my_team){
 		add_towers("R", enemy_nation);	
 	
 	//create ... me
-	if(game_mode != 2 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
 		my_tank_nr = 0;
 	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
 	MY_TANK.selected = 1;
 	
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		//add few more me
 		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
@@ -362,7 +295,7 @@ function init_action(map_nr, my_team){
 	auto_scoll_map();
 	
 	//add bots if single player
-	if(game_mode == 1){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 		//get random type
 		var possible_types = [];
 		var random_type=0;
@@ -373,14 +306,14 @@ function init_action(map_nr, my_team){
 			
 		//friends
 		var n = MAPS[level-1].team_allies;
-		if(game_mode == 3)
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 			n = 7;
 		for(var i=1; i<n; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			if(DEBUG==false){
-				if(game_mode == 3)
+				if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation);
 				else
 					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
@@ -394,7 +327,7 @@ function init_action(map_nr, my_team){
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
-			if(game_mode == 3) break;
+			if(game_mode == 'single_craft' || game_mode == 'multi_craft') break;
 			i++;
 			}
 		}
@@ -406,13 +339,13 @@ function init_action(map_nr, my_team){
 		MAP_SCROLL_CONTROLL=true; 
 		move_to_place(xx, yy);
 		});
-	if(game_mode == 3)
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 		MAP_SCROLL_MODE = 2;
 		
 	draw_map(false);
 	
 	//register crystals
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		for(var e in MAPS[level-1].elements){
 			if(MAPS[level-1].elements[e][0] != 'crystals') continue;
 			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
@@ -437,7 +370,7 @@ function init_action(map_nr, my_team){
 	window.requestAnimationFrame = requestAnimationFrame;
 	draw_interval_id = requestAnimationFrame(draw_main);
 
-	if(game_mode != 3)	
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick')	
 		bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
@@ -613,7 +546,7 @@ function timed_functions_handler(){
 	}
 //quit button - quits all possible actions
 function quit_game(init_next_game){
-	if(PLACE=='game' && game_mode == 2){
+	if(PLACE=='game' && (game_mode == 'multi_quick' || game_mode == 'multi_craft')){
 		if(confirm("Do you really want to quit game?")==false)
 			return false;
 		}
@@ -643,7 +576,7 @@ function quit_game(init_next_game){
 		if(audio_main != undefined)
 			audio_main.pause();
 		
-		if(game_mode == 2){
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			register_tank_action('leave_game', opened_room_id, name);
 			room_controller();
 			}
@@ -654,7 +587,7 @@ function quit_game(init_next_game){
 			}
 		}
 	else if(PLACE == 'room'){
-		if(game_mode == 2 && opened_room_id != -1){
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && opened_room_id != -1){
 			register_tank_action('leave_room', opened_room_id, name);
 			}
 		opened_room_id = -1;
@@ -680,7 +613,7 @@ function quit_game(init_next_game){
 	mouse_click_controll = false;
 	target_range = 0;
 	ABILITIES_POS = [];
-	game_mode = 1;
+	game_mode = 'single_quick';
 	last_selected = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
@@ -704,7 +637,7 @@ function quit_game(init_next_game){
 		}
 	}
 //register some are for mouse clicks
-function register_button(x, y, width, height, place, myfunction, extra){
+function register_button(x, y, width, height, place, myfunction, extra, type){
 	for(var i in BUTTONS){
 		if(BUTTONS[i].x == x && BUTTONS[i].y == y && BUTTONS[i].width == width && BUTTONS[i].height == height && BUTTONS[i].place == place){
 			return false;
@@ -717,7 +650,8 @@ function register_button(x, y, width, height, place, myfunction, extra){
 		height: height,
 		place: place,
 		function: myfunction,
-		extra: extra
+		extra: extra,
+		type: type,
 		});
 	}
 function unregister_buttons(button_place){
@@ -737,7 +671,7 @@ function starting_game_timer_handler(){
 	if(starting_timer==0){
 		starting_timer = -1;
 		clearInterval(start_game_timer_id);
-		if(game_mode != 2)
+		if(game_mode == 'single_quick' || game_mode == 'single_craft')
 			init_action(level, 'R');
 		else{
 			ROOM = get_room_by_id(opened_room_id);
@@ -762,7 +696,7 @@ function chat(text, author, team, shift){
 		else
 			team = '';	//shift
 		
-		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score'))){
+		if(PLACE=='rooms' || PLACE=='room' || ( (game_mode == 'multi_quick' || game_mode == 'multi_craft') && (PLACE=='select' || PLACE=='game' || PLACE == 'score'))){
 			if(chat_shifted == false)
 				register_tank_action('chat', opened_room_id, name, text, 0);
 			else

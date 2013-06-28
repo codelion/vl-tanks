@@ -1,8 +1,8 @@
 function check_path_AI(TANK){
-	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
+	if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && TANK.master.id != MY_TANK.id) return false;
 	if(TANK.id == MY_TANK.id) return false;
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
-	if(game_mode == 2)
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 		TANK.ai_reuse = 1000+Date.now();	//second pause
 	else
 		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
@@ -16,7 +16,7 @@ function check_path_AI(TANK){
 	
 	//if in battle - stop
 	if(TANK.last_bullet_time + 1000 - Date.now() > 0){
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			TANK.move = 0;
 			try_skills(TANK);
 			}
@@ -85,12 +85,11 @@ function set_random_path_AI(TANK){
 		else
 			do_ai_move(TANK, 0, TANK.y, 'left');	//must turn left
 		}
-	if(game_mode != 2){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft')
 		TANK.move=1;
-		}
 	}
 function do_ai_move(TANK, xx, yy, direction){
-	if(game_mode == 2){
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 		register_tank_action('move', opened_room_id, TANK.id, [round(TANK.x), round(TANK.y), round(xx), round(yy), undefined, direction]);
 		}
 	else{
@@ -101,21 +100,21 @@ function do_ai_move(TANK, xx, yy, direction){
 		}
 	}
 function try_skills(TANK_AI){
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		var selected_n = get_selected_count(TANK_AI.team);
 		if(selected_n == 1 && TANK_AI.id == MY_TANK.id) return false;
 		}
 	for(i in TYPES[TANK_AI.type].abilities){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
-		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && game_mode == 2) continue;
+		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && (game_mode == 'multi_quick' || game_mode == 'multi_craft')) continue;
 		if(TYPES[TANK_AI.type].abilities[i].passive == true) continue;
 		if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
 		var reuse = 0;
 		try{
 			//execute
 			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
-			if(reuse != undefined && reuse != 0 && game_mode == 3 && TANK_AI.team == MY_TANK.team){
+			if(reuse != undefined && reuse != 0 && (game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK_AI.team == MY_TANK.team){
 				var tmp = new Array();
 				tmp['function'] = "draw_ability_reuse";
 				tmp['duration'] = reuse;
@@ -135,7 +134,7 @@ function try_skills(TANK_AI){
 			TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
 		}
 	//check if missle or bomb ready
-	if(game_mode != 2 && TANK_AI.dead == undefined){	
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') && TANK_AI.dead == undefined){	
 		do_auto_missile(TANK_AI.id);
 		do_auto_bomb(TANK_AI.id);
 		}
@@ -189,7 +188,7 @@ function soldiers_move(mouseX, mouseY){
 		mouseY_tmp = Math.floor(mouseY_tmp);
 		
 		//register
-		if(game_mode == 2){
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			if(found_something==true)
 				register_tank_action('move', opened_room_id, TANKS[i].id, [round(TANKS[i].x), round(TANKS[i].y), round(mouseX_tmp), round(mouseY_tmp), target_lock_id]);
 			else
@@ -263,7 +262,7 @@ function do_auto_missile(tank_id){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_missile.reuse;
@@ -326,7 +325,7 @@ function do_auto_bomb(tank_id){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode == 3){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_bomb.reuse;

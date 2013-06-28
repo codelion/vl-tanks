@@ -46,7 +46,7 @@ function on_keyboard_action(event){
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
 					//stop move
-					if(game_mode == 2){
+					if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 						if(MY_TANK.move == 1)
 							register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
 						}
@@ -183,7 +183,7 @@ function on_mousemove(event){
 		selection.y2 = mouseY;
 		}
 	//info about crystals
-	if(PLACE == 'game' && game_mode == 3){
+	if(PLACE == 'game' && (game_mode == 'single_craft' || game_mode == 'multi_craft')){
 		ability_hover_text = '';
 		var found = false;
 		for(var c in MAP_CRYSTALS){
@@ -257,7 +257,7 @@ function on_mousemove_background(event){
 			show_skill_description();	
 			}
 		//mouse over training tanks list
-		if(game_mode == 3 && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
+		if( (game_mode == 'single_craft' || game_mode == 'multi_craft') && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
 			var stats = draw_factory_gui(undefined, true);
 			//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
 			j=0;
@@ -309,7 +309,8 @@ function on_mousemove_background(event){
 		}		
 	}
 function on_mousemove_parent(event){
-	mouse_inside = false;
+	if(FS == false)
+		mouse_inside = false;
 	}
 	
 //=== mouse right ==============================================================
@@ -328,7 +329,7 @@ function on_mouse_right_click(event){
 		}
 	if(PLACE == 'game'){
 		mouse_click_controll = false;
-		if(game_mode == 3){
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue;
 				if(TANKS[i].data.name != "Factory") continue;
@@ -360,7 +361,7 @@ function on_mousedown(event){
 		mouseY = event.layerY;
 		}
 	if(event.which != 3){	//not right click
-		if(PLACE == 'game' && game_mode == 3 && mouse_click_controll == false){
+		if(PLACE == 'game' && (game_mode == 'single_craft' || game_mode == 'multi_craft') && mouse_click_controll == false){
 			selection = {
 				x: mouseX, 
 				y: mouseY,
@@ -386,7 +387,7 @@ function on_mousedown(event){
 			return true;
 			}
 	
-		if(game_mode != 3){
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 			//move tank
 			draw_tank_move(mouseX, mouseY);
 			}
@@ -416,6 +417,8 @@ function on_mousedown_back(event){
 		mouseY = event.layerY;
 		}
 	menu_pressed = false;
+	mouseX_old = mouseX;
+	mouseY_old = mouseY;
 	//full screen fix
 	if(FS==true){
 		mouseX = mouseX - status_x;	
@@ -424,8 +427,14 @@ function on_mousedown_back(event){
 	for(var i in BUTTONS){
 		if(BUTTONS[i]==undefined) continue;
 		if(BUTTONS[i].place != '' && BUTTONS[i].place != PLACE) continue;
-		if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
-		if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
+		if(BUTTONS[i].type != 'nofix'){
+			if(mouseX < BUTTONS[i].x || mouseX > BUTTONS[i].x+BUTTONS[i].width)  continue;
+			if(mouseY < BUTTONS[i].y || mouseY > BUTTONS[i].y+BUTTONS[i].height)  continue;
+			}
+		else{
+			if(mouseX_old < BUTTONS[i].x || mouseX_old > BUTTONS[i].x+BUTTONS[i].width)  continue;
+			if(mouseY_old < BUTTONS[i].y || mouseY_old > BUTTONS[i].y+BUTTONS[i].height)  continue;
+			}
 		if(typeof BUTTONS[i].function == 'string')
 			window[BUTTONS[i].function](mouseX, mouseY, BUTTONS[i].extra);
 		else
@@ -451,7 +460,7 @@ function on_mouseup(event){
 		}
 	if(event.which == 3) return true;	//right click release
 	if(PLACE=='game'){
-		if(game_mode == 3){
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			//select object
 			var selected_n = 0;
 			var last_selected_i; 

@@ -11,13 +11,6 @@ function draw_main(){
 	
 	//clear main
 	canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
-	//redraw sight
-	if(QUALITY == 2){
-		canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
-		canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		}
-	
 	redraw_mini_map();	// mini map actions
 	
 	//external drawings functions
@@ -87,7 +80,7 @@ function draw_main(){
 						i_locked = t;
 					}
 				if(TANKS[i_locked] == undefined || TANKS[i_locked].dead == 1){	//maybe target is already dead
-					if(game_mode != 2){
+					if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 						TANKS[i].move = 0;
 						delete TANKS[i].target_move;
 						delete TANKS[i].target_move_lock;
@@ -181,7 +174,7 @@ function draw_main(){
 							}
 						}
 					if(check_collisions(TANKS[i].cx() + Math.cos(radiance)*TANKS[i].width()/2, TANKS[i].cy()+Math.sin(radiance)*TANKS[i].height()/2, TANKS[i])==true){
-						if(game_mode != 3)
+						if(game_mode == 'single_quick' || game_mode == 'multi_quick')
 							TANKS[i].move = 0;
 						}
 					else{
@@ -225,7 +218,7 @@ function draw_main(){
 				}
 			
 			//autoskills
-			if(game_mode == 3 && TANKS[i].last_bullet_time + 1000 - Date.now() > 0){
+			if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TANKS[i].last_bullet_time + 1000 - Date.now() > 0){
 				if(TANKS[i].ai_reuse - Date.now() < 0 || TANKS[i].ai_reuse == undefined){
 					TANKS[i].ai_reuse = 1000/2+Date.now();	//half second pause
 					try_skills(TANKS[i]);
@@ -266,7 +259,7 @@ function draw_main(){
 			}
 		}
 		
-	lighten_pixels_all();
+	add_scout_and_fog();
 	if(screen_message.time > Date.now())
 		draw_message(canvas_main, screen_message.text);
 		
@@ -293,7 +286,7 @@ function draw_main(){
 		}
 	
 	//h3 status
-	if(game_mode == 3)
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 		draw_he3_info();
 	
 	show_chat();
@@ -443,7 +436,7 @@ function add_first_screen_elements(){
 		register_button(settings_positions[i].x, settings_positions[i].y, settings_positions[i].width, settings_positions[i].height, 'init', function(xx, yy, extra){
 			if(extra==0){
 				// single player
-				game_mode = 1;
+				game_mode = 'single_quick';
 				draw_tank_select_screen();
 				}
 			else if(extra==1){
@@ -455,7 +448,7 @@ function add_first_screen_elements(){
 				}
 			else if(extra==2){
 				room_id_to_join = -1;
-				game_mode = 3;
+				game_mode = 'single_craft';
 				//commander mode
 				draw_tank_select_screen();
 				}	
@@ -516,6 +509,8 @@ function draw_right_buttons(clean){
 	var minibutton_height = 20;
 	var padding = 5;
 	var mi = 0;
+	var button_color = '#b7b7b7';
+	var button_border_c = '#292929'; 
 	
 	//background
 	if(clean != undefined)
@@ -524,8 +519,8 @@ function draw_right_buttons(clean){
 	//intro button
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	canvas_backround.strokeStyle = "#686868";
-	canvas_backround.fillStyle = "#f5f5f5";
+	canvas_backround.strokeStyle = button_border_c;
+	canvas_backround.fillStyle = button_color;
 	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
 	
 	canvas_backround.fillStyle = "#0c2c0c";
@@ -543,8 +538,8 @@ function draw_right_buttons(clean){
 	//library
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	canvas_backround.strokeStyle = "#686868";
-	canvas_backround.fillStyle = "#f5f5f5";
+	canvas_backround.strokeStyle = button_border_c;
+	canvas_backround.fillStyle = button_color;
 	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
 	
 	canvas_backround.fillStyle = "#0c2c0c";
@@ -560,8 +555,8 @@ function draw_right_buttons(clean){
 	//Controls
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	canvas_backround.strokeStyle = "#686868";
-	canvas_backround.fillStyle = "#f5f5f5";
+	canvas_backround.strokeStyle = button_border_c;
+	canvas_backround.fillStyle = button_color;
 	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
 	
 	canvas_backround.fillStyle = "#0c2c0c";
@@ -615,8 +610,8 @@ function draw_right_buttons(clean){
 	//settings
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	canvas_backround.strokeStyle = "#686868";
-	canvas_backround.fillStyle = "#f5f5f5";
+	canvas_backround.strokeStyle = button_border_c;
+	canvas_backround.fillStyle = button_color;
 	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
 	
 	canvas_backround.fillStyle = "#0c2c0c";
@@ -630,8 +625,8 @@ function draw_right_buttons(clean){
 	//About
 	var mini_x = WIDTH_APP-minibutton_width-padding;
 	var mini_y = mi*(minibutton_height+padding)+padding;
-	canvas_backround.strokeStyle = "#686868";
-	canvas_backround.fillStyle = "#f5f5f5";
+	canvas_backround.strokeStyle = button_border_c;
+	canvas_backround.fillStyle = button_color;
 	roundRect(canvas_backround, mini_x, mini_y, minibutton_width, minibutton_height, 5, true);
 	
 	canvas_backround.fillStyle = "#0c2c0c";
@@ -782,7 +777,7 @@ function draw_logo_tanks(left, top, change_logo){
 var score_button_pos = new Array();
 //final scores after game ended
 function draw_final_score(live, lost_team){
-	if(live==true && game_mode == 3) return false;
+	if(live==true && (game_mode == 'single_craft' || game_mode == 'multi_craft')) return false;
 	var button_width = WIDTH_SCROLL-40;
 	var button_height = 15;
 	var buttons_gap = 5;
@@ -832,6 +827,7 @@ function draw_final_score(live, lost_team){
 		
 		if(audio_main != undefined)
 			audio_main.pause();
+		canvas_fog.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	
 		canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 		canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
@@ -884,7 +880,8 @@ function draw_final_score(live, lost_team){
 		canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
 		roundRect(canvas_main, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
 		}
-	if(game_mode == 3) return false;
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft') 
+		return false;
 	
 	canvas.font = "bold 12px Helvetica";
 	
@@ -949,7 +946,7 @@ function draw_final_score(live, lost_team){
 			var name_tmp = TANKS[i].name;
 			if(name_tmp != undefined && name_tmp.length>33)
 				name_tmp = name_tmp.substr(0,33)
-			if(game_mode==2){
+			if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 				ROOM = get_room_by_id(opened_room_id);
 				if(ROOM.host == TANKS[i].name)
 					name_tmp = name_tmp+"*";
@@ -1041,7 +1038,8 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 	unregister_buttons(PLACE);
 	dynamic_title();
 	canvas_map.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP); 
-	canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+	canvas_fog.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+	canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 	document.getElementById("chat_box").style.display = 'none';
 	room_controller();
 	
@@ -1049,7 +1047,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 	var gap = 8;
 	var info_block_height = 100;
 	if(selected_tank == undefined){
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			selected_tank = 0;
 			my_tank_nr = selected_tank;
 			}
@@ -1065,7 +1063,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 				}
 			}
 		}
-	if(game_mode == 2){
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 		ROOM = get_room_by_id(opened_room_id);
 		var my_team;
 		for(var t in ROOM.players){
@@ -1087,7 +1085,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 	
 	//show all possible tanks
 	var info_left = 7;
-	if(game_mode != 3){
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 		j = 0;
 	 	preview_x = 90;
 		preview_y = 80;
@@ -1137,13 +1135,13 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 		
 			//if bonus
 			ROOM = get_room_by_id(opened_room_id);
-			if(game_mode == 2 && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
+			if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && ROOM.settings[0]=='normal' && TYPES[i].bonus != undefined)
 				draw_image(canvas_backround, 'lock', pos1+preview_x-14-5, pos2+preview_y-20-5);
 	
 			//register button
 			if(locked==false){
 				register_button(15+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
-					if(game_mode == 2){
+					if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 						ROOM = get_room_by_id(opened_room_id);
 						if(ROOM.settings[0]=='normal'){
 							if(TYPES[index].bonus != undefined){
@@ -1191,7 +1189,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 			}
 		}
 		
-	if(game_mode != 2){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 		preview_x = 50;
 		preview_y = 40;
 		x = info_left + gap;
@@ -1221,19 +1219,19 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 			}
 		}
 		
-	if(game_mode != 3)
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick')
 		y = y + info_block_height+10;
 	else
 		y = y + preview_y + 10;
 	
 	//mini maps
-	if(game_mode != 2){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 		show_maps_selection(canvas_backround, y, true);
 		y = y + 81+30;
 		}
 		
 	//teams
-	if(game_mode == 2){
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 		ROOM = get_room_by_id(opened_room_id);
 		players_n = ROOM.players.length;	
 		var ICON_WIDTH = 55;
@@ -1303,7 +1301,7 @@ function draw_tank_select_screen(selected_tank, selected_nation){
 		}
 		
 	//time left line
-	if(game_mode == 2){
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 		red_line_y = y+10;
 		if(starting_timer==-1)
 			starting_timer = START_GAME_COUNT;

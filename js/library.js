@@ -226,7 +226,7 @@ function draw_library_maps(){
 	var gap = 8;
 	
 	maps_positions = [];
-	game_mode = 1;
+	game_mode = 'single_quick';
 	show_maps_selection(canvas_backround, y, true);
 	y = y + 80 + 40;
 	var active_map = MAPS[level-1];

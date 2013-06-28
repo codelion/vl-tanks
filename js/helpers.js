@@ -108,7 +108,7 @@ function get_dimensions(){
 	return [theWidth, theHeight];
 	}
 function log(text){
-	console.log(text);
+	console.log(text+" - "+arguments.callee.caller.name+"()");
 	}
 function drawImage_rotated(canvas, file, x, y, width, height, angle){
 	var TO_RADIANS = Math.PI/180;

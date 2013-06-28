@@ -263,7 +263,7 @@ function Repair(TANK, descrition_only, settings_only, ai){
 		if(valid==false) continue;	//lets avoid exploits/immortality here		
 		
 		//add effect
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
@@ -308,7 +308,7 @@ function Boost(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			//damage buff
 			TANKS[ii].buffs.push({
 				name: 'damage',
@@ -714,7 +714,7 @@ function check_mines(tank_id){
 			if(TYPES[TANKS[i].type].type != 'tank') continue;	//must be tank
 			if(TYPES[TANKS[i].type].no_collisions==1) continue;	//flying units dont care mines
 			if(TANKS[i].dead == 1) continue;			//ghost
-			if(game_mode != 2 && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
+			if((game_mode == 'single_quick' || game_mode == 'single_craft') && MINES[m].team == TANKS[i].team) continue;	//fix for all team suicide
 			var sizew = TANKS[i].width();
 			var sizeh = TANKS[i].height();
 			if(TANKS[i].x+sizew > MINES[m].x-mine_size_half && TANKS[i].x < MINES[m].x+mine_size_half){
@@ -823,7 +823,7 @@ function EMP_Bomb(TANK, descrition_only, settings_only, ai){
 function M7_Shield(TANK, descrition_only, settings_only, ai){
 	var reuse = 20000;
 	var duration = 2000 + 105*(TANK.abilities_lvl[2]-1);
-	if(game_mode == 3)
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 		duration = 3000;
 	var power = 5 + 0.5*(TANK.abilities_lvl[2]-1);
 	var range = 80;
@@ -839,7 +839,7 @@ function M7_Shield(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			//shield buff
 			TANKS[ii].buffs.push({
 				name: 'shield',
@@ -962,7 +962,7 @@ function Medicine(TANK, descrition_only, settings_only, ai){
 		distance = get_distance_between_tanks(TANK, TANKS[ii]);
 		if(distance > range)		continue;	//too far
 		//add effect
-		if(game_mode != 2){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			//repair buff
 			TANKS[ii].buffs.push({
 				name: 'repair',
@@ -1036,7 +1036,7 @@ function Plasma(TANK, descrition_only, settings_only, ai){
 function Jump(TANK, descrition_only, settings_only, ai){
 	var reuse = 10000;
 	var range = 100 + 2.7 * (TANK.abilities_lvl[1]-1);
-	if(game_mode == 3)
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft')
 		range = 120;
 	
 	if(descrition_only != undefined)
@@ -1102,7 +1102,7 @@ function PL_Shield(TANK, descrition_only, settings_only, ai){
 function do_jump(tank_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_jump == undefined) return false;
-	if(game_mode != 2 && MAPS[level-1].ground_only != undefined) return false;
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') && MAPS[level-1].ground_only != undefined) return false;
 	if(TANK.id == MY_TANK.id){
 		var mouseX = mouse_click_pos[0];
 		var mouseY = mouse_click_pos[1];
@@ -1135,7 +1135,7 @@ function do_jump(tank_id, skip_broadcast){
 		return false;	//wrong place
 	
 	//broadcast
-	if(game_mode == 2 && skip_broadcast !== true){
+	if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 		DATA = {
 			function: 'do_jump',
 			fparam: [tank_id, true],
@@ -1178,7 +1178,7 @@ function do_jump(tank_id, skip_broadcast){
 	auto_scoll_map();
 		
 	//init reuse
-	if(game_mode != 2 || TANK.id == MY_TANK.id){
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_jump.reuse;
@@ -1349,7 +1349,8 @@ function Freak_out(TANK, descrition_only, settings_only, ai){
 	
 	if(descrition_only != undefined)
 		return 'Increase tower attack speed by '+((1-power)*100)+'% for '+(duration/1000)+'s. Costs '+cost+' HE-3.';
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	if(TANK.constructing != undefined) return false;
@@ -1383,7 +1384,8 @@ function Factory(TANK, descrition_only, settings_only, ai){
 		cost = apply_buff(TANK, 'cost', cost);
 		return 'Construct factory to create land, air, defence units. Costs '+cost+' HE-3.';
 		}
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	construct_prepare(TANK, reuse, tank_type, 0);
@@ -1404,7 +1406,8 @@ function Research(TANK, descrition_only, settings_only, ai){
 		cost = apply_buff(TANK, 'cost', cost);
 		return 'Construct research station. Costs '+cost+' HE-3.';
 		}
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	construct_prepare(TANK, reuse, tank_type, 1);
@@ -1425,7 +1428,8 @@ function Silo(TANK, descrition_only, settings_only, ai){
 		cost = apply_buff(TANK, 'cost', cost);
 		return 'Construct structure for storing Helium-3. Costs '+cost+' HE-3.';
 		}
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined) return {reuse: reuse};
 	
 	construct_prepare(TANK, reuse, tank_type, 2);
@@ -1621,7 +1625,8 @@ function Weapons(TANK, descrition_only, settings_only, ai){
 		else
 			return 'Upgrade units weapons. Max level.';
 		}
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined) 
 		return {
 			reuse: reuse, 
@@ -1662,7 +1667,8 @@ function Armor(TANK, descrition_only, settings_only, ai){
 		else
 			return 'Upgrade units weapons. Max level.';
 		}
-	if(ai != undefined || game_mode != 3) return false;
+	if(ai != undefined) return false;
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 	if(settings_only != undefined)
 		return {
 			reuse: reuse, 
@@ -1693,7 +1699,7 @@ function Armor(TANK, descrition_only, settings_only, ai){
 function do_missile(tank_id, enemy_id, skip_broadcast){
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_missile == undefined) return false;
-	if(TANK.name == name || (game_mode == 3 && TANK.team == MY_TANK.team)){
+	if(TANK.name == name || ((game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK.team == MY_TANK.team)){
 		var mouseX = mouse_click_pos[0];
 		var mouseY = mouse_click_pos[1];
 		}
@@ -1719,7 +1725,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
-			if(game_mode == 2 && skip_broadcast !== true){
+			if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 				//broadcast
 				DATA = {
 					function: '',
@@ -1762,7 +1768,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 		}
 		
 	//broadcast
-	if(game_mode == 2 && skip_broadcast !== true){
+	if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 		DATA = {
 			function: 'do_missile',
 			fparam: [tank_id, enemy_id, true],
@@ -1799,7 +1805,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode != 2 || TANK.id == MY_TANK.id){
+	if( (game_mode == 'single_quick' || game_mode == 'single_craft') || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_missile.reuse;
@@ -1818,7 +1824,7 @@ function do_missile(tank_id, enemy_id, skip_broadcast){
 function do_bomb(tank_id, distance_ok, skip_broadcast){	
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_bomb == undefined) return false;
-	if(TANK.name == name || (game_mode == 3 && TANK.team == MY_TANK.team)){
+	if(TANK.name == name || ( (game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK.team == MY_TANK.team)){
 		mouseX = mouse_click_pos[0];
 		mouseY = mouse_click_pos[1];
 		}
@@ -1840,7 +1846,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 			mouse_click_controll = false;
 			target_range=0;
 			target_mode='';
-			if(game_mode == 2 && skip_broadcast !== true){
+			if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 				//broadcast
 				DATA = {
 					function: '',
@@ -1867,7 +1873,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 			}
 		}
 	//broadcast
-	if(game_mode == 2 && skip_broadcast !== true){
+	if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 		DATA = {
 			function: 'do_bomb',
 			fparam: [tank_id, true, true],
@@ -1907,7 +1913,7 @@ function do_bomb(tank_id, distance_ok, skip_broadcast){
 	BULLETS.push(tmp);
 	
 	//init reuse
-	if(game_mode != 2 || TANK.id == MY_TANK.id){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft' || TANK.id == MY_TANK.id){
 		var tmp = new Array();
 		tmp['function'] = "draw_ability_reuse";
 		tmp['duration'] = TANK.try_bomb.reuse;

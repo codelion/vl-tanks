@@ -21,12 +21,21 @@ function draw_map(map_only){
 			}
 		status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
 		
+		canvas_fog.fillStyle = "rgba(0, 0, 0, 0.5)";
+		canvas_fog.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+		canvas_fog.globalCompositeOperation = 'destination-out';
+		document.getElementById("canvas_fog").style.display = 'none';
 		if(QUALITY == 3){
-			canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-			canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.34)";
-			canvas_map_sight.fillRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
-			canvas_map_sight.globalCompositeOperation = 'destination-out';
+			document.getElementById("canvas_fog").style.display = 'block';
 			}
+		//init mini fog
+		MINI_FOG = document.createElement("canvas");
+		MINI_FOG.width = MINI_MAP_PLACE[2];
+		MINI_FOG.height = MINI_MAP_PLACE[3];
+		//fill
+		MINI_FOG.getContext("2d").fillStyle = "rgba(0, 0, 0, 0.3)";
+		MINI_FOG.getContext("2d").fillRect(0, 0, MINI_FOG.width, MINI_FOG.height);
+		MINI_FOG.getContext("2d").globalCompositeOperation = 'destination-out';
 		}
 	
 	//background
@@ -55,7 +64,7 @@ function draw_map(map_only){
 		
 		var visible = true;
 		if(MAPS[level-1].elements[e][0] == 'crystals'){
-			if(game_mode != 3)
+			if(game_mode == 'single_quick' || game_mode == 'multi_quick')
 				visible = false;
 			else{
 				for(var t in MAP_CRYSTALS){
@@ -72,76 +81,68 @@ function draw_map(map_only){
 	
 	if(map_only==false)
 		draw_infobar(true);
-	
-	//darken all
-	darken_map();
 	}
-//darken map - using shadows
-function darken_map(){
-	try{
-		imgData = canvas_map.getImageData(0, 0, WIDTH_MAP, HEIGHT_MAP);
-		pix = imgData.data;
-		dark_weight = 15;
-		for (var i = 0, n = pix.length; i < n; i += 4) {
-			if(pix[i+0]>dark_weight)	pix[i+0] = pix[i+0] - dark_weight;
-			if(pix[i+1]>dark_weight)	pix[i+1] = pix[i+1] - dark_weight;
-			if(pix[i+2]>dark_weight)	pix[i+2] = pix[i+2] - dark_weight;
-		}
-		canvas_map.putImageData(imgData, 0, 0);
-		}
-	catch(err){
-		console.log("ERROR: "+err.message);
-		}
-	}
-//visible all tanks areas are light
-function lighten_pixels_all(tank){
+/*
+1x speed if QUALITY = 1	- scout off, fog off
+2x slow  if QUALITY = 2 - scout on, fog off
+3x slow  if QUALITY = 3 - scout on, fog on
+*/
+function add_scout_and_fog(tank){
 	if(PLACE != 'game') return false;
 	if(QUALITY == 1) return false;
+	if(SCOUT_FOG_REUSE - Date.now() > 0) return false; //not so fast, wait a little
+	
 	if(QUALITY == 3){
+		//reveal fog
 		for(var i in TANKS){
 			if(TANKS[i].team != MY_TANK.team) continue;
 			if(TANKS[i].constructing != undefined) continue;
+			if(TANKS[i].dead == 1) continue;
+			//if(TANKS[i].skip_sight == 1) continue; //buildings do not move - already parsed
 			
-			var pX = TANKS[i].cx();
-			var pY = TANKS[i].cy();
-			var r1 = round(TANKS[i].sight/2);
-			var r2 = TANKS[i].sight;
-		
-			var radGrd = canvas_map_sight.createRadialGradient( pX, pY, r1, pX, pY, r2 );
-			radGrd.addColorStop(       0, 'rgba( 0, 0, 0,  1 )' );
-			radGrd.addColorStop( 0.6, 'rgba( 0, 0, 0, .1 )' );
-			radGrd.addColorStop(       1, 'rgba( 0, 0, 0,  0 )' );
-			canvas_map_sight.fillStyle = radGrd;
-			canvas_map_sight.fillRect( pX - r2, pY - r2, r2*2, r2*2 );
+			var xx = round(TANKS[i].cx());
+			var yy = round(TANKS[i].cy());
+			canvas_fog.beginPath();
+			var sight_range = TANKS[i].sight;
+			canvas_fog.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
+			canvas_fog.fill();
+			
+			if(TANKS[i].data.type == 'building')
+				TANKS[i].skip_sight = 1;
 			}
-		return false;
 		}
-	
+	//adds scout
+	canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+	canvas_map_sight.fillStyle = "rgba(0, 0, 0, 0.4)";
+	canvas_map_sight.fillRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 	canvas_map_sight.save();
-	if(QUALITY == 3)
-		canvas_map_sight.fillStyle = "#ffffff";
+	if(QUALITY == 3) canvas_map_sight.fillStyle = "#ffffff";
 	canvas_map_sight.globalCompositeOperation = 'destination-out';	// this does the trick
 	for(var i in TANKS){
 		if(TANKS[i].team != MY_TANK.team) continue;
 		if(TANKS[i].constructing != undefined) continue;
-		
+		if(TANKS[i].dead == 1) continue;
+			
 		var xx = round(TANKS[i].cx() + map_offset[0]);
 		var yy = round(TANKS[i].cy() + map_offset[1]);
+		
+		if(xx < 0 || yy < 0 || xx > WIDTH_SCROLL || yy > HEIGHT_SCROLL) continue; //not in visible area
+		
 		canvas_map_sight.beginPath();
-		var sight_range = TANKS[i].sight;// + TANKS[i].width()/2;
+		var sight_range = TANKS[i].sight;
 		canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 		canvas_map_sight.fill();
 		}
-	canvas_map_sight.restore();	
+	canvas_map_sight.restore();
+	SCOUT_FOG_REUSE = Date.now() + 50; //next repaint in 50 ms - 20fps
 	}
-//cancel manuel map move controlls
+//cancel manual map move controlls
 function move_to_place_reset(){
 	MAP_SCROLL_CONTROLL=false;
 	auto_scoll_map();
 	}
 //move map by tank position
 function auto_scoll_map(){
-	
 	//calc
 	map_offset[0] = -1 * MY_TANK.cx() + WIDTH_SCROLL/2;
 	map_offset[1] = -1 * MY_TANK.cy() + HEIGHT_SCROLL/2;
@@ -157,6 +158,10 @@ function auto_scoll_map(){
 	//scrolling using css - 2x speed gain
 	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	if(QUALITY == 3){
+		document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
+		document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
+		}
 	}
 //scroll map in manual scroll mode
 function scoll_map(xx, yy, step){
@@ -180,11 +185,15 @@ function scoll_map(xx, yy, step){
 	//scrolling using css - 2x speed gain
 	document.getElementById("canvas_map").style.marginTop =  map_offset[1]+"px";
 	document.getElementById("canvas_map").style.marginLeft = map_offset[0]+"px";
+	if(QUALITY == 3){
+		document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
+		document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
+		}
 	}
 var maps_positions = [];
 //redraw actions in selecting tank/map window
 function show_maps_selection(canvas_this, top_height, can_select_map){
-	if(game_mode == 2) return false;
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft') return false;
 	var gap = 8;
 	var button_width = 90;
 	var button_height = 80;
@@ -214,7 +223,7 @@ function show_maps_selection(canvas_this, top_height, can_select_map){
 		//paint towers
 		msize = 3;
 		for (ii in MAPS[i].towers){
-			if(game_mode == 3 && MAPS[i].towers[ii][3] != 'Base') continue;
+			if((game_mode == 'single_craft' || game_mode == 'multi_craft') && MAPS[i].towers[ii][3] != 'Base') continue;
 			var type_info;
 			for(var t in TYPES){
 				if(TYPES[t].name == MAPS[i].towers[ii][3]){
@@ -313,4 +322,26 @@ function get_element_by_name(name){
 			}
 		}
 	return false;
+	}
+function change_quality(){
+	QUALITY++;
+	if(QUALITY==4)
+		QUALITY = 1;
+	setCookie("quality", QUALITY, 30);
+	
+	if(PLACE == 'game'){
+		canvas_map_sight.globalCompositeOperation = 'source-over';
+		if(QUALITY == 1){
+			canvas_map_sight.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);
+			document.getElementById("canvas_fog").style.display = 'none';
+			}
+		else if(QUALITY == 2)
+			document.getElementById("canvas_fog").style.display = 'none';
+		else if(QUALITY == 3){
+			document.getElementById("canvas_fog").style.display = 'block';
+			
+			document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
+			document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
+			}
+		}
 	}

@@ -71,7 +71,7 @@ var mouse_pos = [0,0];			//current mouse position for external functions
 var mouse_click_pos = [0,0];		//last mouse click position for external functions
 var pre_draw_functions = [];		//extra functions executed before main draw loop
 var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
-var game_mode = 0;			//1=single player, 2=multi player, 3=commander mode
+var game_mode;				//single_quick, single_craft, multi_quick, multi_craft
 var QUALITY = 3;			//1=low, 2=mid, 3=high
 var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room
 var preloaded=false;			//if all images preloaded
@@ -100,6 +100,8 @@ var weapons_bonus = 0;			//in commander mode weappon bonus
 var armor_bonus = 0;			//in commander mode armor bonus
 var screen_message = {};		//message to show on screen
 var mouse_last_move = Date.now();	//if mouse moving
+var SCOUT_FOG_REUSE = 0;		//pause between fog and scout repaint
+var MINI_FOG;				//fog data for mini map
 
 //repeative functions handlers
 var draw_interval_id;			//controller for main draw loop, rate: 35/s
@@ -112,6 +114,7 @@ var bots_interval_id;			//controller for adding new bots function, rate: once pe
 
 //canvas layers
 var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map
+var canvas_fog = document.getElementById("canvas_fog").getContext("2d");	//fog
 var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//sight
 var canvas_backround = document.getElementById("canvas_backround").getContext("2d");	//backgrounds
 var canvas_base = document.getElementById("canvas_main");

@@ -383,7 +383,7 @@ function get_packet(fromClient, message){
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
 		//DATA = [room_id, host_enemy_name]
 		if(PLACE=="room" && opened_room_id==DATA[0]){
-			game_mode = 2;
+			game_mode = 'multi_quick';
 			start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
 			draw_tank_select_screen();
 			ROOM = get_room_by_id(DATA[0]);
@@ -637,7 +637,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		//adding kill stats
-		if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 3){
+		if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			//player
 			if(TANK_TO.dead != 1)
 				TANK_FROM.kills = TANK_FROM.kills + 1;	
@@ -847,13 +847,13 @@ function update_players_ping(name){
 		}
 	}
 function disconnect_game(e){
-	if(PLACE=='room' && game_mode == 2){
+	if(PLACE=='room' && (game_mode == 'multi_quick' || game_mode == 'multi_craft') ){
 		if(confirm("Do you really want to leave this room?")==false){
 			return false;
 			}
 		register_tank_action('leave_room', opened_room_id, name);
 		}
-	if(PLACE=='game' && game_mode == 2){
+	if(PLACE=='game' && (game_mode == 'multi_quick' || game_mode == 'multi_craft') ){
 		if(confirm("Do you really want to quit game???")==false){
 			return false;
 			}
