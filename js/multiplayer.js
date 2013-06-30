@@ -383,14 +383,20 @@ function get_packet(fromClient, message){
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
 		//DATA = [room_id, host_enemy_name]
 		if(PLACE=="room" && opened_room_id==DATA[0]){
-			game_mode = 'multi_quick';
-			start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
-			draw_tank_select_screen();
 			ROOM = get_room_by_id(DATA[0]);
+			game_mode = ROOM.settings[3];
 			ROOM.host_enemy_name = DATA[1];
 			ROOM.players_max = ROOM.players.length;
-			if(ROOM.host==name && ROOM.settings[0] != 'normal'){
-				choose_and_register_tanks(ROOM);
+			if(game_mode == 'multi_quick'){	log('11111');
+				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
+				draw_tank_select_screen();
+				if(ROOM.host==name && ROOM.settings[0] != 'normal'){
+					choose_and_register_tanks(ROOM);
+					}
+				}
+			else if(game_mode == 'multi_craft'){
+				draw_tank_select_screen(); //jsut let system to prepare here
+				register_tank_action('start_game', opened_room_id, false, ROOM.players);
 				}
 			}
 		else if(PLACE=="rooms"){
@@ -801,7 +807,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 		alert('Error, unknown action ['+action+'] in register_tank_action();');	
 	}
 //new room was created
-function register_new_room(room_name, mode, type, max_players, map, nation1, nation2){
+function register_new_room(room_name, mode, type, max_players, map, nation1, nation2, main_mode){
 	var players = [];
 	players.push({
 		name: name, 
@@ -813,7 +819,7 @@ function register_new_room(room_name, mode, type, max_players, map, nation1, nat
 	ROOM = {
 		id: Math.floor(Math.random()*9999999),
 		name: room_name,
-		settings: [mode, type, map],
+		settings: [mode, type, map, main_mode],
 		max: max_players,
 		host: name,
 		players: players,

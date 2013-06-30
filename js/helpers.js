@@ -107,8 +107,9 @@ function get_dimensions(){
 		}
 	return [theWidth, theHeight];
 	}
-function log(text){
-	console.log(text+" - "+arguments.callee.caller.name+"()");
+function log(object){
+	console.log(object);
+	//console.log(object+" - "+arguments.callee.caller.name+"()");
 	}
 function drawImage_rotated(canvas, file, x, y, width, height, angle){
 	var TO_RADIANS = Math.PI/180;
@@ -192,4 +193,11 @@ CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen
 	this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
 	this.stroke();
 	this.closePath();
+	};
+Object.size = function(obj) {
+	var size = 0, key;
+	for (key in obj){
+		if (obj.hasOwnProperty(key)) size++;
+		}
+	return size;
 	};

@@ -523,7 +523,7 @@ TYPES.push({
 		{name: 'Weapons',	passive: false,		broadcast: 1}, 
 		{name: 'Armor',		passive: false,		broadcast: 1},
 		],
-	size: ['L', 50, 42],
+	size: ['L', 50, 40],
 	preview: false,
 	icon_top: false,
 	icon_base: true,
@@ -535,7 +535,7 @@ TYPES.push({
 TYPES.push({
 	name: 'Silo',
 	type: 'building',
-	description: ["Structure for storing Helium-3."],
+	description: ["Structure for generating Helium-3."],
 	life: [400,0],
 	damage: [0, 0],		//0 dps
 	range: 0,

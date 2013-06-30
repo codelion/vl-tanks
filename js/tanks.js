@@ -207,7 +207,7 @@ function draw_tank(tank){
 			canvas_main.beginPath();
 			canvas_main.arc(round(map_offset[0]+tank.clicked[0]), round(map_offset[1]+tank.clicked[1]), round(tank.clicked[2]), 0 , 2 * Math.PI, false);	
 			canvas_main.lineWidth = 2;
-			canvas_main.strokeStyle = "#558a54";
+			canvas_main.strokeStyle = "#ffffff";
 			canvas_main.stroke();
 			tank.clicked[2] = tank.clicked[2]-1;
 			if(tank.clicked[2] == 1)
@@ -608,7 +608,7 @@ function prepare_tank_move(tank){
 	delete tank.target_move_lock;
 	}
 //tank move rgistration and graphics
-function draw_tank_move(mouseX, mouseY){
+function draw_tank_move(mouseX, mouseY){		log('1111');
 	//remove some handlers
 	prepare_tank_move(MY_TANK);
 	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
@@ -619,7 +619,7 @@ function draw_tank_move(mouseX, mouseY){
 			}
 		}
 	
-	if(MY_TANK.death_respan != undefined) return false;
+	if(MY_TANK.death_respan != undefined) return false;		log('222222');
 		
 	//check clicks
 	var found_something = false;
@@ -675,7 +675,6 @@ function draw_tank_move(mouseX, mouseY){
 			}
 		else
 			register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
-		//MY_TANK.move = 0;
 		return false;
 		}
 	else{

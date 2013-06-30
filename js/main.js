@@ -4,10 +4,8 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	road?
-	multiplayer
-		game_mode = single_quick   single_craft   multi_quick   multi_craft
-		creating room, rooms, select adjust
+	multiplayer	- game_mode = single_quick   single_craft   multi_quick   multi_craft
+		multi controlls: move, target, skills, others
 		move he3 to team, initial he3
 		implement weapons_bonus and armor_bonus
 		optimize network packets in mode3:
@@ -16,6 +14,8 @@ TODO:
 			skill_do
 			skill_advanced
 	special score for mode3: he3 and army graph in time
+	heavy - aoe skill? more aoe skills?
+	classes? - http://www.webmonkey.com/2010/02/make_oop_classes_in_javascript/
 */
 
 //init hello screen
@@ -58,7 +58,7 @@ function init_game(first_time){
 	if(first_time==true)
 		check_canvas_sizes();
 	
-	//check sound support
+	//detect sound extension, .ogg by default
 	if(isIE()==true)
 		SOUND_EXT = '.mp3';
 	
@@ -288,8 +288,8 @@ function init_action(map_nr, my_team){
 	
 	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 		//add few more me
-		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
-		add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+		add_tank(1, name+'-2', name, my_tank_nr, my_team, my_nation);
+		add_tank(1, name+'-3', name, my_tank_nr, my_team, my_nation);
 		}
 	
 	auto_scoll_map();
@@ -430,7 +430,7 @@ var IMAGES_SETTINGS = {
 		SAM_Tower:	{ x:0,	y:1550,	w:90,	h:80 },
 		Base:		{ x:0,	y:1200,	w:90,	h:80 },
 		Factory:	{ x:0,	y:1400,	w:68,	h:56 },
-		Research:	{ x:0,	y:1500,	w:50,	h:42 },
+		Research:	{ x:0,	y:1500,	w:50,	h:40 },
 		Silo:		{ x:0,	y:1600,	w:46,	h:46 },
 		},
 	bullets: {

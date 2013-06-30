@@ -45,6 +45,21 @@ function draw_map(map_only){
 		for(var j=0; j<Math.ceil(MAPS[level-1].width/backround_width); j++)
 			canvas_map.drawImage(IMAGE_MOON, 0+j*backround_width, 0+i*backround_height);
 		}
+		
+	//roads
+	for(var i in MAPS[level-1].roads){
+		var road_group = MAPS[level-1].roads[i][1];
+		var width = MAPS[level-1].roads[i][0];
+		for(var j in road_group){
+			var road = road_group[j];
+			if(road[0] == 'line')
+				add_road_line(canvas_map, width, road[1], road[2], road[3], road[4]);
+			else if(road[0] == 'turn')
+				add_road_turn(canvas_map, width, road[1], road[2], road[3], road[4], road[5], road[6]);
+			else if(road[0] == 'curve')
+				add_road_curve(canvas_map, width, road[1], road[2], road[3], road[4], road[5], road[6], road[7], road[8]);
+			}
+		}
 	
 	//elements
 	for(var e in MAPS[level-1].elements){
@@ -78,9 +93,142 @@ function draw_map(map_only){
 		if(visible == true)
 			draw_image(canvas_map, element.name, x, y, max_w, max_h, undefined);
 		}
-	
-	if(map_only==false)
+		
+	if(map_only==false){
 		draw_infobar(true);
+		}
+	}
+function add_road_line(ctx, width, x1, y1, x2, y2){
+	//light border
+	ctx.lineWidth = width+5;
+	ctx.strokeStyle = '#585953';
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+	
+	//main
+	ctx.lineWidth = width;
+	ctx.strokeStyle = '#3c3b36';
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+	
+	if(width >= 30 ){
+		//double line
+		ctx.lineWidth = 6;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		
+		//double line gap in middle
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = '#3c3b36';
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		}
+	else{
+		//center line
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		}
+	}
+function add_road_turn(ctx, width, x1, y1, x2, y2, x3, y3){
+	//light border
+	ctx.lineWidth = width+5;
+	ctx.strokeStyle = '#585953';
+	ctx.beginPath();
+	ctx.moveTo(x1,y1);
+	ctx.quadraticCurveTo(x2,y2,x3,y3);
+	ctx.stroke();
+	
+	//main
+	ctx.lineWidth = width;
+	ctx.strokeStyle = '#3c3b36';
+	ctx.beginPath();
+	ctx.moveTo(x1,y1);
+	ctx.quadraticCurveTo(x2,y2,x3,y3);
+	ctx.stroke();
+	
+	if(width >= 30 ){
+		//double line
+		ctx.lineWidth = 6;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.quadraticCurveTo(x2,y2,x3,y3);
+		ctx.stroke();
+		
+			//double line gap in middle
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = '#3c3b36';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.quadraticCurveTo(x2,y2,x3,y3);
+		ctx.stroke();
+		}
+	else{
+		//center line
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.quadraticCurveTo(x2,y2,x3,y3);
+		ctx.stroke();
+		}
+	}
+function add_road_curve(ctx, width, x1, y1, x2, y2, x3, y3, x4, y4){
+	//light border
+	ctx.lineWidth = width+5;
+	ctx.strokeStyle = '#585953';
+	ctx.beginPath();
+	ctx.moveTo(x1,y1);
+	ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+	ctx.stroke();
+	
+	//main
+	ctx.lineWidth = width;
+	ctx.strokeStyle = '#3c3b36';
+	ctx.beginPath();
+	ctx.moveTo(x1,y1);
+	ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+	ctx.stroke();
+	
+	if(width >= 30 ){
+		//double line
+		ctx.lineWidth = 6;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+		ctx.stroke();
+		
+		//double line gap in middle
+		ctx.lineWidth = 3;
+		ctx.strokeStyle = '#3c3b36';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+		ctx.stroke();
+		}
+	else{
+		//center line
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = '#53582f';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+		ctx.stroke();
+		}
 	}
 /*
 1x speed if QUALITY = 1	- scout off, fog off
@@ -125,16 +273,16 @@ function add_scout_and_fog(tank){
 			
 		var xx = round(TANKS[i].cx() + map_offset[0]);
 		var yy = round(TANKS[i].cy() + map_offset[1]);
+		var sight_range = TANKS[i].sight;
 		
-		if(xx < 0 || yy < 0 || xx > WIDTH_SCROLL || yy > HEIGHT_SCROLL) continue; //not in visible area
+		if(xx+sight_range < 0 || yy+sight_range < 0 || xx-sight_range > WIDTH_SCROLL || yy-sight_range > HEIGHT_SCROLL) continue; //not in visible area
 		
 		canvas_map_sight.beginPath();
-		var sight_range = TANKS[i].sight;
 		canvas_map_sight.arc(xx, yy, sight_range, 0 , 2 * Math.PI, true);
 		canvas_map_sight.fill();
 		}
 	canvas_map_sight.restore();
-	SCOUT_FOG_REUSE = Date.now() + 50; //next repaint in 50 ms - 20fps
+	SCOUT_FOG_REUSE = Date.now() + 40; //next repaint in 40 ms - 25fps
 	}
 //cancel manual map move controlls
 function move_to_place_reset(){

@@ -227,13 +227,13 @@ function on_mousemove_background(event){
 			if(mouseX > settings_positions[i].x && mouseX < settings_positions[i].x+settings_positions[i].width){
 				if(mouseY > settings_positions[i].y && mouseY < settings_positions[i].y+settings_positions[i].height){
 					//we have mouse over button
-					add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"], i);
+					add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], i);
 					found = true;
 					}
 				}
 			}
 		if(found == false)
-			add_settings_buttons(canvas_backround, ["Single player", "Multiplayer", "Commander (beta)"], 99);		
+			add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], 99);		
 		}
 	if(PLACE=='game'){
 		//mouse over abilities
@@ -340,7 +340,7 @@ function on_mouse_right_click(event){
 					}
 				}
 			//move tank
-			draw_tank_move(mouseX, mouseY);	
+			draw_tank_move(mouseX, mouseY);
 			}
 		else
 			soldiers_move(mouseX, mouseY);
