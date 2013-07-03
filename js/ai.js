@@ -1,22 +1,22 @@
 function check_path_AI(TANK){
-	if(game_mode == 2 && TANK.master.id != MY_TANK.id) return false;
+	if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && TANK.master.id != MY_TANK.id) return false;
+	if(TANK.id == MY_TANK.id) return false;
 	if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
-	if(game_mode == 1)
-		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
-	else
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 		TANK.ai_reuse = 1000+Date.now();	//second pause
+	else
+		TANK.ai_reuse = 1000/2+Date.now();	//half second pause
 	if(TANK.dead==1) return false;	//dead
 	
-	var tank_size = TYPES[TANK.type].size[1];
-	var max_width = WIDTH_MAP - tank_size;
-	var max_height = HEIGHT_MAP - tank_size;
+	var max_width = WIDTH_MAP - TANK.width();
+	var max_height = HEIGHT_MAP - TANK.height();
 	var y_direction = 0;
 	if(TANK.team=='B') //top
 		y_direction = max_height;
 	
 	//if in battle - stop
 	if(TANK.last_bullet_time + 1000 - Date.now() > 0){
-		if(game_mode == 1){
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			TANK.move = 0;
 			try_skills(TANK);
 			}
@@ -34,9 +34,8 @@ function check_path_AI(TANK){
 	set_random_path_AI(TANK);
 	}
 function set_random_path_AI(TANK){
-	var tank_size = TYPES[TANK.type].size[1];
-	var max_width = WIDTH_MAP - tank_size;
-	var max_height = HEIGHT_MAP - tank_size;
+	var max_width = WIDTH_MAP - TANK.width();
+	var max_height = HEIGHT_MAP - TANK.height();
 	collision_gap = 5;
 	
 	var direction = TANK.move_direction;
@@ -44,12 +43,12 @@ function set_random_path_AI(TANK){
 	if(TANK.move==1 && (direction == 'up' || direction == 'down')) return false;
 	
 	//try move down
-	if(TANK.team=='B' && TANK.y+tank_size/2<max_height && check_collisions(TANK.x+tank_size/2, TANK.y+tank_size+collision_gap, TANK)==false){
+	if(TANK.team=='B' && TANK.cy() < max_height && check_collisions(TANK.cx(), TANK.y+TANK.height()+collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, max_height, 'down');
 		return true;
 		}
 	//try move up
-	else if(TANK.team!='B' && TANK.y-tank_size/2>0 && check_collisions(TANK.x+tank_size/2, TANK.y-collision_gap, TANK)==false){
+	else if(TANK.team!='B' && TANK.y-TANK.height()/2>0 && check_collisions(TANK.cx(), TANK.y-collision_gap, TANK)==false){
 		do_ai_move(TANK, TANK.x, 0, 'up');
 		return true;
 		}
@@ -60,7 +59,7 @@ function set_random_path_AI(TANK){
 			else 	direction = 'right';
 			}
 		//map up/bottom borders
-		else if(TANK.team=='B' && TANK.y+tank_size/2>max_height || TANK.team!='B' && TANK.y-tank_size/2<0){
+		else if(TANK.team=='B' && TANK.cy() > max_height || TANK.team!='B' && TANK.y-TANK.height()/2<0){
 			if(getRandomInt(1,2)==1) direction = 'left';		
 			else 	direction = 'right';
 			TANK.move = 0;
@@ -69,7 +68,7 @@ function set_random_path_AI(TANK){
 	
 	//try move left				
 	if(direction == 'left'){
-		if(TANK.x-tank_size>0 && check_collisions(TANK.x-collision_gap, TANK.y+tank_size/2, TANK)==false){
+		if(TANK.x-TANK.width() > 0 && check_collisions(TANK.x-collision_gap, TANK.cy(), TANK)==false){
 			if(TANK.move_direction != 'left')
 				do_ai_move(TANK, 0, TANK.y, 'left');
 			}
@@ -79,19 +78,18 @@ function set_random_path_AI(TANK){
 		}
 	//right
 	else if(direction == 'right'){
-		if(TANK.x+tank_size<max_width && check_collisions(TANK.x+tank_size+collision_gap, TANK.y+tank_size/2, TANK)==false){
+		if(TANK.cx() < max_width && check_collisions(TANK.cx()+collision_gap, TANK.cy(), TANK)==false){
 			if(TANK.move_direction != 'right')
 				do_ai_move(TANK, max_width, TANK.y, 'right');
 			}
 		else
 			do_ai_move(TANK, 0, TANK.y, 'left');	//must turn left
 		}
-	if(game_mode == 1){
+	if(game_mode == 'single_quick' || game_mode == 'single_craft')
 		TANK.move=1;
-		}
 	}
 function do_ai_move(TANK, xx, yy, direction){
-	if(game_mode == 2){
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 		register_tank_action('move', opened_room_id, TANK.id, [round(TANK.x), round(TANK.y), round(xx), round(yy), undefined, direction]);
 		}
 	else{
@@ -102,16 +100,30 @@ function do_ai_move(TANK, xx, yy, direction){
 		}
 	}
 function try_skills(TANK_AI){
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		var selected_n = get_selected_count(TANK_AI.team);
+		if(selected_n == 1 && TANK_AI.id == MY_TANK.id) return false;
+		}
 	for(i in TYPES[TANK_AI.type].abilities){
 		var nr = 1+parseInt(i);
 		var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
-		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && game_mode == 2) continue;
+		if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && (game_mode == 'multi_quick' || game_mode == 'multi_craft')) continue;
 		if(TYPES[TANK_AI.type].abilities[i].passive == true) continue;
 		if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
 		var reuse = 0;
 		try{
 			//execute
 			reuse = window[ability_function](TANK_AI, undefined, undefined, true);
+			if(reuse != undefined && reuse != 0 && (game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK_AI.team == MY_TANK.team){
+				var tmp = new Array();
+				tmp['function'] = "draw_ability_reuse";
+				tmp['duration'] = reuse;
+				tmp['type'] = 'REPEAT';
+				tmp['nr'] = nr-1;	
+				tmp['max'] = reuse;
+				tmp['tank'] = TANK_AI;
+				timed_functions.push(tmp);
+				}
 			if(reuse !== false)
 				break;
 			}
@@ -122,7 +134,7 @@ function try_skills(TANK_AI){
 			TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
 		}
 	//check if missle or bomb ready
-	if(game_mode != 2){	
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') && TANK_AI.dead == undefined){	
 		do_auto_missile(TANK_AI.id);
 		do_auto_bomb(TANK_AI.id);
 		}
@@ -149,8 +161,7 @@ function soldiers_move(mouseX, mouseY){
 			delete TANKS[i].target_move_lock;
 
 		for(var j in TANKS){
-			var tank_size =  0.9*TYPES[TANKS[j].type].size[1];
-			if(Math.abs(TANKS[j].x+tank_size/2 - mouseX) < tank_size/2 && Math.abs(TANKS[j].y+tank_size/2 - mouseY) < tank_size/2){
+			if(Math.abs(TANKS[j].cx() - mouseX) < TANKS[j].width()/2 && Math.abs(TANKS[j].cy()- mouseY) < TANKS[j].height()/2){
 				if(TANKS[j].team == TANKS[i].team){
 					if(TANKS[j].name != name)
 						return false; //clicked on allies, but not youself
@@ -171,14 +182,13 @@ function soldiers_move(mouseX, mouseY){
 		if(found_something == false)
 			TANKS[i].clicked = [mouseX,mouseY,8];
 	
-		var tank_size = TYPES[TANKS[i].type].size[1];
-		mouseX_tmp = mouseX-tank_size/2;	
-		mouseY_tmp = mouseY-tank_size/2;
+		mouseX_tmp = mouseX-TANKS[i].width()/2;	
+		mouseY_tmp = mouseY-TANKS[i].height()/2;	
 		mouseX_tmp = Math.floor(mouseX_tmp);
 		mouseY_tmp = Math.floor(mouseY_tmp);
 		
 		//register
-		if(game_mode == 2){
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			if(found_something==true)
 				register_tank_action('move', opened_room_id, TANKS[i].id, [round(TANKS[i].x), round(TANKS[i].y), round(mouseX_tmp), round(mouseY_tmp), target_lock_id]);
 			else
@@ -191,6 +201,7 @@ function soldiers_move(mouseX, mouseY){
 				try{
 					audio_finish = document.createElement('audio');
 					audio_finish.setAttribute('src', '../sounds/click.ogg');
+					audio_finish.volume = FX_VOLUME;
 					audio_finish.play();
 					}
 				catch(error){}
@@ -198,10 +209,9 @@ function soldiers_move(mouseX, mouseY){
 			}
 		}
 	}
-function do_auto_missile(tank_id){			
+function do_auto_missile(tank_id){	
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_missile == undefined) return false;
-	var tank_size = TYPES[TANK.type].size[1]/2;
 	
 	//find enemy with min hp
 	var ENEMY_NEAR;
@@ -240,8 +250,8 @@ function do_auto_missile(tank_id){
 		
 	//bullet	
 	var tmp = new Array();
-	tmp['x'] = TANK.x+tank_size;
-	tmp['y'] = TANK.y+tank_size;
+	tmp['x'] = TANK.cx();
+	tmp['y'] = TANK.cy();
 	tmp['bullet_to_target'] = enemy;
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_missile.power;
@@ -251,12 +261,23 @@ function do_auto_missile(tank_id){
 	if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
 	BULLETS.push(tmp);
 	
+	//init reuse
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_missile.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_missile.ability_nr;	
+		tmp['max'] = TANK.try_missile.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
+	
 	delete TANK.try_missile;
 	}
 function do_auto_bomb(tank_id){	
 	TANK = get_tank_by_id(tank_id);
 	if(TANK.try_bomb == undefined) return false;
-	var tank_size = TYPES[TANK.type].size[1]/2;
 	
 	//find enemy with min hp
 	var ENEMY_NEAR;
@@ -279,8 +300,8 @@ function do_auto_bomb(tank_id){
 		}
 	if(ENEMY_NEAR == undefined) return false;
 	var enemy = TANKS[ENEMY_NEAR[1]];
-	var mouseX = enemy.x + TYPES[enemy.type].size[1]/2;
-	var mouseY = enemy.y + TYPES[enemy.type].size[1]/2;
+	var mouseX = enemy.cx();
+	var mouseY = enemy.cy();
 
 	//control
 	nr = TANK.try_bomb.ability_nr;
@@ -289,8 +310,8 @@ function do_auto_bomb(tank_id){
 	
 	//bullet	
 	var tmp = new Array();
-	tmp['x'] = TANK.x+tank_size;
-	tmp['y'] = TANK.y+tank_size;
+	tmp['x'] = TANK.cx();
+	tmp['y'] = TANK.cy();
 	tmp['bullet_to_area'] = [mouseX, mouseY];
 	tmp['bullet_from_target'] = TANK;
 	tmp['damage'] = TANK.try_bomb.power;
@@ -302,6 +323,18 @@ function do_auto_bomb(tank_id){
 		tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
 		}
 	BULLETS.push(tmp);
+	
+	//init reuse
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		var tmp = new Array();
+		tmp['function'] = "draw_ability_reuse";
+		tmp['duration'] = TANK.try_bomb.reuse;
+		tmp['type'] = 'REPEAT';
+		tmp['nr'] = TANK.try_bomb.ability_nr;	
+		tmp['max'] = TANK.try_bomb.reuse;
+		tmp['tank'] = TANK;
+		timed_functions.push(tmp);
+		}
 	
 	delete TANK.try_bomb;
 	}

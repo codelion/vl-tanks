@@ -8,6 +8,7 @@
 <body style="margin:0px;padding:0px;background-color:#ffffff;" onload="init_game(true)">
 <div id="canvas_area">
 	<canvas style="position:absolute;" id="canvas_map">Your browser doesn't support canvas.</canvas>
+	<canvas style="position:absolute;" id="canvas_fog"></canvas>
 	<canvas style="position:absolute;" id="canvas_map_sight"></canvas>
 	<canvas style="position:absolute;" id="canvas_backround"></canvas>
 	<canvas style="position:absolute;" id="canvas_main"></canvas>
@@ -16,6 +17,7 @@
 		<input type="text" style="width:250px;" id="chat_text" />
 		<input type="submit" value="Say" onclick="chat();" />
 	</div>
+	<div id="popup"></div>
 </div>
 <div style="position:absolute;left:0px;top:525px;width:100%;height:1000px;background-color:white"></div>
 <div style="position:absolute;left:800px;top:0px;width:1000px;height:100%;background-color:white;"></div>

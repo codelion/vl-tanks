@@ -2,24 +2,23 @@ COUNTRIES = {
 	us: {
 		name: 'United States', 
 		file: 'us',
-		description: 'Strong offensive country. Units have 10% more dps and 5% more shields.',
-		pros: 'More dps, more unit armor. Good at offensive strategy.',
-		cons: 'No weak points.',
+		description: 'Strong offensive country. High damage units per second will allow you to shine at offensive strategy.',
+		pros: 'High damage units per second will allow you to shine at offensive strategy.',
+		cons: 'Enemy mines',
 		buffs: [
-			{ name: 'damage',	power: 1.1, },
-			{ name: 'shield',	power: 5,	type: 'static' },
+			{ name: 'damage',		power: 1.1, },
 			],
-		tanks_lock: ['Heavy', 'Miner', 'Truck'],
+		tanks_lock: ['Heavy', 'Miner', 'TRex'],
 		tank_unique: 'Bomber',
 		},
 	ru: {
-		name: 'Russia', 
+		name: 'Russia',
 		file: 'ru',
-		description: 'Defensive country. Units can be rebuilt 50% faster.',
-		pros: 'Fast unit rebuild gives good base defence.',
-		cons: 'Enemies has more powerful units and are advanced more.',
+		description: 'Defensive country. Units will excel at defence.',
+		pros: 'Units will excel at defence.',
+		cons: 'Issues in offensive strategy',
 		buffs: [
-			{ name: 'respawn',	power: 0.5, },
+			{ name: 'health',		power: 1.15,	},
 			],
 		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
 		tank_unique: 'Heavy',
@@ -27,13 +26,17 @@ COUNTRIES = {
 	ch: {
 		name: 'China', 
 		file: 'ch',
-		description: 'Country has fastest-growing economy. Units level-up faster by 20%.',
-		pros: 'Strongest economy in late game.',
-		cons: 'Weak in early game, can not afford to use some advanced technologies.',
+		description: 'Rush-attack country.',
+		pros: 'Excel at rush attacks.',
+		cons: 'Units have less health.',
 		buffs: [
-			{ name: 'level_up',	power: 0.8, },
+			{ name: 'respawn',	power: 0.5, },
+			{ name: 'speed',		power: 1.15,},
+			{ name: 'health',		power: 0.9,	},
+			{ name: 'cost',		power: 0.9,	},
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
+		tank_unique: 'TRex',
 		},
 	}
 
@@ -46,8 +49,8 @@ TYPES.push({
 	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
 	life: [210, 12],
 	damage: [30, 1.5],		//30 dps
-	range: 80,
-	scout: 90,
+	range: 80, 
+	scout: 110,
 	armor: [25, 0.5, 50],
 	speed: 28,
 	attack_delay: 1,
@@ -57,13 +60,13 @@ TYPES.push({
 		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
 		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 70,
 	});
 
 //Heavy
@@ -74,7 +77,7 @@ TYPES.push({
 	life: [230, 12],  				//[tank life in level 0, life increase in each level]
 	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80,					//tank shooting range
-	scout: 90,					//tank scout range
+	scout: 110,					//tank scout range
 	armor: [40, 0.5, 65],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 25,					//speed
 	attack_delay: 1,				//pause between shoots in seconds
@@ -89,13 +92,13 @@ TYPES.push({
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
 		{name: 'Health',	passive: true,		broadcast: 1}, 
 		],
-	size: ['M', 50],				//[tank size: S/M/L, icon width and height(same)]
+	size: ['M', 50, 50],				//[tank size: S/M/L, icon width and height(same)]
 	icon_top: true,				//tank base images
 	icon_base: true,			//tank top images
 	preview: true,				//tank preview image
 	bullet: 'small_bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
-	accuracy: 90,					//chance to hit target, %
+	cost: 60,
 	});
 
 //Cruiser
@@ -106,7 +109,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [18, 1.3],	//18 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 30,
 	attack_delay: 1,
@@ -116,13 +119,13 @@ TYPES.push({
 		{name: 'Repair',	passive: false,		broadcast: 0}, 
 		{name: 'Boost',		passive: false,		broadcast: 0}, 
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 50,
 	});
 
 //Launcher
@@ -133,7 +136,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1.1],	//15 dps
 	range: 100,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 1,
@@ -143,13 +146,13 @@ TYPES.push({
 		{name: 'Mortar',	passive: false,		broadcast: 2}, 
 		{name: 'MM Missile',	passive: false,		broadcast: 2},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 100,
+	cost: 60,
 	});
 
 //Stealth
@@ -160,7 +163,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [40, 2],	//20 dps
 	range: 100,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 28,
 	attack_delay: 2,
@@ -170,14 +173,14 @@ TYPES.push({
 		{name: 'Camouflage',	passive: false,		broadcast: 1}, 
 		{name: 'Scout',		passive: false,		broadcast: 0},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	ignore_armor: 1,
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 80,
+	cost: 50,
 	});
 
 //Miner
@@ -188,7 +191,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
@@ -198,13 +201,13 @@ TYPES.push({
 		{name: 'Explode',	passive: false,		broadcast: 1}, 
 		{name: 'SAM',		passive: false,		broadcast: 1}, 
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 50,
 	});
 
 //Tech
@@ -215,7 +218,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [20, 1.4],	//20 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
 	attack_delay: 1,
@@ -225,13 +228,13 @@ TYPES.push({
 		{name: 'EMP Bomb',	passive: false,		broadcast: 2},
 		{name: 'M7 Shield',	passive: false,		broadcast: 0},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 50,
 	});
 
 //Truck
@@ -242,7 +245,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [15, 1],	//15 dps
 	range: 80,
-	scout: 90,
+	scout: 110,
 	armor: [10, 0, 10],
 	speed: 25,
 	attack_delay: 1,
@@ -252,13 +255,13 @@ TYPES.push({
 		{name: 'Soldiers',	passive: false,		broadcast: 1}, 
 		{name: 'Medicine',	passive: false,		broadcast: 0}, 
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: false,
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 0,
 	});
 
 //TRex
@@ -269,7 +272,7 @@ TYPES.push({
 	life: [170, 11],
 	damage: [20, 1.4],	//20 dps
 	range: 40,
-	scout: 80,
+	scout: 100,
 	armor: [30, 0.5, 55],
 	speed: 28,
 	attack_delay: 1,
@@ -279,13 +282,13 @@ TYPES.push({
 		{name: 'Jump',		passive: false,		broadcast: 2}, 
 		{name: 'PL Shield',	passive: false,		broadcast: 1},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 50,
 	});
 
 //Apache
@@ -296,7 +299,7 @@ TYPES.push({
 	life: [180, 11],
 	damage: [20, 1.3],	//20 dps
 	range: 90,
-	scout: 100,
+	scout: 120,
 	armor: [20, 0.5, 45],	
 	speed: 32,
 	attack_delay: 1,
@@ -309,13 +312,13 @@ TYPES.push({
 		{name: 'Scout',		passive: false,		broadcast: 0}, 
 		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: false,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 70,
 	});
 
 //Bomber
@@ -326,7 +329,7 @@ TYPES.push({
 	life: [150, 10],
 	damage: [20, 1.3],	//20 dps
 	range: 80,
-	scout: 100,
+	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 37,
 	attack_delay: 1,
@@ -339,13 +342,13 @@ TYPES.push({
 		{name: 'AA bomb',	passive: false,		broadcast: 2}, 
 		{name: 'Rest',		passive: false,		broadcast: 1},
 		],
-	size: ['M', 50],
+	size: ['M', 50, 50],
 	preview: true,
 	icon_top: false,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 60,
 	});
 
 //Soldier
@@ -353,70 +356,200 @@ TYPES.push({
 	name: 'Soldier',
 	type: 'human',
 	description: ["Infantry", "No armor", "Low damage", "Supports tanks in battle"],
-	life: [130, 6],
+	life: [120, 6],
 	damage: [11, 0.7],	//11 dps
 	range: 70,
-	scout: 80,
+	scout: 100,
 	armor: [0, 0, 0],
 	speed: 25,
 	attack_delay: 1,
 	turn_speed: 4,
 	no_repawn: 1,
 	abilities: [],
-	size: ['S', 30],
+	size: ['S', 20, 22],
 	preview: true,
 	icon_top: false,
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 30,
 	});
 
 //Tower
 TYPES.push({
 	name: 'Tower',
-	type: 'tower',
+	type: 'building',
 	description: ["Tower for defence"],
 	life: [1200,0],
 	damage: [30, 0],	//30 dps
 	range: 110,
-	scout: 110,
+	scout: 130,
+	armor: [20, 0, 20],
+	speed: 0,
+	attack_delay: 1.1,
+	turn_speed: 2.5,
+	no_repawn: 1,
+	abilities: [
+		{name: 'Freak out',		passive: false,		broadcast: 1}, 
+		],
+	size: ['L', 50, 50],
+	preview: false,
+	icon_top: true,
+	icon_base: true,
+	bullet: 'bullet',
+	fire_sound: 'shoot',
+	attack_type: 'ground',
+	cost: 150,
+	});
+	
+//SAM Tower
+TYPES.push({
+	name: 'SAM_Tower',
+	type: 'building',
+	description: ["Tower for air defence"],
+	life: [1000,0],
+	damage: [50, 0],	//40 dps
+	range: 110,
+	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
 	attack_delay: 1.1,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [],
-	size: ['L', 50],
+	size: ['L', 50, 50],
 	preview: false,
 	icon_top: true,
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	attack_type: 'air',
+	cost: 120,
+	});
+
+//Scout Tower
+TYPES.push({
+	name: 'Scout_Tower',
+	type: 'building',
+	description: ["Tower for scouting"],
+	life: [500,0],
+	damage: [0, 0],	//0 dps
+	range: 110,
+	scout: 140,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [],
+	size: ['L', 22, 20],
+	preview: false,
+	icon_top: true,
+	icon_base: false,
+	no_base_rotate: true,
+	cost: 40,
 	});
 
 //Base
 TYPES.push({
 	name: 'Base',
-	type: 'tower',
+	type: 'building',
 	description: ["Main base"],
 	life: [2500, 0],
 	damage: [45, 0],	//45 dps
 	range: 110,
-	scout: 110,
+	scout: 130,
 	armor: [50, 0, 50],
 	speed: 0,
 	attack_delay: 1.1,
 	turn_speed: 2.5,
 	no_repawn: 1,
-	abilities: [],
-	size: ['L', 90],
+	abilities: [
+		{name: 'Factory',		passive: false,		broadcast: 2}, 
+		{name: 'Research',		passive: false,		broadcast: 2}, 
+		{name: 'Silo',			passive: false,		broadcast: 2}, 
+		],
+	size: ['L', 90, 90],
 	preview: false,
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	accuracy: 90,
+	cost: 450,
+	});
+
+//Factory
+TYPES.push({
+	name: 'Factory',
+	type: 'building',
+	description: ["Tanks factory"],
+	life: [500,0],
+	damage: [0, 0],		//0 dps
+	range: 0,
+	scout: 90,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [
+		{name: 'War units',	passive: true,		broadcast: 0,}, 
+		{name: 'Towers',	passive: true,		broadcast: 0,},
+		],
+	size: ['L', 68, 56],
+	preview: false,
+	icon_top: false,
+	icon_base: true,
+	no_base_rotate: true,
+	cost: 150,
+	});
+
+//Research
+TYPES.push({
+	name: 'Research',
+	type: 'building',
+	description: ["Research station"],
+	life: [700,0],
+	damage: [0, 0],		//0 dps
+	range: 0,
+	scout: 90,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [
+		{name: 'Weapons',	passive: false,		broadcast: 1}, 
+		{name: 'Armor',		passive: false,		broadcast: 1},
+		],
+	size: ['L', 50, 40],
+	preview: false,
+	icon_top: false,
+	icon_base: true,
+	no_base_rotate: true,
+	cost: 185,
+	});
+
+//Silo
+TYPES.push({
+	name: 'Silo',
+	type: 'building',
+	description: ["Structure for generating Helium-3."],
+	life: [400,0],
+	damage: [0, 0],		//0 dps
+	range: 0,
+	scout: 50,
+	armor: [0, 0, 0],
+	speed: 0,
+	attack_delay: 999,
+	turn_speed: 0,
+	no_repawn: 1,
+	abilities: [],
+	size: ['L', 46, 46],
+	preview: false,
+	icon_top: false,
+	icon_base: true,
+	no_base_rotate: true,
+	cost: 60,
 	});

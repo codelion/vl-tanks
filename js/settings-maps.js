@@ -1,15 +1,10 @@
-ELEMENTS.push({
-	name: 'fence',
-	size: [100, 26],
-	alt_color: '#4e4b44',	
-	collission: true,	
-	});
-ELEMENTS.push({
-	name: 'vfence',
-	size: [26, 100], 
-	alt_color: '#4e4b44',	
-	collission: true,	
-	});
+ELEMENTS.push({	name: 'fence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'vfence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'hill',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'rocks1',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'rocks2',				collission: true,	alpha: 1	});
+ELEMENTS.push({	name: 'bones',				collission: false,	alpha: 0.7	});
+ELEMENTS.push({	name: 'crystals',			collission: false,	alpha: 0.8	});	
 
 //====== Main ==================================================================
 
@@ -41,14 +36,26 @@ MAPS.push({
 			['fence', 	450,	200,	0,	0],
 			['fence', 	550,	200,	0,	0],
 			['fence', 	650,	200,	50,	0],
-			['fence', 	0,	500,	0,	0],
-			['fence', 	700,	500,	0,	0],
 			['fence', 	100,	800,	50,	0],
 			['fence', 	150,	800,	0,	0],
 			['fence', 	250,	800,	0,	0],
 			['fence', 	450,	800,	0,	0],
 			['fence', 	550,	800,	0,	0],
 			['fence', 	650,	800,	50,	0],
+			['rocks1', 	-80,	410,	0,	0],
+			['rocks2', 	-80,	490,	0,	0],
+			['bones', 	420,	450,	0,	0],
+			['hill', 	340,	10,	0,	0],
+			['hill', 	340,	900,	0,	0],
+			['crystals', 	100-20,	50-20,	0,	0],
+			['crystals', 	700-20,	950-20,	0,	0],
+			['crystals', 	50-20,	500-20,	0,	0],
+			['crystals', 	750-20,	500-20,	0,	0],
+		],
+	roads: [
+			//[width	[line/turn/curn x1,y1 x2,y2 (x3,y3 x4,y4)], [...], [...] ]
+			[50, [['line', 400,200, 400,800]] ],
+			[25, [['curve', 50,0, 50,350, 150,350, 150,500], ['curve', 150,500, 150,650, 50,650, 50,1000]] ],
 		],
 	bots: [
 			['B',	35,	1,	[[5, 18],[25,50],[25,70],[5,82], [45,99]] ],
@@ -76,7 +83,7 @@ MAPS.push({
 			['B',	150,	250,	'Tower'],
 			['R',	150,	750,	'Tower'],
 			['R',	400,	850,	'Tower'],
-			['R',	400,	940,	'Base'],
+			['R',	400,	950,	'Base'],
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
@@ -101,6 +108,14 @@ MAPS.push({
 			['fence', 	400,	700,	0,	0],
 			['fence', 	500,	700,	0,	0],
 			['fence', 	600,	700,	0,	0],
+			['bones', 	620,	400,	0,	0],
+			['crystals', 	700-20,	50-20,	0,	0],
+			['crystals', 	100-20,	950-20,	0,	0],
+			['crystals', 	30,	260-20,	0,	0],
+			['crystals', 	30,	740-20,	0,	0],
+		],
+	roads: [
+			[25, [['line', 750,0, 750,300], ['curve', 750,300, 750,500, 50,300, 50,500], ['curve', 750,700, 750,500, 50,700, 50,500], ['line', 750,1000, 750,700]] ],
 		],
 	bots: [
 			['B',	65,	5,	[[95,18],[95,40],[5, 40],[5, 60],[95,60],[95, 82],[50, 95]] ],
@@ -125,7 +140,7 @@ MAPS.push({
 			['B',	500,	150,	'Tower'],
 			['R',	300,	850,	'Tower'],
 			['R',	500,	850,	'Tower'],
-			['R',	400,	940,	'Base'],
+			['R',	400,	950,	'Base'],
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
@@ -145,6 +160,18 @@ MAPS.push({
 			['vfence', 	650,	600,	0,	0],
 			['vfence', 	650,	700,	0,	0],
 			['vfence', 	650,	800,	0,	0],	
+			['rocks1', 	300,	300,	0,	0],
+			['rocks2', 	300,	550,	0,	0],
+			['bones', 	0,	0,	0,	0],
+			['bones', 	650,	900,	0,	0],
+			['crystals', 	700-20,	50-20,	0,	0],
+			['crystals', 	100-20,	950-20,	0,	0],
+			['crystals', 	50-20,	480-20,	0,	0],
+			['crystals', 	50-20,	520-20,	0,	0],	
+			['crystals', 	80-20,	500-20,	0,	0],		
+		],
+	roads: [
+			[50, [['line', 400,100, 400,300], ['line', 400,410, 400,550], ['line', 400,660, 400,890]] ],
 		],
 	bots: [
 			['B',	50,	10,	[[30,30],[30,95],[50,95]] ],
@@ -165,7 +192,7 @@ MAPS.push({
 	description: "You, enemy, 4 towers, 2 bases and no time and space. Victory or defeat will come fast!",
 	towers: [
 			//team x,	 y, 	name
-			['B',	50,	55,	'Base'],
+			['B',	60,	55,	'Base'],
 			['B',	150,	50,	'Tower'],
 			['B',	50,	160,	'Tower'],
 			['R',	750,	210,	'Tower'],
@@ -175,9 +202,16 @@ MAPS.push({
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
 			['fence', 	0,	110,	0,	0],
-			['fence', 	100,	110,	0,	0],
-			['fence', 	600,	240,	0,	0],
 			['fence', 	700,	240,	0,	0],
+			['bones', 	330,	100,	0,	0],
+			['bones', 	300,	150,	0,	0],
+			['crystals', 	100,	90,	0,	0],
+			['crystals', 	650,	220,	0,	0],
+		],
+	roads: [
+			[25, [['line', 200,0, 200,370]] ],
+			[25, [['line', 550,0, 550,370]] ],
+			[50, [['line', 212,300, 538,300]] ],
 		],
 	bots: [
 			['B',	25,	5,	[[95,20],[95,90]] ],
@@ -200,7 +234,7 @@ MAPS.push({
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],
 			['B',	420,	300,	'Tower'],
-			['R',	400,	540,	'Base'],
+			['R',	400,	550,	'Base'],
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
@@ -212,6 +246,15 @@ MAPS.push({
 			['fence', 	540,	300,	0,	0],
 			['fence', 	640,	300,	0,	0],
 			['fence', 	740,	300,	60,	0],
+			['bones', 	50,	500,	0,	0],
+			['bones', 	700,	320,	0,	0],
+			['rocks2', 	600,	480,	0,	0],
+			['hill', 	340,	10,	0,	0],
+			['crystals', 	50,	50,	0,	0],
+			['crystals', 	500,	540,	0,	0],
+		],
+	roads: [
+			[40, [['line', 420,130, 420,520]] ],
 		],
 	bots: [],
 	});
@@ -220,59 +263,57 @@ MAPS.push({
 
 MAPS.push({
 	name: "Huge",
-	width: 2000,
-	height: 3000,
+	width: 1500,
+	height: 2000,
 	team_allies: 10,
 	team_enemies: 10,
 	description: "Huge area for epic battles only. Don't try to enter without big team - it will be too big for you.",
 	towers: [
 			//team x,	 y, 	name
-			['B',	400,	60,	'Base'],
-			['B',	1600,	60,	'Base'],
-			['B',	600,	510,	'Tower'],
-			['B',	1400,	510,	'Tower'],
-			['B',	700,	720,	'Tower'],
-			['B',	1300,	720,	'Tower'],
-			['B',	800,	930,	'Tower'],
-			['B',	1200,	930,	'Tower'],
-			['B',	900,	1140,	'Tower'],
-			['B',	1100,	1140,	'Tower'],
-			['B',	1000,	1350,	'Tower'],
-			['R',	1000,	1650,	'Tower'],
-			['R',	900,	1860,	'Tower'],
-			['R',	1100,	1860,	'Tower'],
-			['R',	800,	2070,	'Tower'],
-			['R',	1200,	2070,	'Tower'],
-			['R',	700,	2280,	'Tower'],
-			['R',	1300,	2280,	'Tower'],
-			['R',	600,	2490,	'Tower'],
-			['R',	1400,	2490,	'Tower'],
-			['R',	400,	2940,	'Base'],
-			['R',	1600,	2940,	'Base'],
+			['B',	'rand',	60,	'Base'],
+			['B',	150,	150,	'Scout_Tower'],
+			['B',	1350,	150,	'Scout_Tower'],
+			['B',	550,	430,	'Tower'],
+			['B',	950,	430,	'Tower'],
+			['B',	650,	640,	'Tower'],
+			['B',	850,	640,	'Tower'],
+			['B',	750,	950,	'Tower'],
+			['R',	750,	1150,	'Tower'],
+			['R',	650,	1360,	'Tower'],
+			['R',	850,	1360,	'Tower'],
+			['R',	550,	1570,	'Tower'],
+			['R',	950,	1570,	'Tower'],
+			['R',	150,	1850,	'Scout_Tower'],
+			['R',	1350,	1850,	'Scout_Tower'],
+			['R',	'rand',	1940,	'Base'],
 		],
 	elements: [
 			//name, 	x,	y,   max_width,	max_height
-			['fence', 	300,	175,	0,	0],
-			['fence', 	400,	175,	0,	0],
-			['fence', 	1500,	175,	0,	0],
-			['fence', 	1600,	175,	0,	0],
-			['fence', 	300,	2825,	0,	0],
-			['fence', 	400,	2825,	0,	0],
-			['fence', 	1500,	2825,	0,	0],
-			['fence', 	1600,	2825,	0,	0],
-			
-			['fence', 	0,	1500,	0,	0],
-			['fence', 	100,	1500,	0,	0],
-			['fence', 	200,	1500,	0,	0],
-			['fence', 	300,	1500,	0,	0],
-			
-			['fence', 	1300,	1500,	0,	0],					
-			['fence', 	1400,	1500,	0,	0],
-			['fence', 	1500,	1500,	0,	0],
-			['fence', 	1600,	1500,	0,	0],
-			['fence', 	1700,	1500,	0,	0],
-			['fence', 	1800,	1500,	0,	0],
-			['fence', 	1900,	1500,	0,	0],
+			['fence', 	0,	1000,	0,	0],
+			['fence', 	100,	1000,	0,	0],
+			['fence', 	200,	1000,	0,	0],
+			['fence', 	1200,	1000,	0,	0],
+			['fence', 	1300,	1000,	0,	0],
+			['fence', 	1400,	1000,	0,	0],
+			['hill', 	1200,	1300,	0,	0],
+			['rocks1', 	900,	700,	0,	0],
+			['rocks2', 	200,	1100,	0,	0],
+			['bones', 	1100,	200,	0,	0],
+			['crystals', 	100-20,	150-20,	0,	0],
+			['crystals', 	1400-20,150-20,	0,	0],
+			['crystals', 	100-20,	1850-20,0,	0],
+			['crystals', 	1400-20,1850-20,0,	0],
+			['crystals', 	740-20,1000-20,	0,	0],
+			['crystals', 	700-20,1000-20,	0,	0],
+			['crystals', 	740-20,1040-20,	0,	0],
+			['crystals', 	700-20,1040-20,	0,	0],
+			['crystals', 	780-20,1000-20,	0,	0],
+			['crystals', 	780-20,1040-20,	0,	0],
+		],
+	roads: [
+			[100, [['line', 750,0, 750,2000]] ],
+			[50, [['line', 0,500, 700,500]] ],
+			[50, [['line', 800,1500, 1500,1500]] ],
 		],
 	bots: [],
 	});

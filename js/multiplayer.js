@@ -383,14 +383,20 @@ function get_packet(fromClient, message){
 	else if(type == 'prepare_game'){	//prepare game - select tanks/maps screen
 		//DATA = [room_id, host_enemy_name]
 		if(PLACE=="room" && opened_room_id==DATA[0]){
-			game_mode = 2;
-			start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
-			draw_tank_select_screen();
 			ROOM = get_room_by_id(DATA[0]);
+			game_mode = ROOM.settings[3];
 			ROOM.host_enemy_name = DATA[1];
 			ROOM.players_max = ROOM.players.length;
-			if(ROOM.host==name && ROOM.settings[0] != 'normal'){
-				choose_and_register_tanks(ROOM);
+			if(game_mode == 'multi_quick'){	log('11111');
+				start_game_timer_id = setInterval(starting_game_timer_handler, 1000);
+				draw_tank_select_screen();
+				if(ROOM.host==name && ROOM.settings[0] != 'normal'){
+					choose_and_register_tanks(ROOM);
+					}
+				}
+			else if(game_mode == 'multi_craft'){
+				draw_tank_select_screen(); //jsut let system to prepare here
+				register_tank_action('start_game', opened_room_id, false, ROOM.players);
 				}
 			}
 		else if(PLACE=="rooms"){
@@ -420,50 +426,6 @@ function get_packet(fromClient, message){
 					}
 				else
 					draw_tank_select_screen();
-				}
-			}
-		else if(PLACE=="game" && DATA[3] == true){
-			var ROOM = get_room_by_id(DATA[0]);
-			if(ROOM != false){
-				//update players
-				for(var p in ROOM.players){
-					if(ROOM.players[p].name == DATA[2]){
-						ROOM.players[p].tank = DATA[1];
-						}
-					}
-				for(var i in TANKS){
-					if(TANKS[i].name == DATA[2]){
-						var type = DATA[1];
-						var level = TANKS[i].level;
-						//change stats
-						TANKS[i].type = type;
-						TANKS[i].hp = get_tank_max_hp(TANKS[i]);
-						TANKS[i].sight = TYPES[type].scout + round(TYPES[type].size[1]/2);
-						TANKS[i].speed = TYPES[type].speed;
-						TANKS[i].armor = TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1);
-						TANKS[i].damage = TYPES[type].damage[0] + TYPES[type].damage[1]*(level-1);
-						TANKS[i].attack_delay = TYPES[type].attack_delay;
-						TANKS[i].turn_speed = TYPES[type].turn_speed;
-						}
-					}
-				//if me
-				if(DATA[2]==name){
-					my_tank_nr = DATA[1];
-					draw_counter_tank_selection(my_tank_nr);
-					draw_tank_abilities();
-					
-					//auto add 1 lvl upgrade
-					for(jj in TYPES[MY_TANK.type].abilities){ 
-						var nr = 1+parseInt(jj);
-						var ability_function = TYPES[MY_TANK.type].abilities[jj].name.replace(/ /g,'_')+"_once";
-						if(ability_function != undefined){
-							try{
-								window[ability_function](MY_TANK);
-								}
-							catch(err){}
-							}
-						}
-					}
 				}
 			}
 		}
@@ -534,6 +496,7 @@ function get_packet(fromClient, message){
 			try{
 				audio_finish = document.createElement('audio');
 				audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+				audio_finish.volume = FX_VOLUME;
 				audio_finish.play();
 				}
 			catch(error){}
@@ -670,6 +633,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			check_selection(TANK_TO);
 			//removing
 			for(var b=0; b < TANKS.length; b++){
 				if(TANKS[b].id==TANK_TO.id){	
@@ -679,7 +643,7 @@ function get_packet(fromClient, message){
 				}
 			}
 		//adding kill stats
-		if(TYPES[TANK_TO.type].no_repawn == undefined){
+		if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			//player
 			if(TANK_TO.dead != 1)
 				TANK_FROM.kills = TANK_FROM.kills + 1;	
@@ -751,8 +715,8 @@ function get_packet(fromClient, message){
 		
 		//create bullet
 		var tmp = new Array();
-		tmp.x = TANK.x + TYPES[TANK.type].size[1]/2;
-		tmp.y = TANK.y + TYPES[TANK.type].size[1]/2;
+		tmp.x = TANK.cx();
+		tmp.y = TANK.cy();
 		tmp.bullet_to_target = TANK_TO; 
 		tmp.bullet_from_target = TANK;
 		tmp.angle = DATA[2];
@@ -843,7 +807,7 @@ function register_tank_action(action, room_id, player, data, data2, data3){	//lo
 		alert('Error, unknown action ['+action+'] in register_tank_action();');	
 	}
 //new room was created
-function register_new_room(room_name, mode, type, max_players, map, nation1, nation2){
+function register_new_room(room_name, mode, type, max_players, map, nation1, nation2, main_mode){
 	var players = [];
 	players.push({
 		name: name, 
@@ -855,7 +819,7 @@ function register_new_room(room_name, mode, type, max_players, map, nation1, nat
 	ROOM = {
 		id: Math.floor(Math.random()*9999999),
 		name: room_name,
-		settings: [mode, type, map],
+		settings: [mode, type, map, main_mode],
 		max: max_players,
 		host: name,
 		players: players,
@@ -889,13 +853,13 @@ function update_players_ping(name){
 		}
 	}
 function disconnect_game(e){
-	if(PLACE=='room' && game_mode == 2){
+	if(PLACE=='room' && (game_mode == 'multi_quick' || game_mode == 'multi_craft') ){
 		if(confirm("Do you really want to leave this room?")==false){
 			return false;
 			}
 		register_tank_action('leave_room', opened_room_id, name);
 		}
-	if(PLACE=='game' && game_mode == 2){
+	if(PLACE=='game' && (game_mode == 'multi_quick' || game_mode == 'multi_craft') ){
 		if(confirm("Do you really want to quit game???")==false){
 			return false;
 			}

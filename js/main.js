@@ -2,6 +2,20 @@
 Name: Moon wars
 Author: Vilius
 Email: www.viliusl@gmail.com
+
+TODO:
+	multiplayer	- game_mode = single_quick   single_craft   multi_quick   multi_craft
+		multi controlls: move, target, skills, others
+		move he3 to team, initial he3
+		implement weapons_bonus and armor_bonus
+		optimize network packets in mode3:
+			tank_move
+			bullet
+			skill_do
+			skill_advanced
+	special score for mode3: he3 and army graph in time
+	heavy - aoe skill? more aoe skills?
+	classes? - http://www.webmonkey.com/2010/02/make_oop_classes_in_javascript/
 */
 
 //init hello screen
@@ -12,14 +26,30 @@ function init_game(first_time){
 	
 	if(socket_live == true)
 		room_controller();
-	if(getCookie("mute_fx") != '0')
-		MUTE_FX=true;
-	if(getCookie("mute_music") != '0')
-		MUTE_MUSIC=true;
+	
+	//sound effects
+	var cookie = getCookie("mute_fx");
+	if(cookie == '0' || cookie == '')
+		MUTE_FX = true;
+	else{
+		MUTE_FX = false;
+		FX_VOLUME = cookie;
+		}
+	
+	//music	
+	var cookie = getCookie("mute_music");
+	if(cookie == '0' || cookie == '')
+		MUTE_MUSIC = true;
+	else{
+		MUTE_MUSIC = false;
+		MUSIC_VOLUME = cookie;
+		}		
+
 	if(DEBUG==true){
 		MAX_SENT_PACKETS = 1000;
-		START_GAME_COUNT_MULTI = 5;
+		START_GAME_COUNT = 5;
 		}
+		
 	if(getCookie("nointro") == '1')
 		intro_enabled = 0;
 	unique_id = 0;
@@ -28,7 +58,7 @@ function init_game(first_time){
 	if(first_time==true)
 		check_canvas_sizes();
 	
-	//check sound support
+	//detect sound extension, .ogg by default
 	if(isIE()==true)
 		SOUND_EXT = '.mp3';
 	
@@ -46,6 +76,7 @@ function init_game(first_time){
 		if(MUTE_FX==false){
 			var audio_fire = document.createElement('audio');
 			audio_fire.setAttribute('src', '../sounds/shoot'+SOUND_EXT);
+			audio_fire.volume = FX_VOLUME;
 			audio_fire.play();
 			}
 		});
@@ -77,7 +108,6 @@ function intro(force){
 		return false;
 		}
 	//draw
-	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	IMAGES_INRO.onload = function(){
 		canvas_backround.drawImage(IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 		//draw text
@@ -97,6 +127,7 @@ function intro(force){
 		canvas_backround.strokeStyle = '#ffffff';
 		canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
 		}
+	IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 	
 	if(intro_page==0){
 		//register skip button
@@ -124,6 +155,7 @@ function check_canvas_sizes(){
 		if(WIDTH_MAP<800)
 			WIDTH_SCROLL = WIDTH_MAP;
 		HEIGHT_SCROLL = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
+		parent.document.getElementById("main_iframe").style.paddingLeft = "0px";
 		}
 	else{
 		//full screen
@@ -156,9 +188,15 @@ function check_canvas_sizes(){
 	//map
 	document.getElementById("canvas_map").width  = WIDTH_MAP;
 	document.getElementById("canvas_map").height = HEIGHT_MAP;
+	
+	//fog
+	document.getElementById("canvas_fog").width  = WIDTH_MAP;
+	document.getElementById("canvas_fog").height = HEIGHT_MAP;
+	
 	//map sight
 	document.getElementById("canvas_map_sight").width  = WIDTH_SCROLL;
 	document.getElementById("canvas_map_sight").height = HEIGHT_SCROLL;
+	
 	//objects
 	canvas_base.width  = WIDTH_SCROLL;
 	canvas_base.height = HEIGHT_SCROLL;
@@ -168,6 +206,11 @@ function check_canvas_sizes(){
 	try{
 		parent.document.getElementById("main_iframe").style.height = HEIGHT_APP+"px";
 		parent.document.getElementById("main_iframe").style.width = WIDTH_APP+"px";
+		//center screen
+		if(WIDTH_MAP < dimensions[0]){
+			var left_margin = round((dimensions[0] - WIDTH_APP)/2);
+			parent.document.getElementById("main_iframe").style.paddingLeft = left_margin + "px";
+			}
 		}catch(error){}
 	//chat elements
 	document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
@@ -180,50 +223,79 @@ function init_action(map_nr, my_team){
 	dynamic_title();
 	room_controller();
 	CHAT_LINES = [];
-	
 	level = map_nr;
 	
 	check_canvas_sizes();
 	
 	if(my_tank_nr == -1)
 		my_tank_nr=0;
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		for(var i in TYPES)
+			if(TYPES[i].name == 'Soldier')
+				my_tank_nr = i;
+		}
 	
 	if(my_team=='B')
 		map_offset = [0, 0];
 	else
 		map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
 		
-	var requestAnimationFrame = window.requestAnimationFrame 
-				|| window.mozRequestAnimationFrame 
-				|| window.webkitRequestAnimationFrame 
-				|| window.msRequestAnimationFrame
-				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
-	window.requestAnimationFrame = requestAnimationFrame;
-	draw_interval_id = requestAnimationFrame(draw_main);
-
 	//sound
 	if(MUTE_MUSIC==false){
 		audio_main = document.createElement('audio');
 		audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
 		audio_main.setAttribute('loop', 'loop');
+		audio_main.volume = MUSIC_VOLUME;
 		try{
 			audio_main.play();
 			}
 		catch(error){}
 		}
 	
-	//create ... me
-	if(game_mode==1 && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
-		my_tank_nr = 0;
-	if(game_mode==2)
+	if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 		my_nation = get_nation_by_team(my_team);
+		
+	//find enemy team
+	enemy_team = 'B';
+	if(enemy_team == my_team)
+		enemy_team = 'R';
+		
+	//find enemy nation
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
+		enemy_nation_tmp = [];
+		for(var n in COUNTRIES){
+			if(n != my_nation)
+				enemy_nation_tmp.push(n);
+			}
+		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
+		}
+	else
+		var enemy_nation = get_nation_by_team(enemy_team);
+	
+	//add towers
+	add_towers(my_team, my_nation);	
+	if(my_team == 'R')
+		add_towers("B", enemy_nation);	
+	else
+		add_towers("R", enemy_nation);	
+	
+	//create ... me
+	if((game_mode == 'single_quick' || game_mode == 'single_craft') && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
+		my_tank_nr = 0;
 	add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 	MY_TANK = TANKS[(TANKS.length-1)];
+	MY_TANK.selected = 1;
+	
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		//add few more me
+		add_tank(1, name+'-2', name, my_tank_nr, my_team, my_nation);
+		add_tank(1, name+'-3', name, my_tank_nr, my_team, my_nation);
+		}
 	
 	auto_scoll_map();
 	
-	//add enemy if single player
-	if(game_mode==1){
+	//add bots if single player
+	if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 		//get random type
 		var possible_types = [];
 		var random_type=0;
@@ -233,78 +305,73 @@ function init_action(map_nr, my_team){
 			}
 			
 		//friends
-		for(var i=1; i< MAPS[level-1].team_allies;){
+		var n = MAPS[level-1].team_allies;
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft')
+			n = 7;
+		for(var i=1; i<n; i++){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
-			if(DEBUG==false)
-				add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
-			i++;
+			if(DEBUG==false){
+				if(game_mode == 'single_craft' || game_mode == 'multi_craft')
+					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation);
+				else
+					add_tank(1, get_unique_id(), generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
+				}
 			}
-		
 		//enemies
-		enemy_team = 'B';
-		if(enemy_team == my_team)
-			enemy_team = 'R';
-		//find nation
-		enemy_nation_tmp = [];
-		for(var n in COUNTRIES){
-			if(n != my_nation)
-				enemy_nation_tmp.push(n);
-			}
-		var enemy_nation = enemy_nation_tmp[getRandomInt(0, enemy_nation_tmp.length-1)];
-		//create
 		for(var i=0; i< MAPS[level-1].team_enemies; ){
 			random_type = possible_types[getRandomInt(0, possible_types.length-1)];
-				//random_type = 4;
+				//random_type = 3;
 			if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 				continue;
 			add_tank(1, get_unique_id(), generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			if(DEBUG==true) break;
+			if(game_mode == 'single_craft' || game_mode == 'multi_craft') break;
 			i++;
 			}
 		}
 		
-	add_towers();
-
 	sync_multiplayers();
-	
-	//auto add 1 lvl upgrade
-	for(ii in TANKS){
-		for(jj in TYPES[TANKS[ii].type].abilities){ 
-			var nr = 1+parseInt(jj);
-			var ability_function = TYPES[TANKS[ii].type].abilities[jj].name.replace(/ /g,'_')+"_once";
-			if(ability_function != undefined){
-				try{
-					window[ability_function](TANKS[ii]);
-					}
-				catch(err){	}
-				}
-			}
-		}
-	
-	//racial stats
-	for(i in TANKS){
-		if(TYPES[TANKS[i].type].type == 'human') continue;
-		for(var b in COUNTRIES[TANKS[i].nation].buffs){
-			var buff = COUNTRIES[TANKS[i].nation].buffs[b];
-			TANKS[i].buffs.push({
-				name: buff.name,
-				power: buff.power,
-				type: buff.type,
-				});
-			}
-		}	
 	
 	//handler for mini map
 	register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
 		MAP_SCROLL_CONTROLL=true; 
 		move_to_place(xx, yy);
 		});
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft')
+		MAP_SCROLL_MODE = 2;
 		
 	draw_map(false);
 	
-	bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
+	//register crystals
+	if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+		for(var e in MAPS[level-1].elements){
+			if(MAPS[level-1].elements[e][0] != 'crystals') continue;
+			var element = get_element_by_name(MAPS[level-1].elements[e][0]);
+			MAP_CRYSTALS.push({
+				id: getRandomInt(0, 999999),
+				x: MAPS[level-1].elements[e][1],
+				y: MAPS[level-1].elements[e][2],
+				cx: MAPS[level-1].elements[e][1] + IMAGES_SETTINGS.elements[element.name].w/2,
+				cy: MAPS[level-1].elements[e][2] + IMAGES_SETTINGS.elements[element.name].h/2,
+				w: IMAGES_SETTINGS.elements[element.name].w,
+				h: IMAGES_SETTINGS.elements[element.name].h,
+				power: CRYSTAL_POWER,
+				});
+			}
+		}
+	
+	var requestAnimationFrame = window.requestAnimationFrame 
+				|| window.mozRequestAnimationFrame 
+				|| window.webkitRequestAnimationFrame 
+				|| window.msRequestAnimationFrame
+				|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
+	window.requestAnimationFrame = requestAnimationFrame;
+	draw_interval_id = requestAnimationFrame(draw_main);
+
+	if(game_mode == 'single_quick' || game_mode == 'multi_quick')	
+		bots_interval_id = setInterval(add_bots, 1000*SOLDIERS_INTERVAl);
 	level_hp_regen_id = setInterval(level_hp_regen_handler, 1000);
 	level_interval_id = setInterval(tank_level_handler, 1000);
 	timed_functions_id = setInterval(timed_functions_handler, 100);
@@ -331,12 +398,19 @@ var IMAGES_SETTINGS = {
 		us:		{ x:300,	y:0,	w:15,	h:9 },
 		ru:		{ x:350,	y:0,	w:15,	h:9 },
 		ch:		{ x:400,	y:0,	w:15,	h:9 },
-		level:	{ x:0,	y:50,	w:150,h:15 },
-		logo_small:	{ x:0,	y:100,w:76,	h:25 },
-		skill_off:	{ x:0,	y:150,w:65,	h:65 },
-		skill_on:	{ x:0,	y:250,w:65,	h:65 },
-		statusbar:	{ x:0,	y:350,w:800,h:130 },
-		he3:	{ x:100,	y:100,w:13,h:20 },
+		level:	{ x:0,	y:50,	w:150, h:15 },
+		logo_small:	{ x:0,	y:100, w:76,	h:25 },
+		skill_off:	{ x:0,	y:150, w:65,	h:65 },
+		skill_on:	{ x:0,	y:250, w:65,	h:65 },
+		statusbar:	{ x:0,	y:350, w:800, h:128 },
+		he3:	{ x:100,	y:150,w:18, h:20 },
+		danger:	{ x:150,	y:50, w:16, h:16 },
+		shield:	{ x:200,	y:50, w:16, h:16 },
+		alert:	{ x:300,	y:50, w:16, h:16 },
+		bonus:	{ x:350,	y:50, w:16, h:15 },
+		bolt:	{ x:250,	y:50, w:14, h:20 },
+		error:	{ x:400,	y:50, w:16, h:16 },	
+		flag: 	{ x:100,	y:100, w:16, h:16 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },
@@ -349,10 +423,15 @@ var IMAGES_SETTINGS = {
 		Truck:	{ x:0,	y:700,	w:90,	h:80 },
 		Apache:	{ x:0,	y:800,	w:90,	h:80 },
 		Bomber:	{ x:0,	y:900,	w:90,	h:80 },
-		Soldier:	{ x:0,	y:1000,	w:90,	h:80 },
-		Tower:	{ x:0,	y:1100,	w:90,	h:80 },
-		Base:		{ x:0,	y:1200,	w:90,	h:80 },
+		Soldier:	{ x:0,	y:1000,	w:20,	h:22 },
 		TRex:		{ x:0,	y:1300,	w:90,	h:80 },
+		Tower:		{ x:0,	y:1100,	w:90,	h:80 },
+		Scout_Tower:	{ x:0,	y:1150,	w:22,	h:20 },
+		SAM_Tower:	{ x:0,	y:1550,	w:90,	h:80 },
+		Base:		{ x:0,	y:1200,	w:90,	h:80 },
+		Factory:	{ x:0,	y:1400,	w:68,	h:56 },
+		Research:	{ x:0,	y:1500,	w:50,	h:40 },
+		Silo:		{ x:0,	y:1600,	w:46,	h:46 },
 		},
 	bullets: {
 		bullet:	{ x:0,	y:0,		w:6,	h:6 }, 
@@ -367,6 +446,11 @@ var IMAGES_SETTINGS = {
 		vfence:	{ x:0,	y:100,	w:26,	h:100 }, 
 		mine:		{ x:0,	y:200,	w:15,	h:15 }, 
 		block:	{ x:0,	y:300,	w:21,	h:21 },
+		hill:	{ x:100,y:0,	w:136,	h:118 },
+		rocks1:	{ x:250,y:0,	w:184,	h:108 },
+		rocks2:	{ x:50,	y:150,	w:184,	h:108 },
+		bones:	{ x:250,y:150,	w:136,	h:86 },
+		crystals:{ x:0,y:50,	w:52,	h:44 },
 		},
 	}
 	
@@ -383,37 +467,39 @@ function preload_all_files(){
 	preload_total = preload_left;
 	
 	//preload images
-	IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	IMAGE_BACK.onload = function(){ update_preload(1); }
-	IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	IMAGE_LOGO.onload = function(){ update_preload(1); }
-	IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	IMAGE_MOON.onload = function(){ update_preload(1); }
-	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	IMAGES_GENERAL.onload = function(){ update_preload(1); }
-	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	IMAGES_TANKS.onload = function(){ update_preload(1); }
-	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	IMAGES_BULLETS.onload = function(){ update_preload(1); }
-	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;	IMAGES_ELEMENTS.onload = function(){ update_preload(1); }
+	IMAGE_BACK.onload = function(){ update_preload(1); };		IMAGE_BACK.src = '../img/background.jpg?'+VERSION;	
+	IMAGE_LOGO.onload = function(){ update_preload(1); };		IMAGE_LOGO.src = '../img/logo.png?'+VERSION;	
+	IMAGE_MOON.onload = function(){ update_preload(1); };		IMAGE_MOON.src = '../img/moon.jpg?'+VERSION;	
+	IMAGES_GENERAL.onload = function(){ update_preload(1); };	IMAGES_GENERAL.src = '../img/general.png?'+VERSION;	
+	IMAGES_TANKS.onload = function(){ update_preload(1); };	IMAGES_TANKS.src = '../img/tanks.png?'+VERSION;	
+	IMAGES_BULLETS.onload = function(){ update_preload(1); };	IMAGES_BULLETS.src = '../img/bullets.png?'+VERSION;	
+	IMAGES_ELEMENTS.onload = function(){ update_preload(1); };	IMAGES_ELEMENTS.src = '../img/elements.png?'+VERSION;
 	
-	//prelaod sound
+	//preload sound
 	for(var i in audio_to_preload){
 		preload(audio_to_preload[i], 'audio');
 		}
 	}
 //preloading files	
-function preload(file, type){
+function preload(file, type){	
 	if(type=='image' || type==undefined){
 		var imageObj = new Image();
-		imageObj.src=file;
 		imageObj.onload = function(){
-			update_preload(1);
+			update_preload(10);	
 			}
+		imageObj.src=file;
 		}
-	else if(type=="audio"){
+	else if(type=="audio"){	
+		update_preload(1);	//preload is buggy
 		try{
 			var audio_object = new Audio();
-			audio_object.addEventListener('canplaythrough', function(){update_preload(1);}, false);
+			audio_object.addEventListener('canplaythrough', function(event){	/*update_preload(1);*/ }, false);
 			audio_object.src = file;
 			}
 		catch(err){
 			update_preload(1);
 			}
+		
 		}	
 	else
 		alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');
@@ -429,6 +515,22 @@ function speed2pixels(speed, time_diff){
 	}
 //repeat some functions in time
 function timed_functions_handler(){
+	//check map scrolling	//event.target.id
+	if(PLACE == 'game' && MAP_SCROLL_MODE == 2 && Date.now() - mouse_last_move > 100 && mouse_inside == true){
+		//move map if mouse in corners
+		var gap = 50;
+		var power = 50;
+		if(mouse_pos[0] < gap)
+			scoll_map(1, 0, power);	//left
+		if(mouse_pos[0] > WIDTH_SCROLL - gap) 
+			scoll_map(-1, 0, power);//right
+		if(mouse_pos[1] < gap) 
+			scoll_map(0, 1, power);	//up
+		if(mouse_pos[1] > HEIGHT_SCROLL - gap) 
+			scoll_map(0, -1, power);//down
+		}
+	
+	//exec functions
 	for(var i=0; i<timed_functions.length; i++){		
 		timed_functions[i].duration = timed_functions[i].duration - 100;
 		var duration = 	timed_functions[i].duration				
@@ -444,7 +546,7 @@ function timed_functions_handler(){
 	}
 //quit button - quits all possible actions
 function quit_game(init_next_game){
-	if(PLACE=='game' && game_mode == 2){
+	if(PLACE=='game' && (game_mode == 'multi_quick' || game_mode == 'multi_craft')){
 		if(confirm("Do you really want to quit game?")==false)
 			return false;
 		}
@@ -474,7 +576,7 @@ function quit_game(init_next_game){
 		if(audio_main != undefined)
 			audio_main.pause();
 		
-		if(game_mode == 2){
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			register_tank_action('leave_game', opened_room_id, name);
 			room_controller();
 			}
@@ -485,7 +587,7 @@ function quit_game(init_next_game){
 			}
 		}
 	else if(PLACE == 'room'){
-		if(game_mode == 2 && opened_room_id != -1){
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && opened_room_id != -1){
 			register_tank_action('leave_room', opened_room_id, name);
 			}
 		opened_room_id = -1;
@@ -511,12 +613,12 @@ function quit_game(init_next_game){
 	mouse_click_controll = false;
 	target_range = 0;
 	ABILITIES_POS = [];
-	game_mode = 1;
+	game_mode = 'single_quick';
 	last_selected = -1;
-	last_selected_counter = -1;
 	my_tank_nr = -1;
 	document.getElementById("chat_write").style.visibility = 'hidden';
 	document.getElementById("chat_box").style.display = 'none';
+	document.getElementById("popup").style.display="none";
 	packets_used=0;
 	packets_all=0;
 	shift_pressed = false;
@@ -524,13 +626,18 @@ function quit_game(init_next_game){
 	frame_time = undefined;
 	intro_page = 0;
 	my_team = undefined;
+	map_offset = [0, 0];
+	target_mode = '';
+	weapons_bonus = 0;
+	armor_bonus = 0;
+	MAP_CRYSTALS = [];
 	
 	if(init_next_game != false){
 		init_game(false);
 		}
 	}
 //register some are for mouse clicks
-function register_button(x, y, width, height, place, myfunction, extra){
+function register_button(x, y, width, height, place, myfunction, extra, type){
 	for(var i in BUTTONS){
 		if(BUTTONS[i].x == x && BUTTONS[i].y == y && BUTTONS[i].width == width && BUTTONS[i].height == height && BUTTONS[i].place == place){
 			return false;
@@ -543,7 +650,8 @@ function register_button(x, y, width, height, place, myfunction, extra){
 		height: height,
 		place: place,
 		function: myfunction,
-		extra: extra
+		extra: extra,
+		type: type,
 		});
 	}
 function unregister_buttons(button_place){
@@ -563,7 +671,7 @@ function starting_game_timer_handler(){
 	if(starting_timer==0){
 		starting_timer = -1;
 		clearInterval(start_game_timer_id);
-		if(game_mode == 1)
+		if(game_mode == 'single_quick' || game_mode == 'single_craft')
 			init_action(level, 'R');
 		else{
 			ROOM = get_room_by_id(opened_room_id);
@@ -588,7 +696,7 @@ function chat(text, author, team, shift){
 		else
 			team = '';	//shift
 		
-		if(PLACE=='rooms' || PLACE=='room' || (game_mode==2 && (PLACE=='select' || PLACE=='game' || PLACE == 'score'))){
+		if(PLACE=='rooms' || PLACE=='room' || ( (game_mode == 'multi_quick' || game_mode == 'multi_craft') && (PLACE=='select' || PLACE=='game' || PLACE == 'score'))){
 			if(chat_shifted == false)
 				register_tank_action('chat', opened_room_id, name, text, 0);
 			else
