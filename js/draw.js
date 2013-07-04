@@ -402,7 +402,7 @@ function add_first_screen_elements(){
 	register_button(160, 340-48, 477, 52, 'init', function(){ draw_logo_tanks(160, 340-52); });
 	
 	draw_right_buttons();
-	draw_status_bar();	
+	STATUS.draw_status_bar();	
 	add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"]);
 
 	name_tmp = getCookie("name");
@@ -543,7 +543,7 @@ function draw_right_buttons(clean){
 	text_width = canvas_backround.measureText(text).width;
 	canvas_backround.fillText(text, mini_x+(minibutton_width-text_width)/2, mini_y+14);
 	register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
-		draw_library_list();
+		LIBRARY.draw_library_list();
 		});
 	mi++;
 	
@@ -571,17 +571,17 @@ function draw_right_buttons(clean){
 		
 		var height_space = 16;
 		var st=0;
-		lib_show_stats("move and target", "Mouse", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("additional movements", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("skills", "1, 2, 3", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("global chat or team chat in game", "Shift+Enter", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("change scroll mode", "s", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("scroll map in manual scroll mode", "arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("scroll map up/down", "mouse wheel", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("stop and move map to your tank", "Esc", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("change abilities upgrade mode", "u", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("move and target", "Mouse", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("additional movements", "Right click", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("skills", "1, 2, 3", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("global chat or team chat in game", "Shift+Enter", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("change scroll mode", "s", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("scroll map in manual scroll mode", "arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("scroll map up/down", "mouse wheel", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("stop and move map to your tank", "Esc", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("change abilities upgrade mode", "u", padding+20+90, padding+20+st*height_space, -90); st++;
 		
 		//back button
 		offset_top = padding+20+st*height_space+20;
@@ -641,10 +641,10 @@ function draw_right_buttons(clean){
 		
 		var height_space = 16;
 		var st=0;
-		lib_show_stats("Moon wars", "Name", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("ViliusL", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats(APP_EMAIL, "Email", padding+20+90, padding+20+st*height_space, -90); st++;
-		lib_show_stats("", "Website", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("Moon wars", "Name", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("ViliusL", "Author", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats(APP_EMAIL, "Email", padding+20+90, padding+20+st*height_space, -90); st++;
+		LIBRARY.lib_show_stats("", "Website", padding+20+90, padding+20+st*height_space, -90); st++;
 		//link
 		canvas_backround.font = "Bold 10px Verdana";
 		canvas_backround.fillStyle = "#69a126";

@@ -63,7 +63,7 @@ function draw_infobar(first){
 				do_abilities(ABILITIES_POS[i].nr, MY_TANK);
 				}, i);
 			}	
-		draw_status_bar();
+		STATUS.draw_status_bar();
 		}
 	}
 //redrwar tanks stats in status bar
