@@ -38,7 +38,7 @@ function STATUS_CLASS(){
 	
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#414141";
-		roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
+		HELPER.roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 		
 		fs_text = "Music";
 		if(MUTE_MUSIC == true)
@@ -61,7 +61,7 @@ function STATUS_CLASS(){
 			canvas_backround.strokeStyle = "#ffffff";
 			canvas_backround.stroke();
 			}
-		register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_music, WIDTH_APP-PADDING, 'nofix');
+		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_music, WIDTH_APP-PADDING, 'nofix');
 		}
 	//draw mute effects button in statusbar
 	this.draw_mute_fx_button = function(){
@@ -71,7 +71,7 @@ function STATUS_CLASS(){
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#414141";
-		roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
+		HELPER.roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 		fs_text = "Sound";
 		if(MUTE_FX == true)
 			canvas_backround.fillStyle = "#686868";
@@ -94,7 +94,7 @@ function STATUS_CLASS(){
 			canvas_backround.stroke();
 			}
 		
-		register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_fx, WIDTH_APP-PADDING, 'nofix');
+		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_fx, WIDTH_APP-PADDING, 'nofix');
 		}
 	//show quality button in statusbar
 	this.draw_quality_button = function(first_run){
@@ -104,8 +104,8 @@ function STATUS_CLASS(){
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#414141";
-		roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
-		quality_cookie = getCookie("quality");
+		HELPER.roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
+		quality_cookie = HELPER.getCookie("quality");
 		if(quality_cookie != '')
 			QUALITY = quality_cookie;
 		
@@ -118,15 +118,15 @@ function STATUS_CLASS(){
 			q_text = "High";
 		
 		if(PLACE=='game' && first_run==false)
-			draw_map(true);
+			MAP.draw_map(true);
 		
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "normal 11px Arial";
 		var tmp = round((width - canvas_backround.measureText(q_text).width)/2);
 		canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 		
-		register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', function(){
-			change_quality();
+		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', function(){
+			MAP.change_quality();
 			STATUS.draw_quality_button(false);
 			}, false, 'nofix');
 		}
@@ -138,14 +138,14 @@ function STATUS_CLASS(){
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#414141";
-		roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
+		HELPER.roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 		q_text = "Quit";
 		canvas_backround.fillStyle = "#f3676f";
 		canvas_backround.font = "Bold 11px Helvetica";
 		var tmp = round((width - canvas_backround.measureText(q_text).width)/2);
 		canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 		
-		register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', 'quit_game', false, 'nofix');
+		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', MAIN.quit_game, false, 'nofix');
 		}
 	//show fullscreen button in statusbar
 	this.draw_fs_button = function(){
@@ -156,14 +156,14 @@ function STATUS_CLASS(){
 		
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#414141";
-		roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
+		HELPER.roundRect(canvas_backround, WIDTH_APP-PADDING, HEIGHT_APP-23+1, width, height, 5, true);
 		fs_text = "Full Scr.";
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Normal 11px Arial";
 		var tmp = round((width - canvas_backround.measureText(fs_text).width)/2);
 		canvas_backround.fillText(fs_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 		
-		register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
+		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
 			fullscreen('canvas_area');
 			}, false, 'nofix');
 		}
@@ -216,8 +216,8 @@ function STATUS_CLASS(){
 					}catch(error){}
 				}
 			}
-		if(MUTE_MUSIC==true)	setCookie("mute_music", "0", 30);
-		else			setCookie("mute_music", MUSIC_VOLUME, 30);
+		if(MUTE_MUSIC==true)	HELPER.setCookie("mute_music", "0", 30);
+		else			HELPER.setCookie("mute_music", MUSIC_VOLUME, 30);
 		STATUS.draw_mute_music_button();
 		}
 	//do mute or unmute effects
@@ -239,8 +239,8 @@ function STATUS_CLASS(){
 			if(MUTE_FX==false)	MUTE_FX = true;
 			else			MUTE_FX = false;
 			}
-		if(MUTE_FX==true)	setCookie("mute_fx", "0", 30);
-		else			setCookie("mute_fx", FX_VOLUME, 30);
+		if(MUTE_FX==true)	HELPER.setCookie("mute_fx", "0", 30);
+		else			HELPER.setCookie("mute_fx", FX_VOLUME, 30);
 		STATUS.draw_mute_fx_button();
 		}
 	}

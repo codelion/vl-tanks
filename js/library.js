@@ -4,7 +4,7 @@ function LIBRARY_CLASS(){
 	var TOP = 0;
 	this.draw_library_list = function(next, type){
 		PLACE = 'library';
-		unregister_buttons(PLACE);
+		MAIN.unregister_buttons(PLACE);
 		map_offset = [0, 0];
 		var selected_color = "#196119";
 		
@@ -12,7 +12,7 @@ function LIBRARY_CLASS(){
 		y = 10;
 		
 		//background
-		canvas_backround.drawImage(IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+		canvas_backround.drawImage(MAIN.IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 		
 		//Units button
 		width = 100;
@@ -21,15 +21,15 @@ function LIBRARY_CLASS(){
 		canvas_backround.fillStyle = "#69a126";		
 		if(type == 'Units')
 			canvas_backround.fillStyle = selected_color;
-		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
+		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
+		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			LIBRARY.draw_library_units();
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
 		text = "Units";
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 		x = x + 100+10;
 		
 		//maps button
@@ -37,15 +37,15 @@ function LIBRARY_CLASS(){
 		canvas_backround.fillStyle = "#69a126";		
 		if(type == 'Maps')
 			canvas_backround.fillStyle = selected_color;
-		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
+		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
+		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			LIBRARY.draw_library_maps();
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
 		text = "Maps";
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 		x = x + 100+10;
 		
 		//countries button
@@ -53,15 +53,15 @@ function LIBRARY_CLASS(){
 		canvas_backround.fillStyle = "#69a126";		
 		if(type == 'Countries')
 			canvas_backround.fillStyle = selected_color;
-		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
+		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
+		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			LIBRARY.draw_library_countries();
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
 		text = "Countries";
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 		x = x + 100+10;
 		
 		//elements button
@@ -69,31 +69,31 @@ function LIBRARY_CLASS(){
 		canvas_backround.fillStyle = "#69a126";		
 		if(type == 'Elements')
 			canvas_backround.fillStyle = selected_color;
-		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
+		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
+		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			LIBRARY.draw_library_elements();
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
 		text = "Elements";
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 		x = x + 100+10;
 		
 		//back button
 		width = 80;
 		canvas_backround.strokeStyle = "#000000";
 		canvas_backround.fillStyle = "#c50000";
-		roundRect(canvas_backround, x, y, width, height, 5, true);
-		register_button(x, y, width, height, PLACE, function(xx, yy){
-			last_selected = -1;
-			init_game(false);
+		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
+		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
+			DRAW.last_selected = -1;
+			MAIN.init_game(false);
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
 		text = "Back";
 		text_width = canvas_backround.measureText(text).width;
-		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height+font_pixel_to_height(13))/2);
+		canvas_backround.fillText(text, x+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 		
 		TOP = y + height + 20;
 		
@@ -123,7 +123,7 @@ function LIBRARY_CLASS(){
 				back_color = "#dbd9da";
 			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+			HELPER.roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 			
 			//logo
 			var pos1 = 10+j*(preview_x+gap);
@@ -131,25 +131,25 @@ function LIBRARY_CLASS(){
 			var pos_left = pos1 + (preview_x-TYPES[i].size[1])/2;
 			var pos_top = pos2 + (preview_y-TYPES[i].size[2])/2;
 			if(TYPES[i].size[1] < preview_x && TYPES[i].size[2] < preview_y)
-				draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
+				UNITS.draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
 			else{
 				//image too big - draw only inside active zone
 				canvas_backround.save();
 				canvas_backround.beginPath();
 				canvas_backround.rect(pos1, pos2, preview_x, preview_y);
 				canvas_backround.clip();
-				draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
+				UNITS.draw_tank_clone(i, pos_left, pos_top, 0, 1, canvas_backround);
 				canvas_backround.restore();
 				}
 			
 			//register button
-			register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			MAIN.register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				//index;
 				LIBRARY.draw_library_units(index);
 				}, i);
 			j++;
 			}
-		last_selected = selected_tank;
+		DRAW.last_selected = selected_tank;
 		y = y + preview_y+gap;	
 		
 		//tank info block
@@ -158,7 +158,7 @@ function LIBRARY_CLASS(){
 		var info_block_width = WIDTH_APP-20;
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
+		HELPER.roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
 	
 		//tank stats
 		if(selected_tank != undefined){
@@ -166,7 +166,7 @@ function LIBRARY_CLASS(){
 			var pos2 = y + round((info_block_height-preview_y)/2) + (preview_y-preview_y)/2;
 			
 			//hero	
-			draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
+			DRAW.draw_image(canvas_backround, TYPES[selected_tank].name, pos1, pos2);
 			
 			//name
 			canvas_backround.font = "bold 18px Verdana";
@@ -227,9 +227,9 @@ function LIBRARY_CLASS(){
 		var y = TOP;
 		var gap = 8;
 		
-		maps_positions = [];
+		MAP.maps_positions = [];
 		game_mode = 'single_quick';
-		show_maps_selection(canvas_backround, y, true);
+		MAP.show_maps_selection(canvas_backround, y, true);
 		y = y + 80 + 40;
 		var active_map = MAPS[level-1];
 		
@@ -238,7 +238,7 @@ function LIBRARY_CLASS(){
 		var info_block_width = WIDTH_APP-20;
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, 10, y, info_block_width, info_block_height, 5, true);
+		HELPER.roundRect(canvas_backround, 10, y, info_block_width, info_block_height, 5, true);
 		
 		//name
 		canvas_backround.font = "bold 18px Verdana";
@@ -315,13 +315,13 @@ function LIBRARY_CLASS(){
 				back_color = "#dbd9da";
 			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+			HELPER.roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 			
 			//logo
 			var flag_size = IMAGES_SETTINGS.general[COUNTRIES[i].file];
 			var pos1 = 10+j*(preview_x+gap) + round((preview_x-flag_size.w)/2);
 			var pos2 = y + round((preview_y-flag_size.h)/2);
-			draw_image(canvas_backround, COUNTRIES[i].file, pos1, pos2);
+			DRAW.draw_image(canvas_backround, COUNTRIES[i].file, pos1, pos2);
 			
 			//name
 			if(selected_item == j)
@@ -334,7 +334,7 @@ function LIBRARY_CLASS(){
 			canvas_backround.fillText(COUNTRIES[i].name, 10+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
 			
 			//register button
-			register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			MAIN.register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				//index;
 				LIBRARY.draw_library_countries(index);
 				}, j);
@@ -348,12 +348,12 @@ function LIBRARY_CLASS(){
 		var info_block_width = WIDTH_APP-20;
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
+		HELPER.roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
 	
 		//stats
 		
 		//flag
-		draw_image(canvas_backround, COUNTRIES[country].file, info_left+10, y+13);
+		DRAW.draw_image(canvas_backround, COUNTRIES[country].file, info_left+10, y+13);
 		
 		//name
 		canvas_backround.font = "bold 18px Verdana";
@@ -370,7 +370,7 @@ function LIBRARY_CLASS(){
 		for(var b in COUNTRIES[country].buffs){
 			var title = "Changes";
 			if(b!="0") title = '';
-			var value = ucfirst(COUNTRIES[country].buffs[b].name);
+			var value = HELPER.ucfirst(COUNTRIES[country].buffs[b].name);
 			value_tmp = round((COUNTRIES[country].buffs[b].power)*100-100);
 			if(value_tmp > 0)
 				value += ": +"+value_tmp+"%";
@@ -406,7 +406,7 @@ function LIBRARY_CLASS(){
 				back_color = "#dbd9da";
 			canvas_backround.fillStyle = back_color;
 			canvas_backround.strokeStyle = "#196119";
-			roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
+			HELPER.roundRect(canvas_backround, 10+j*(preview_x+gap), y, preview_x, preview_y, 5, true);
 			
 			//logo
 			element_w = IMAGES_SETTINGS.elements[ELEMENTS[i].name].w;
@@ -414,7 +414,7 @@ function LIBRARY_CLASS(){
 			var pos1 = 10+j*(preview_x+gap) + round((preview_x-element_w)/2);
 			var pos2 = y + round((preview_y-element_h)/2);
 			if(element_w < preview_x && element_h < preview_y)
-				draw_image(canvas_backround, ELEMENTS[i].name, pos1, pos2);
+				DRAW.draw_image(canvas_backround, ELEMENTS[i].name, pos1, pos2);
 			else{
 				//image too big - draw only inside active zone
 				pos1 = 10+j*(preview_x+gap);
@@ -423,7 +423,7 @@ function LIBRARY_CLASS(){
 				canvas_backround.beginPath();
 				canvas_backround.rect(pos1, pos2, preview_x, preview_y);
 				canvas_backround.clip();
-				draw_image(canvas_backround, ELEMENTS[i].name, 
+				DRAW.draw_image(canvas_backround, ELEMENTS[i].name, 
 					pos1, pos2, Math.min(preview_x, element_w), Math.min(preview_y, element_h), 
 					undefined, undefined, element_w, element_h);
 				canvas_backround.restore();
@@ -440,7 +440,7 @@ function LIBRARY_CLASS(){
 			canvas_backround.fillText(ELEMENTS[i].name, 10+j*(preview_x+gap)+padding_left, y+preview_y+gap+10);
 			
 			//register button
-			register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
+			MAIN.register_button(10+j*(preview_x+gap)+1, y+1, preview_x, preview_y, PLACE, function(mouseX, mouseY, index){
 				//index;
 				LIBRARY.draw_library_elements(index);
 				}, j);
@@ -454,14 +454,14 @@ function LIBRARY_CLASS(){
 		var info_block_width = WIDTH_APP-20;
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.strokeStyle = "#196119";
-		roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
+		HELPER.roundRect(canvas_backround, info_left, y, info_block_width, info_block_height, 5, true);
 	
 		//stats
 		element_w = IMAGES_SETTINGS.elements[ELEMENTS[element].name].w;
 		element_h = IMAGES_SETTINGS.elements[ELEMENTS[element].name].h;
 		
 		//flag
-		draw_image(canvas_backround, ELEMENTS[element].name, info_left+200, y+13);
+		DRAW.draw_image(canvas_backround, ELEMENTS[element].name, info_left+200, y+13);
 		
 		//name
 		canvas_backround.font = "bold 18px Verdana";
