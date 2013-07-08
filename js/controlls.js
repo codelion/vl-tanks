@@ -6,6 +6,7 @@ var ctrl_pressed = false;
 var alt_pressed = false;
 var shift_pressed = false;
 var mouse_inside = true;
+var chat_mode = 0;			//if 1, show textbox for writing
 
 //=== keyboard =================================================================
 
@@ -26,40 +27,40 @@ function on_keyboard_action(event){
 	if(PLACE == 'game'){
 		if(MY_TANK.dead != 1 && chat_mode==0){
 			if(k == 49 || k == 97 )
-				do_abilities(1, MY_TANK);	//special 1
+				UNITS.do_abilities(1, MY_TANK);	//special 1
 			else if(k == 50 || k == 98)
-				do_abilities(2, MY_TANK);	//sepcial 2
+				UNITS.do_abilities(2, MY_TANK);	//sepcial 2
 			else if(k == 51 || k == 99)
-				do_abilities(3, MY_TANK);	//special 3
+				UNITS.do_abilities(3, MY_TANK);	//special 3
 			else if(k == 38)
-				scoll_map(0, 1);	//up
+				MAP.scoll_map(0, 1);	//up
 			else if(k == 40)
-				scoll_map(0, -1); 	//down
+				MAP.scoll_map(0, -1); 	//down
 			else if(k == 39)
-				scoll_map(-1, 0);	//left
+				MAP.scoll_map(-1, 0);	//left
 			else if(k == 37)
-				scoll_map(1, 0); 	//right
+				MAP.scoll_map(1, 0); 	//right
 			else if(k == 46){ 		//del
 				if(MY_TANK.data.name != "Base")
-					do_damage(MY_TANK, MY_TANK, {damage: get_tank_max_hp(MY_TANK), pierce_armor: 100});
+					UNITS.do_damage(MY_TANK, MY_TANK, {damage: UNITS.get_tank_max_hp(MY_TANK), pierce_armor: 100});
 				}
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
 					//stop move
 					if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 						if(MY_TANK.move == 1)
-							register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
+							MP.register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(MY_TANK.x), round(MY_TANK.y)]);
 						}
 					else
 						MY_TANK.move = 0;
 					//reset scroll
 					if(MAP_SCROLL_MODE==2){
 						MAP_SCROLL_MODE = 1;
-						auto_scoll_map();
+						MAP.auto_scoll_map();
 						}
 					//
 					if(mouse_click_controll == true){
-						prepare_tank_move(MY_TANK);
+						UNITS.prepare_tank_move(MY_TANK);
 						mouse_click_controll = false;
 						}
 					}	
@@ -85,7 +86,7 @@ function on_keyboard_action(event){
 					}	
 				}
 			if(ABILITIES_MODE>3) ABILITIES_MODE = 0;
-			draw_tank_abilities();
+			INFOBAR.draw_tank_abilities();
 			}
 		}
 	if(k==13){
@@ -105,7 +106,7 @@ function on_keyboard_action(event){
 				//end write
 				chat_mode=0;
 				document.getElementById("chat_write").style.visibility = 'hidden';
-				chat();
+				MAIN.chat();
 				}
 			}
 		}
@@ -114,12 +115,12 @@ function on_keyboard_action(event){
 		if(MAP_SCROLL_MODE==1) MAP_SCROLL_MODE = 2;
 		else{
 			MAP_SCROLL_MODE = 1;
-			auto_scoll_map();
+			MAP.auto_scoll_map();
 			}
 		}
 	if(k == 27){	//esc
 		if(PLACE == 'library' || PLACE == 'intro')
-			quit_game();
+			MAIN.quit_game();
 		}
 	
 	//disable some keys
@@ -155,9 +156,9 @@ function MouseWheelHandler(e){
 	
 	//scroll	
 	if(delta == 1)
-		scoll_map(0, 1);
+		MAP.scoll_map(0, 1);
 	else if(delta == -1)
-		scoll_map(0, -1);
+		MAP.scoll_map(0, -1);
 	
 	//disable page scroll - dont worry, only on started game area
 	e.preventDefault()
@@ -184,19 +185,19 @@ function on_mousemove(event){
 		}
 	//info about crystals
 	if(PLACE == 'game' && (game_mode == 'single_craft' || game_mode == 'multi_craft')){
-		ability_hover_text = '';
+		INFOBAR.ability_hover_text = '';
 		var found = false;
 		for(var c in MAP_CRYSTALS){
 			if(mouseX-map_offset[0] < MAP_CRYSTALS[c].x || mouseX-map_offset[0] > MAP_CRYSTALS[c].x + MAP_CRYSTALS[c].w) continue;
 			if(mouseY-map_offset[1] < MAP_CRYSTALS[c].y || mouseY-map_offset[1] > MAP_CRYSTALS[c].y + MAP_CRYSTALS[c].h) continue;
-			ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE-3";
-			show_skill_description();
+			INFOBAR.ability_hover_text = MAP_CRYSTALS[c].power+"/"+CRYSTAL_POWER+" HE-3";
+			INFOBAR.show_skill_description();
 			found = true;
 			break;
 			}
 		if(found == false){
-			ability_hover_text = '';
-			show_skill_description();
+			INFOBAR.ability_hover_text = '';
+			INFOBAR.show_skill_description();
 			}
 		}
 	mouse_pos = [mouseX, mouseY];
@@ -223,57 +224,57 @@ function on_mousemove_background(event){
 		if(preloaded==false)
 			return false;
 		var found = false;
-		for (i in settings_positions){
-			if(mouseX > settings_positions[i].x && mouseX < settings_positions[i].x+settings_positions[i].width){
-				if(mouseY > settings_positions[i].y && mouseY < settings_positions[i].y+settings_positions[i].height){
+		for (i in DRAW.settings_positions){
+			if(mouseX > DRAW.settings_positions[i].x && mouseX < DRAW.settings_positions[i].x + DRAW.settings_positions[i].width){
+				if(mouseY > DRAW.settings_positions[i].y && mouseY < DRAW.settings_positions[i].y + DRAW.settings_positions[i].height){
 					//we have mouse over button
-					add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], i);
+					DRAW.add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], i);
 					found = true;
 					}
 				}
 			}
 		if(found == false)
-			add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], 99);		
+			DRAW.add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"], 99);		
 		}
 	if(PLACE=='game'){
 		//mouse over abilities
 		var new_i;
-		for(var i=0; i<ABILITIES_POS.length; i++){
-			if(mouseX>ABILITIES_POS[i].x && mouseX<ABILITIES_POS[i].x+ABILITIES_POS[i].width){
-				if(mouseY>ABILITIES_POS[i].y && mouseY<ABILITIES_POS[i].y+ABILITIES_POS[i].height){
+		for(var i=0; i < INFOBAR.ABILITIES_POS.length; i++){
+			if(mouseX > INFOBAR.ABILITIES_POS[i].x && mouseX < INFOBAR.ABILITIES_POS[i].x + INFOBAR.ABILITIES_POS[i].width){
+				if(mouseY > INFOBAR.ABILITIES_POS[i].y && mouseY < INFOBAR.ABILITIES_POS[i].y + INFOBAR.ABILITIES_POS[i].height){
 					new_i = i;
 					}
 				}
 			}
-		if(new_i != ability_hover_id){
-			ability_hover_id = new_i;
+		if(new_i != INFOBAR.ability_hover_id){
+			INFOBAR.ability_hover_id = new_i;
 			if(new_i != undefined && TYPES[MY_TANK.type].abilities[new_i] != undefined){
 				function_name = TYPES[MY_TANK.type].abilities[new_i].name.replace(/ /g,'_');
-				ability_hover_text = window[function_name](MY_TANK, true);
+				INFOBAR.ability_hover_text = window[function_name](MY_TANK, true);
 				}
 			else
-				ability_hover_text = '';
+				INFOBAR.ability_hover_text = '';
 			//renew
-			show_skill_description();	
+			INFOBAR.show_skill_description();	
 			}
 		//mouse over training tanks list
 		if( (game_mode == 'single_craft' || game_mode == 'multi_craft') && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
-			var stats = draw_factory_gui(undefined, true);
+			var stats = INFOBAR.draw_factory_gui(undefined, true);
 			//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
 			j=0;
 			row=0;
 			//units
 			for(var i in TYPES){
 				if(TYPES[i].type == 'building') continue;
-				if(check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+				if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
 				var xx = stats.pos1+j*(stats.msize+stats.gap);
 				var yy = stats.pos2+row*(stats.msize+stats.gap);
 				if(mouseX > xx && mouseX < xx + stats.msize){
 					if(mouseY > yy && mouseY < yy + stats.msize){
 						var name = TYPES[i].name.replace("_"," ");
 						var cost = TYPES[i].cost;
-						cost = apply_buff(MY_TANK, 'cost', cost);
-						ability_hover_text = name+" - "+cost+" HE-3"
+						cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
+						INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
 						}
 					}
 				
@@ -284,28 +285,27 @@ function on_mousemove_background(event){
 			row=1;
 			for(var i in TYPES){
 				if(TYPES[i].type != 'building') continue;
-				if(strpos(TYPES[i].name, "ower")==false) continue;
-				if(check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+				if(HELPER.strpos(TYPES[i].name, "ower")==false) continue;
+				if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
 				var xx = stats.pos1+j*(stats.msize+stats.gap);
 				var yy = stats.pos2+row*(stats.msize+stats.gap);
 				if(mouseX > xx && mouseX < xx + stats.msize){
 					if(mouseY > yy && mouseY < yy + stats.msize){
 						var name = TYPES[i].name.replace("_"," ");
 						var cost = TYPES[i].cost;
-						cost = apply_buff(MY_TANK, 'cost', cost);
-						ability_hover_text = name+" - "+cost+" HE-3"
+						cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
+						INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
 						}
 					}
 				
 				j++;
 				}
 			//renew
-			show_skill_description();
+			INFOBAR.show_skill_description();
 			}
 		//mini map scrolling
-		if(MAP_SCROLL_CONTROLL==true){
-			move_to_place(mouseX, mouseY);
-			}
+		if(MAP_SCROLL_CONTROLL==true)
+			INFOBAR.move_to_place(mouseX, mouseY);
 		}		
 	}
 function on_mousemove_parent(event){
@@ -340,10 +340,10 @@ function on_mouse_right_click(event){
 					}
 				}
 			//move tank
-			draw_tank_move(mouseX, mouseY);
+			UNITS.draw_tank_move(mouseX, mouseY);
 			}
 		else
-			soldiers_move(mouseX, mouseY);
+			AI.soldiers_move(mouseX, mouseY);
 		}
 	return false;
 	}
@@ -376,10 +376,10 @@ function on_mousedown(event){
 		mouseY = mouseY-map_offset[1];
 		mouse_click_pos = [mouseX, mouseY];
 		if(mouse_click_controll==true){
-			do_missile(MY_TANK.id);
-			do_bomb(MY_TANK.id);
-			do_jump(MY_TANK.id);
-			do_construct(MY_TANK.id);
+			SKILLS.do_missile(MY_TANK.id);
+			SKILLS.do_bomb(MY_TANK.id);
+			SKILLS.do_jump(MY_TANK.id);
+			SKILLS.do_construct(MY_TANK.id);
 			
 			//external click functions
 			for (i in on_click_functions)
@@ -389,7 +389,7 @@ function on_mousedown(event){
 	
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 			//move tank
-			draw_tank_move(mouseX, mouseY);
+			UNITS.draw_tank_move(mouseX, mouseY);
 			}
 		}
 	else{
@@ -498,7 +498,7 @@ function on_mouseup(event){
 				if(selected_n > 0)
 					MY_TANK = TANKS[last_selected_i];
 				if(redraw == true)
-					draw_infobar();
+					INFOBAR.draw_infobar();
 				}
 			if(selection.drag == false){
 				//select 1
@@ -512,7 +512,7 @@ function on_mouseup(event){
 						TANKS[i].selected = 1;
 						selected_n++;
 						MY_TANK = TANKS[i];
-						draw_infobar();
+						INFOBAR.draw_infobar();
 						break;
 						}
 					}
@@ -527,7 +527,7 @@ function on_mouseup(event){
 						
 						TANKS[i].selected = 1;
 						}
-					draw_infobar();
+					INFOBAR.draw_infobar();
 					}
 				}
 			}
@@ -540,7 +540,7 @@ function on_mouseup_back(event){
 	if(PLACE=='game' && MAP_SCROLL_CONTROLL==true){
 		MAP_SCROLL_CONTROLL=false;
 		if(MAP_SCROLL_MODE==1)
-			move_to_place_reset();
+			MAP.move_to_place_reset();
 		}
 	}
 
@@ -573,20 +573,20 @@ function full_screenchange_handler(event){
 		//turn on
 		FS = true;
 		if(PLACE == 'game'){
-			check_canvas_sizes();
-			draw_map(false);
+			MAIN.check_canvas_sizes();
+			MAP.draw_map(false);
 			}
 		}
 	if(document.fullscreen==false || document.mozFullScreen==false || document.webkitIsFullScreen==false){
 		//turn off
 		FS = false;
 		if(PLACE == 'game'){
-			check_canvas_sizes();
-			draw_map(false);
+			MAIN.check_canvas_sizes();
+			MAP.draw_map(false);
 			}
 		else if(PLACE == 'init'){
-			check_canvas_sizes();
-			init_game(false);
+			MAIN.check_canvas_sizes();
+			MAIN.init_game(false);
 			}	
 		}
 	}
@@ -669,15 +669,7 @@ function update_name(user_response){
 		}
 	name = name[0].toUpperCase() + name.slice(1);
 	name = name.substring(0, 10);
-	setCookie("name", name, 30);
+	HELPER.setCookie("name", name, 30);
 	if(PLACE == 'library')
-		draw_settings();
-	}
-function update_counter(user_response){
-	START_GAME_COUNT_SINGLE = parseInt(user_response.number);
-	if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
-	if(START_GAME_COUNT_SINGLE > 30)		START_GAME_COUNT_SINGLE = 30;
-	add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
-	setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
-	draw_settings();
+		DRAW.draw_settings();
 	}
