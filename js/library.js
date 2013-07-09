@@ -101,7 +101,7 @@ function LIBRARY_CLASS(){
 			LIBRARY.draw_library_units();	
 		}
 	this.draw_library_units = function(selected_tank){
-		this.draw_library_list(false, 'Units');
+		LIBRARY.draw_library_list(false, 'Units');
 		var y = TOP;
 		var gap = 8;
 		
@@ -202,28 +202,28 @@ function LIBRARY_CLASS(){
 			var value = "";
 			if(TYPES[selected_tank].abilities[0] != undefined){
 				function_name = TYPES[selected_tank].abilities[0].name.replace(/ /g,'_');
-				value = TYPES[selected_tank].abilities[0].name + " - "+window[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
+				value = TYPES[selected_tank].abilities[0].name + " - "+SKILLS[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
 				}
 			LIBRARY.lib_show_stats("1st ability", value, xx, y+50+st*height_space, 90, true); st++;
 			//2nd ability
 			var value = "";
 			if(TYPES[selected_tank].abilities[1] != undefined){
 				function_name = TYPES[selected_tank].abilities[1].name.replace(/ /g,'_');
-				value = TYPES[selected_tank].abilities[1].name + " - "+window[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
+				value = TYPES[selected_tank].abilities[1].name + " - "+SKILLS[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
 				}
 			LIBRARY.lib_show_stats("2nd ability", value, xx, y+50+st*height_space, 90, true); st++;
 			//3rd ability
 			var value = "";
 			if(TYPES[selected_tank].abilities[2] != undefined){
 				function_name = TYPES[selected_tank].abilities[2].name.replace(/ /g,'_');
-				value = TYPES[selected_tank].abilities[2].name + " - "+window[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
+				value = TYPES[selected_tank].abilities[2].name + " - "+SKILLS[function_name]({abilities_lvl: [1,1,1], type: selected_tank}, true);
 				}
 			LIBRARY.lib_show_stats("3rd ability", value, xx, y+50+st*height_space, 90, true); st++;
 			LIBRARY.lib_show_stats("Cost", TYPES[selected_tank].cost+" HE-3", xx, y+50+st*height_space, 90); st++;
 			}
 		}
 	this.draw_library_maps = function(){
-		this.draw_library_list(false, 'Maps');
+		LIBRARY.draw_library_list(false, 'Maps');
 		var y = TOP;
 		var gap = 8;
 		
@@ -293,7 +293,7 @@ function LIBRARY_CLASS(){
 			}
 		}
 	this.draw_library_countries = function(selected_item){
-		this.draw_library_list(false, 'Countries');
+		LIBRARY.draw_library_list(false, 'Countries');
 		var y = TOP;
 		var gap = 8;
 		
@@ -384,7 +384,7 @@ function LIBRARY_CLASS(){
 		LIBRARY.lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
 		}
 	this.draw_library_elements = function(selected_item){
-		this.draw_library_list(false, 'Elements');
+		LIBRARY.draw_library_list(false, 'Elements');
 		var y = TOP;
 		var gap = 8;
 		

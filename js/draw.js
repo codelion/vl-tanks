@@ -26,14 +26,14 @@ function DRAW_CLASS(){
 		
 		//external drawings functions
 		for (i in pre_draw_functions){
-			window[pre_draw_functions[i][0]](pre_draw_functions[i][1]);
+			SKILLS[pre_draw_functions[i][0]](pre_draw_functions[i][1]);
 			}
 	
 		//tanks actions
 		for(var i=0; i < TANKS.length; i++){
 			if(PLACE != 'game') return false;
 			var angle = undefined;
-			try{
+			//try{
 				//speed multiplier
 				var speed_multiplier = 1;
 				speed_multiplier = UNITS.apply_buff(TANKS[i], 'speed', speed_multiplier);
@@ -113,7 +113,7 @@ function DRAW_CLASS(){
 							TANKS[i].move = 0;
 							delete TANKS[i].target_move_lock;
 							delete TANKS[i].move_to;
-							window[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
+							SKILLS[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
 							delete TANKS[i].reach_tank_and_execute;
 							}
 						//reached targeted enemy for general attack
@@ -145,7 +145,7 @@ function DRAW_CLASS(){
 						TANKS[i].move = 0;
 						delete TANKS[i].target_move_lock;
 						delete TANKS[i].move_to;
-						window[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true, true);
+						SKILLS[TANKS[i].reach_pos_and_execute[1]](TANKS[i].reach_pos_and_execute[4], true, true);
 						delete TANKS[i].reach_pos_and_execute;
 						}
 					}
@@ -170,8 +170,8 @@ function DRAW_CLASS(){
 					radiance = Math.atan2(dist_y, dist_x);
 					angle = (radiance*180.0)/Math.PI+90;
 					angle = round(angle);
-					if(DRAW.body_rotation(TANKS[i], "angle", TANKS[i].turn_speed, angle, time_gap)){
-						if(distance < MAIN.speed2pixels(TANKS[i].speed*speed_multiplier, time_gap)){
+					if(DRAW.body_rotation(TANKS[i], "angle", TANKS[i].data.turn_speed, angle, time_gap)){
+						if(distance < MAIN.speed2pixels(TANKS[i].data.speed * speed_multiplier, time_gap)){
 							if(TANKS[i].move_to[0].length == undefined){
 								TANKS[i].move = 0;
 								}
@@ -191,8 +191,8 @@ function DRAW_CLASS(){
 						else{
 							var last_x = TANKS[i].x;
 							var last_y = TANKS[i].y;
-							TANKS[i].x += Math.cos(radiance) * MAIN.speed2pixels(TANKS[i].speed * speed_multiplier, time_gap);
-							TANKS[i].y += Math.sin(radiance) * MAIN.speed2pixels(TANKS[i].speed * speed_multiplier, time_gap);
+							TANKS[i].x += Math.cos(radiance) * MAIN.speed2pixels(TANKS[i].data.speed * speed_multiplier, time_gap);
+							TANKS[i].y += Math.sin(radiance) * MAIN.speed2pixels(TANKS[i].data.speed * speed_multiplier, time_gap);
 							
 							//border controll
 							var border_error = false;
@@ -213,7 +213,7 @@ function DRAW_CLASS(){
 					if(TANKS[i].attacking == undefined){
 						//if peace
 						if(angle != undefined)
-							DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, angle, time_gap);
+							DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].data.turn_speed, angle, time_gap);
 						}
 					else{
 						//in battle
@@ -224,7 +224,7 @@ function DRAW_CLASS(){
 						var enemy_angle = (radiance*180.0)/Math.PI+90;
 						
 						//rotate
-						DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].turn_speed, enemy_angle, time_gap);
+						DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].data.turn_speed, enemy_angle, time_gap);
 						}
 					}
 				
@@ -249,10 +249,10 @@ function DRAW_CLASS(){
 					UNITS.check_enemies(TANKS[i]);
 					UNITS.draw_tank(TANKS[i]);
 					}
-				}
+				/*}
 			catch(err){
 				console.log("Error: "+err.message);
-				}
+				}*/
 			}
 		
 		//target	
@@ -363,16 +363,15 @@ function DRAW_CLASS(){
 				}	
 			}
 		}
-	var HE3 = 260;
 	this.draw_he3_info = function(){
 		if(PLACE != 'game') return false;
 		var left = WIDTH_APP-100;
 		var top = 8;
-		var value = round(HE3);
+		var value = round(UNITS.HE3);
 		
 		value = HELPER.format("#,##0.####", value);
 		
-		DRAW.draw_image(canvas_main, 'he3',left, top);
+		DRAW.draw_image(canvas_main, 'he3', left, top);
 		canvas_main.fillStyle = "#ffffff";
 		canvas_main.font = "Bold 10px Verdana";
 		canvas_main.fillText(value, left+10+12, top+12);
@@ -780,7 +779,7 @@ function DRAW_CLASS(){
 		var top_margin = 60;
 		var letter_height = 9;
 		var text_y = 70;
-		var flag_space = (button_height-flag_height)/2;
+		var flag_space = (button_height - UNITS.flag_height)/2;
 		
 		if(live==false) tab_scores=false;
 		
@@ -1001,9 +1000,7 @@ function DRAW_CLASS(){
 		
 		if(live==false){
 			TANKS = [];
-			timed_functions = [];
 			pre_draw_functions = [];
-			on_click_functions = [];
 			}
 		}
 	//message on screen in game
@@ -1518,7 +1515,7 @@ function DRAW_CLASS(){
 	//calculate body and turret rotation
 	this.body_rotation = function(obj, str, speed, rot, time_diff){
 		if(obj.stun != undefined)	return false; //stun
-		if(obj.speed == 0 && TYPES[obj.type].type == 'tank')	return false; //0 speed
+		if(obj.data.speed == 0 && TYPES[obj.type].type == 'tank')	return false; //0 speed
 		speed = speed * 100 * time_diff/1000;	
 		
 		if (obj[str] > 360) obj[str] = obj[str] - 360;

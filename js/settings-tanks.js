@@ -45,27 +45,32 @@ COUNTRIES = {
 //Tiger
 TYPES.push({
 	name: 'Tiger',
-	type: 'tank',
+	type: 'tank',					//values: tank, human, building
 	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
-	life: [210, 12],
-	damage: [30, 1.5],		//30 dps
-	range: 80, 
-	scout: 110,
-	armor: [25, 0.5, 50],
-	speed: 28,
-	attack_delay: 1,
-	turn_speed: 2.5,
-	abilities: [
+	life: [210, 12],				//[tank life in level 0, life increase in each level]
+	damage: [30, 1.5],	//30 dps		//[tank damage in level 0, damage increase in each level]
+	range: 80, 					//tank shooting range
+	scout: 110,					//tank scout range
+	armor: [25, 0.5, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	speed: 28,					//moving speed
+	attack_delay: 1,				//pause between shoots in seconds
+	turn_speed: 2.5,				//turn speed, higher - faster
+	//no_repawn: 1,					//if tank dies - he will not respawn
+	//no_collisions: 1,				//tank can go other walls and other tanks
+	//bonus: 1,					//tank will be available only in single mode, random and mirror
+	//flying: true,					//can fly
+	//ignore_armor: 1,				//tank will ignore armor
+	abilities: [					//name, active/passive, broadcast activation in multiplayer (0-no, 1-yes, 2-yes, but on later)
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
 		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
-	size: ['M', 50, 50],
-	preview: true,
-	icon_top: true,
-	icon_base: true,
-	bullet: 'bullet',
-	fire_sound: 'shoot',
+	size: ['M', 50, 50],				//[tank size S/M/L (for radar), icon width and height]
+	preview: true,					//tank preview image
+	icon_top: true,					//tank base images
+	icon_base: true,				//tank top images
+	bullet: 'bullet',				//bullet_image
+	fire_sound: 'shoot',				//shooting sound
 	cost: 70,
 	});
 
@@ -74,30 +79,25 @@ TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
-	life: [230, 12],  				//[tank life in level 0, life increase in each level]
-	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
-	range: 80,					//tank shooting range
-	scout: 110,					//tank scout range
-	armor: [40, 0.5, 65],				//[tank armor in level 0, armor increase in each level, max armor]
-	speed: 25,					//speed
-	attack_delay: 1,				//pause between shoots in seconds
-	turn_speed: 2.5,					//turn speed, higher - faster
-	//no_repawn: 1,					//if tank dies - he will not respawn
-	//no_collisions: 1,				//tank can go other walls and other tanks
-	//bonus: 1,					//tank will be available only in single mode, random and mirror
-	//flying: true,					//can fly
-	//ignore_armor: 1,				//tank will ignore armor
-	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
+	life: [230, 12],
+	damage: [15, 1],	//15 dps
+	range: 80,
+	scout: 110,
+	armor: [40, 0.5, 65],
+	speed: 25,
+	attack_delay: 1,
+	turn_speed: 2.5,
+	abilities: [
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
 		{name: 'Health',	passive: true,		broadcast: 1}, 
 		],
-	size: ['M', 50, 50],				//[tank size: S/M/L, icon width and height(same)]
-	icon_top: true,				//tank base images
-	icon_base: true,			//tank top images
-	preview: true,				//tank preview image
-	bullet: 'small_bullet',				//bullet_image
-	fire_sound: 'shoot',				//shooting sound
+	size: ['M', 50, 50],
+	icon_top: true,
+	icon_base: true,
+	preview: true,
+	bullet: 'small_bullet',
+	fire_sound: 'shoot',
 	cost: 60,
 	});
 

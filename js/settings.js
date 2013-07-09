@@ -4,8 +4,8 @@
 var VERSION = "2.0";			//app version
 var DEBUG = true;			//show debug info
 var SOCKET = ['tryunion.com', '80'];	//socket server //unionplatform.com - amazing service
-var APP_URL = 'http://viliusle.github.io/vl-tanks/';
-var APP_EMAIL = 'www.viliusl@gmail.com';
+var APP_URL = 'http://viliusle.github.io/vl-tanks/';	//homepage
+var APP_EMAIL = 'www.viliusl@gmail.com';	//author email
 var FPS = 25;				//frames per second
 var START_GAME_COUNT = 20;		//second how much to count in multiplayer
 var WIDTH_APP = 800;			//application width
@@ -59,14 +59,12 @@ var name = '';				//user name
 var my_tank_nr = -1;			//my tank type: [0,1...n]
 var audio_main;				//main audio track controller
 var map_offset = [0, 0];		//map offest [x ,y], < 0, this is for map scrolling, if map bigger then canvas size
-var timed_functions = [];		//timed functions array, for repeative exec.
 var mouse_click_controll = false;	//if external funtion takes mouse clicks controll
 var target_mode = '';			//target mode: target, rectangle
 var target_range = 0;			//targer circle range for aoe skills
 var mouse_pos = [0,0];			//current mouse position for external functions
 var mouse_click_pos = [0,0];		//last mouse click position for external functions
 var pre_draw_functions = [];		//extra functions executed before main draw loop
-var on_click_functions = [];		//on click custom actions functions, only if mouse_click_controll=true
 var game_mode;				//single_quick, single_craft, multi_quick, multi_craft
 var QUALITY = 3;				//1=low, 2=mid, 3=high
 var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room

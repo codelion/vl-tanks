@@ -250,7 +250,7 @@ function on_mousemove_background(event){
 			INFOBAR.ability_hover_id = new_i;
 			if(new_i != undefined && TYPES[MY_TANK.type].abilities[new_i] != undefined){
 				function_name = TYPES[MY_TANK.type].abilities[new_i].name.replace(/ /g,'_');
-				INFOBAR.ability_hover_text = window[function_name](MY_TANK, true);
+				INFOBAR.ability_hover_text = SKILLS[function_name](MY_TANK, true);
 				}
 			else
 				INFOBAR.ability_hover_text = '';
@@ -381,9 +381,6 @@ function on_mousedown(event){
 			SKILLS.do_jump(MY_TANK.id);
 			SKILLS.do_construct(MY_TANK.id);
 			
-			//external click functions
-			for (i in on_click_functions)
-				window[on_click_functions[i][0]](on_click_functions[i][1]);
 			return true;
 			}
 	

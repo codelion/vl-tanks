@@ -4,18 +4,15 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	after classes test everything + every packet function
-	timed_functions - remove this ????
-	multiplayer	- game_mode = single_quick   single_craft   multi_quick   multi_craft
-		random respawn - at multi wrong
-		multi controlls: move, target, skills, others
-		move he3 to team, initial he3
+	multiplayer	game_mode = single_quick   single_craft   multi_quick   multi_craft
 		implement weapons_bonus and armor_bonus
-		optimize network packets in mode3:
+		optimize controlls packets: 
 			tank_move
+			target
 			bullet
 			skill_do
 			skill_advanced
+	ai for single craft
 	special score for mode3: he3 and army graph in time
 	heavy - aoe skill? more aoe skills?
 */
@@ -33,7 +30,7 @@ function MAIN_CLASS(){
 	this.IMAGES_BULLETS = new Image();
 	this.IMAGES_ELEMENTS = new Image();
 	this.IMAGES_INRO = new Image();
-	var images_src_n = 7;	//image to load count, intro excluded
+	var images_src_n = 7;	//images to load count, intro excluded
 	var unique_id = 0;
 	var page_title_copy = 'Moon wars';	//copy of original title
 	var intro_enabled = 1;			//if show intro
@@ -353,6 +350,7 @@ function MAIN_CLASS(){
 			}
 			
 		MP.sync_multiplayers();
+		UNITS.HE3 = UNITS.he3_begin;
 		
 		//handler for mini map
 		MAIN.register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
@@ -471,21 +469,7 @@ function MAIN_CLASS(){
 			if(mouse_pos[1] > HEIGHT_SCROLL - gap) 
 				MAP.scoll_map(0, -1, power);//down
 			}
-		
-		//exec functions
-		/*for(var i=0; i<timed_functions.length; i++){		
-			timed_functions[i].duration = timed_functions[i].duration - 100;
-			var duration = 	timed_functions[i].duration				
-			if(timed_functions[i].type == 'REPEAT'){
-				window[timed_functions[i]['function']](timed_functions[i]);
-				}
-			if(duration<0){
-				if(timed_functions[i].type == 'ON_END')
-					window[timed_functions[i].function](timed_functions[i]);
-				//unregister f-tion
-				timed_functions.splice(i, 1);	i--;
-				}
-			}*/
+		INFOBAR.draw_ability_reuse();
 		}
 	//quit button - quits all possible actions
 	this.quit_game = function(init_next_game){
@@ -510,9 +494,7 @@ function MAIN_CLASS(){
 		TANKS = [];
 		
 		if(PLACE=='game'){
-			timed_functions = [];
 			pre_draw_functions = [];
-			on_click_functions = [];
 			
 			canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 					
@@ -549,9 +531,7 @@ function MAIN_CLASS(){
 		BUTTONS = [];
 		opened_room_id = -1;
 		CHAT_LINES = [];
-		timed_functions = [];
 		pre_draw_functions = [];
-		on_click_functions = [];
 		mouse_click_controll = false;
 		target_range = 0;
 		INFOBAR.ABILITIES_POS = [];

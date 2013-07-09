@@ -21,6 +21,8 @@ function SKILLS_CLASS(){
 			}
 		
 		TANK.abilities_reuse[0] = Date.now() + reuse;
+		TANK.abilities_reuse_max[0] = reuse;
+		
 		//speed buff
 		TANK.buffs.push({
 			name: 'speed',
@@ -58,11 +60,13 @@ function SKILLS_CLASS(){
 		var max_hp = UNITS.get_tank_max_hp(TANK);
 		if(TANK.hp > max_hp*hp_level/100){ 
 			TANK.abilities_reuse[1] = Date.now();
+			TANK.abilities_reuse_max[1] = 0;
 			return false;
 			}						
 	
 		//do
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		//damage buff
 		TANK.buffs.push({
 			name: 'damage',
@@ -107,10 +111,14 @@ function SKILLS_CLASS(){
 			if(TANK.hp > max_hp/2) return false;
 			}
 		
-		if(TYPES[TANK.type].name == "Heavy")
+		if(TYPES[TANK.type].name == "Heavy"){
 			TANK.abilities_reuse[0] = Date.now() + reuse;
-		else if(TYPES[TANK.type].name == "Bomber")
+			TANK.abilities_reuse_max[0] = reuse;
+			}
+		else if(TYPES[TANK.type].name == "Bomber"){
 			TANK.abilities_reuse[2] = Date.now() + reuse;
+			TANK.abilities_reuse_max[2] = reuse;
+			}
 		
 		//repair buff
 		TANK.buffs.push({
@@ -145,6 +153,7 @@ function SKILLS_CLASS(){
 		if(ai != undefined) return false;
 		
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		
 		//armor debuff
 		TANK.buffs.push({
@@ -202,6 +211,7 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		TANK.abilities_reuse[0] = Date.now() + reuse;
+		TANK.abilities_reuse_max[0] = reuse;
 		//speed buff
 		TANK.buffs.push({
 			name: 'speed',
@@ -250,6 +260,7 @@ function SKILLS_CLASS(){
 			}
 	
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		for (ii in TANKS){
 			if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 			if(TANKS[ii].team != TANK.team)			continue; //enemy
@@ -307,6 +318,7 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		TANK.abilities_reuse[2] = Date.now() + reuse; 
+		TANK.abilities_reuse_max[2] = reuse;
 		for (ii in TANKS){
 			if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 			if(TANKS[ii].team != TANK.team)			continue; //enemy
@@ -513,12 +525,13 @@ function SKILLS_CLASS(){
 			}
 			
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		
 		//check ranges
 		if(TANK.id == MY_TANK.id || ai != undefined){
 			for(var i in TANKS){
 				if(TANKS[i].team == TANK.team) continue; //same team
-				var distance = get_distance_between_tanks(TANKS[i], TANK);
+				var distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
 				distance = UNITS.distance + TANKS[i].width()/2;
 				var min_range = TANKS[i].sight;
 				//min_range = min_range - TANK.width()/2;
@@ -532,12 +545,18 @@ function SKILLS_CLASS(){
 		
 		//remove invisibility
 		if(TANK.invisibility == 1){
-			stop_camouflage(TANK);
+			SKILLS.stop_camouflage(TANK);
 			return reuse;
 			}
 		
 		TANK.invisibility = 1;
-		TANK.speed = round(TANK.speed * power_speed);
+		
+		//speed buff
+		TANK.buffs.push({
+			name: 'speed',
+			source: 'camouflage',
+			power: power_speed,
+			});		
 		//weak debuff
 		TANK.buffs.push({
 			name: 'damage',
@@ -555,10 +574,14 @@ function SKILLS_CLASS(){
 		return reuse;
 		}
 	this.stop_camouflage = function(TANK){
-		TANK.speed = TYPES[TANK.type].speed;
 		delete TANK.invisibility;
 		
 		//update buffs
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].name == 'speed' && TANK.buffs[b].source == 'camouflage'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
 		for(var b in TANK.buffs){
 			if(TANK.buffs[b].name == 'damage' && TANK.buffs[b].source == 'camouflage'){
 				TANK.buffs.splice(b, 1); b--;
@@ -585,6 +608,7 @@ function SKILLS_CLASS(){
 		
 		//add
 		TANK.abilities_reuse[0] = Date.now() + reuse;
+		TANK.abilities_reuse_max[0] = reuse;
 		MINES.push({
 			x: round(TANK.cx()),
 			y: round(TANK.cy()),
@@ -606,6 +630,7 @@ function SKILLS_CLASS(){
 		if(ai != undefined) return false;
 		
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		var mine_size_half = 8;
 		
 		for(var m=0; m < MINES.length; m++){
@@ -647,6 +672,7 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		TANK.abilities_reuse[2] = Date.now() + reuse;
+		TANK.abilities_reuse_max[2] = reuse;
 		//find nearest enemy
 		var ENEMY_NEAR;
 		for (i in TANKS){				
@@ -837,6 +863,7 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		TANK.abilities_reuse[2] = Date.now() + reuse;
+		TANK.abilities_reuse_max[2] = reuse;
 		for (ii in TANKS){
 			if(TYPES[TANKS[ii].type].type == 'building')	continue; //building
 			if(TANKS[ii].team != TANK.team)			continue; //enemy
@@ -923,6 +950,7 @@ function SKILLS_CLASS(){
 			
 		//prepare
 		TANK.abilities_reuse[1] = Date.now() + reuse;
+		TANK.abilities_reuse_max[1] = reuse;
 		var type = '0';
 		for(var t in TYPES){
 			if(TYPES[t].name == 'Soldier')
@@ -959,6 +987,7 @@ function SKILLS_CLASS(){
 		if(ai != undefined) return false;
 		
 		TANK.abilities_reuse[2] = Date.now() + reuse;
+		TANK.abilities_reuse_max[2] = reuse;
 		for (ii in TANKS){
 			if(TANKS[ii].master == undefined) continue; //not selite soldier
 			if(TANKS[ii].master.id != TANK.id) continue; //not mine
@@ -1092,6 +1121,7 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		TANK.abilities_reuse[2] = Date.now() + reuse;
+		TANK.abilities_reuse_max[2] = reuse;
 		//shield buff
 		TANK.buffs.push({
 			name: 'shield',
@@ -1160,7 +1190,8 @@ function SKILLS_CLASS(){
 		//control
 		nr = TANK.try_jump.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
-		TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;
+		TANK.abilities_reuse[nr] = Date.now() + TANK.try_jump.reuse;	
+		TANK.abilities_reuse_max[nr] = TANK.try_jump.reuse;
 		
 		//animation
 		TANK.animations.push({
@@ -1181,18 +1212,6 @@ function SKILLS_CLASS(){
 		TANK.fire_angle = angle;
 		MAP.auto_scoll_map();
 			
-		//init reuse
-		if((game_mode == 'single_quick' || game_mode == 'single_craft') || TANK.id == MY_TANK.id){
-			var tmp = new Array();
-			tmp['function'] = INFOBAR.draw_ability_reuse;
-			tmp['duration'] = TANK.try_jump.reuse;
-			tmp['type'] = 'REPEAT';
-			tmp['nr'] = TANK.try_jump.ability_nr;	
-			tmp['max'] = TANK.try_jump.reuse;
-			tmp['tank'] = TANK;
-			timed_functions.push(tmp);
-			}
-		
 		delete TANK.try_jump;
 		mouse_click_controll = false;
 		target_range=0;
@@ -1251,7 +1270,8 @@ function SKILLS_CLASS(){
 		
 		TANK.sight = TYPES[TANK.type].scout + round(TANK.width()/2) + power;
 		
-		TANK.abilities_reuse[ability_nr] = Date.now() + reuse;
+		TANK.abilities_reuse[ability_nr] = Date.now() + reuse;	
+		TANK.abilities_reuse_max[ability_nr] = reuse;
 			
 		//check invisible enemies
 		for(var i in TANKS){
@@ -1358,10 +1378,14 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		if(TANK.constructing != undefined) return false;
-		if(HE3 < cost) return false;
-		HE3 = HE3 - cost;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < cost) return false;
+			UNITS.HE3 = UNITS.HE3 - cost;
+			}
 		
 		TANK.abilities_reuse[0] = Date.now() + reuse;	
+		TANK.abilities_reuse_max[0] = reuse;
+		
 		//damage buff
 		TANK.buffs.push({
 			name: 'hit_reuse',
@@ -1455,7 +1479,7 @@ function SKILLS_CLASS(){
 			return 0;
 			}
 		
-		if(HE3 < cost){
+		if(TANK.team == MY_TANK.team && UNITS.HE3 < cost){
 			//message
 			screen_message.text = "Not enough HE-3.";
 			screen_message.time = Date.now() + 1000;
@@ -1477,10 +1501,10 @@ function SKILLS_CLASS(){
 			//hover f-tion
 			var found = false;
 			for(var f in pre_draw_functions)
-				if(pre_draw_functions[0] == 'SKILLS.construct_hover')
+				if(pre_draw_functions[0] == 'construct_hover')
 					found = true;
 			if(found == false)
-				pre_draw_functions.push(['SKILLS.construct_hover']);
+				pre_draw_functions.push(['construct_hover']);
 			}
 		//init
 		TANK.try_construct = {
@@ -1641,12 +1665,14 @@ function SKILLS_CLASS(){
 		
 		if(TANK.constructing != undefined) return false;
 		if(weapons_bonus >= power * levels) return false;
-		if(HE3 < cost){ 
-			screen_message.text = "Not enough HE-3.";
-			screen_message.time = Date.now() + 1000;
-			return false;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < cost){ 
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			UNITS.HE3 = UNITS.HE3 - cost;
 			}
-		HE3 = HE3 - cost;
 		
 		//register effect
 		setTimeout(function(){
@@ -1683,12 +1709,14 @@ function SKILLS_CLASS(){
 		
 		if(TANK.constructing != undefined) return false;
 		if(armor_bonus >= power * levels) return false;
-		if(HE3 < cost){ 
-			screen_message.text = "Not enough HE-3.";
-			screen_message.time = Date.now() + 1000;
-			return false;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < cost){ 
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			UNITS.HE3 = UNITS.HE3 - cost;
 			}
-		HE3 = HE3 - cost;
 		
 		//register effect
 		setTimeout(function(){
@@ -1738,7 +1766,7 @@ function SKILLS_CLASS(){
 							{key: 'target_move_lock', value: enemy.id},
 							{key: 'move', value: 1},
 							{key: 'move_to', value: [mouseX-tank_size_w, mouseY-tank_size_h]},
-							{key: 'reach_tank_and_execute', value: [TANK.try_missile.range, SKILLS.do_missile, tank_id]},
+							{key: 'reach_tank_and_execute', value: [TANK.try_missile.range, 'do_missile', tank_id]},
 							{key: 'try_missile', value: TANK.try_missile},
 							{key: 'missile_x', value: mouse_click_pos[0]},
 							{key: 'missile_y', value: mouse_click_pos[1]},
@@ -1752,7 +1780,7 @@ function SKILLS_CLASS(){
 					TANK.target_move_lock = enemy.id;
 					TANK.move = 1;
 					TANK.move_to = [mouseX-tank_size_w, mouseY-tank_size_h];
-					TANK.reach_tank_and_execute = [TANK.try_missile.range, SKILLS.do_missile, tank_id];
+					TANK.reach_tank_and_execute = [TANK.try_missile.range, 'do_missile', tank_id];
 					}
 				return false;
 				}
@@ -1774,7 +1802,7 @@ function SKILLS_CLASS(){
 		//broadcast
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 			DATA = {
-				function: 'SKILLS.do_missile',
+				function: 'do_missile',
 				fparam: [tank_id, enemy_id, true],
 				tank_params: [
 					{key: 'try_missile', value: TANK.try_missile},
@@ -1794,6 +1822,7 @@ function SKILLS_CLASS(){
 		nr = TANK.try_missile.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_missile.reuse;
+		TANK.abilities_reuse_max[nr] = TANK.try_missile.reuse;
 			
 		//bullet	
 		var tmp = new Array();
@@ -1807,18 +1836,6 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
 		if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
 		BULLETS.push(tmp);
-		
-		//init reuse
-		if( (game_mode == 'single_quick' || game_mode == 'single_craft') || TANK.id == MY_TANK.id){
-			var tmp = new Array();
-			tmp['function'] = INFOBAR.draw_ability_reuse;
-			tmp['duration'] = TANK.try_missile.reuse;
-			tmp['type'] = 'REPEAT';
-			tmp['nr'] = TANK.try_missile.ability_nr;	
-			tmp['max'] = TANK.try_missile.reuse;
-			tmp['tank'] = TANK;
-			timed_functions.push(tmp);
-			}
 		
 		delete TANK.try_missile;
 		mouse_click_controll = false;
@@ -1858,7 +1875,7 @@ function SKILLS_CLASS(){
 						tank_params: [
 							{key: 'move', value: 1},
 							{key: 'move_to', value: [mouseX-tank_size_w, mouseY-tank_size_h]},
-							{key: 'reach_pos_and_execute', value: [TANK.try_bomb.range, SKILLS.do_bomb, mouseX, mouseY, tank_id]},
+							{key: 'reach_pos_and_execute', value: [TANK.try_bomb.range, 'do_bomb', mouseX, mouseY, tank_id]},
 							{key: 'try_bomb', value: TANK.try_bomb},
 							{key: 'bomb_x', value: mouse_click_pos[0]},
 							{key: 'bomb_y', value: mouse_click_pos[1]},
@@ -1871,7 +1888,7 @@ function SKILLS_CLASS(){
 					delete TANK.target_move_lock;
 					TANK.move = 1;
 					TANK['move_to'] = [mouseX-tank_size_w, mouseY-tank_size_h];
-					TANK.reach_pos_and_execute = [TANK.try_bomb.range, SKILLS.do_bomb, mouseX, mouseY, tank_id];
+					TANK.reach_pos_and_execute = [TANK.try_bomb.range, 'do_bomb', mouseX, mouseY, tank_id];
 					}
 				return false;
 				}
@@ -1879,7 +1896,7 @@ function SKILLS_CLASS(){
 		//broadcast
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
 			DATA = {
-				function: 'SKILLS.do_bomb',
+				function: 'do_bomb',
 				fparam: [tank_id, true, true],
 				tank_params: [
 					{key: 'try_bomb', value: TANK.try_bomb},
@@ -1899,6 +1916,7 @@ function SKILLS_CLASS(){
 		nr = TANK.try_bomb.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_bomb.reuse;
+		TANK.abilities_reuse_max[nr] = TANK.try_bomb.reuse;
 		
 		//bullet	
 		var tmp = new Array();
@@ -1915,19 +1933,7 @@ function SKILLS_CLASS(){
 			tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
 			}
 		BULLETS.push(tmp);
-		
-		//init reuse
-		if(game_mode == 'single_quick' || game_mode == 'single_craft' || TANK.id == MY_TANK.id){
-			var tmp = new Array();
-			tmp['function'] = INFOBAR.draw_ability_reuse;
-			tmp['duration'] = TANK.try_bomb.reuse;
-			tmp['type'] = 'REPEAT';
-			tmp['nr'] = TANK.try_bomb.ability_nr;	
-			tmp['max'] = TANK.try_bomb.reuse;
-			tmp['tank'] = TANK;
-			timed_functions.push(tmp);
-			}
-		
+
 		delete TANK.try_bomb;
 		mouse_click_controll = false;
 		target_range=0;
@@ -1947,14 +1953,17 @@ function SKILLS_CLASS(){
 		if(SKILLS.validate_construction(mouseX, mouseY, true)==false) return false;
 		
 		TANK.try_construct.cost = UNITS.apply_buff(TANK, 'cost', TANK.try_construct.cost);
-		if(HE3 < TANK.try_construct.cost) return false;
-		HE3 = HE3 - TANK.try_construct.cost;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < TANK.try_construct.cost) return false;
+			UNITS.HE3 = UNITS.HE3 - TANK.try_construct.cost;
+			}
 		
 		//control
 		if(TANK.try_construct == undefined)  return false;
 		nr = TANK.try_construct.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_construct.reuse;
+		TANK.abilities_reuse_max[nr] = TANK.try_construct.reuse;
 		
 		var x = mouseX - round(TYPES[type].size[1]/2);
 		var y = mouseY - round(TYPES[type].size[2]/2);

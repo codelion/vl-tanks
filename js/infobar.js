@@ -148,7 +148,7 @@ function INFOBAR_CLASS(){
 			//value
 			canvas_backround.fillStyle = "#a3ad16";
 			canvas_backround.font = "bold 10px Verdana";
-			var damage_string = MY_TANK.damage;
+			var damage_string = MY_TANK.data.damage[0] + MY_TANK.data.damage[1]*(MY_TANK.level-1);
 			damage_string = UNITS.apply_buff(MY_TANK, 'damage', damage_string);
 			damage_string = Math.floor(damage_string);
 			canvas_backround.fillText(damage_string, left_x_values, top_y);
@@ -160,7 +160,9 @@ function INFOBAR_CLASS(){
 			//value
 			canvas_backround.fillStyle = "#a3ad16";
 			canvas_backround.font = "bold 10px Verdana";
-			var armor_text = MY_TANK.armor;
+			var armor_text = MY_TANK.data.armor[0] + MY_TANK.data.armor[1]*(MY_TANK.level-1);
+			if(MY_TANK > MY_TANK.data.armor[2])
+				armor_text = MY_TANK.data.armor[2];
 			armor_text = UNITS.apply_buff(MY_TANK, 'shield', armor_text);
 			if(armor_text > 100) armor_text = 100;
 			if(armor_text < 0) armor_text = 0;
@@ -190,7 +192,7 @@ function INFOBAR_CLASS(){
 			//value
 			canvas_backround.fillStyle = "#a3ad16";
 			canvas_backround.font = "bold 10px Verdana";
-			var speed_text = MY_TANK.speed;
+			var speed_text = MY_TANK.data.speed;
 			speed_text = UNITS.apply_buff(MY_TANK, 'speed', speed_text);
 			speed_text = Math.floor(speed_text)+" km/h";
 			canvas_backround.fillText(speed_text, left_x_values, top_y+28);
@@ -325,7 +327,7 @@ function INFOBAR_CLASS(){
 			if(TYPES[MY_TANK.type].abilities[i].passive == true)	
 				back_image = 'skill_off';
 			var ability_function = TYPES[MY_TANK.type].abilities[i].name.replace(/ /g,'_');
-			var ability_stats = window[ability_function](MY_TANK, undefined, true);
+			var ability_stats = SKILLS[ability_function](MY_TANK, undefined, true);
 			if(ability_stats.active != undefined && ability_stats.active == false)
 				back_image = 'skill_off';
 			DRAW.draw_image(canvas_backround, back_image, status_x_tmp+i*(SKILL_BUTTON+gap)-5, status_y-5);
@@ -367,23 +369,30 @@ function INFOBAR_CLASS(){
 				}
 			}
 		//clear areas if less then 3 skills
-		for(j=i; j<3; j++){
+		for(j=i; j<3; j++)
 			DRAW.draw_image(canvas_backround, 'skill_off', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5);
-			}
 		}
 	//draw tanks skill reuse animation
-	this.draw_ability_reuse = function(object){
+	this.draw_ability_reuse = function(){
 		var gap = 15;
 		var status_x_tmp = status_x+590;
 		var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
+		var animation = true;
 		
-		if(INFOBAR.check_abilities_visibility() == false) return false;
-		if(object != undefined){
-			if(object.tank.id != MY_TANK.id) return false;	//another tank
-			
-			var i = object.nr;
-			var ability_reuse = object.tank.abilities_reuse[i] - Date.now();
+		if(PLACE != 'game') return false;
+		if(INFOBAR.check_abilities_visibility() == false) animation = false; //craft mode - not 1 type selected
+		
+		if(animation == false){
+			//clean
+			for(j=0; j<3; j++)
+				DRAW.draw_image(canvas_backround, 'skill_off', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5);
+			return false;
+			}
+		
+		for(var i=0; i<3; i++){
 			if(TYPES[MY_TANK.type].abilities[i] == undefined) return false;
+			var ability_reuse = MY_TANK.abilities_reuse[i] - Date.now();
+			if(ability_reuse < 0) continue;
 			
 			//button
 			var active = true;
@@ -393,7 +402,7 @@ function INFOBAR_CLASS(){
 				active = false;
 				}
 			var ability_function = TYPES[MY_TANK.type].abilities[i].name.replace(/ /g,'_');
-			var ability_stats = window[ability_function](MY_TANK, undefined, true);
+			var ability_stats = SKILLS[ability_function](MY_TANK, undefined, true);
 			if(ability_stats.active != undefined && ability_stats.active == false){
 				back_image = 'skill_off';
 				active = false;
@@ -405,7 +414,7 @@ function INFOBAR_CLASS(){
 			//if active
 			var img_height=0;
 			if(active == true){
-				img_height = (SKILL_BUTTON) * ability_reuse / object.max + 5;
+				img_height = (SKILL_BUTTON) * ability_reuse / MY_TANK.abilities_reuse_max[i] + 5;
 				if(img_height > 65)
 					img_height = 65;	//error here
 				if(img_height < 6){
@@ -468,8 +477,6 @@ function INFOBAR_CLASS(){
 				canvas_backround.fillText(reuse, status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5-value_width, status_y+round(SKILL_BUTTON*9/10));
 				}
 			}
-		else
-			log('Error: undefined object in INFOBAR.draw_ability_reuse().');
 		}
 	//show skills descriptino on mouse hover
 	this.show_skill_description = function(){
@@ -811,7 +818,7 @@ function INFOBAR_CLASS(){
 					if(TANKS[x].selected == undefined) continue;
 					if(TANKS[x].data.name != 'Factory') continue;
 					for(var i in TANKS[x].training){
-						HE3 = HE3 + TANKS[x].training[i].cost;
+						UNITS.HE3 = UNITS.HE3 + TANKS[x].training[i].cost;
 						}
 					TANKS[x].training = [];
 					}
@@ -909,7 +916,7 @@ function INFOBAR_CLASS(){
 				var unit_cost = TYPES[index].cost;
 				unit_cost = UNITS.apply_buff(MY_TANK, 'cost', unit_cost);
 				//check he3
-				if(HE3 < unit_cost){
+				if(UNITS.HE3 < unit_cost){
 					screen_message.text = "Not enough HE-3.";
 					screen_message.time = Date.now() + 1000;
 					return false;
@@ -931,7 +938,7 @@ function INFOBAR_CLASS(){
 					screen_message.time = Date.now() + 1000;
 					return false;
 					}
-				HE3 = HE3 - unit_cost;
+				UNITS.HE3 = UNITS.HE3 - unit_cost;
 				//register
 				var duration = 30*1000;
 				if(TYPES[index].type == 'human')
@@ -964,7 +971,7 @@ function INFOBAR_CLASS(){
 			var unit_cost = TYPES[index].cost;
 			stats = SKILLS.Towers(TANK, undefined, true);
 			var reuse = stats.reuse;
-			if(HE3 < unit_cost){
+			if(UNITS.HE3 < unit_cost){
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
 				return false;
