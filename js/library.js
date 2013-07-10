@@ -190,7 +190,7 @@ function LIBRARY_CLASS(){
 			var st=0;
 			var xx = info_left+preview_x+40;
 			var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay]
-			LIBRARY.lib_show_stats("DPS", value, xx, y+50+st*height_space, 90, false, 10, 30); st++;
+			LIBRARY.lib_show_stats("DPS", value, xx, y+50+st*height_space, 90, false, 9, 30); st++;
 			LIBRARY.lib_show_stats("Life", TYPES[selected_tank].life, xx, y+50+st*height_space, 90, false, 100, 250); st++;
 			LIBRARY.lib_show_stats("Armor", TYPES[selected_tank].armor, xx, y+50+st*height_space, 90, false, 0, 40); st++;
 			LIBRARY.lib_show_stats("Speed", TYPES[selected_tank].speed, xx, y+50+st*height_space, 90, false, 20, 35); st++;

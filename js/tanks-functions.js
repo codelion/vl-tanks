@@ -1024,7 +1024,7 @@ function SKILLS_CLASS(){
 		return reuse;
 		}
 	
-	//====== TRex ============================================================
+	//====== TRex ==========================================================
 	
 	this.Plasma = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 7000;
@@ -1399,70 +1399,213 @@ function SKILLS_CLASS(){
 	
 	//====== Base ============================================================
 	
-	this.Factory = function(TANK, descrition_only, settings_only, ai){
+	this.Mechanic = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 0;
-		var tank_type = 'Factory';
+		var duration = 20*1000;		if(DEBUG == true) duration = 2000;
 		
+		var type;
 		for(var i in TYPES){
-			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+			if(TYPES[i].name == 'Mechanic')
+				type = i;
 			}
-		
-		if(descrition_only != undefined){
-			var cost = tank_info.cost;
-			cost = UNITS.apply_buff(TANK, 'cost', cost);
-			return 'Construct factory to create land, air, defence units. Costs '+cost+' HE-3.';
-			}
+		var cost = TYPES[type].cost;
+		if(descrition_only != undefined)
+			return 'Train mechanic. Costs '+cost+' HE-3.';
 		if(ai != undefined) return false;
-		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
 		if(settings_only != undefined) return {reuse: reuse};
 		
-		SKILLS.construct_prepare(TANK, reuse, tank_type, 0);
+		cost = UNITS.apply_buff(TANK, 'cost', cost);
+		//check he3
+		if(UNITS.HE3 < cost){
+			screen_message.text = "Not enough HE-3.";
+			screen_message.time = Date.now() + 1000;
+			return false;
+			}
+		//check unit limit
+		var team_units = 0;
+		for(var ii in TANKS){
+			if(TANKS[ii].team != TANK.team) continue;
+			if(TANKS[ii].data.type == 'building'){
+				if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
+					team_units = team_units + TANKS[ii].training.length;
+				continue;
+				}
+			team_units++;
+			}
+		if(TANK.training != undefined && TANK.training.length >= 5) return false;
+		if(team_units >= MAX_TEAM_TANKS){
+			screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+			screen_message.time = Date.now() + 1000;
+			return false;
+			}
+		if(TANK.team == MY_TANK.team)
+			UNITS.HE3 = UNITS.HE3 - cost;
 		
-		//return reuse - later, on use
+		//check respawn buff
+		for(var b in COUNTRIES[TANK.nation].buffs){
+			var buff = COUNTRIES[TANK.nation].buffs[b];
+			if(buff.name == "respawn"){
+				if(buff.type == 'static')	duration = duration + buff.power;
+				else				duration = duration * buff.power;
+				}
+			}
+		if(duration < 1000) duration = 1000;
+		
+		if(TANK.training == undefined)	TANK.training = new Array();
+		TANK.training.push({
+			duration: duration,
+			type: type,
+			cost: cost,
+			});
+		
+		return reuse;
+		}
+
+	//====== Factory =========================================================	
+	
+	this.War_units = function(TANK, descrition_only, settings_only, ai){
+		if(descrition_only != undefined)
+			return 'Construct land or air unit.';
+		if(settings_only != undefined) return {};
+		
+		//passive
 		return 0;
 		}
-	this.Research = function(TANK, descrition_only, settings_only, ai){
-		var reuse = 0;
-		var tank_type = 'Research';
+	this.Towers = function(TANK, descrition_only, settings_only, ai){
+		if(descrition_only != undefined)
+			return 'Construct various towers.';
+		if(settings_only != undefined) return {};
 		
-		for(var i in TYPES){
-			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
-			}
-		
-		if(descrition_only != undefined){
-			var cost = tank_info.cost;
-			cost = UNITS.apply_buff(TANK, 'cost', cost);
-			return 'Construct research station. Costs '+cost+' HE-3.';
-			}
-		if(ai != undefined) return false;
-		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
-		if(settings_only != undefined) return {reuse: reuse};
-		
-		SKILLS.construct_prepare(TANK, reuse, tank_type, 1);
-			
-		//return reuse - later, on use
+		//passive
 		return 0;
 		}
-	this.Silo = function(TANK, descrition_only, settings_only, ai){
-		var reuse = 100;
-		var tank_type = 'Silo';
-		
-		for(var i in TYPES){
-			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
-			}
+	
+	//====== Research ========================================================
+	
+	this.Weapons = function(TANK, descrition_only, settings_only, ai){
+		var power = 5; //%
+		var level = COUNTRIES[TANK.nation].bonus.weapon / power;	
+		var cost = 100*(level+1);
+		var reuse = 180*1000;			if(DEBUG == true) reuse = 2000;
+		var levels = 3;
+		var active = true;
+		if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) active = false;
+		cost = UNITS.apply_buff(TANK, 'cost', cost);
 		
 		if(descrition_only != undefined){
-			var cost = tank_info.cost;
-			cost = UNITS.apply_buff(TANK, 'cost', cost);
-			return 'Construct structure for storing Helium-3. Costs '+cost+' HE-3.';
+			if(level < levels)
+				return 'Upgrade units weapons. Costs '+cost+' HE-3.';
+			else
+				return 'Upgrade units weapons. Max level.';
 			}
 		if(ai != undefined) return false;
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
-		if(settings_only != undefined) return {reuse: reuse};
+		if(settings_only != undefined) 
+			return {
+				reuse: reuse, 
+				power: power, 
+				active: active,
+				level: level,
+				};
 		
-		SKILLS.construct_prepare(TANK, reuse, tank_type, 2);
+		if(TANK.constructing != undefined) return false;
+		if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) return false;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < cost){ 
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			UNITS.HE3 = UNITS.HE3 - cost;
+			}
+		
+		//register effect
+		setTimeout(function(){
+			COUNTRIES[TANK.nation].bonus.weapon = COUNTRIES[TANK.nation].bonus.weapon + power;
+			}, reuse);
+		
+		return reuse;
+		}
+	this.Armor = function(TANK, descrition_only, settings_only, ai){
+		var power = 5; //static
+		var level = COUNTRIES[TANK.nation].bonus.armor / power;
+		var cost = 100*(level+1);
+		var reuse = 180*1000;		if(DEBUG == true) reuse = 2000;
+		var levels = 3;
+		var active = true;
+		if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) active = false;
+		cost = UNITS.apply_buff(TANK, 'cost', cost);
+		
+		if(descrition_only != undefined){
+			if(level < levels)
+				return 'Upgrade units armor. Costs '+cost+' HE-3.';
+			else
+				return 'Upgrade units weapons. Max level.';
+			}
+		if(ai != undefined) return false;
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
+		if(settings_only != undefined)
+			return {
+				reuse: reuse, 
+				power: power, 
+				active: active,
+				level: level,
+				};
+		
+		if(TANK.constructing != undefined) return false;
+		if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) return false;
+		if(TANK.team == MY_TANK.team){
+			if(UNITS.HE3 < cost){ 
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				return false;
+				}
+			UNITS.HE3 = UNITS.HE3 - cost;
+			}
+		
+		//register effect
+		setTimeout(function(){
+			COUNTRIES[TANK.nation].bonus.armor = COUNTRIES[TANK.nation].bonus.armor + power;
+			}, reuse);
+		
+		return reuse;
+		}
+	
+	//====== Engineer ======================================================
+	
+	this.Rebuild = function(TANK, descrition_only, settings_only, ai){
+		var reuse = 0;
+		var power = 30;	//hp points per s
+		
+		if(descrition_only != undefined)
+			return 'Rebuilds damaged structures. Power - '+power+'hp/s.';
+		if(settings_only != undefined) return {reuse: reuse, power: power};
+		if(ai != undefined) return false;
+		
+		return reuse;
+		}
+	this.Occupy = function(TANK, descrition_only, settings_only, ai){
+		var reuse = 0;
+		var duration = 15*1000;
+		
+		if(descrition_only != undefined)
+			return 'Occupy enemy structure.';
+		if(settings_only != undefined) return {reuse: reuse, duration: duration};
+		if(ai != undefined) return false;
 			
-		//return reuse - later, on use
+		return reuse;
+		}
+	this.Construct = function(TANK, descrition_only, settings_only, ai){
+		if(descrition_only != undefined)
+			return 'Constructs buildings.';
+		
+		/*var tank_type = 'Factory';
+		for(var i in TYPES){
+			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
+			}
+		SKILLS.construct_prepare(TANK, reuse, tank_type, 0);*/
+		
+		//passive
 		return 0;
 		}
 	this.construct_prepare = function(TANK, reuse, tank_type, ability_nr){
@@ -1613,117 +1756,6 @@ function SKILLS_CLASS(){
 			}
 		
 		return true;
-		}
-	
-	//====== Factory =========================================================	
-	
-	this.War_units = function(TANK, descrition_only, settings_only, ai){
-		if(descrition_only != undefined)
-			return 'Construct land or air unit.';
-		if(settings_only != undefined) return {};
-		
-		//passive
-		return 0;
-		}
-	this.Towers = function(TANK, descrition_only, settings_only, ai){
-		if(descrition_only != undefined)
-			return 'Construct various towers.';
-		if(settings_only != undefined) return {};
-		
-		//passive
-		return 0;
-		}
-	
-	//====== Research ========================================================
-	
-	this.Weapons = function(TANK, descrition_only, settings_only, ai){
-		var power = 10; //%
-		var level = weapons_bonus/power;
-		var cost = 100*(level+1);
-		var reuse = 180*1000;	
-		if(DEBUG == true) reuse = 5000;
-		var levels = 3;
-		var active = true;
-		if(weapons_bonus >= power * levels) active = false;
-		cost = UNITS.apply_buff(TANK, 'cost', cost);
-		
-		if(descrition_only != undefined){
-			if(level < levels)
-				return 'Upgrade units weapons. Costs '+cost+' HE-3.';
-			else
-				return 'Upgrade units weapons. Max level.';
-			}
-		if(ai != undefined) return false;
-		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
-		if(settings_only != undefined) 
-			return {
-				reuse: reuse, 
-				power: power, 
-				active: active,
-				level: level,
-				};
-		
-		if(TANK.constructing != undefined) return false;
-		if(weapons_bonus >= power * levels) return false;
-		if(TANK.team == MY_TANK.team){
-			if(UNITS.HE3 < cost){ 
-				screen_message.text = "Not enough HE-3.";
-				screen_message.time = Date.now() + 1000;
-				return false;
-				}
-			UNITS.HE3 = UNITS.HE3 - cost;
-			}
-		
-		//register effect
-		setTimeout(function(){
-			weapons_bonus = weapons_bonus + power;
-			}, reuse);
-		
-		return reuse;
-		}
-	this.Armor = function(TANK, descrition_only, settings_only, ai){
-		var power = 5; //static
-		var level = armor_bonus/power;
-		var cost = 100*(level+1);
-		var reuse = 180*1000;							reuse = 1000;
-		var levels = 3;
-		var active = true;
-		if(armor_bonus >= power * levels) active = false;
-		cost = UNITS.apply_buff(TANK, 'cost', cost);
-		
-		if(descrition_only != undefined){
-			if(level < levels)
-				return 'Upgrade units armor. Costs '+cost+' HE-3.';
-			else
-				return 'Upgrade units weapons. Max level.';
-			}
-		if(ai != undefined) return false;
-		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;
-		if(settings_only != undefined)
-			return {
-				reuse: reuse, 
-				power: power, 
-				active: active,
-				level: level,
-				};
-		
-		if(TANK.constructing != undefined) return false;
-		if(armor_bonus >= power * levels) return false;
-		if(TANK.team == MY_TANK.team){
-			if(UNITS.HE3 < cost){ 
-				screen_message.text = "Not enough HE-3.";
-				screen_message.time = Date.now() + 1000;
-				return false;
-				}
-			UNITS.HE3 = UNITS.HE3 - cost;
-			}
-		
-		//register effect
-		setTimeout(function(){
-			armor_bonus = armor_bonus + power;
-			}, reuse);
-		
-		return reuse;
 		}
 	
 	//====== General =========================================================
@@ -1993,15 +2025,14 @@ function SKILLS_CLASS(){
 					break;
 					}
 				}
-			}
+			}	
 		//adding flag
-		if(new_tank.data.name == 'Factory'){
+		if(new_tank.data.name == 'Factory' || new_tank.data.name == 'Base'){
 			if(new_tank.team == 'B') //top
 				new_tank.flag = { x: new_tank.x, y: new_tank.y+60}
 			else //bottom
 				new_tank.flag = { x: new_tank.x, y: new_tank.y-60}
 			}
-		
 		if(shift_pressed == false){
 			delete TANK.try_construct;
 			mouse_click_controll = false;

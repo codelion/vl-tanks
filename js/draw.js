@@ -830,8 +830,8 @@ function DRAW_CLASS(){
 			//background
 			canvas_backround.drawImage(MAIN.IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
 			
-			canvas_backround.strokeStyle = "#000000";	
-			canvas_backround.fillStyle = "rgba(255, 255, 255, 0.7)";
+			canvas_backround.fillStyle = "#000000";
+			canvas_backround.fillStyle = "#d5d5d5";
 			HELPER.roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_APP-20*2-10, 0, true);
 			
 			canvas_backround.strokeStyle = "#000000";

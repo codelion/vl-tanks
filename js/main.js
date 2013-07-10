@@ -4,17 +4,18 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	Mechanic 
+		implement skills
+		factory do not work
 	multiplayer	game_mode = single_quick   single_craft   multi_quick   multi_craft
-		implement weapons_bonus and armor_bonus
 		optimize controlls packets: 
 			tank_move
 			target
 			bullet
 			skill_do
 			skill_advanced
-	ai for single craft
+	full mode AI
 	special score for mode3: he3 and army graph in time
-	heavy - aoe skill? more aoe skills?
 */
 
 var MAIN = new MAIN_CLASS();
@@ -30,7 +31,7 @@ function MAIN_CLASS(){
 	this.IMAGES_BULLETS = new Image();
 	this.IMAGES_ELEMENTS = new Image();
 	this.IMAGES_INRO = new Image();
-	var images_src_n = 7;	//images to load count, intro excluded
+	var images_src_n = 7;	//images count to load, intro excluded
 	var unique_id = 0;
 	var page_title_copy = 'Moon wars';	//copy of original title
 	var intro_enabled = 1;			//if show intro
@@ -246,10 +247,14 @@ function MAIN_CLASS(){
 		
 		if(my_tank_nr == -1)
 			my_tank_nr=0;
+		var mechanic_type = '0';
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			for(var i in TYPES)
+			for(var i in TYPES){
 				if(TYPES[i].name == 'Soldier')
 					my_tank_nr = i;
+				if(TYPES[i].name == 'Mechanic')
+					mechanic_type = i;
+				}
 			}
 		
 		if(my_team=='B')
@@ -305,8 +310,9 @@ function MAIN_CLASS(){
 		
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			//add few more me
-			UNITS.add_tank(1, name+'-2', name, my_tank_nr, my_team, my_nation);
-			UNITS.add_tank(1, name+'-3', name, my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, my_team, my_nation);
 			}
 		
 		MAP.auto_scoll_map();
@@ -351,6 +357,11 @@ function MAIN_CLASS(){
 			
 		MP.sync_multiplayers();
 		UNITS.HE3 = UNITS.he3_begin;
+		//reset Research bonus
+		for(var i in COUNTRIES){
+			COUNTRIES[i].bonus.weapon = 0;
+			COUNTRIES[i].bonus.armor = 0;
+			}
 		
 		//handler for mini map
 		MAIN.register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
@@ -362,8 +373,9 @@ function MAIN_CLASS(){
 			
 		MAP.draw_map(false);
 		
-		//register crystals
+	
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+			//register crystals
 			for(var e in MAPS[level-1].elements){
 				if(MAPS[level-1].elements[e][0] != 'crystals') continue;
 				var element = MAP.get_element_by_name(MAPS[level-1].elements[e][0]);
@@ -377,6 +389,15 @@ function MAIN_CLASS(){
 					h: IMAGES_SETTINGS.elements[element.name].h,
 					power: CRYSTAL_POWER,
 					});
+				}
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TANKS[i].data.name != 'Base') continue;
+				//adding flag
+				if(TANKS[i].team == 'B') //top
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60}
+				else //bottom
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60}
 				}
 			}
 		
@@ -550,8 +571,6 @@ function MAIN_CLASS(){
 		my_team = undefined;
 		map_offset = [0, 0];
 		target_mode = '';
-		weapons_bonus = 0;
-		armor_bonus = 0;
 		MAP_CRYSTALS = [];
 		
 		if(init_next_game != false)

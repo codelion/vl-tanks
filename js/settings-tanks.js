@@ -10,6 +10,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Heavy', 'Miner', 'TRex'],
 		tank_unique: 'Bomber',
+		bonus: {weapon: 0, armor: 0},	//Research bonus, resets on start
 		},
 	ru: {
 		name: 'Russia',
@@ -22,6 +23,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
 		tank_unique: 'Heavy',
+		bonus: {weapon: 0, armor: 0},
 		},
 	ch: {
 		name: 'China', 
@@ -37,6 +39,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		tank_unique: 'TRex',
+		bonus: {weapon: 0, armor: 0},
 		},
 	}
 
@@ -71,7 +74,8 @@ TYPES.push({
 	icon_base: true,				//tank top images
 	bullet: 'bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
-	cost: 70,
+	//mode: 'quick',				//if set, unit available only in quick/craft mode
+	cost: 70,					//unit cost in full mode
 	});
 
 //Heavy
@@ -261,8 +265,37 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	mode: 'quick',
 	cost: 0,
 	});
+
+//Mechanic	
+TYPES.push({
+	name: 'Mechanic',
+	type: 'tank',
+	description: ["Constructs, rebuilds and occupies enemy building", "Essential unit in Full mode"],
+	life: [150, 10],
+	damage: [10, 1],	//10 dps
+	range: 80,
+	scout: 110,
+	armor: [10, 0, 10],
+	speed: 25,
+	attack_delay: 1,
+	turn_speed: 3,
+	abilities: [
+		{name: 'Rebuild',	passive: false,		broadcast: 2}, 
+		{name: 'Occupy',	passive: false,		broadcast: 2}, 
+		{name: 'Construct',	passive: true,		broadcast: 2}, 
+		],
+	size: ['M', 50, 50],
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'small_bullet',
+	fire_sound: 'shoot',
+	mode: 'craft',
+	cost: 40,
+	});	
 
 //TRex
 TYPES.push({
@@ -465,9 +498,10 @@ TYPES.push({
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
-		{name: 'Factory',		passive: false,		broadcast: 2}, 
+		{name: 'Mechanic',		passive: false,		broadcast: 2}, 
+		/*{name: 'Factory',		passive: false,		broadcast: 2}, 
 		{name: 'Research',		passive: false,		broadcast: 2}, 
-		{name: 'Silo',			passive: false,		broadcast: 2}, 
+		{name: 'Silo',			passive: false,		broadcast: 2}, */
 		],
 	size: ['L', 90, 90],
 	preview: false,
@@ -484,7 +518,7 @@ TYPES.push({
 	name: 'Factory',
 	type: 'building',
 	description: ["Tanks factory"],
-	life: [500,0],
+	life: [800,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 90,
@@ -510,7 +544,7 @@ TYPES.push({
 	name: 'Research',
 	type: 'building',
 	description: ["Research station"],
-	life: [700,0],
+	life: [900,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 90,
@@ -536,7 +570,7 @@ TYPES.push({
 	name: 'Silo',
 	type: 'building',
 	description: ["Structure for generating Helium-3."],
-	life: [400,0],
+	life: [500,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 50,

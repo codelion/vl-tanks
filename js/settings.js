@@ -85,8 +85,6 @@ var packets_all = 0;			//received packets count in 1 game
 var chat_shifted = false;		//if chat was activated with shift
 var intro_page = 0;			//intro page
 var time_gap;				//time difference between frames
-var weapons_bonus = 0;			//in commander mode weappon bonus
-var armor_bonus = 0;			//in commander mode armor bonus
 var screen_message = {};		//message to show on screen
 var mouse_last_move = Date.now();	//if mouse moving
 var SCOUT_FOG_REUSE = 0;		//pause between fog and scout repaint
@@ -176,6 +174,7 @@ var IMAGES_SETTINGS = {
 		Miner:	{ x:0,	y:500,	w:90,	h:80 },
 		Tech:		{ x:0,	y:600,	w:90,	h:80 },
 		Truck:	{ x:0,	y:700,	w:90,	h:80 },
+		Mechanic:	{ x:0,	y:700,	w:90,	h:80 },
 		Apache:	{ x:0,	y:800,	w:90,	h:80 },
 		Bomber:	{ x:0,	y:900,	w:90,	h:80 },
 		Soldier:	{ x:0,	y:1000,	w:20,	h:22 },

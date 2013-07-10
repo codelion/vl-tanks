@@ -1328,12 +1328,14 @@ function UNITS_CLASS(){
 		
 		damage = TANK.data.damage[0] + TANK.data.damage[1]*(TANK.level-1);
 		damage = UNITS.apply_buff(TANK, 'damage', damage);
+		damage = damage * (100+COUNTRIES[TANK.nation].bonus.weapon)/100;
 		if(BULLET.damage != undefined)
 			damage = BULLET.damage;
 			
-		armor = TANK_TO.data.armor[0] + TANK_TO.data.armor[1]*(TANK_TO.level-1)
+		armor = TANK_TO.data.armor[0] + TANK_TO.data.armor[1]*(TANK_TO.level-1);
 		if(armor > TYPES[TANK_TO.type].armor[2])
 			armor = TYPES[TANK_TO.type].armor[2];
+		armor = armor + COUNTRIES[TANK_TO.nation].bonus.armor;
 		armor = UNITS.apply_buff(TANK_TO, 'shield', armor);
 		if(armor > 100) armor = 100;
 		if(armor < 0) armor = 0;
@@ -1702,7 +1704,13 @@ function UNITS_CLASS(){
 			}
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TYPES){
-				if(TYPES[i].cost == 0 && TYPES[i].name == tank_name)
+				if(TYPES[i].name == tank_name && TYPES[i].mode == 'quick')
+					return false;	
+				}
+			}
+		else{
+			for(var i in TYPES){
+				if(TYPES[i].name == tank_name && TYPES[i].mode == 'craft')
 					return false;	
 				}
 			}

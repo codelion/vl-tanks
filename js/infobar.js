@@ -95,9 +95,15 @@ function INFOBAR_CLASS(){
 		if(ns > 1 && only_factory == false) return false;
 		
 		//commander mode - Factory
-		if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
-			INFOBAR.draw_factory_gui();
-			return false;
+		if((game_mode == 'single_craft' || game_mode == 'multi_craft') && MY_TANK.constructing == undefined){
+			if(TYPES[MY_TANK.type].name == 'Factory'){
+				INFOBAR.draw_factory_gui();
+				return false;
+				}
+			else if(TYPES[MY_TANK.type].name == 'Mechanic'){
+				INFOBAR.draw_mechanic_gui();
+				return false;
+				}
 			}
 		//clear
 		DRAW.draw_image(canvas_backround, 'statusbar', status_x+245, top_y-40+10, 330, 83,
@@ -150,6 +156,7 @@ function INFOBAR_CLASS(){
 			canvas_backround.font = "bold 10px Verdana";
 			var damage_string = MY_TANK.data.damage[0] + MY_TANK.data.damage[1]*(MY_TANK.level-1);
 			damage_string = UNITS.apply_buff(MY_TANK, 'damage', damage_string);
+			damage_string = damage_string * (100+COUNTRIES[MY_TANK.nation].bonus.weapon)/100;
 			damage_string = Math.floor(damage_string);
 			canvas_backround.fillText(damage_string, left_x_values, top_y);
 	
@@ -163,6 +170,7 @@ function INFOBAR_CLASS(){
 			var armor_text = MY_TANK.data.armor[0] + MY_TANK.data.armor[1]*(MY_TANK.level-1);
 			if(MY_TANK > MY_TANK.data.armor[2])
 				armor_text = MY_TANK.data.armor[2];
+			armor_text = armor_text + COUNTRIES[MY_TANK.nation].bonus.armor;
 			armor_text = UNITS.apply_buff(MY_TANK, 'shield', armor_text);
 			if(armor_text > 100) armor_text = 100;
 			if(armor_text < 0) armor_text = 0;
@@ -503,7 +511,7 @@ function INFOBAR_CLASS(){
 				if(active_line == 1 && canvas_backround.measureText(tmp).width < limit)
 					text = text+" "+words[i];
 				else{ 
-					INFOBAR.ability_hover_text_more += " "+words[i];
+					ability_hover_text_more += " "+words[i];
 					active_line=2;
 					}
 				}
@@ -515,7 +523,7 @@ function INFOBAR_CLASS(){
 		
 		canvas_backround.fillStyle = "#8f947d";
 		canvas_backround.font = "normal 10px Verdana";
-		canvas_backround.fillText(INFOBAR.ability_hover_text_more, status_x_tmp+5, status_y+13+13);
+		canvas_backround.fillText(ability_hover_text_more, status_x_tmp+5, status_y+13+13);
 		}
 	//move map by user mouse coordinates on mini map
 	this.move_to_place = function(mouse_x, mouse_y){
@@ -737,7 +745,7 @@ function INFOBAR_CLASS(){
 				pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
 				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 			
-			//ability to upgrade
+			//show training count
 			if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 				for(var x=0; x<type_n; x++){
 					canvas_backround.beginPath();
@@ -755,50 +763,6 @@ function INFOBAR_CLASS(){
 			j++;
 			}
 			
-		//towers
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			var j=0;
-			var row = 1;
-			var nation = UNITS.get_nation_by_team(MY_TANK.team);
-			for(var i in TYPES){
-				if(TYPES[i].type != 'building') continue;
-				if(HELPER.strpos(TYPES[i].name, "ower")==false) continue;
-				if(UNITS.check_nation_tank(TYPES[i].name, nation)==false) continue;
-				//reset background
-				var back_color = '';
-				if(selected_tank != undefined && selected_tank == i || i == MY_TANK.type)
-					back_color = "#8fc74c"; //selected
-				else
-					back_color = "#dbd9da";
-				canvas_backround.fillStyle = back_color;
-				canvas_backround.strokeStyle = "#196119";
-				HELPER.roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
-				
-				//detect size
-				var sizer = msize * 100 / TYPES[i].size[1] / 100;
-				if(sizer>1) sizer = 1;
-				var pad_tmp = 2;
-				if(sizer == 1)
-					pad_tmp = Math.floor((msize - TYPES[i].size[1])/2);
-				
-				//logo
-				DRAW.draw_image(canvas_backround, TYPES[i].name, 
-					pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
-					100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
-				DRAW.draw_image(canvas_backround, TYPES[i].name, 
-					pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
-					150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
-				
-				//register button
-				MAIN.register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
-					pos2+row*(msize+gap) + APP_SIZE_CACHE[1] - HEIGHT_APP, 
-					msize, msize, PLACE, function(mouseX, mouseY, index){
-					INFOBAR.gui_action(index, 'towers');
-					}, i);
-				j++;
-				}
-			}
-		
 		//cancel button
 		if(MY_TANK.training != undefined && MY_TANK.training.length > 0){
 			width = 50;
@@ -830,6 +794,76 @@ function INFOBAR_CLASS(){
 			canvas_backround.font = "Bold 11px Arial";
 			var text_width = canvas_backround.measureText(text).width;
 			canvas_backround.fillText(text, xx+(width-text_width)/2, yy+(height + HELPER.font_pixel_to_height(11))/2);
+			}
+		}
+	this.draw_mechanic_gui = function(selected_tank, get_stats){
+		var padding_left = 250;
+		var padding_top = 15;
+		var pos1 = status_x+padding_left;
+		var pos2 = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+padding_top;
+		var top_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+40;
+		var max_width = 325;
+		var max_height = 80;
+		var gap = 3;
+		var msize = 33;
+		var first_time = false;
+		if(get_stats != undefined)
+			return {
+				msize: msize, 
+				pos1: pos1, 
+				pos2: pos2, 
+				gap: gap, 
+				};
+		
+		if(selected_tank == undefined){
+			selected_tank = MY_TANK.type;
+			first_time = true;
+			}
+		
+		//clear area
+		DRAW.draw_image(canvas_backround, 'statusbar', status_x+padding_left, status_y+padding_top, max_width, max_height,
+			status_x+padding_left, padding_top, max_width, max_height);
+		
+		//structures
+		var j=0;
+		var row = 0;
+		var nation = UNITS.get_nation_by_team(MY_TANK.team);
+		for(var i in TYPES){
+			if(TYPES[i].type != 'building') continue;
+			if(UNITS.check_nation_tank(TYPES[i].name, nation)==false) continue;
+			
+			//reset background
+			var back_color = '';
+			if(selected_tank != undefined && selected_tank == i || i == MY_TANK.type)
+				back_color = "#8fc74c"; //selected
+			else
+				back_color = "#dbd9da";
+			canvas_backround.fillStyle = back_color;
+			canvas_backround.strokeStyle = "#196119";
+			HELPER.roundRect(canvas_backround, pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize, 3, true);
+			
+			//detect size
+			var sizer = msize * 100 / TYPES[i].size[1] / 100;
+			if(sizer>1) sizer = 1;
+			var pad_tmp = 2;
+			if(sizer == 1)
+				pad_tmp = Math.floor((msize - TYPES[i].size[1])/2);
+	
+			//logo
+			DRAW.draw_image(canvas_backround, TYPES[i].name, 
+				pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				100, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+			DRAW.draw_image(canvas_backround, TYPES[i].name, 
+				pos1+j*(msize+gap)+pad_tmp, pos2+row*(msize+gap)+pad_tmp, TYPES[i].size[1]*sizer, TYPES[i].size[2]*sizer,
+				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
+			
+			//register button
+			MAIN.register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+				pos2+row*(msize+gap)+ APP_SIZE_CACHE[1] - HEIGHT_APP,
+				msize, msize, PLACE, function(mouseX, mouseY, index){
+				INFOBAR.gui_action(index, 'structures');
+				}, i);
+			j++;
 			}
 		}
 	this.draw_units_gui = function(){
@@ -954,8 +988,8 @@ function INFOBAR_CLASS(){
 							duration = duration * buff.power;
 						}
 					}
-				
 				if(duration < 1000) duration = 1000;
+				
 				if(TANKS[i].training == undefined)
 					TANKS[i].training = new Array();
 				TANKS[i].training.push({
@@ -963,21 +997,20 @@ function INFOBAR_CLASS(){
 					type: index,
 					cost: unit_cost,
 					});
+				
 				INFOBAR.draw_factory_gui();
 				}
 			}
 		//towers build
-		if(MY_TANK.data.name == 'Factory' && type == 'towers'){
+		if(MY_TANK.data.name == 'Mechanic' && type == 'structures'){
 			var unit_cost = TYPES[index].cost;
-			stats = SKILLS.Towers(TANK, undefined, true);
-			var reuse = stats.reuse;
 			if(UNITS.HE3 < unit_cost){
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
 				return false;
 				}
 			SKILLS.construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
-			}
+			}	
 		//multliple selection
 		if(MY_TANK.data.name != 'Factory' && type == 'selection'){
 			var k = 0;
