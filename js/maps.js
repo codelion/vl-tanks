@@ -348,7 +348,7 @@ function MAP_CLASS(){
 		var gap = 8;
 		var button_width = 90;
 		var button_height = 80;
-		this.maps_positions = [];
+		MAP.maps_positions = [];
 		
 		//clear name area
 		canvas_backround.drawImage(MAIN.IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
@@ -446,14 +446,14 @@ function MAP_CLASS(){
 				tmp['title'] = MAPS[i].name;
 				tmp['index'] = i;
 				tmp['top_height'] = top_height-18*2;
-				this.maps_positions.push(tmp);
+				MAP.maps_positions.push(tmp);
 				
-				MAIN.register_button(tmp['x'], tmp['y'], tmp['width'], tmp['height'], PLACE, function(mouseX, mouseY){
-					for (i in this.maps_positions){
-						if(mouseX > this.maps_positions[i].x && mouseX < this.maps_positions[i].x + this.maps_positions[i].width){
-							if(mouseY > this.maps_positions[i].y && mouseY < this.maps_positions[i].y + this.maps_positions[i].height){
+				MAIN.register_button(tmp['x'], tmp['y'], tmp['width'], tmp['height'], PLACE, function(mouseX, mouseY){	
+					for (i in MAP.maps_positions){
+						if(mouseX > MAP.maps_positions[i].x && mouseX < MAP.maps_positions[i].x + MAP.maps_positions[i].width){
+							if(mouseY > MAP.maps_positions[i].y && mouseY < MAP.maps_positions[i].y + MAP.maps_positions[i].height){
 								//we have click on map
-								level = 1+parseInt(this.maps_positions[i].index); 
+								level = 1+parseInt(MAP.maps_positions[i].index); 
 								MAP.show_maps_selection(canvas_backround, top_height, true);
 								if(PLACE == 'library')
 									LIBRARY.draw_library_maps();

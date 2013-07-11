@@ -116,25 +116,17 @@ function AI_CLASS(){
 			var reuse = 0;
 			try{
 				//execute
-				reuse = window[ability_function](TANK_AI, undefined, undefined, true);
-				if(reuse != undefined && reuse != 0 && (game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK_AI.team == MY_TANK.team){
-					var tmp = new Array();
-					tmp['function'] = INFOBAR.draw_ability_reuse;
-					tmp['duration'] = reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = reuse;
-					tmp['tank'] = TANK_AI;
-					timed_functions.push(tmp);
-					}
+				reuse = SKILLS[ability_function](TANK_AI, undefined, undefined, true);
 				if(reuse !== false)
 					break;
 				}
 			catch(err){
 				console.log("AI error: "+err.message);
 				}
-			if(reuse != 0)
+			if(reuse != 0){
 				TANK_AI.abilities_reuse[nr-1] = Date.now() + reuse;
+				TANK_AI.abilities_reuse_max[nr-1] = reuse;
+				}
 			}
 		//check if missle or bomb ready
 		if((game_mode == 'single_quick' || game_mode == 'single_craft') && TANK_AI.dead == undefined){	
@@ -250,6 +242,7 @@ function AI_CLASS(){
 		nr = TANK.try_missile.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_missile.reuse;
+		TANK.abilities_reuse_max[nr] = TANK.try_missile.reuse;
 			
 		//bullet	
 		var tmp = new Array();
@@ -263,18 +256,6 @@ function AI_CLASS(){
 		if(TANK.try_missile.icon != undefined)	tmp['bullet_icon'] = TANK.try_missile.icon;
 		if(TANK.try_missile.more != undefined)	tmp[TANK.try_missile.more[0]] = TANK.try_missile.more[1];
 		BULLETS.push(tmp);
-		
-		//init reuse
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			var tmp = new Array();
-			tmp['function'] = INFOBAR.draw_ability_reuse;
-			tmp['duration'] = TANK.try_missile.reuse;
-			tmp['type'] = 'REPEAT';
-			tmp['nr'] = TANK.try_missile.ability_nr;	
-			tmp['max'] = TANK.try_missile.reuse;
-			tmp['tank'] = TANK;
-			timed_functions.push(tmp);
-			}
 		
 		delete TANK.try_missile;
 		}
@@ -310,6 +291,7 @@ function AI_CLASS(){
 		nr = TANK.try_bomb.ability_nr;
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_bomb.reuse;
+		TANK.abilities_reuse_max[nr] = TANK.try_bomb.reuse;
 		
 		//bullet	
 		var tmp = new Array();
@@ -319,26 +301,14 @@ function AI_CLASS(){
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = TANK.try_bomb.power;
 		if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 100;
-		if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
-		if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
+		if(TANK.try_bomb.icon != undefined)	tmp['bullet_icon'] = TANK.try_bomb.icon;
+		if(TANK.try_bomb.more != undefined)	tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
 		if(TANK.try_bomb.aoe != undefined){
 			tmp['aoe_effect'] = 1;
 			tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
 			}
 		BULLETS.push(tmp);
-		
-		//init reuse
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			var tmp = new Array();
-			tmp['function'] = INFOBAR.draw_ability_reuse;
-			tmp['duration'] = TANK.try_bomb.reuse;
-			tmp['type'] = 'REPEAT';
-			tmp['nr'] = TANK.try_bomb.ability_nr;	
-			tmp['max'] = TANK.try_bomb.reuse;
-			tmp['tank'] = TANK;
-			timed_functions.push(tmp);
-			}
-		
+
 		delete TANK.try_bomb;
 		}
 	}

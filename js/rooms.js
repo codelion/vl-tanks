@@ -666,7 +666,7 @@ function ROOM_CLASS(){
 		letter_padding_left = 10;
 		x1 = 10;
 		x2 = 10+gap+width;
-		flag_space = (height-flag_height)/2;
+		flag_space = (height - UNITS.flag_height)/2;
 		y_begin = y;
 		icon_width = height;
 		

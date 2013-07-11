@@ -10,6 +10,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Heavy', 'Miner', 'TRex'],
 		tank_unique: 'Bomber',
+		bonus: {weapon: 0, armor: 0},	//Research bonus, resets on start
 		},
 	ru: {
 		name: 'Russia',
@@ -22,6 +23,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
 		tank_unique: 'Heavy',
+		bonus: {weapon: 0, armor: 0},
 		},
 	ch: {
 		name: 'China', 
@@ -37,6 +39,7 @@ COUNTRIES = {
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		tank_unique: 'TRex',
+		bonus: {weapon: 0, armor: 0},
 		},
 	}
 
@@ -45,28 +48,34 @@ COUNTRIES = {
 //Tiger
 TYPES.push({
 	name: 'Tiger',
-	type: 'tank',
+	type: 'tank',					//values: tank, human, building
 	description: ["Extreme damage", "Strong against slow enemies", "Light armor"],
-	life: [210, 12],
-	damage: [30, 1.5],		//30 dps
-	range: 80, 
-	scout: 110,
-	armor: [25, 0.5, 50],
-	speed: 28,
-	attack_delay: 1,
-	turn_speed: 2.5,
-	abilities: [
+	life: [210, 12],				//[tank life in level 0, life increase in each level]
+	damage: [30, 1.5],	//30 dps		//[tank damage in level 0, damage increase in each level]
+	range: 80, 					//tank shooting range
+	scout: 110,					//tank scout range
+	armor: [25, 0.5, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	speed: 28,					//moving speed
+	attack_delay: 1,				//pause between shoots in seconds
+	turn_speed: 2.5,				//turn speed, higher - faster
+	//no_repawn: 1,					//if tank dies - he will not respawn
+	//no_collisions: 1,				//tank can go other walls and other tanks
+	//bonus: 1,					//tank will be available only in single mode, random and mirror
+	//flying: true,					//can fly
+	//ignore_armor: 1,				//tank will ignore armor
+	abilities: [					//name, active/passive, broadcast activation in multiplayer (0-no, 1-yes, 2-yes, but on later)
 		{name: 'Blitzkrieg',	passive: false,		broadcast: 1},
 		{name: 'Frenzy',	passive: false,		broadcast: 1}, 
 		{name: 'AA Bullets',	passive: true,		broadcast: 1},
 		],
-	size: ['M', 50, 50],
-	preview: true,
-	icon_top: true,
-	icon_base: true,
-	bullet: 'bullet',
-	fire_sound: 'shoot',
-	cost: 70,
+	size: ['M', 50, 50],				//[tank size S/M/L (for radar), icon width and height]
+	preview: true,					//tank preview image
+	icon_top: true,					//tank base images
+	icon_base: true,				//tank top images
+	bullet: 'bullet',				//bullet_image
+	fire_sound: 'shoot',				//shooting sound
+	//mode: 'quick',				//if set, unit available only in quick/craft mode
+	cost: 70,					//unit cost in full mode
 	});
 
 //Heavy
@@ -74,30 +83,25 @@ TYPES.push({
 	name: 'Heavy',
 	type: 'tank',
 	description: ["Heavy armor, high defence", "Low damage", "Weak only against Stealth and Tiger"],
-	life: [230, 12],  				//[tank life in level 0, life increase in each level]
-	damage: [15, 1],	//15 dps		//[tank damage in level 0, damage increase in each level]
-	range: 80,					//tank shooting range
-	scout: 110,					//tank scout range
-	armor: [40, 0.5, 65],				//[tank armor in level 0, armor increase in each level, max armor]
-	speed: 25,					//speed
-	attack_delay: 1,				//pause between shoots in seconds
-	turn_speed: 2.5,					//turn speed, higher - faster
-	//no_repawn: 1,					//if tank dies - he will not respawn
-	//no_collisions: 1,				//tank can go other walls and other tanks
-	//bonus: 1,					//tank will be available only in single mode, random and mirror
-	//flying: true,					//can fly
-	//ignore_armor: 1,				//tank will ignore armor
-	abilities: [					//name; skill icon; active or passive; broadcast activation in multiplayer? 0-no, 1-yes, 2-yes, but on later
+	life: [230, 12],
+	damage: [15, 1],	//15 dps
+	range: 80,
+	scout: 110,
+	armor: [40, 0.5, 65],
+	speed: 25,
+	attack_delay: 1,
+	turn_speed: 2.5,
+	abilities: [
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
 		{name: 'Rage',		passive: false,		broadcast: 1}, 
 		{name: 'Health',	passive: true,		broadcast: 1}, 
 		],
-	size: ['M', 50, 50],				//[tank size: S/M/L, icon width and height(same)]
-	icon_top: true,				//tank base images
-	icon_base: true,			//tank top images
-	preview: true,				//tank preview image
-	bullet: 'small_bullet',				//bullet_image
-	fire_sound: 'shoot',				//shooting sound
+	size: ['M', 50, 50],
+	icon_top: true,
+	icon_base: true,
+	preview: true,
+	bullet: 'small_bullet',
+	fire_sound: 'shoot',
 	cost: 60,
 	});
 
@@ -261,8 +265,37 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
+	mode: 'quick',
 	cost: 0,
 	});
+
+//Mechanic	
+TYPES.push({
+	name: 'Mechanic',
+	type: 'tank',
+	description: ["Constructs, rebuilds and occupies enemy building", "Essential unit in Full mode"],
+	life: [150, 10],
+	damage: [10, 1],	//10 dps
+	range: 80,
+	scout: 110,
+	armor: [10, 0, 10],
+	speed: 25,
+	attack_delay: 1,
+	turn_speed: 3,
+	abilities: [
+		{name: 'Rebuild',	passive: false,		broadcast: 2}, 
+		{name: 'Occupy',	passive: false,		broadcast: 2}, 
+		{name: 'Construct',	passive: true,		broadcast: 2}, 
+		],
+	size: ['M', 50, 50],
+	preview: true,
+	icon_top: false,
+	icon_base: true,
+	bullet: 'small_bullet',
+	fire_sound: 'shoot',
+	mode: 'craft',
+	cost: 40,
+	});	
 
 //TRex
 TYPES.push({
@@ -465,9 +498,10 @@ TYPES.push({
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
-		{name: 'Factory',		passive: false,		broadcast: 2}, 
+		{name: 'Mechanic',		passive: false,		broadcast: 2}, 
+		/*{name: 'Factory',		passive: false,		broadcast: 2}, 
 		{name: 'Research',		passive: false,		broadcast: 2}, 
-		{name: 'Silo',			passive: false,		broadcast: 2}, 
+		{name: 'Silo',			passive: false,		broadcast: 2}, */
 		],
 	size: ['L', 90, 90],
 	preview: false,
@@ -484,7 +518,7 @@ TYPES.push({
 	name: 'Factory',
 	type: 'building',
 	description: ["Tanks factory"],
-	life: [500,0],
+	life: [800,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 90,
@@ -510,7 +544,7 @@ TYPES.push({
 	name: 'Research',
 	type: 'building',
 	description: ["Research station"],
-	life: [700,0],
+	life: [900,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 90,
@@ -536,7 +570,7 @@ TYPES.push({
 	name: 'Silo',
 	type: 'building',
 	description: ["Structure for generating Helium-3."],
-	life: [400,0],
+	life: [500,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 50,

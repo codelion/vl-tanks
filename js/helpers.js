@@ -176,8 +176,8 @@ function HELPER_CLASS(){
 	}	
 	
 function log(object){
-	//console.log(object);
-	console.log([object, " - "+arguments.callee.caller.name+"()"]);
+	console.log(object);
+	//console.log([object, " - "+arguments.callee.caller.name+"()"]);
 	}		
 function round(number){
 	return Math.round(number);
