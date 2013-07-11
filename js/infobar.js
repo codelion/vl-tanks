@@ -310,6 +310,13 @@ function INFOBAR_CLASS(){
 		var gap = 15;
 		var status_x_tmp = status_x+590;
 		var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
+		var ns = UNITS.get_selected_count(MY_TANK.team);
+		
+		//clear area
+		for(j=0; j<3; j++){
+			if(MY_TANK.abilities_reuse[j] <= 0)
+				DRAW.draw_image(canvas_backround, 'skill_off', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5);
+			}
 		
 		//save abilities position
 		for (var i=0; i<3; i++){	
@@ -329,6 +336,8 @@ function INFOBAR_CLASS(){
 		for (var i=0; i<TYPES[MY_TANK.type].abilities.length; i++){
 			//check if abilites not in use
 			if(MY_TANK.abilities_reuse[i] > Date.now() ) continue;
+			if(game_mode == 'single_craft' || game_mode == 'multi_craft')
+				if(ns > 1 && MY_TANK.data.abilities[i].broadcast == 2) continue;
 			
 			//button
 			var back_image = 'skill_on';
@@ -376,9 +385,6 @@ function INFOBAR_CLASS(){
 					}
 				}
 			}
-		//clear areas if less then 3 skills
-		for(j=i; j<3; j++)
-			DRAW.draw_image(canvas_backround, 'skill_off', status_x_tmp+j*(SKILL_BUTTON+gap)-5, status_y-5);
 		}
 	//draw tanks skill reuse animation
 	this.draw_ability_reuse = function(){
@@ -386,6 +392,7 @@ function INFOBAR_CLASS(){
 		var status_x_tmp = status_x+590;
 		var status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+gap;
 		var animation = true;
+		var ns = UNITS.get_selected_count(MY_TANK.team);
 		
 		if(PLACE != 'game') return false;
 		if(INFOBAR.check_abilities_visibility() == false) animation = false; //craft mode - not 1 type selected
@@ -755,11 +762,11 @@ function INFOBAR_CLASS(){
 					}
 				}
 			//register button
-			MAIN.register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+			MAIN.register_button(pos1+j*(msize+gap) - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
 				pos2+row*(msize+gap)+ APP_SIZE_CACHE[1] - HEIGHT_APP,
 				msize, msize, PLACE, function(mouseX, mouseY, index){
-				INFOBAR.gui_action(index, 'units');
-				}, i);
+				INFOBAR.gui_action(index);
+				}, j);
 			j++;
 			}
 			
@@ -830,7 +837,6 @@ function INFOBAR_CLASS(){
 		var nation = UNITS.get_nation_by_team(MY_TANK.team);
 		for(var i in TYPES){
 			if(TYPES[i].type != 'building') continue;
-			if(UNITS.check_nation_tank(TYPES[i].name, nation)==false) continue;
 			
 			//reset background
 			var back_color = '';
@@ -858,11 +864,11 @@ function INFOBAR_CLASS(){
 				150, undefined, TYPES[i].size[1], TYPES[i].size[2]);
 			
 			//register button
-			MAIN.register_button(pos1+j*(msize+gap)+1 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
+			MAIN.register_button(pos1+j*(msize+gap) - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
 				pos2+row*(msize+gap)+ APP_SIZE_CACHE[1] - HEIGHT_APP,
 				msize, msize, PLACE, function(mouseX, mouseY, index){
-				INFOBAR.gui_action(index, 'structures');
-				}, i);
+				INFOBAR.gui_action(index);
+				}, j);
 			j++;
 			}
 		}
@@ -932,93 +938,120 @@ function INFOBAR_CLASS(){
 			MAIN.register_button(pos1+j*(msize+gap)+1*0 - round((WIDTH_APP-APP_SIZE_CACHE[0])/2),
 				pos2+row*(msize+gap) + APP_SIZE_CACHE[1] - HEIGHT_APP, 
 				msize, msize, PLACE, function(mouseX, mouseY, index){
-				INFOBAR.gui_action(index, 'selection');
+				INFOBAR.gui_action(index);
 				}, k);
 			j++;
 			k++;
 			if(k>=33) return false;
 			}
 		}
-	this.gui_action = function(index, type){
+	this.gui_action = function(index){
+		var ns = UNITS.get_selected_count(MY_TANK.team);
 		//units training
-		if(MY_TANK.data.name == 'Factory' && type == 'units'){
-			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TANKS[i].data.name != "Factory") continue;
-				if(TANKS[i].selected == undefined) continue;
+		if(MY_TANK.data.name == 'Factory'){
+			//find type
+			var k = 0;
+			var found = false;
+			for(var t in TYPES){
+				if(TYPES[t].type == 'building') continue;
+				if(UNITS.check_nation_tank(TYPES[t].name, MY_TANK.nation)==false) continue;
+				k++;
+				if(k-1 != index) continue;
+				index = t;
+				found = true;
+				break;
+				}
+			if(found == true){
+				//loop for each factories
+				for(var i in TANKS){	
+					if(TANKS[i].team != MY_TANK.team) continue;
+					if(TANKS[i].data.name != "Factory") continue;
+					if(TANKS[i].selected == undefined) continue;
+					
+					var unit_cost = TYPES[index].cost;
+					unit_cost = UNITS.apply_buff(MY_TANK, 'cost', unit_cost);
+					//check he3
+					if(UNITS.HE3 < unit_cost){
+						screen_message.text = "Not enough HE-3.";
+						screen_message.time = Date.now() + 1000;
+						return false;
+						}
+					//check unit limit
+					var team_units = 0;
+					for(var ii in TANKS){
+						if(TANKS[ii].team != MY_TANK.team) continue;
+						if(TANKS[ii].data.type == 'building'){
+							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
+								team_units = team_units + TANKS[ii].training.length;
+							continue;
+							}
+						team_units++;
+						}
+					if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
+					if(team_units >= MAX_TEAM_TANKS){
+						screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+						screen_message.time = Date.now() + 1000;
+						return false;
+						}
+					UNITS.HE3 = UNITS.HE3 - unit_cost;
+					//register
+					var duration = 30*1000;
+					if(TYPES[index].type == 'human')
+						duration = 20*1000;
+					if(DEBUG == true) duration = 1000;
+					//check respawn buff
+					for(var b in COUNTRIES[MY_TANK.nation].buffs){
+						var buff = COUNTRIES[MY_TANK.nation].buffs[b];
+						if(buff.name == "respawn"){
+							if(buff.type == 'static')
+								duration = duration + buff.power;
+							else
+								duration = duration * buff.power;
+							}
+						}
+					if(duration < 1000) duration = 1000;
+					
+					if(TANKS[i].training == undefined)
+						TANKS[i].training = new Array();
+					TANKS[i].training.push({
+						duration: duration,
+						type: index,
+						cost: unit_cost,
+						});
+					
+					INFOBAR.draw_factory_gui();
+					}
+				return true;
+				}
+			}
+		//structures build
+		else if(MY_TANK.data.name == 'Mechanic' && ns == 1){
+			var k = 0;
+			for(var i in TYPES){  	//find type
+				if(TYPES[i].type != 'building') continue;
+				k++;
+				if(k-1 != index) continue;
+				index = i;
 				
-				var unit_cost = TYPES[index].cost;
-				unit_cost = UNITS.apply_buff(MY_TANK, 'cost', unit_cost);
-				//check he3
+				var unit_cost = TYPES[index].cost; 
 				if(UNITS.HE3 < unit_cost){
 					screen_message.text = "Not enough HE-3.";
 					screen_message.time = Date.now() + 1000;
 					return false;
 					}
-				//check unit limit
-				var team_units = 0;
-				for(var ii in TANKS){
-					if(TANKS[ii].team != MY_TANK.team) continue;
-					if(TANKS[ii].data.type == 'building'){
-						if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
-							team_units = team_units + TANKS[ii].training.length;
-						continue;
-						}
-					team_units++;
-					}
-				if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
-				if(team_units >= MAX_TEAM_TANKS){
-					screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
-					screen_message.time = Date.now() + 1000;
-					return false;
-					}
-				UNITS.HE3 = UNITS.HE3 - unit_cost;
-				//register
-				var duration = 30*1000;
-				if(TYPES[index].type == 'human')
-					duration = 20*1000;
-				if(DEBUG == true) duration = 1000;
-				//check respawn buff
-				for(var b in COUNTRIES[MY_TANK.nation].buffs){
-					var buff = COUNTRIES[MY_TANK.nation].buffs[b];
-					if(buff.name == "respawn"){
-						if(buff.type == 'static')
-							duration = duration + buff.power;
-						else
-							duration = duration * buff.power;
-						}
-					}
-				if(duration < 1000) duration = 1000;
-				
-				if(TANKS[i].training == undefined)
-					TANKS[i].training = new Array();
-				TANKS[i].training.push({
-					duration: duration,
-					type: index,
-					cost: unit_cost,
-					});
-				
-				INFOBAR.draw_factory_gui();
+				SKILLS.construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
+				return true;
 				}
-			}
-		//towers build
-		if(MY_TANK.data.name == 'Mechanic' && type == 'structures'){
-			var unit_cost = TYPES[index].cost;
-			if(UNITS.HE3 < unit_cost){
-				screen_message.text = "Not enough HE-3.";
-				screen_message.time = Date.now() + 1000;
-				return false;
-				}
-			SKILLS.construct_prepare(MY_TANK, 0, TYPES[index].name, 2);
 			}	
 		//multliple selection
-		if(MY_TANK.data.name != 'Factory' && type == 'selection'){
+		if(ns > 1){
 			var k = 0;
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue; //enemy
 				if(TANKS[i].selected == undefined) continue; //not selected
 				k++;
 				if(k-1 != index) continue;
+				index = i;
 				for(var j in TANKS) delete TANKS[j].selected; //unselect all
 				
 				if(ctrl_pressed==true){

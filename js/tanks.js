@@ -176,8 +176,11 @@ function UNITS_CLASS(){
 					alpha = (Date.now()-tank.visible.time) / fade_duration;
 					alpha = round(alpha*100)/100;
 					}
-				if(tank.constructing != undefined)
-					alpha = (Date.now() - tank.constructing.start) * 1 / tank.constructing.duration;
+				if(tank.constructing != undefined){
+					alpha = 1 * tank.constructing.time / tank.constructing.duration;
+					if(alpha < 0.2)
+						alpha = 0.2;
+					}
 				}
 					
 			//generate unique cache id
@@ -403,7 +406,7 @@ function UNITS_CLASS(){
 		canvas_main.fillRect(red_bar_x+padding_left, yy+padding_top, red_bar_length, hp_height);
 		
 		if(tank.constructing != undefined){
-			var length =(Date.now() - tank.constructing.start) * hp_width / tank.constructing.duration;
+			var length = hp_width * tank.constructing.time / tank.constructing.duration;
 			length = round(length);
 			if(length >= hp_width)
 				delete tank.constructing;
@@ -721,6 +724,7 @@ function UNITS_CLASS(){
 		}
 	//tank move rgistration and graphics
 	this.draw_tank_move = function(mouseX, mouseY){
+		var ns = UNITS.get_selected_count(MY_TANK.team);
 		//remove some handlers
 		UNITS.prepare_tank_move(MY_TANK);
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
@@ -741,11 +745,20 @@ function UNITS_CLASS(){
 				var tank_size_w =  0.9*TANKS[i].width();
 				var tank_size_h =  0.9*TANKS[i].height();
 				//click on enemies
-				if(TANKS[i].team != MY_TANK.team){
-					if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
-						//clicked on enemy
-						TANKS[i].clicked_on = 10;	// will draw circle on enemies
-							
+				if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
+					//if clicked on enemy
+					if(TANKS[i].team != MY_TANK.team){
+						TANKS[i].clicked_on = 10;	// will draw circle on enemy
+						
+						//check occupy
+						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].data.type == 'building' && TANKS[i].data.name != 'Base'){
+							MY_TANK.target_move_lock = TANKS[i].id;
+							MY_TANK.move = 1;
+							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
+							MY_TANK.reach_tank_and_execute = [10, 'register_occupy', MY_TANK.id];
+							return false;
+							}
+						
 						if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
 							MY_TANK.target_move_lock = TANKS[i].id;
 							MY_TANK.target_shoot_lock = TANKS[i].id;
@@ -763,6 +776,30 @@ function UNITS_CLASS(){
 						target_lock_id = TANKS[i].id;
 						found_something = true;
 						break;
+						}
+					//if clicked on allies
+					else{
+						//check constructions
+						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].constructing != undefined){
+							TANKS[i].clicked_on = 10;
+							
+							MY_TANK.target_move_lock = TANKS[i].id;
+							MY_TANK.move = 1;
+							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
+							MY_TANK.reach_tank_and_execute = [10, 'register_build', MY_TANK.id];
+							return false;
+							}
+						//check repair
+						var max_hp = UNITS.get_tank_max_hp(TANKS[i]);
+						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].hp < max_hp){
+							TANKS[i].clicked_on = 10;
+							
+							MY_TANK.target_move_lock = TANKS[i].id;
+							MY_TANK.move = 1;
+							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
+							MY_TANK.reach_tank_and_execute = [10, 'register_repair', MY_TANK.id];
+							return false;
+							}
 						}
 					}
 				}
@@ -897,6 +934,11 @@ function UNITS_CLASS(){
 			TANKS[i].move = 1;
 			TANKS[i].move_to = [new_x, new_y];
 			j++;
+			
+			//cancel some extra actions
+			if(TANKS[i].do_construct != undefined)	SKILLS.cancel_build(TANKS[i]);
+			if(TANKS[i].do_repair != undefined)	SKILLS.cancel_repair(TANKS[i]);
+			if(TANKS[i].do_occupy != undefined)	SKILLS.cancel_occupy(TANKS[i]);
 			}
 		}
 	//checks tanks levels
@@ -935,8 +977,62 @@ function UNITS_CLASS(){
 					MAP.draw_map(true);
 					}
 				}
+			//passive He3 regen
 			if(valid == false)
 				UNITS.HE3 = UNITS.HE3 + 0.5; //poor team dont have silo :), lets give them a bit
+			//constructions
+			for(var i in TANKS){
+				if(TANKS[i].data.name != 'Mechanic') continue;
+				if(TANKS[i].do_construct == undefined) continue;
+				TANK_to = UNITS.get_tank_by_id(TANKS[i].do_construct);
+				if(TANK_to.constructing == undefined) continue;	
+				
+				TANK_to.constructing.time += 1000;	//like 1s
+				
+				if(TANK_to.constructing.time >= TANK_to.constructing.duration)
+					SKILLS.cancel_build(TANKS[i]);
+				}
+			//repair
+			for(var i in TANKS){
+				if(TANKS[i].data.name != 'Mechanic') continue;
+				if(TANKS[i].do_repair == undefined) continue;
+				TANK_to = UNITS.get_tank_by_id(TANKS[i].do_repair);
+				if(TANK_to.data.type != 'building') continue;
+				
+				TANK_to = UNITS.get_tank_by_id(TANKS[i].do_repair);
+				var max_hp = UNITS.get_tank_max_hp(TANK_to);
+				var skill_stats = SKILLS.Rebuild(undefined, undefined, true);
+				
+				//check he3
+				if(TANKS[i].team == MY_TANK.team && UNITS.HE3 < skill_stats.cost){
+					SKILLS.cancel_repair(TANKS[i]);
+					return false;
+					}
+				
+				TANK_to.hp = TANK_to.hp + skill_stats.power;
+				if(TANKS[i].team == MY_TANK.team)
+					UNITS.HE3 = UNITS.HE3 - skill_stats.cost;
+	
+				if(TANK_to.hp >= max_hp){
+					TANK_to.hp = max_hp;
+					SKILLS.cancel_repair(TANKS[i]);
+					}
+				}
+			//occupy
+			for(var i in TANKS){
+				if(TANKS[i].data.name != 'Mechanic') continue;
+				if(TANKS[i].do_occupy == undefined) continue;
+				TANK_to = UNITS.get_tank_by_id(TANKS[i].do_occupy);
+				if(TANK_to.data.type != 'building') continue;
+				
+				TANKS[i].occupy_progress -= 1000;
+				
+				if(TANKS[i].occupy_progress <= 0){
+					TANK_to.team = TANKS[i].team;
+					SKILLS.cancel_occupy(TANKS[i]);
+					}
+				}
+			
 			return false;
 			}
 		//check level-up
@@ -992,7 +1088,7 @@ function UNITS_CLASS(){
 	//checks tanks hp regen
 	this.level_hp_regen_handler = function(){		//once per 1 second - 2.2%/s
 		for (i in TANKS){
-			if(TANKS[i].dead == 1 || TYPES[TANKS[i].type].type == 'building') continue;
+			if(TANKS[i].dead == 1 || TANKS[i].data.type == 'building') continue;
 			var max_hp = UNITS.get_tank_max_hp(TANKS[i]);
 			//passive hp regain - 2.2%/s
 			var extra_hp = round(max_hp * 2.2 / 100);
@@ -1056,6 +1152,9 @@ function UNITS_CLASS(){
 	this.check_enemies = function(TANK){
 		if(TANK.dead == 1) return false; //dead
 		if(TANK.constructing != undefined) return false; //still not ready
+		if(TANK.do_construct != undefined) return false; //constructing
+		if(TANK.do_repair != undefined) return false; //repairing
+		if(TANK.do_occupy != undefined) return false; //on occupy
 		if(TANK.stun != undefined) return false; //stuned
 	
 		if(TANK.hit_reuse == undefined){
@@ -1283,6 +1382,21 @@ function UNITS_CLASS(){
 	//draw tank shooting fire
 	this.draw_fire = function(TANK, TANK_TO){
 		if(TANK.invisibility==1) return false;
+		
+		//register animation
+		var size = 5;
+		if(TYPES[TANK.type].type == 'human')
+			size = 3;
+		TANK.animations.push({
+			name: 'shoot',
+			to_x: TANK_TO.cx(),
+			to_y: TANK_TO.cy(),
+			from_x: TANK.cx(),
+			from_y: TANK.cy(),
+			lifetime: Date.now() + 200,
+			duration: 200,
+			size: size,
+			});
 		if(TYPES[TANK.type].type == 'human') return false;
 		
 		//register animation
@@ -1932,6 +2046,7 @@ function UNITS_CLASS(){
 		}
 	this.apply_buff = function(TANK, buff_name, original_value){
 		for(var b in TANK.buffs){
+			if(TANK.buffs[b].name == undefined) continue;
 			if(TANK.buffs[b].name == buff_name){
 				if(TANK.buffs[b].type == 'static'){
 					original_value = original_value + TANK.buffs[b].power;

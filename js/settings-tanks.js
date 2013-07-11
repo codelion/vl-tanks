@@ -283,9 +283,9 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 3,
 	abilities: [
-		{name: 'Rebuild',	passive: false,		broadcast: 2}, 
-		{name: 'Occupy',	passive: false,		broadcast: 2}, 
-		{name: 'Construct',	passive: true,		broadcast: 2}, 
+		{name: 'Rebuild',	passive: true,		broadcast: 0}, 
+		{name: 'Occupy',	passive: true,		broadcast: 0}, 
+		{name: 'Construct',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50, 50],
 	preview: true,
@@ -465,7 +465,7 @@ TYPES.push({
 	name: 'Scout_Tower',
 	type: 'building',
 	description: ["Tower for scouting"],
-	life: [500,0],
+	life: [300,0],
 	damage: [0, 0],	//0 dps
 	range: 110,
 	scout: 140,
@@ -570,7 +570,7 @@ TYPES.push({
 	name: 'Silo',
 	type: 'building',
 	description: ["Structure for generating Helium-3."],
-	life: [500,0],
+	life: [300,0],
 	damage: [0, 0],		//0 dps
 	range: 0,
 	scout: 50,
