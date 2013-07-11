@@ -250,7 +250,7 @@ function on_mousemove_background(event){
 			INFOBAR.ability_hover_id = new_i;
 			if(new_i != undefined && TYPES[MY_TANK.type].abilities[new_i] != undefined){
 				function_name = TYPES[MY_TANK.type].abilities[new_i].name.replace(/ /g,'_');
-				INFOBAR.ability_hover_text = window[function_name](MY_TANK, true);
+				INFOBAR.ability_hover_text = SKILLS[function_name](MY_TANK, true);
 				}
 			else
 				INFOBAR.ability_hover_text = '';
@@ -258,47 +258,70 @@ function on_mousemove_background(event){
 			INFOBAR.show_skill_description();	
 			}
 		//mouse over training tanks list
-		if( (game_mode == 'single_craft' || game_mode == 'multi_craft') && TYPES[MY_TANK.type].name == 'Factory' && MY_TANK.constructing == undefined){
-			var stats = INFOBAR.draw_factory_gui(undefined, true);
-			//pos1+j*(msize+gap), pos2+row*(msize+gap), msize, msize
-			j=0;
-			row=0;
-			//units
-			for(var i in TYPES){
-				if(TYPES[i].type == 'building') continue;
-				if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
-				var xx = stats.pos1+j*(stats.msize+stats.gap);
-				var yy = stats.pos2+row*(stats.msize+stats.gap);
-				if(mouseX > xx && mouseX < xx + stats.msize){
-					if(mouseY > yy && mouseY < yy + stats.msize){
-						var name = TYPES[i].name.replace("_"," ");
-						var cost = TYPES[i].cost;
-						cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-						INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+		if( (game_mode == 'single_craft' || game_mode == 'multi_craft') && MY_TANK.constructing == undefined){
+			if(TYPES[MY_TANK.type].name == 'Factory'){
+				var stats = INFOBAR.draw_factory_gui(undefined, true);
+				j=0;
+				row=0;
+				//units
+				for(var i in TYPES){
+					if(TYPES[i].type == 'building') continue;
+					if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+					var xx = stats.pos1+j*(stats.msize+stats.gap);
+					var yy = stats.pos2+row*(stats.msize+stats.gap);
+					if(mouseX > xx && mouseX < xx + stats.msize){
+						if(mouseY > yy && mouseY < yy + stats.msize){
+							var name = TYPES[i].name.replace("_"," ");
+							var cost = TYPES[i].cost;
+							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							}
 						}
+					
+					j++;
 					}
-				
-				j++;
+				//towers
+				j=0;
+				row=1;
+				for(var i in TYPES){
+					if(TYPES[i].type != 'building') continue;
+					if(HELPER.strpos(TYPES[i].name, "ower")==false) continue;
+					if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+					var xx = stats.pos1+j*(stats.msize+stats.gap);
+					var yy = stats.pos2+row*(stats.msize+stats.gap);
+					if(mouseX > xx && mouseX < xx + stats.msize){
+						if(mouseY > yy && mouseY < yy + stats.msize){
+							var name = TYPES[i].name.replace("_"," ");
+							var cost = TYPES[i].cost;
+							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							}
+						}
+					
+					j++;
+					}
 				}
-			//towers
-			j=0;
-			row=1;
-			for(var i in TYPES){
-				if(TYPES[i].type != 'building') continue;
-				if(HELPER.strpos(TYPES[i].name, "ower")==false) continue;
-				if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
-				var xx = stats.pos1+j*(stats.msize+stats.gap);
-				var yy = stats.pos2+row*(stats.msize+stats.gap);
-				if(mouseX > xx && mouseX < xx + stats.msize){
-					if(mouseY > yy && mouseY < yy + stats.msize){
-						var name = TYPES[i].name.replace("_"," ");
-						var cost = TYPES[i].cost;
-						cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-						INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+			else if(TYPES[MY_TANK.type].name == 'Mechanic'){
+				var stats = INFOBAR.draw_factory_gui(undefined, true);
+				j=0;
+				row=0;
+				//towers
+				for(var i in TYPES){
+					if(TYPES[i].type != 'building') continue;
+					if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+					var xx = stats.pos1+j*(stats.msize+stats.gap);
+					var yy = stats.pos2+row*(stats.msize+stats.gap);
+					if(mouseX > xx && mouseX < xx + stats.msize){
+						if(mouseY > yy && mouseY < yy + stats.msize){
+							var name = TYPES[i].name.replace("_"," ");
+							var cost = TYPES[i].cost;
+							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							}
 						}
+					
+					j++;
 					}
-				
-				j++;
 				}
 			//renew
 			INFOBAR.show_skill_description();
@@ -332,7 +355,7 @@ function on_mouse_right_click(event){
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TANKS[i].data.name != "Factory") continue;
+				if(TANKS[i].data.name != "Factory" && TANKS[i].data.name != "Base") continue;
 				if(TANKS[i].selected == undefined) continue;
 				if(TANKS[i].flag != undefined){
 					TANKS[i].flag.x = mouseX;
@@ -381,9 +404,6 @@ function on_mousedown(event){
 			SKILLS.do_jump(MY_TANK.id);
 			SKILLS.do_construct(MY_TANK.id);
 			
-			//external click functions
-			for (i in on_click_functions)
-				window[on_click_functions[i][0]](on_click_functions[i][1]);
 			return true;
 			}
 	

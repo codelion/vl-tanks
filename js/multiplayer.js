@@ -530,20 +530,11 @@ function MP_CLASS(){
 			var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
 			//execute
 			TANK_FROM.rand = DATA[3];
-			var ability_reuse = window[ability_function](TANK_FROM);
+			var ability_reuse = SKILLS[ability_function](TANK_FROM);
 			//reuse	
-			if(ability_reuse != undefined && ability_reuse != 0){		
+			if(ability_reuse != undefined && ability_reuse != 0){	
 				TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-				if(DATA[1] == name){
-					var tmp = new Array();
-					tmp['function'] = INFOBAR.draw_ability_reuse;
-					tmp['duration'] = ability_reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = ability_reuse;
-					tmp['tank'] = TANK_FROM;
-					timed_functions.push(tmp);
-					}
+				TANK_FROM.abilities_reuse_max[nr-1] = ability_reuse;
 				}
 			}
 		else if(type == 'chat'){		//chat
@@ -583,7 +574,7 @@ function MP_CLASS(){
 			//executing function
 			var function_name = skill_data.function;
 			if(function_name != '')	
-				window[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+				SKILLS[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
 			}
 		else if(type == 'tank_update'){		//tank updates 
 			//DATA = [tank_id, params]
@@ -629,9 +620,12 @@ function MP_CLASS(){
 				//change base stats
 				for(var b in TANKS){
 					if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
-						TANKS[b].armor = TANKS[b].armor - 10;
-						if(TANKS[b].armor<0) 
-							TANKS[b].armor = 0;	
+						//armor debuff
+						TANKS[b].buffs.push({
+							name: 'shield',
+							type: 'static',
+							power: -10,
+							});	
 						}
 					}
 				}
@@ -666,10 +660,6 @@ function MP_CLASS(){
 				return false;
 				}
 			TANK_TO.level = DATA[2];
-			TANK_TO.armor = TANK_TO.armor + TYPES[TANK_TO.type].armor[1];
-			TANK_TO.damage = TANK_TO.damage + TYPES[TANK_TO.type].damage[1];
-			if(TANK_TO.armor > TYPES[TANK_TO.type].armor[2])
-				TANK_TO.armor = TYPES[TANK_TO.type].armor[2];
 			TANK_TO.score = TANK_TO.score + SCORES_INFO[0];
 			
 			TANK_TO.abilities_lvl[DATA[3]]++;
@@ -683,7 +673,7 @@ function MP_CLASS(){
 				var ability_function = TYPES[TANK_TO.type].abilities[a].name.replace(/ /g,'_');
 				if(ability_function != undefined){
 					try{
-						window[ability_function](TANK_TO);
+						SKILLS[ability_function](TANK_TO);
 						}
 					catch(err){console.log("Error: "+err.message);}
 					}
@@ -696,7 +686,7 @@ function MP_CLASS(){
 				console.log('Error: tank "'+DATA[0]+'" was not found on del_invisible.');
 				return false;
 				}
-			stop_camouflage(TANK);
+			SKILLS.stop_camouflage(TANK);
 			}
 		else if(type == 'summon_bots'){	//send bots
 			//DATA = [room_id, random_id]

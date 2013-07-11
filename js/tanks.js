@@ -1,8 +1,10 @@
 var UNITS = new UNITS_CLASS();
 
 function UNITS_CLASS(){
-	var flag_width = 15;
-	var flag_height = 9;
+	this.flag_width = 15;
+	this.flag_height = 9;
+	this.he3_begin = 260;
+	this.HE3 = this.he3_begin;		//my team hellium-3 resources
 	
 	//adds new tank
 	this.add_tank = function(level, id, name, type, team, nation, x, y, angle, AI, master_tank, begin_time){ 
@@ -14,13 +16,10 @@ function UNITS_CLASS(){
 			angle = 0;
 		//modifiers
 		var hp_mod = 1;
-		var damage_mod = 1;
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && (TYPES[type].name == 'Tower' || TYPES[type].name == 'Base')){
 			room = ROOM.get_room_by_id(opened_room_id);
-			if(room.players.length < 3){
+			if(room.players.length < 3)
 				hp_mod = TOWER_HP_DAMAGE_IN_1VS1[0];
-				damage_mod = TOWER_HP_DAMAGE_IN_1VS1[1];
-				}
 			}
 		var hp = hp_mod * (TYPES[type].life[0]+TYPES[type].life[1]*(level-1));
 		for(var b in COUNTRIES[nation].buffs){
@@ -36,54 +35,49 @@ function UNITS_CLASS(){
 		
 		//create
 		TANK_tmp = {
-			id: id,
-			name: name,
-			type: type,
-			team: team,
-			nation: nation,
-			x: x,
-			y: y,
-			angle: angle,
-			fire_angle: angle,
-			move: 0,
-			level: level,	
-			sublevel: 0,	
-			hp: hp,
-			abilities_lvl: [1, 1, 1],
-			abilities_reuse: [0, 0, 0],
-			sight: TYPES[type].scout + round(TYPES[type].size[1]/2),
-			speed: TYPES[type].speed,
-			armor: TYPES[type].armor[0] + TYPES[type].armor[1]*(level-1),
-			damage: damage_mod * (TYPES[type].damage[0] + TYPES[type].damage[1]*(level-1)),
-			attack_delay: TYPES[type].attack_delay,
-			turn_speed: TYPES[type].turn_speed,
-			pierce_armor: 0,
-			animations: [],
+			id: id,			//unique id
+			name: name,		//name
+			type: type,		//type index
+			team: team,		//team
+			nation: nation,		//nation
+			x: x,			//x position
+			y: y,			//y position
+			angle: angle,		//body angle
+			fire_angle: angle,	//turret angle
+			move: 0,		//moving or not, 0 or 1
+			level: level,		//level, 1-999
+			sublevel: 0,		//progres till level-up
+			hp: hp,			//current health
+			abilities_lvl: [1, 1, 1],					//skills initial levels
+			abilities_reuse: [0, 0, 0],					//skills reuse time left
+			abilities_reuse_max: [0, 0, 0],					//skills max reuse time
+			sight: TYPES[type].scout + round(TYPES[type].size[1]/2),	//sight 
+			pierce_armor: 0,	//pierce enemy in %, 0-100
+			animations: [],		//array of animations, DRAW.completely draw them
 			visible: {state: false, time: Date.now()-10000},	//if visible, used only for grapchics effects
-			begin_time: Date.now(),	//time it was created
-			death_time: 0,	//how much second tank was dead
-			bullets: 0,	//how much second tank was in battle
+			begin_time: Date.now(),	//time unit was created
+			death_time: 0,		//how much second tank was dead
+			bullets: 0,		//how much second tank was in battle
 			damage_received: 0,	//total damage received
 			damage_done: 0,		//total damage done
-			score: 0,
-			kills: 0,
-			deaths: 0,
-			cache_tank: [],
-			buffs: [],	//buffs array
-			last_bullet_time: Date.now()-5000,
-			he3: 0,
-			data: TYPES[type],
+			score: 0,		//total score
+			kills: 0,		//total kills
+			deaths: 0,		//total deaths
+			cache_tank: [],		//cache for draw operations
+			buffs: [],		//buffs array
+			last_bullet_time: Date.now()-5000, //last bullet time, for checking if unit in battle
+			data: TYPES[type],	//unit type general info
 			};
 		if(AI != undefined)
-			TANK_tmp.use_AI = AI;
+			TANK_tmp.use_AI = AI;		//bots has auto-controlls in AI class (ai.js)
 		if(master_tank != undefined)
-			TANK_tmp.master = master_tank;	
+			TANK_tmp.master = master_tank;	//if unit slave, like Truck soldiers 
 		if(begin_time != undefined)
 			TANK_tmp.begin_time = begin_time;
-		TANK_tmp.cx = function(){ 	return this.x + round(TYPES[this.type].size[1]/2);	}
-		TANK_tmp.cy = function(){	return this.y + round(TYPES[this.type].size[2]/2);	}
-		TANK_tmp.width = function(){	return TYPES[this.type].size[1];		}
-		TANK_tmp.height = function(){	return TYPES[this.type].size[2];		}
+		TANK_tmp.cx = function(){ 	return this.x + round(TYPES[this.type].size[1]/2);	} //center x coordinates
+		TANK_tmp.cy = function(){	return this.y + round(TYPES[this.type].size[2]/2);	} //center y coordinates
+		TANK_tmp.width = function(){	return TYPES[this.type].size[1];		}	//unit width
+		TANK_tmp.height = function(){	return TYPES[this.type].size[2];		}	//unit height
 		if(TANK_tmp.x == undefined || TANK_tmp.y == undefined)
 			UNITS.set_spawn_coordinates(TANK_tmp);
 		
@@ -103,7 +97,7 @@ function UNITS_CLASS(){
 			var ability_function = TYPES[TANK_tmp.type].abilities[jj].name.replace(/ /g,'_')+"_once";
 			if(ability_function != undefined){
 				try{
-					window[ability_function](TANK_tmp);
+					SKILLS[ability_function](TANK_tmp);
 					}
 				catch(err){	}
 				}
@@ -490,11 +484,11 @@ function UNITS_CLASS(){
 			//flag
 			if(show_flag == true){
 				flag_gap = 4;
-				var total_width = flag_width + flag_gap + tmp_object.measureText(player_name).width;
+				var total_width = UNITS.flag_width + flag_gap + tmp_object.measureText(player_name).width;
 				var name_pos_x = name_pos_x - round(total_width/2);
 				if(name_pos_x < 0) name_pos_x = 0;		
 				DRAW.draw_image(tmp_object, COUNTRIES[tank.nation].file, name_pos_x, 4);
-				var name_pos_x = name_pos_x + flag_width + flag_gap;
+				var name_pos_x = name_pos_x + UNITS.flag_width + flag_gap;
 				}
 			
 			//name
@@ -889,7 +883,7 @@ function UNITS_CLASS(){
 			if(TANKS[i].team != MY_TANK.team) continue;
 			if(TANKS[i].dead == 1) continue;
 			if(TANKS[i].selected == undefined) continue;
-			if(TANKS[i].speed == 0) continue;
+			if(TANKS[i].data.speed == 0) continue;
 			
 			new_x = xx + bsize * dx[j];
 			new_y = yy + bsize * dy[j];
@@ -918,7 +912,7 @@ function UNITS_CLASS(){
 				if(TANKS[i].crystal.power > 0){
 					TANKS[i].crystal.power = TANKS[i].crystal.power - SILO_POWER;
 					if(TANKS[i].team == MY_TANK.team){
-						HE3 = HE3 + SILO_POWER;
+						UNITS.HE3 = UNITS.HE3 + SILO_POWER;
 						valid = true;
 						}
 					}
@@ -942,7 +936,7 @@ function UNITS_CLASS(){
 					}
 				}
 			if(valid == false)
-				HE3 = HE3 + 0.5; //poor team dont have silo, lets give them a bit
+				UNITS.HE3 = UNITS.HE3 + 0.5; //poor team dont have silo :), lets give them a bit
 			return false;
 			}
 		//check level-up
@@ -957,7 +951,7 @@ function UNITS_CLASS(){
 			tank_level_up_time = UNITS.apply_buff(TANKS[i], 'level_up', tank_level_up_time);
 			
 			//calc level
-			time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets*TYPES[TANKS[i].type].attack_delay;
+			time_diff = (Date.now() - TANKS[i].begin_time)/1000 - TANKS[i].death_time + TANKS[i].bullets * TYPES[TANKS[i].type].attack_delay;
 			
 			TANKS[i].level = Math.ceil(time_diff/tank_level_up_time);	
 			TANKS[i].sublevel = round(time_diff/tank_level_up_time*100) - TANKS[i].level*100 + 100;	
@@ -965,10 +959,6 @@ function UNITS_CLASS(){
 			//do level changes	
 			if(TANKS[i].level != last_level){				//lvl changed
 				if(game_mode == 'single_quick' || game_mode == 'single_craft'){
-					TANKS[i].armor = TANKS[i].armor + TYPES[TANKS[i].type].armor[1];
-					TANKS[i].damage = TANKS[i].damage + TYPES[TANKS[i].type].damage[1];
-					if(TANKS[i].armor > TYPES[TANKS[i].type].armor[2])
-						TANKS[i].armor = TYPES[TANKS[i].type].armor[2];
 					TANKS[i].score = TANKS[i].score + SCORES_INFO[0]*(TANKS[i].level-last_level);	// +25 for 1 lvl
 					}
 				INFOBAR.redraw_tank_stats();
@@ -991,16 +981,13 @@ function UNITS_CLASS(){
 					var ability_function = TYPES[TANKS[i].type].abilities[a].name.replace(/ /g,'_');
 					if(ability_function != undefined){
 						try{
-							window[ability_function](TANKS[i]);
+							SKILLS[ability_function](TANKS[i]);
 							}
 						catch(err){console.log("Error: "+err.message);}
 						}
 					}
 				}
 			}
-		//he-3 regen
-		if(MY_TANK.dead != 1)
-			MY_TANK.he3 += 1; 
 		}
 	//checks tanks hp regen
 	this.level_hp_regen_handler = function(){		//once per 1 second - 2.2%/s
@@ -1072,7 +1059,7 @@ function UNITS_CLASS(){
 		if(TANK.stun != undefined) return false; //stuned
 	
 		if(TANK.hit_reuse == undefined){
-			var hit_reuse = TANK.attack_delay*1000;
+			var hit_reuse = TANK.data.attack_delay*1000;
 			hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
 			TANK.hit_reuse = hit_reuse + Date.now();
 			}
@@ -1080,7 +1067,7 @@ function UNITS_CLASS(){
 		if(TANK.check_enemies_reuse - Date.now() > 0)
 			return false;	//check reuse
 		UNITS.scout_enemies_buildings(TANK);
-		if(TANK.damage == 0) return false;	//not war unit, no more check
+		if(TANK.data.damage[0] == 0) return false;	//not war unit, no more check
 			
 		if(TANK.hit_reuse - Date.now() > 0)
 			return false;	//hit reuse
@@ -1257,7 +1244,7 @@ function UNITS_CLASS(){
 			}
 		
 		//check turret
-		if(DRAW.body_rotation(TANK, "fire_angle", TANK.turn_speed, shoot_angle, time_gap)==false){
+		if(DRAW.body_rotation(TANK, "fire_angle", TANK.data.turn_speed, shoot_angle, time_gap)==false){
 			if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 				if((TANK.attacking==undefined || TANK.attacking.id != TANK_TO.id) && UNITS.check_if_broadcast(TANK)==true && TANK.attacking_sig_wait == undefined){
 					TANK.attacking_sig_wait = 1;
@@ -1288,7 +1275,7 @@ function UNITS_CLASS(){
 		else
 			MP.send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle)]);
 		
-		var hit_reuse = TANK.attack_delay*1000;
+		var hit_reuse = TANK.data.attack_delay*1000;
 		hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
 		TANK.hit_reuse = hit_reuse + Date.now();	
 		TANK.check_enemies_reuse = 0;
@@ -1339,16 +1326,19 @@ function UNITS_CLASS(){
 			catch(error){}
 			}	
 		
-		damage = TANK.damage;
+		damage = TANK.data.damage[0] + TANK.data.damage[1]*(TANK.level-1);
 		damage = UNITS.apply_buff(TANK, 'damage', damage);
+		damage = damage * (100+COUNTRIES[TANK.nation].bonus.weapon)/100;
 		if(BULLET.damage != undefined)
 			damage = BULLET.damage;
 			
-		armor = TANK_TO.armor;
+		armor = TANK_TO.data.armor[0] + TANK_TO.data.armor[1]*(TANK_TO.level-1);
 		if(armor > TYPES[TANK_TO.type].armor[2])
 			armor = TYPES[TANK_TO.type].armor[2];
+		armor = armor + COUNTRIES[TANK_TO.nation].bonus.armor;
 		armor = UNITS.apply_buff(TANK_TO, 'shield', armor);
 		if(armor > 100) armor = 100;
+		if(armor < 0) armor = 0;
 		
 		//check armor_piercing
 		armor = armor - TANK.pierce_armor;
@@ -1371,7 +1361,7 @@ function UNITS_CLASS(){
 		//check invisibility
 		if(TANK_TO.invisibility != undefined && BULLET.aoe_effect != undefined){
 			if(game_mode == 'single_quick' || game_mode == 'single_craft')
-				stop_camouflage(TANK_TO);
+				SKILLS.stop_camouflage(TANK_TO);
 			else
 				MP.send_packet('del_invisible', [TANK_TO.id]);
 			}
@@ -1423,9 +1413,12 @@ function UNITS_CLASS(){
 					//tower dead - decreasing base armor
 					for(var b in TANKS){
 						if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
-							TANKS[b].armor = TANKS[b].armor - 10;
-							if(TANKS[b].armor<0) 
-								TANKS[b].armor = 0;	
+							//armor debuff
+							TANKS[b].buffs.push({
+								name: 'shield',
+								type: 'static',
+								power: -10,
+								});
 							}
 						}
 					}
@@ -1513,6 +1506,7 @@ function UNITS_CLASS(){
 		tank.dead = 1;	
 		
 		tank.abilities_reuse = [0, 0, 0];
+		tank.abilities_reuse_max = [0, 0, 0];
 		delete tank.target_move_lock;
 		delete tank.target_shoot_lock;
 		mouse_click_controll = false;
@@ -1629,46 +1623,33 @@ function UNITS_CLASS(){
 		if(ability_function != undefined){
 			if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 				//local ability
-				var ability_reuse = window[ability_function](TANK); //exec here
+				var ability_reuse = SKILLS[ability_function](TANK); //exec here
 				if(ability_reuse != undefined && ability_reuse != 0){
 					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-					var tmp = new Array();
-					tmp['function'] = INFOBAR.draw_ability_reuse;
-					tmp['duration'] = ability_reuse;
-					tmp['type'] = 'REPEAT';
-					tmp['nr'] = nr-1;	
-					tmp['max'] = ability_reuse;
-					tmp['tank'] = TANK;
-					timed_functions.push(tmp);
+					TANK.abilities_reuse_max[nr-1] = ability_reuse;
 					}
 				}
 			else{ //broadcasting
 				if(broadcast_mode==0){
 					//local
-					var ability_reuse = window[ability_function](TANK); //exec here
+					var ability_reuse = SKILLS[ability_function](TANK); //exec here
 					if(ability_reuse != undefined && ability_reuse != 0){
 						TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-						var tmp = new Array();
-						tmp['function'] = INFOBAR.draw_ability_reuse;
-						tmp['duration'] = ability_reuse;
-						tmp['type'] = 'REPEAT';
-						tmp['nr'] = nr-1;	
-						tmp['max'] = ability_reuse;
-						tmp['tank'] = TANK;
-						timed_functions.push(tmp);
+						TANK.abilities_reuse_max[nr-1] = ability_reuse;
 						}
 					}
 				else if(broadcast_mode==1){
 					//instant broadcast
-					var ability_reuse = window[ability_function](TANK, undefined, true);
+					var ability_reuse = SKILLS[ability_function](TANK, undefined, true);
 					ability_reuse = ability_reuse.reuse;
 					if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
 					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
+					TANK.abilities_reuse_max[nr-1] = ability_reuse;
 					MP.register_tank_action('skill_do', opened_room_id, name,  nr, HELPER.getRandomInt(1, 999999));
 					}
 				else if(broadcast_mode==2){
 					//no broadcast - do it later
-					var ability_reuse = window[ability_function](TANK);
+					var ability_reuse = SKILLS[ability_function](TANK);
 					}
 				}
 			}
@@ -1723,7 +1704,13 @@ function UNITS_CLASS(){
 			}
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TYPES){
-				if(TYPES[i].cost == 0 && TYPES[i].name == tank_name)
+				if(TYPES[i].name == tank_name && TYPES[i].mode == 'quick')
+					return false;	
+				}
+			}
+		else{
+			for(var i in TYPES){
+				if(TYPES[i].name == tank_name && TYPES[i].mode == 'craft')
 					return false;	
 				}
 			}
@@ -1939,7 +1926,7 @@ function UNITS_CLASS(){
 				if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 					MP.send_packet('del_invisible', [TANK.id]);
 				else
-					stop_camouflage(TANK);
+					SKILLS.stop_camouflage(TANK);
 				}
 			}
 		}
@@ -1960,16 +1947,20 @@ function UNITS_CLASS(){
 		}
 	this.set_spawn_coordinates = function(tank){
 		var space = 35;
+		var xx;
+		var yy;
+		var angle;
 		if(tank.team=='B'){	//blue top
-			tank.y = 20;
-			tank.angle = 180;
+			yy = 20;
+			angle = 180;
 			}
 		else{		//red bottom 
-			tank.y = HEIGHT_MAP - 20 - tank.height();
+			yy = HEIGHT_MAP - 20 - tank.height();
 			angle = 0;
 			}
 		
 		center_x = round(WIDTH_MAP/2);
+		var found = false;
 		for(var i=1; i<20; i++){
 			var min = center_x - 150 - i*10;
 			var max = center_x + 150 + i*10;
@@ -1977,13 +1968,31 @@ function UNITS_CLASS(){
 			if(max > WIDTH_MAP-50) max = WIDTH_MAP-50;
 			
 			var x = HELPER.getRandomInt(min, max);	//random line
-			if(UNITS.check_collisions(x, tank.y+tank.width()/2, tank, true)==true) continue;
-			if(UNITS.check_collisions(x+tank.width(), tank.y+tank.height()/2, tank, true)==true) continue;
+			if(UNITS.check_collisions(x, yy+tank.width()/2, tank, true)==true) continue;
+			if(UNITS.check_collisions(x+tank.width(), yy+tank.height()/2, tank, true)==true) continue;
 			
-			tank.x = x - round(tank.width()/2);
-			return false;
+			xx = x - round(tank.width()/2);
+			found = true;
+			break;
 			}
-		tank.x = 100;
+		if(found == false)
+			xx = 100;
+			
+		tank.x = xx;
+		tank.y = yy;
+		tank.angle = angle;
+		
+		//if multi - only hosts set random coordinates
+		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
+			room = ROOM.get_room_by_id(opened_room_id);
+			if(room.host != name) return false;	//not host
+			var params = [
+				{key: 'x', value: xx},
+				{key: 'y', value: yy},
+				{key: 'angle', value: angle},
+				];
+			MP.send_packet('tank_update', [tank.id, params]);
+			}
 		}
 	this.get_selected_count = function(team){
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return 1;
