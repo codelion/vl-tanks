@@ -1571,40 +1571,33 @@ function SKILLS_CLASS(){
 		return reuse;
 		}
 	
-	//====== Engineer ======================================================
+	//====== Mechanic ======================================================
 	
 	this.Rebuild = function(TANK, descrition_only, settings_only, ai){
-		var reuse = 0;
 		var power = 30;	//hp points per s
+		var cost = 3; //he3 per s
 		
 		if(descrition_only != undefined)
-			return 'Rebuilds damaged structures. Power - '+power+'hp/s.';
-		if(settings_only != undefined) return {reuse: reuse, power: power};
-		if(ai != undefined) return false;
+			return 'Rebuilds damaged structures '+power+' hp/s. Right click to repair.';
+		if(settings_only != undefined) return {power: power, cost: cost};
 		
-		return reuse;
+		//passive
+		return 0;
 		}
 	this.Occupy = function(TANK, descrition_only, settings_only, ai){
-		var reuse = 0;
 		var duration = 15*1000;
 		
 		if(descrition_only != undefined)
-			return 'Occupy enemy structure.';
-		if(settings_only != undefined) return {reuse: reuse, duration: duration};
-		if(ai != undefined) return false;
+			return 'Occupy enemy structure. Right click on enemy building to occupy.';
+		if(settings_only != undefined) return {duration: duration};
 			
-		return reuse;
+		//passive
+		return 0;
 		}
 	this.Construct = function(TANK, descrition_only, settings_only, ai){
 		if(descrition_only != undefined)
 			return 'Constructs buildings.';
-		
-		/*var tank_type = 'Factory';
-		for(var i in TYPES){
-			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
-			}
-		SKILLS.construct_prepare(TANK, reuse, tank_type, 0);*/
-		
+			
 		//passive
 		return 0;
 		}
@@ -1674,27 +1667,6 @@ function SKILLS_CLASS(){
 	this.validate_construction = function(xx, yy, show_errors){
 		var type = MY_TANK.try_construct.tank_type;
 	
-		//check range
-		var valid = false;
-		for (i in TANKS){
-			if(TYPES[TANKS[i].type].type == 'tank') continue;
-			if(TANKS[i].team != MY_TANK.team) continue;
-			if(TANKS[i].constructing != undefined) continue;
-	
-			dist_x = TANKS[i].cx() - (mouse_pos[0] - map_offset[0]);
-			dist_y = TANKS[i].cy() - (mouse_pos[1] - map_offset[1]);
-			var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-			if(distance < TYPES[TANKS[i].type].scout + TYPES[type].scout + TANKS[i].width()/2 + TYPES[type].size[1]/2)
-				valid = true;
-			}
-		if(valid == false){
-			if(show_errors == true){
-				screen_message.text = "Too far from your territory.";
-				screen_message.time = Date.now() + 1000;
-				}
-			return false;
-			}
-		
 		if(TYPES[type].name == 'Silo'){
 			//find nearest resourse
 			var min_distance = 999;
@@ -1757,7 +1729,83 @@ function SKILLS_CLASS(){
 		
 		return true;
 		}
-	
+	this.register_build = function(tank_id, building_id){
+		TANK = UNITS.get_tank_by_id(tank_id);
+		//link
+		TANK.do_construct = building_id;
+		//icon
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_construct'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		TANK.buffs.push({
+			icon: 'bolt',
+			source: 'do_construct',
+			});	
+		}
+	this.cancel_build = function(TANK){
+		delete TANK.do_construct;
+		//remove buffs
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_construct'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		}
+	this.register_repair = function(tank_id, building_id){
+		TANK = UNITS.get_tank_by_id(tank_id);
+		//link
+		TANK.do_repair = building_id;
+		//icon
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_repair'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		TANK.buffs.push({
+			icon: 'bolt',
+			source: 'do_repair',
+			});	
+		}
+	this.cancel_repair = function(TANK){
+		delete TANK.do_repair;
+		//remove buffs
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_repair'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		}
+	this.register_occupy = function(tank_id, building_id){
+		TANK = UNITS.get_tank_by_id(tank_id);
+		var skill_stats = SKILLS.Occupy(undefined, undefined, true);
+		
+		//link
+		TANK.do_occupy = building_id;
+		TANK.occupy_progress = skill_stats.duration;
+		//icon
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_occupy'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		TANK.buffs.push({
+			icon: 'error',
+			source: 'do_occupy',
+			});	
+		}
+	this.cancel_occupy = function(TANK){
+		delete TANK.do_occupy;
+		delete TANK.occupy_progress;
+		//remove buffs
+		for(var b in TANK.buffs){
+			if(TANK.buffs[b].source == 'do_occupy'){
+				TANK.buffs.splice(b, 1); b--;
+				}
+			}
+		}		
+		
 	//====== General =========================================================
 	
 	this.do_missile = function(tank_id, enemy_id, skip_broadcast){
@@ -2007,13 +2055,19 @@ function SKILLS_CLASS(){
 		//create tank
 		var new_tank = UNITS.add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
 		
+		//send mechanic
+		TANK.target_move_lock = new_tank.id;
+		TANK.move = 1;
+		TANK.move_to = [new_tank.cx(), new_tank.cy()];
+		TANK.reach_tank_and_execute = [10, 'register_build', tank_id];
+		
 		var duration = 30*1000;
-		if(DEBUG == true) duration = 1000;
+		if(DEBUG == true) duration = 3000;
 		new_tank.constructing = {
 			duration: duration,
-			start: Date.now(),
+			time: 0,
 			}
-		//register crystal
+		//register crystal?
 		if(new_tank.data.name == 'Silo'){
 			var min_distance = 999;
 			for(var c in MAP_CRYSTALS){
@@ -2026,7 +2080,7 @@ function SKILLS_CLASS(){
 					}
 				}
 			}	
-		//adding flag
+		//add flag?
 		if(new_tank.data.name == 'Factory' || new_tank.data.name == 'Base'){
 			if(new_tank.team == 'B') //top
 				new_tank.flag = { x: new_tank.x, y: new_tank.y+60}

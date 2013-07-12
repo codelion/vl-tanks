@@ -1,4 +1,4 @@
-var LIBRARY = new LIBRARY_CLASS();
+var LIBRARY = new LIBRARY_CLASS(); AI.check
 
 function LIBRARY_CLASS(){	
 	var TOP = 0;

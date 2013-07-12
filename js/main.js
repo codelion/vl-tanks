@@ -4,9 +4,6 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	Mechanic 
-		implement skills
-		factory do not work
 	multiplayer	game_mode = single_quick   single_craft   multi_quick   multi_craft
 		optimize controlls packets: 
 			tank_move
@@ -313,33 +310,34 @@ function MAIN_CLASS(){
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, my_team, my_nation);
+			
+			//enemies
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			}
 		
 		MAP.auto_scoll_map();
 		
 		//add bots if single player
-		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
+		if(game_mode == 'single_quick'){
 			//get random type
 			var possible_types = [];
 			var random_type=0;
 			for(var t in TYPES){
-				if(TYPES[t].type=="tank")
-					possible_types.push(t);
+				if(TYPES[t].type != "tank") continue;
+				if(TYPES[t].mode != undefined && TYPES[t].mode == 'craft') continue;
+				possible_types.push(t);
 				}
 				
 			//friends
 			var n = MAPS[level-1].team_allies;
-			if(game_mode == 'single_craft' || game_mode == 'multi_craft')
-				n = 7;
 			for(var i=1; i<n; i++){
 				random_type = possible_types[HELPER.getRandomInt(0, possible_types.length-1)];
 				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 					continue;
 				if(DEBUG==false){
-					if(game_mode == 'single_craft' || game_mode == 'multi_craft')
-						UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation);
-					else
-						UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
+					UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
 					}
 				}
 			//enemies
@@ -350,7 +348,6 @@ function MAIN_CLASS(){
 					continue;
 				UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 				if(DEBUG==true) break;
-				if(game_mode == 'single_craft' || game_mode == 'multi_craft') break;
 				i++;
 				}
 			}

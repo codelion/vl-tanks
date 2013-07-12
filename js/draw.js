@@ -113,7 +113,10 @@ function DRAW_CLASS(){
 							TANKS[i].move = 0;
 							delete TANKS[i].target_move_lock;
 							delete TANKS[i].move_to;
-							SKILLS[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
+							if(typeof TANKS[i].reach_tank_and_execute[1] == 'string')
+								SKILLS[TANKS[i].reach_tank_and_execute[1]](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
+							else
+								TANKS[i].reach_tank_and_execute[1](TANKS[i].reach_tank_and_execute[2], TANKS[i_locked].id, true);
 							delete TANKS[i].reach_tank_and_execute;
 							}
 						//reached targeted enemy for general attack
@@ -336,7 +339,7 @@ function DRAW_CLASS(){
 					UNITS.draw_tank_clone(TANK.type, x, y, animation.angle, alpha);
 					}
 				}
-			//fire
+			//fire explosion
 			else if(animation.name == 'fire'){
 				alpha = (animation.lifetime - Date.now()) / animation.duration;
 				alpha = round(alpha*100)/100;
@@ -361,6 +364,14 @@ function DRAW_CLASS(){
 				DRAW.draw_image(canvas_main, 'explosion', animation.x, animation.y);
 				canvas_main.restore();
 				}	
+			//shoot
+			else if(animation.name == 'shoot'){
+				alpha = (animation.lifetime - Date.now()) / animation.duration;
+				alpha = round(alpha*100)/100;
+				DRAW.drawSoftLine(canvas_main, animation.from_x+map_offset[0], animation.from_y+map_offset[1], 
+					animation.to_x+map_offset[0], animation.to_y+map_offset[1], 
+					animation.size, 255, 255, 255, alpha);
+				}
 			}
 		}
 	this.draw_he3_info = function(){
@@ -761,13 +772,19 @@ function DRAW_CLASS(){
 				}
 			}
 		var n = 0;
-		for(var t in TYPES)
-			if(TYPES[t].type == 'tank') n++;
 		for(var t in TYPES){
 			if(TYPES[t].type != 'tank') continue;
-			var pos_left = left+t*round(477/n)+(50-TYPES[t].size[1])/2;
+			if(TYPES[t].mode != undefined && TYPES[t].mode == 'quick') continue;
+			n++;
+			}
+		var k = 0;
+		for(var t in TYPES){
+			if(TYPES[t].type != 'tank') continue;
+			if(TYPES[t].mode != undefined && TYPES[t].mode == 'quick') continue;
+			var pos_left = left+k*round(477/n)+(50-TYPES[t].size[1])/2;
 			var pos_top = top+52-TYPES[t].size[2];
 			UNITS.draw_tank_clone(t, pos_left, pos_top, 0, 1, canvas_backround);
+			k++;
 			}
 		}
 	//final scores after game ended
@@ -1605,5 +1622,27 @@ function DRAW_CLASS(){
 		DRAW.add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 		HELPER.setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
 		DRAW.draw_settings();
+		}
+	this.drawSoftLine = function(ctx, x1, y1, x2, y2, lineWidth, r, g, b, a){
+		var lx = x2 - x1;
+		var ly = y2 - y1;
+		var lineLength = Math.sqrt(lx*lx + ly*ly);
+		var wy = lx / lineLength * lineWidth;
+		var wx = ly / lineLength * lineWidth;
+		var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
+		// The gradient must be defined accross the line, 90° turned compared
+		// to the line direction.
+		gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
+		gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
+		gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
+		gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
+		ctx.save();
+		ctx.beginPath();
+		ctx.lineWidth = lineWidth;
+		ctx.strokeStyle = gradient;
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		ctx.restore(); 
 		}
 	}
