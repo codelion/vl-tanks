@@ -4,13 +4,8 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	multiplayer	game_mode = single_quick   single_craft   multi_quick   multi_craft
-		optimize controlls packets: 
-			tank_move
-			target
-			bullet
-			skill_do
-			skill_advanced
+	text multiplayer with 2 clients
+	game ends on last base death
 	full mode AI
 	special score for mode3: he3 and army graph in time
 */
@@ -310,7 +305,8 @@ function MAIN_CLASS(){
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, my_team, my_nation);
-			
+			}
+		if(game_mode == 'single_craft'){
 			//enemies
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);

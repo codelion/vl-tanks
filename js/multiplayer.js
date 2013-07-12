@@ -495,46 +495,73 @@ function MP_CLASS(){
 			}
 		else if(type == 'tank_move'){		//tank move
 			//DATA = room_id, tank_id, [from_x, from_y, to_x, to_y, lock, direction] 
-			if(DATA[1] == name && MUTE_FX==false){
-				try{
-					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
-					audio_finish.volume = FX_VOLUME;
-					audio_finish.play();
-					}
-				catch(error){}
-				}
 			if(PLACE=="game" && opened_room_id==DATA[0]){
-				TANK = UNITS.get_tank_by_id(DATA[1]);
-				if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
-				MP.update_players_ping(TANK.name);
-				UNITS.sync_movement(TANK, DATA[2][0], DATA[2][1]);
-				TANK.move = 1;
-				TANK.move_to = [DATA[2][2], DATA[2][3]];
-				delete TANK.target_move_lock;
-				if(DATA[2][4] != undefined){
-					//target lock
-					TANK.target_move_lock = DATA[2][4];
-					TANK.target_shoot_lock = DATA[2][4];
+				//sound
+				if(DATA[1] == name && MUTE_FX==false){
+					try{
+						audio_finish = document.createElement('audio');
+						audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+						audio_finish.volume = FX_VOLUME;
+						audio_finish.play();
+						}
+					catch(error){}
 					}
-				if(DATA[2][5] != undefined)
-					TANK.move_direction = DATA[2][5];
+				//move tank
+				var ids = [];
+				if(typeof DATA[1] != 'object')
+					ids = [DATA[1]];
+				else
+					ids = DATA[1];
+				for(var i in ids){
+					TANK = UNITS.get_tank_by_id(ids[i]);
+					if(TANK===false) console.log('Error: tank "'+ids[i]+'" was not found on tank_move.');
+					MP.update_players_ping(TANK.name);
+					if(ids.length == 1)
+						UNITS.sync_movement(TANK, DATA[2][0], DATA[2][1], 100);
+					if(game_mode == 'multi_quick'){
+						TANK.move = 1;
+						TANK.move_to = [DATA[2][2], DATA[2][3]];
+						}
+					else{
+						TANK.selected = 1;
+						if(DATA[2][4] == undefined)
+							UNITS.calc_new_position(TANK.team, DATA[2][2], DATA[2][3]);
+						}
+					delete TANK.target_move_lock;
+					if(DATA[2][4] != undefined){
+						//target lock
+						TANK.target_move_lock = DATA[2][4];
+						TANK.target_shoot_lock = DATA[2][4];
+						}
+					if(DATA[2][5] != undefined)
+						TANK.move_direction = DATA[2][5];
+					}
 				}
 			}
 		else if(type == 'skill_do'){	//tank skill start
-			//DATA = room_id, player_name, nr=[1,2,3], random
+			//DATA = room_id, tank_id, nr=[1,2,3], random
 			if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
-			TANK_FROM = UNITS.get_tank_by_name(DATA[1]);
-			if(TANK_FROM===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
-			var nr = DATA[2];	
-			var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
-			//execute
-			TANK_FROM.rand = DATA[3];
-			var ability_reuse = SKILLS[ability_function](TANK_FROM);
-			//reuse	
-			if(ability_reuse != undefined && ability_reuse != 0){	
-				TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-				TANK_FROM.abilities_reuse_max[nr-1] = ability_reuse;
+			var ids = [];
+			if(typeof DATA[1] != 'object')
+				ids = [DATA[1]];
+			else
+				ids = DATA[1];
+			for(var i in ids){
+				TANK_FROM = UNITS.get_tank_by_id(ids[i]);
+				if(TANK_FROM===false){
+					console.log('Error: tank "'+ids[i]+'" was not found on skill_do.');
+					return false;
+					}
+				var nr = DATA[2];	
+				var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
+				//execute
+				TANK_FROM.rand = DATA[3];
+				var ability_reuse = SKILLS[ability_function](TANK_FROM);
+				//reuse	
+				if(ability_reuse != undefined && ability_reuse != 0){	
+					TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
+					TANK_FROM.abilities_reuse_max[nr-1] = ability_reuse;
+					}
 				}
 			}
 		else if(type == 'chat'){		//chat
@@ -556,13 +583,13 @@ function MP_CLASS(){
 			MP.update_players_ping(DATA[2]);
 			}
 		else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
-			/*DATA = room_id, player, {
+			/*DATA = room_id, unit_id, {
 					function: 'function_name',
 					fparam: [param1, param2, param3],
 					tank_params: [	{key: 'xxxx', value: 'xxxx'},	]
 					}*/
 			if(PLACE != "game" || opened_room_id != DATA[0]) return false;
-			TANK = UNITS.get_tank_by_name(DATA[1]);
+			TANK = UNITS.get_tank_by_id(DATA[1]);
 			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
 			var skill_data = DATA[2];
 			delete TANK.target_move_lock;
@@ -629,7 +656,7 @@ function MP_CLASS(){
 						}
 					}
 				}
-			if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			if(TYPES[TANK_TO.type].no_repawn != undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){	
 				UNITS.check_selection(TANK_TO);
 				//removing
 				for(var b=0; b < TANKS.length; b++){
@@ -691,7 +718,11 @@ function MP_CLASS(){
 		else if(type == 'summon_bots'){	//send bots
 			//DATA = [room_id, random_id]
 			UNITS.add_bots(DATA[1]);
-			}	
+			}
+		else if(type == 'train_unit'){	//create trained unit
+			//DATA = [type, team, nation, x, y, angle, flag_x, flag_y]
+			UNITS.spawn_trained_unit(DATA[0], DATA[1], DATA[2], DATA[3], DATA[4], DATA[5], DATA[6], DATA[7]);
+			}		
 		else if(type == 'bullet'){	//tank hit
 			//DATA = [target_id, source_id, angle, damage, instant_bullet, pierce_armor]
 			TANK_TO = UNITS.get_tank_by_id(DATA[0]);

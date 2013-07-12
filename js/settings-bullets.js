@@ -9,7 +9,7 @@ BULLETS_TYPES.push({file: 'plasma',		size: [15, 15], 	speed: 140,	rotate: false,
 
 BULLETS_TYPES.push({file: 'bullet',		size: [6, 6], 		speed: 999,	rotate: false, });
 BULLETS_TYPES.push({file: 'small_bullet',	size: [4, 4], 		speed: 999,	rotate: false, });
-BULLETS_TYPES.push({file: 'missle',		size: [8, 23], 		speed: 999,	rotate: true, });
-BULLETS_TYPES.push({file: 'airstrike',		size: [38, 15], 	speed: 999,	rotate: true, });
-BULLETS_TYPES.push({file: 'bomb',		size: [12, 12], 	speed: 999,	rotate: false, });
-BULLETS_TYPES.push({file: 'plasma',		size: [15, 15], 	speed: 999,	rotate: false, });
+BULLETS_TYPES.push({file: 'missle',		size: [8, 23], 		speed: 140,	rotate: true, });
+BULLETS_TYPES.push({file: 'airstrike',		size: [38, 15], 	speed: 140,	rotate: true, });
+BULLETS_TYPES.push({file: 'bomb',		size: [12, 12], 	speed: 120,	rotate: false, });
+BULLETS_TYPES.push({file: 'plasma',		size: [15, 15], 	speed: 140,	rotate: false, });

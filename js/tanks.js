@@ -436,16 +436,12 @@ function UNITS_CLASS(){
 					var angle = 180;
 					if(MY_TANK.team != 'B')
 						angle = 0;
-					//create tank
-					var id = 'unit-'+TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
-					var new_tank = UNITS.add_tank(1, id, HELPER.generatePassword(6), type, tank.team, tank.nation, x, y, angle);
-					new_tank.move = 1;
-					//randomize spawn position
-					var gap_rand = new_tank.width()*2;
-					new_tank.move_to = [
-						tank.flag.x + HELPER.getRandomInt(-gap_rand, gap_rand), 
-						tank.flag.y + HELPER.getRandomInt(-gap_rand, gap_rand)
-						];
+						
+					if(game_mode == 'single_craft')
+						UNITS.spawn_trained_unit(type, tank.team, tank.nation, x, y, angle, tank.flag.x, tank.flag.y);
+					else
+						MP.send_packet('train_unit', [type, tank.team, tank.nation, Math.round(x), Math.round(y), angle, tank.flag.x, tank.flag.y]);
+					
 					//unregister
 					tank.training.splice(t, 1); t--;
 					break;
@@ -458,6 +454,18 @@ function UNITS_CLASS(){
 				}
 			}	
 			
+		}
+	this.spawn_trained_unit = function(type, team, nation, x, y, angle, flag_x, flag_y){
+		//create tank
+		var id = 'unit-'+TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
+		var new_tank = UNITS.add_tank(1, id, HELPER.generatePassword(6), type, team, nation, x, y, angle);
+		new_tank.move = 1;
+		//randomize spawn position
+		var gap_rand = new_tank.width()*2;
+		new_tank.move_to = [
+			flag_x + HELPER.getRandomInt(-gap_rand, gap_rand), 
+			flag_y + HELPER.getRandomInt(-gap_rand, gap_rand)
+			];
 		}
 	//tank name above
 	this.add_player_name = function(tank){
@@ -752,10 +760,7 @@ function UNITS_CLASS(){
 						
 						//check occupy
 						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].data.type == 'building' && TANKS[i].data.name != 'Base'){
-							MY_TANK.target_move_lock = TANKS[i].id;
-							MY_TANK.move = 1;
-							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
-							MY_TANK.reach_tank_and_execute = [10, 'register_occupy', MY_TANK.id];
+							SKILLS.register_occupy(MY_TANK.id, TANKS[i].id, false);
 							return false;
 							}
 						
@@ -782,22 +787,14 @@ function UNITS_CLASS(){
 						//check constructions
 						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].constructing != undefined){
 							TANKS[i].clicked_on = 10;
-							
-							MY_TANK.target_move_lock = TANKS[i].id;
-							MY_TANK.move = 1;
-							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
-							MY_TANK.reach_tank_and_execute = [10, 'register_build', MY_TANK.id];
+							SKILLS.register_build(MY_TANK.id, TANKS[i].id, false);
 							return false;
 							}
 						//check repair
 						var max_hp = UNITS.get_tank_max_hp(TANKS[i]);
 						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].hp < max_hp){
 							TANKS[i].clicked_on = 10;
-							
-							MY_TANK.target_move_lock = TANKS[i].id;
-							MY_TANK.move = 1;
-							MY_TANK.move_to = [TANKS[i].cx(), TANKS[i].cy()];
-							MY_TANK.reach_tank_and_execute = [10, 'register_repair', MY_TANK.id];
+							SKILLS.register_repair(MY_TANK.id, TANKS[i].id, false);
 							return false;
 							}
 						}
@@ -822,14 +819,21 @@ function UNITS_CLASS(){
 					];
 				MP.send_packet('tank_update', [MY_TANK.id, params]);
 				}
-			else
-				MP.register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
+			else{
+				if(game_mode == 'multi_quick')
+					MP.register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
+				else{
+					var selected_tanks = UNITS.get_selected_tanks(MY_TANK.team);
+					if(selected_tanks.length > 0)
+						MP.send_packet('tank_move', [opened_room_id, selected_tanks, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]]);
+					}
+				}
 			return false;
 			}
 		else{
 			if(found_something==false){
-				if(game_mode == 'single_craft' || game_mode == 'multi_craft')
-					UNITS.calc_new_position(mouseX, mouseY);
+				if(game_mode == 'single_craft')
+					UNITS.calc_new_position(MY_TANK.team, mouseX, mouseY);
 				else{
 					MY_TANK.move = 1;
 					MY_TANK.move_to = [mouseX, mouseY];
@@ -846,6 +850,17 @@ function UNITS_CLASS(){
 				catch(error){}
 				}
 			}
+		}
+	//returns array of selected war units, only in craft mode
+	this.get_selected_tanks = function(team){
+		var data = [];
+		for(var i in TANKS){
+			if(TANKS[i].team != team) continue;
+			if(TANKS[i].data.type == "building") continue;
+			if(TANKS[i].selected == undefined) continue;
+			data.push(TANKS[i].id);
+			}
+		return data;
 		}
 	//check collisions
 	this.check_collisions = function(xx, yy, TANK, full_check){
@@ -890,6 +905,7 @@ function UNITS_CLASS(){
 				if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
 				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
 				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
+				if(TANK.use_AI != undefined && TANKS[i].data.name == 'Tower') continue; //ai can go through towers
 				if(TANKS[i].dead == 1) continue;		//tank dead
 				var size2_w = TANKS[i].width();
 				var size2_h = TANKS[i].height();
@@ -907,9 +923,9 @@ function UNITS_CLASS(){
 		
 		return false;
 		}
-	this.calc_new_position = function(xx, yy){
+	this.calc_new_position = function(team, xx, yy){
 		var bsize = 40;
-		var ns = UNITS.get_selected_count(MY_TANK.team);
+		var ns = UNITS.get_selected_count(team);
 		
 		//5x5 cube positions
 		var dx = [0,-1, 1,  -1, 0, 1,-1, 0, 1,  -2,-2,-2, 2, 2, 2,  -2,-1, 0, 1, 2,  -2,-1, 0, 1, 2];
@@ -917,7 +933,7 @@ function UNITS_CLASS(){
 		
 		var j = 0;
 		for(var i in TANKS){
-			if(TANKS[i].team != MY_TANK.team) continue;
+			if(TANKS[i].team != team) continue;
 			if(TANKS[i].dead == 1) continue;
 			if(TANKS[i].selected == undefined) continue;
 			if(TANKS[i].data.speed == 0) continue;
@@ -1387,12 +1403,26 @@ function UNITS_CLASS(){
 		var size = 5;
 		if(TYPES[TANK.type].type == 'human')
 			size = 3;
+		var from_x = TANK.cx();
+		var from_y = TANK.cy();
+		var to_x = TANK_TO.cx();
+		var to_y = TANK_TO.cy();
+		
+		dist_x = to_x - from_x;
+		dist_y = to_y - from_y;
+		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+		radiance = Math.atan2(dist_y, dist_x);
+		from_x += Math.cos(radiance) * TANK.width()/2;
+		from_y += Math.sin(radiance) * TANK.width()/2;
+		to_x -= Math.cos(radiance) * TANK_TO.width()/2;
+		to_y -= Math.sin(radiance) * TANK_TO.width()/2;
+		
 		TANK.animations.push({
 			name: 'shoot',
-			to_x: TANK_TO.cx(),
-			to_y: TANK_TO.cy(),
-			from_x: TANK.cx(),
-			from_y: TANK.cy(),
+			from_x: from_x,
+			from_y: from_y,
+			to_x: to_x,
+			to_y: to_y,
 			lifetime: Date.now() + 200,
 			duration: 200,
 			size: size,
@@ -1514,7 +1544,7 @@ function UNITS_CLASS(){
 			if(TANK.master != undefined){
 				killer = TANK.master;
 				}
-			if(TYPES[TANK_TO.type].no_repawn != undefined  || (game_mode == 'single_craft' || game_mode == 'multi_craft')){	//tanks without repawn
+			if(TYPES[TANK_TO.type].no_repawn != undefined  || game_mode == 'single_craft' || game_mode == 'multi_craft'){	//tanks without repawn
 				//base dead
 				if(TYPES[TANK_TO.type].name == "Base"){
 					if(game_mode == 'single_quick' || game_mode == 'single_craft'){
@@ -1712,21 +1742,26 @@ function UNITS_CLASS(){
 			else if(selected_n == 1)
 				UNITS.do_ability(nr, TANK);
 			else{
+				var ids = [];
 				for(var i in TANKS){
 					if(TANKS[i].team != TANK.team) continue;
 					if(TANKS[i].selected == undefined) continue;
 					if(TANKS[i].data.abilities[nr-1] == undefined) return false;
 					if(TANKS[i].data.abilities[nr-1].passive == true) continue;
 					if(TANKS[i].data.abilities[nr-1].broadcast == 2) continue;
-					//if(TYPES[TANKS[i].type].type == 'building') continue;
 					
-					UNITS.do_ability(nr, TANKS[i]);
+					response = UNITS.do_ability(nr, TANKS[i], true); //here we have only 1 type of many tanks
+					if(response === true)
+						ids.push(TANKS[i].id);
+					}
+				if(ids.length > 0){
+					MP.register_tank_action('skill_do', opened_room_id, ids, nr, HELPER.getRandomInt(1, 999999));
 					}
 				}
 			}
 		}
 	//do ability on 1 tank	
-	this.do_ability = function(nr, TANK){
+	this.do_ability = function(nr, TANK, grouping){
 		if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;	//not ready yet
 		if(TANK.dead == 1 || TANK.stun != undefined) return false; 	//dead or stuned
 		if(TYPES[TANK.type].abilities[nr-1] == undefined) return false;	//no such ability
@@ -1753,13 +1788,17 @@ function UNITS_CLASS(){
 						}
 					}
 				else if(broadcast_mode==1){
-					//instant broadcast
 					var ability_reuse = SKILLS[ability_function](TANK, undefined, true);
 					ability_reuse = ability_reuse.reuse;
 					if(TANK.abilities_reuse[nr-1] > Date.now() ) return false; //last check
 					TANK.abilities_reuse[nr-1] = Date.now() + ability_reuse;
 					TANK.abilities_reuse_max[nr-1] = ability_reuse;
-					MP.register_tank_action('skill_do', opened_room_id, name,  nr, HELPER.getRandomInt(1, 999999));
+					
+					//instant broadcast
+					if(game_mode == 'multi_quick' || grouping == undefined)
+						MP.register_tank_action('skill_do', opened_room_id, MY_TANK.id,  nr, HELPER.getRandomInt(1, 999999));
+					else
+						return true;	//just return to broadcast all together
 					}
 				else if(broadcast_mode==2){
 					//no broadcast - do it later
@@ -1950,8 +1989,7 @@ function UNITS_CLASS(){
 		return distance;
 		}
 	//sync movement in network, if distance too far - fix it, else, ignore
-	this.sync_movement = function(TANK, xx, yy){
-		var MAX_ALLOED_DIFFERENCE = 100;
+	this.sync_movement = function(TANK, xx, yy, MAX_DIFFERENCE){
 		if(TANK===false) return false;
 		if(TYPES[TANK.type].type == 'building') return false;
 		if(TANK.id != MY_TANK.id){
@@ -1959,7 +1997,7 @@ function UNITS_CLASS(){
 			dist_x = TANK.cx() - (xx + TANK.width()/2);
 			dist_y = TANK.cy() - (yy + TANK.height()/2);
 			distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-			if(distance > MAX_ALLOED_DIFFERENCE){
+			if(distance > MAX_DIFFERENCE){
 				TANK.x = xx;
 				TANK.y = yy;
 				}
@@ -2034,8 +2072,14 @@ function UNITS_CLASS(){
 			var distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
 			distance = distance + TANKS[i].width()/2;
 			var min_range = TANKS[i].sight;
-			if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].name != "Tower" && TYPES[TANKS[i].type].name != "Scout_Tower")
-				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
+			
+			//ranges
+			if(TANKS[i].data.flying != undefined || TANKS[i].data.name == "Tower" 
+				|| TANKS[i].data.name == "SAM_Tower" || TANKS[i].data.name == "Scout_Tower" || TANKS[i].data.name == "Base")
+				min_range = min_range;	//has radar
+			else
+				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100; //no radar - less range
+			
 			if(distance < min_range){	
 				if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
 					MP.send_packet('del_invisible', [TANK.id]);

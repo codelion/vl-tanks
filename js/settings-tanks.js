@@ -56,7 +56,7 @@ TYPES.push({
 	scout: 110,					//tank scout range
 	armor: [25, 0.5, 50],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 28,					//moving speed
-	attack_delay: 1,				//pause between shoots in seconds
+	attack_delay: 1.05,				//pause between shoots in seconds
 	turn_speed: 2.5,				//turn speed, higher - faster
 	//no_repawn: 1,					//if tank dies - he will not respawn
 	//no_collisions: 1,				//tank can go other walls and other tanks
@@ -75,7 +75,7 @@ TYPES.push({
 	bullet: 'bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	//mode: 'quick',				//if set, unit available only in quick/craft mode
-	cost: 70,					//unit cost in full mode
+	cost: 80,					//unit cost in full mode
 	});
 
 //Heavy
@@ -89,7 +89,7 @@ TYPES.push({
 	scout: 110,
 	armor: [40, 0.5, 65],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.09,
 	turn_speed: 2.5,
 	abilities: [
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
@@ -116,7 +116,7 @@ TYPES.push({
 	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 30,
-	attack_delay: 1,
+	attack_delay: 0.95,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
@@ -143,7 +143,7 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.02,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Missile',	passive: false,		broadcast: 2}, 
@@ -170,7 +170,7 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 28,
-	attack_delay: 2,
+	attack_delay: 1.92,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Strike',	passive: false,		broadcast: 2}, 
@@ -184,7 +184,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	cost: 50,
+	cost: 70,
 	});
 
 //Miner
@@ -198,7 +198,7 @@ TYPES.push({
 	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 1.07,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Mine',		passive: false,		broadcast: 1}, 
@@ -225,7 +225,7 @@ TYPES.push({
 	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 1.08,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
@@ -252,7 +252,7 @@ TYPES.push({
 	scout: 110,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.03,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
@@ -280,12 +280,12 @@ TYPES.push({
 	scout: 110,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.04,
 	turn_speed: 3,
 	abilities: [
+		{name: 'Construct',	passive: true,		broadcast: 0}, 
 		{name: 'Rebuild',	passive: true,		broadcast: 0}, 
 		{name: 'Occupy',	passive: true,		broadcast: 0}, 
-		{name: 'Construct',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50, 50],
 	preview: true,
@@ -308,7 +308,7 @@ TYPES.push({
 	scout: 100,
 	armor: [30, 0.5, 55],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 0.98,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Plasma',	passive: false,		broadcast: 2}, 
@@ -338,7 +338,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 3,
 	//bonus: 1,
-	no_collisions: 1,
+	no_collisions: 0.99,
 	flying: true,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
@@ -368,7 +368,7 @@ TYPES.push({
 	attack_delay: 1,
 	turn_speed: 3,
 	//bonus: 1,
-	no_collisions: 1,
+	no_collisions: 1.01,
 	flying: true,
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
@@ -395,7 +395,7 @@ TYPES.push({
 	scout: 100,
 	armor: [0, 0, 0],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.06,
 	turn_speed: 4,
 	no_repawn: 1,
 	abilities: [],
@@ -419,7 +419,7 @@ TYPES.push({
 	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.13,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
@@ -446,7 +446,7 @@ TYPES.push({
 	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.15,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [],
@@ -494,14 +494,11 @@ TYPES.push({
 	scout: 130,
 	armor: [50, 0, 50],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.12,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
 		{name: 'Mechanic',		passive: false,		broadcast: 2}, 
-		/*{name: 'Factory',		passive: false,		broadcast: 2}, 
-		{name: 'Research',		passive: false,		broadcast: 2}, 
-		{name: 'Silo',			passive: false,		broadcast: 2}, */
 		],
 	size: ['L', 90, 90],
 	preview: false,

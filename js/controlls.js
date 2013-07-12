@@ -65,6 +65,19 @@ function on_keyboard_action(event){
 						}
 					}	
 				}
+			else if(k == 77){	//m
+				if(DEBUG == true){
+					//reveal map - base gets 9999 sight
+					for(var i in TANKS){
+						if(TANKS[i].data.name == 'Base'){
+							if(TANKS[i].sight != 9999)
+								TANKS[i].sight = 9999;
+							else
+								TANKS[i].sight = TANKS[i].data.scout + round(TANKS[i].width()/2);
+							}
+						}
+					}	
+				}
 			}
 		if(k==9){				
 			//TAB

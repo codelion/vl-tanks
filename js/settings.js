@@ -164,6 +164,8 @@ var IMAGES_SETTINGS = {
 		bolt:	{ x:250,	y:50, w:14, h:20 },
 		error:	{ x:400,	y:50, w:16, h:16 },	
 		flag: 	{ x:100,	y:100, w:16, h:16 },
+		build: 	{ x:150,	y:100, w:20, h:20 },
+		key: 	{ x:200,	y:100, w:20, h:19 },
 		},
 	tanks: {
 		Heavy:	{ x:0,	y:0,		w:90,	h:80 },

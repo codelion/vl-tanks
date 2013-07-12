@@ -532,13 +532,17 @@ function SKILLS_CLASS(){
 			for(var i in TANKS){
 				if(TANKS[i].team == TANK.team) continue; //same team
 				var distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
-				distance = UNITS.distance + TANKS[i].width()/2;
+				distance = distance + TANKS[i].width()/2;
 				var min_range = TANKS[i].sight;
-				//min_range = min_range - TANK.width()/2;
-				if(TYPES[TANKS[i].type].flying == undefined && TYPES[TANKS[i].type].name != "Tower" && TYPES[TANKS[i].type].name != "Scout_Tower")
-					min_range = INVISIBILITY_SPOT_RANGE * min_range / 100;
+				
+				//ranges
+				if(TANKS[i].data.flying != undefined || TANKS[i].data.name == "Tower" 
+					|| TANKS[i].data.name == "SAM_Tower" || TANKS[i].data.name == "Scout_Tower" || TANKS[i].data.name == "Base")
+					min_range = min_range;	//has radar
+				else
+					min_range = INVISIBILITY_SPOT_RANGE * min_range / 100; //no radar - less range
 				if(distance < min_range){	
-					return false;	//too close to somebody
+					return false;	//too close to enemy
 					}
 				}
 			}
@@ -1179,7 +1183,7 @@ function SKILLS_CLASS(){
 					{key: 'jump_y', value: mouse_click_pos[1]},
 					],
 				};
-			MP.register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_jump;
 			mouse_click_controll = false;
 			target_range=0;
@@ -1484,13 +1488,19 @@ function SKILLS_CLASS(){
 	
 	this.Weapons = function(TANK, descrition_only, settings_only, ai){
 		var power = 5; //%
-		var level = COUNTRIES[TANK.nation].bonus.weapon / power;	
+		if(PLACE == 'game')
+			var level = COUNTRIES[TANK.nation].bonus.weapon / power;
+		else
+			var level = 1;
 		var cost = 100*(level+1);
 		var reuse = 180*1000;			if(DEBUG == true) reuse = 2000;
 		var levels = 3;
 		var active = true;
-		if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) active = false;
-		cost = UNITS.apply_buff(TANK, 'cost', cost);
+		if(PLACE == 'game'){
+			if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) 
+				active = false;
+			cost = UNITS.apply_buff(TANK, 'cost', cost);
+			}
 		
 		if(descrition_only != undefined){
 			if(level < levels)
@@ -1528,13 +1538,19 @@ function SKILLS_CLASS(){
 		}
 	this.Armor = function(TANK, descrition_only, settings_only, ai){
 		var power = 5; //static
-		var level = COUNTRIES[TANK.nation].bonus.armor / power;
+		if(PLACE == 'game')
+			var level = COUNTRIES[TANK.nation].bonus.armor / power;
+		else
+			var level = 1;
 		var cost = 100*(level+1);
 		var reuse = 180*1000;		if(DEBUG == true) reuse = 2000;
 		var levels = 3;
 		var active = true;
-		if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) active = false;
-		cost = UNITS.apply_buff(TANK, 'cost', cost);
+		if(PLACE == 'game'){
+			if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) 
+				active = false;
+			cost = UNITS.apply_buff(TANK, 'cost', cost);
+			}
 		
 		if(descrition_only != undefined){
 			if(level < levels)
@@ -1729,18 +1745,40 @@ function SKILLS_CLASS(){
 		
 		return true;
 		}
-	this.register_build = function(tank_id, building_id){
+	this.register_build = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
-		//link
+		BUILDING = UNITS.get_tank_by_id(building_id);
+		
+		//broadcast
+		if(game_mode == 'multi_craft' && skip_broadcast !== true){
+			DATA = {
+				function: 'register_build',
+				fparam: [tank_id, building_id, true],
+				tank_params: [],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
+			return false;
+			}
+			
+		//send
+		distance = UNITS.get_distance_between_tanks(TANK, BUILDING);
+		if(distance > 10){
+			TANK.target_move_lock = building_id;
+			TANK.move = 1;
+			TANK.move_to = [BUILDING.cx(), BUILDING.cy()];
+			TANK.reach_tank_and_execute = [10, 'register_build', tank_id];
+			return false;
+			}
+		
+		//start
 		TANK.do_construct = building_id;
-		//icon
 		for(var b in TANK.buffs){
 			if(TANK.buffs[b].source == 'do_construct'){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
 		TANK.buffs.push({
-			icon: 'bolt',
+			icon: 'build',
 			source: 'do_construct',
 			});	
 		}
@@ -1753,18 +1791,39 @@ function SKILLS_CLASS(){
 				}
 			}
 		}
-	this.register_repair = function(tank_id, building_id){
+	this.register_repair = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
-		//link
+		BUILDING = UNITS.get_tank_by_id(building_id);
+		
+		//broadcast
+		if(game_mode == 'multi_craft' && skip_broadcast !== true){
+			DATA = {
+				function: 'register_repair',
+				fparam: [tank_id, building_id, true],
+				tank_params: [],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
+			return false;
+			}
+		
+		//send
+		distance = UNITS.get_distance_between_tanks(TANK, BUILDING);
+		if(distance > 10){
+			TANK.target_move_lock = building_id;
+			TANK.move = 1;
+			TANK.move_to = [BUILDING.cx(), BUILDING.cy()];
+			TANK.reach_tank_and_execute = [10, 'register_repair', tank_id];
+			}
+		
+		//start
 		TANK.do_repair = building_id;
-		//icon
 		for(var b in TANK.buffs){
 			if(TANK.buffs[b].source == 'do_repair'){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
 		TANK.buffs.push({
-			icon: 'bolt',
+			icon: 'build',
 			source: 'do_repair',
 			});	
 		}
@@ -1777,23 +1836,43 @@ function SKILLS_CLASS(){
 				}
 			}
 		}
-	this.register_occupy = function(tank_id, building_id){
+	this.register_occupy = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
+		BUILDING = UNITS.get_tank_by_id(building_id);
 		var skill_stats = SKILLS.Occupy(undefined, undefined, true);
 		
-		//link
+		//broadcast
+		if(game_mode == 'multi_craft' && skip_broadcast !== true){
+			DATA = {
+				function: 'register_occupy',
+				fparam: [tank_id, building_id, true],	//last parameter mean nothing,
+				tank_params: [],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
+			return false;
+			}
+			
+		//send
+		distance = UNITS.get_distance_between_tanks(TANK, BUILDING);
+		if(distance > 10){
+			TANK.target_move_lock = building_id;
+			TANK.move = 1;
+			TANK.move_to = [BUILDING.cx(), BUILDING.cy()];
+			TANK.reach_tank_and_execute = [10, 'register_occupy', tank_id];
+			}
+			
+		//start
 		TANK.do_occupy = building_id;
 		TANK.occupy_progress = skill_stats.duration;
-		//icon
 		for(var b in TANK.buffs){
 			if(TANK.buffs[b].source == 'do_occupy'){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
 		TANK.buffs.push({
-			icon: 'error',
+			icon: 'key',
 			source: 'do_occupy',
-			});	
+			});
 		}
 	this.cancel_occupy = function(TANK){
 		delete TANK.do_occupy;
@@ -1852,7 +1931,7 @@ function SKILLS_CLASS(){
 							{key: 'missile_y', value: mouse_click_pos[1]},
 							],
 						};
-					MP.register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+					MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 					delete TANK.try_missile;
 					}
 				else{
@@ -1890,7 +1969,7 @@ function SKILLS_CLASS(){
 					{key: 'missile_y', value: mouse_click_pos[1]},
 					],
 				};
-			MP.register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_missile;
 			mouse_click_controll = false;
 			target_range=0;
@@ -1961,7 +2040,7 @@ function SKILLS_CLASS(){
 							{key: 'bomb_y', value: mouse_click_pos[1]},
 							],
 						};
-					MP.register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+					MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 					delete TANK.try_bomb;
 					}
 				else{
@@ -1984,7 +2063,7 @@ function SKILLS_CLASS(){
 					{key: 'bomb_y', value: mouse_click_pos[1]},
 					],
 				};
-			MP.register_tank_action('skill_advanced', opened_room_id, TANK.name, DATA);
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_bomb;
 			mouse_click_controll = false;
 			target_range=0;
@@ -2006,8 +2085,8 @@ function SKILLS_CLASS(){
 		tmp['bullet_from_target'] = TANK;
 		tmp['damage'] = TANK.try_bomb.power;
 		if(TANK.try_bomb.pierce != undefined)	tmp['pierce_armor'] = 100;
-		if(TANK.try_bomb.icon != undefined)		tmp['bullet_icon'] = TANK.try_bomb.icon;
-		if(TANK.try_bomb.more != undefined)		tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
+		if(TANK.try_bomb.icon != undefined)	tmp['bullet_icon'] = TANK.try_bomb.icon;
+		if(TANK.try_bomb.more != undefined)	tmp[TANK.try_bomb.more[0]] = TANK.try_bomb.more[1];
 		if(TANK.try_bomb.aoe != undefined){
 			tmp['aoe_effect'] = 1;
 			tmp['aoe_splash_range'] = TANK.try_bomb.aoe;
@@ -2019,11 +2098,17 @@ function SKILLS_CLASS(){
 		target_range=0;
 		target_mode='';
 		}
-	this.do_construct = function(tank_id){
+	this.do_construct = function(tank_id, skip_broadcast, tmp){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_construct == undefined)  return false;
-		mouseX = mouse_click_pos[0];
-		mouseY = mouse_click_pos[1];
+		if(skip_broadcast == undefined){
+			mouseX = mouse_click_pos[0];
+			mouseY = mouse_click_pos[1];
+			}
+		else{
+			mouseX = TANK.con_x;
+			mouseY = TANK.con_y;
+			}	
 		var type = TANK.try_construct.tank_type;
 		
 		var tank_size_w = TANK.width()/2;		
@@ -2052,10 +2137,28 @@ function SKILLS_CLASS(){
 			angle = 0;
 		var nation = UNITS.get_nation_by_team(TANK.team);
 		var unit_id = 'builing-'+TANK.team+mouseX+"."+mouseY;
-		//create tank
+		
+		//broadcast
+		if(game_mode == 'multi_craft' && skip_broadcast !== true){
+			DATA = {
+				function: 'do_construct',
+				fparam: [tank_id, true, 0],	//last parameter mean nothing,
+				tank_params: [
+					{key: 'try_construct', value: TANK.try_construct},
+					{key: 'con_x', value: mouse_click_pos[0]},
+					{key: 'con_y', value: mouse_click_pos[1]},
+					],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
+			delete TANK.try_construct;
+			mouse_click_controll = false;
+			return false;
+			}
+		
+		//create unit
 		var new_tank = UNITS.add_tank(1, unit_id, '', type, TANK.team, nation, x, y, angle);
 		
-		//send mechanic
+		//send mechanic?
 		TANK.target_move_lock = new_tank.id;
 		TANK.move = 1;
 		TANK.move_to = [new_tank.cx(), new_tank.cy()];
