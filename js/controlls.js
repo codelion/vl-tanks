@@ -259,6 +259,7 @@ function on_mousemove_background(event){
 			}
 		//mouse over training tanks list
 		if( (game_mode == 'single_craft' || game_mode == 'multi_craft') && MY_TANK.constructing == undefined){
+			var ns = UNITS.get_selected_count(MY_TANK.team);
 			if(TYPES[MY_TANK.type].name == 'Factory'){
 				var stats = INFOBAR.draw_factory_gui(undefined, true);
 				j=0;
@@ -301,14 +302,14 @@ function on_mousemove_background(event){
 					j++;
 					}
 				}
-			else if(TYPES[MY_TANK.type].name == 'Mechanic'){
+			else if(TYPES[MY_TANK.type].name == 'Mechanic' && ns == 1){
 				var stats = INFOBAR.draw_factory_gui(undefined, true);
 				j=0;
 				row=0;
 				//towers
 				for(var i in TYPES){
 					if(TYPES[i].type != 'building') continue;
-					if(UNITS.check_nation_tank(TYPES[i].name, MY_TANK.nation)==false) continue;
+					
 					var xx = stats.pos1+j*(stats.msize+stats.gap);
 					var yy = stats.pos2+row*(stats.msize+stats.gap);
 					if(mouseX > xx && mouseX < xx + stats.msize){
