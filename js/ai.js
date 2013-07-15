@@ -35,7 +35,7 @@ function AI_CLASS(){
 			}
 			
 		AI.set_random_path_AI(TANK);
-		}
+		};
 	this.set_random_path_AI = function(TANK){
 		var max_width = WIDTH_MAP - TANK.width();
 		var max_height = HEIGHT_MAP - TANK.height();
@@ -90,7 +90,7 @@ function AI_CLASS(){
 			}
 		if(game_mode == 'single_quick' || game_mode == 'single_craft')
 			TANK.move=1;
-		}
+		};
 	this.do_ai_move = function(TANK, xx, yy, direction){
 		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
 			MP.register_tank_action('move', opened_room_id, TANK.id, [round(TANK.x), round(TANK.y), round(xx), round(yy), undefined, direction]);
@@ -101,7 +101,7 @@ function AI_CLASS(){
 			if(direction != undefined)
 				TANK.move_direction = direction;
 			}
-		}
+		};
 	this.try_skills = function(TANK_AI){
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			var selected_n = UNITS.get_selected_count(TANK_AI.team);
@@ -133,7 +133,7 @@ function AI_CLASS(){
 			AI.do_auto_missile(TANK_AI.id);
 			AI.do_auto_bomb(TANK_AI.id);
 			}
-		}
+		};
 	//ai move registration and graphics
 	this.soldiers_move = function(mouseX, mouseY){
 		if(MY_TANK.death_respan != undefined || MY_TANK.dead == 1) return false;
@@ -203,7 +203,7 @@ function AI_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	this.do_auto_missile = function(tank_id){	
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_missile == undefined) return false;
@@ -258,7 +258,7 @@ function AI_CLASS(){
 		BULLETS.push(tmp);
 		
 		delete TANK.try_missile;
-		}
+		};
 	this.do_auto_bomb = function(tank_id){	
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_bomb == undefined) return false;
@@ -310,5 +310,5 @@ function AI_CLASS(){
 		BULLETS.push(tmp);
 
 		delete TANK.try_bomb;
-		}
+		};
 	}

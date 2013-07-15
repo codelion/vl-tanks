@@ -27,18 +27,13 @@ var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
 var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
 var CRYSTAL_RANGE = 100;		//crystal/silo orange
 var SILO_POWER = 100;			//how much he3 silo generates per 1s
+var QUALITY = 3;			//1=low, 2=mid, 3=high
 
 //========= global variables ===================================================
 
 var TANKS = new Array();		//tanks array
 var MY_TANK;				//my tank
-var TYPES = new Array();		//tanks types config
-var BULLETS_TYPES = new Array();	//bullets types config
-var BULLETS = new Array();		//tanks bullets
-var MAPS = new Array();			//maps config
-var ELEMENTS = new Array();		//maps elements
-var MAP_CRYSTALS = new Array();	//crystals array for map
-var COUNTRIES = new Array();		//countries
+var MAP_CRYSTALS = new Array();		//crystals array for map
 var MINES = [];				//mines
 var BUTTONS = new Array();		//buttons array
 var CHAT_LINES = new Array();		//chat array lines
@@ -47,7 +42,7 @@ var PLAYERS = new Array();		//players list
 var opened_room_id = -1;		//active room id
 var WIDTH_MAP;				//map width, if big, offset start to work (works as scroll)
 var HEIGHT_MAP;				//map height, if big, offset start to work (works as scroll)
-var WIDTH_SCROLL;				//visible map part width, similar to WIDTH_APP
+var WIDTH_SCROLL;			//visible map part width, similar to WIDTH_APP
 var HEIGHT_SCROLL;			//visible map part height, = HEIGHT_APP - status bar height
 var APP_SIZE_CACHE = [WIDTH_APP, HEIGHT_APP]; //original app dimensions cache
 var MUTE_FX = false;			//if effects muted
@@ -66,16 +61,15 @@ var mouse_pos = [0,0];			//current mouse position for external functions
 var mouse_click_pos = [0,0];		//last mouse click position for external functions
 var pre_draw_functions = [];		//extra functions executed before main draw loop
 var game_mode;				//single_quick, single_craft, multi_quick, multi_craft
-var QUALITY = 3;				//1=low, 2=mid, 3=high
 var PLACE = '';				//init, intro, settings, library, select, game, score, rooms, room, create_room
 var preloaded = false;			//if all images preloaded
 var preload_total = 0;			//total images for preload
 var preload_left = 0;			//total images left for preload
 var FS = false;				//fullscreen off/on
 var tab_scores = false;			//show live scroes on TAB
-var status_x = 0;				//info bar x coordinates
-var status_y = 0;				//info bar y coordinates
-var TO_RADIANS = Math.PI/180; 	//for rotating
+var status_x = 0;			//info bar x coordinates
+var status_y = 0;			//info bar y coordinates
+var TO_RADIANS = Math.PI/180; 		//for rotating
 var MAP_SCROLL_CONTROLL = false;	//active if user scrolling map with mouse on mini map
 var MAP_SCROLL_MODE = 1;		//if 1, auto scroll, if 2, no auto scroll
 var room_id_to_join = -1;		//id of room, requested to join

@@ -72,7 +72,7 @@ function INFOBAR_CLASS(){
 				}	
 			STATUS.draw_status_bar();
 			}
-		}
+		};
 	//redrwar tanks stats in status bar
 	this.redraw_tank_stats = function(){
 		status_y = HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT;
@@ -282,7 +282,7 @@ function INFOBAR_CLASS(){
 	
 		//show fps
 		DRAW.update_fps();
-		}
+		};
 	this.check_abilities_visibility = function(){
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			selected_n = 0;
@@ -304,7 +304,7 @@ function INFOBAR_CLASS(){
 			}
 		
 		return true;
-		}
+		};
 	//redraw tank skills
 	this.draw_tank_abilities = function(){
 		var gap = 15;
@@ -385,7 +385,7 @@ function INFOBAR_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	//draw tanks skill reuse animation
 	this.draw_ability_reuse = function(){
 		var gap = 15;
@@ -492,7 +492,7 @@ function INFOBAR_CLASS(){
 				canvas_backround.fillText(reuse, status_x_tmp+i*(SKILL_BUTTON+gap)+SKILL_BUTTON-5-value_width, status_y+round(SKILL_BUTTON*9/10));
 				}
 			}
-		}
+		};
 	//show skills descriptino on mouse hover
 	this.show_skill_description = function(){
 		var gap = 10;
@@ -531,7 +531,7 @@ function INFOBAR_CLASS(){
 		canvas_backround.fillStyle = "#8f947d";
 		canvas_backround.font = "normal 10px Verdana";
 		canvas_backround.fillText(ability_hover_text_more, status_x_tmp+5, status_y+13+13);
-		}
+		};
 	//move map by user mouse coordinates on mini map
 	this.move_to_place = function(mouse_x, mouse_y){
 		//settings
@@ -566,7 +566,7 @@ function INFOBAR_CLASS(){
 			document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
 			document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
 			}
-		}
+		};
 	//mini map in status bar
 	this.redraw_mini_map = function(){
 		//settings
@@ -650,7 +650,7 @@ function INFOBAR_CLASS(){
 				MINI_FOG.getContext("2d").fill();
 				}
 			}
-		}
+		};
 	//draw tank in mini-map
 	this.update_radar = function(tank){
 		if(TYPES[tank.type].type == 'building' ||( tank.dead != 1 && UNITS.check_enemy_visibility(tank)==true)){
@@ -681,7 +681,7 @@ function INFOBAR_CLASS(){
 			tank_y = pos2 + round(tank_y * button_height /(MAPS[level-1].height));
 			canvas_backround.fillRect(tank_x, tank_y, msize, msize);
 			}
-		}
+		};
 	this.draw_factory_gui = function(selected_tank, get_stats){
 		var padding_left = 250;
 		var padding_top = 15;
@@ -802,7 +802,7 @@ function INFOBAR_CLASS(){
 			var text_width = canvas_backround.measureText(text).width;
 			canvas_backround.fillText(text, xx+(width-text_width)/2, yy+(height + HELPER.font_pixel_to_height(11))/2);
 			}
-		}
+		};
 	this.draw_mechanic_gui = function(selected_tank, get_stats){
 		var padding_left = 250;
 		var padding_top = 15;
@@ -871,7 +871,7 @@ function INFOBAR_CLASS(){
 				}, j);
 			j++;
 			}
-		}
+		};
 	this.draw_units_gui = function(){
 		var padding_left = 250;
 		var padding_top = 15;
@@ -944,7 +944,7 @@ function INFOBAR_CLASS(){
 			k++;
 			if(k>=33) return false;
 			}
-		}
+		};
 	this.gui_action = function(index){
 		var ns = UNITS.get_selected_count(MY_TANK.team);
 		//units training
@@ -1074,5 +1074,5 @@ function INFOBAR_CLASS(){
 				return true;
 				}
 			}
-		}
+		};
 	}

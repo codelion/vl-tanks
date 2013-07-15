@@ -99,7 +99,7 @@ function LIBRARY_CLASS(){
 		
 		if(next == undefined)
 			LIBRARY.draw_library_units();	
-		}
+		};
 	this.draw_library_units = function(selected_tank){
 		LIBRARY.draw_library_list(false, 'Units');
 		var y = TOP;
@@ -189,7 +189,7 @@ function LIBRARY_CLASS(){
 			var height_space = 16;
 			var st=0;
 			var xx = info_left+preview_x+40;
-			var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay]
+			var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), round(TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay)]
 			LIBRARY.lib_show_stats("DPS", value, xx, y+50+st*height_space, 90, false, 9, 30); st++;
 			LIBRARY.lib_show_stats("Life", TYPES[selected_tank].life, xx, y+50+st*height_space, 90, false, 100, 250); st++;
 			LIBRARY.lib_show_stats("Armor", TYPES[selected_tank].armor, xx, y+50+st*height_space, 90, false, 0, 40); st++;
@@ -221,7 +221,7 @@ function LIBRARY_CLASS(){
 			LIBRARY.lib_show_stats("3rd ability", value, xx, y+50+st*height_space, 90, true); st++;
 			LIBRARY.lib_show_stats("Cost", TYPES[selected_tank].cost+" HE-3", xx, y+50+st*height_space, 90); st++;
 			}
-		}
+		};
 	this.draw_library_maps = function(){
 		LIBRARY.draw_library_list(false, 'Maps');
 		var y = TOP;
@@ -254,7 +254,7 @@ function LIBRARY_CLASS(){
 		LIBRARY.lib_show_stats("Players", active_map.team_allies+" vs "+active_map.team_enemies, 20, y+50+st*height_space, 90); st++;
 		LIBRARY.lib_show_stats("Total towers", active_map.towers.length, 20, y+50+st*height_space, 90); st++;
 		LIBRARY.lib_show_stats("Bots groups", active_map.bots.length, 20, y+50+st*height_space, 90); st++;
-		}
+		};
 	this.lib_show_stats = function(name, value, x, y, gap, nobold, min_char_value, max_char_value){
 		value_copy = value;
 		//check
@@ -291,7 +291,7 @@ function LIBRARY_CLASS(){
 				canvas_backround.fillStyle = "#69a126";
 			canvas_backround.fillRect(x, y-height, width, height);
 			}
-		}
+		};
 	this.draw_library_countries = function(selected_item){
 		LIBRARY.draw_library_list(false, 'Countries');
 		var y = TOP;
@@ -382,7 +382,7 @@ function LIBRARY_CLASS(){
 		LIBRARY.lib_show_stats("Weak point", COUNTRIES[country].cons, xx, y+50+st*height_space, 90, true); st++;
 		LIBRARY.lib_show_stats("Unique unit", COUNTRIES[country].tank_unique, xx, y+50+st*height_space, 90); st++;
 		LIBRARY.lib_show_stats("Locked units", COUNTRIES[country].tanks_lock.join(', '), xx, y+50+st*height_space, 90); st++;
-		}
+		};
 	this.draw_library_elements = function(selected_item){
 		LIBRARY.draw_library_list(false, 'Elements');
 		var y = TOP;
@@ -476,5 +476,5 @@ function LIBRARY_CLASS(){
 		var xx = info_left+10;
 		LIBRARY.lib_show_stats("Collission", ELEMENTS[element].collission, xx, y+50+st*height_space, 90); st++;
 		LIBRARY.lib_show_stats("Dimensions", element_w+"x"+element_h, xx, y+50+st*height_space, 90, true); st++;
-		}
+		};
 	}

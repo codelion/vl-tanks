@@ -33,7 +33,7 @@ function DRAW_CLASS(){
 		for(var i=0; i < TANKS.length; i++){
 			if(PLACE != 'game') return false;
 			var angle = undefined;
-			//try{
+			try{
 				//speed multiplier
 				var speed_multiplier = 1;
 				speed_multiplier = UNITS.apply_buff(TANKS[i], 'speed', speed_multiplier);
@@ -252,10 +252,10 @@ function DRAW_CLASS(){
 					UNITS.check_enemies(TANKS[i]);
 					UNITS.draw_tank(TANKS[i]);
 					}
-				/*}
+				}
 			catch(err){
 				console.log("Error: "+err.message);
-				}*/
+				}
 			}
 		
 		//target	
@@ -313,7 +313,7 @@ function DRAW_CLASS(){
 		//request next draw
 		if(render_mode == 'requestAnimationFrame')
 			requestAnimationFrame(DRAW.draw_main);
-		}
+		};
 	this.do_animations = function(TANK){
 		if(QUALITY == 1) return false;
 		for(var a=0; a < TANK.animations.length; a++){
@@ -368,12 +368,12 @@ function DRAW_CLASS(){
 			else if(animation.name == 'shoot'){
 				alpha = (animation.lifetime - Date.now()) / animation.duration;
 				alpha = round(alpha*100)/100;
-				DRAW.drawSoftLine(canvas_main, animation.from_x+map_offset[0], animation.from_y+map_offset[1], 
+				HELPER.drawSoftLine(canvas_main, animation.from_x+map_offset[0], animation.from_y+map_offset[1], 
 					animation.to_x+map_offset[0], animation.to_y+map_offset[1], 
 					animation.size, 255, 255, 255, alpha);
 				}
 			}
-		}
+		};
 	this.draw_he3_info = function(){
 		if(PLACE != 'game') return false;
 		var left = WIDTH_APP-100;
@@ -386,7 +386,7 @@ function DRAW_CLASS(){
 		canvas_main.fillStyle = "#ffffff";
 		canvas_main.font = "Bold 10px Verdana";
 		canvas_main.fillText(value, left+10+12, top+12);
-		}
+		};
 	this.add_first_screen_elements = function(){
 		//logo background color
 		canvas_backround.fillStyle = "#676767";
@@ -426,25 +426,27 @@ function DRAW_CLASS(){
 		STATUS.draw_status_bar();	
 		DRAW.add_settings_buttons(canvas_backround, ["Single player", "Multiplayer"]);
 	
-		name_tmp = HELPER.getCookie("name");
-		if(name_tmp != ''){
-			name = name_tmp;
-			if(DEBUG==true)
-				name = name_tmp + HELPER.getRandomInt(10, 99);
-			}
-		if(name != ''){
-			name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
-			name = name[0].toUpperCase() + name.slice(1);
-			name = name.substring(0, 10);
-			}
-		else{
-			var popup_settings=[];
-			popup_settings.push({
-				name: "name",
-				title: "Enter your name:",
-				value: name,
-				});
-			popup('Player name', 'update_name', popup_settings, false);
+		if(name == ''){
+			name_tmp = HELPER.getCookie("name");
+			if(name_tmp != ''){
+				name = name_tmp;
+				if(DEBUG==true)
+					name = name_tmp + HELPER.getRandomInt(10, 99);
+				}
+			if(name != ''){
+				name = name.toLowerCase().replace(/[^\w]+/g,'').replace(/ +/g,'-');
+				name = name[0].toUpperCase() + name.slice(1);
+				name = name.substring(0, 10);
+				}
+			else{
+				var popup_settings=[];
+				popup_settings.push({
+					name: "name",
+					title: "Enter your name:",
+					value: name,
+					});
+				popup('Player name', 'update_name', popup_settings, false);
+				}
 			}
 		
 		if(MUTE_MUSIC==false && audio_main != undefined)
@@ -471,7 +473,7 @@ function DRAW_CLASS(){
 				}, i);
 			}
 		canvas_backround.drawImage(MAIN.IMAGE_LOGO, (WIDTH_APP-598)/2, 15);
-		}
+		};
 	//draws logo and main buttons on logo screen
 	this.add_settings_buttons = function(canvas_this, text_array, active_i){
 		var button_width = 300;
@@ -516,7 +518,7 @@ function DRAW_CLASS(){
 			
 			button_i++;
 			}
-		}
+		};
 	this.draw_right_buttons = function(clean){
 		var minibutton_width = 48;
 		var minibutton_height = 20;
@@ -544,7 +546,7 @@ function DRAW_CLASS(){
 		MAIN.register_button(mini_x, mini_y, minibutton_width, minibutton_height, PLACE, function(){ 
 			intro_page=0;
 			PLACE = 'intro';
-			MAIN.intro(true);
+			DRAW.intro(true);
 			});
 		mi++;
 		
@@ -693,7 +695,7 @@ function DRAW_CLASS(){
 			DRAW.draw_right_buttons();
 			});
 		mi++;
-		}
+		};
 	this.draw_settings = function(){
 		PLACE = 'library';
 		MAIN.unregister_buttons(PLACE);
@@ -745,7 +747,7 @@ function DRAW_CLASS(){
 		MAIN.register_button(padding+25, offset_top, 105, 30, PLACE, MAIN.quit_game);
 		
 		DRAW.draw_right_buttons();
-		}
+		};
 	this.draw_logo_tanks = function(left, top, change_logo){
 		var max_size = 60;
 		var block_width = 600;
@@ -786,10 +788,10 @@ function DRAW_CLASS(){
 			UNITS.draw_tank_clone(t, pos_left, pos_top, 0, 1, canvas_backround);
 			k++;
 			}
-		}
+		};
 	//final scores after game ended
 	this.draw_final_score = function(live, lost_team){
-		if(live==true && (game_mode == 'single_craft' || game_mode == 'multi_craft')) return false;
+		if(DEBUG == false && live==true && (game_mode == 'single_craft' || game_mode == 'multi_craft')) return false;
 		var button_width = WIDTH_SCROLL-40;
 		var button_height = 15;
 		var buttons_gap = 5;
@@ -892,8 +894,6 @@ function DRAW_CLASS(){
 			canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
 			HELPER.roundRect(canvas_main, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
 			}
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft') 
-			return false;
 		
 		canvas.font = "bold 12px Helvetica";
 		
@@ -929,7 +929,7 @@ function DRAW_CLASS(){
 		
 		var j=1;
 		for (var i in TANKS){
-			if(TYPES[TANKS[i].type].type == 'tank'){
+			if(TYPES[TANKS[i].type].type == 'tank' || DEBUG == true){
 				//background
 				canvas.strokeStyle = "#000000";
 				if(TANKS[i].team == 'R')
@@ -965,8 +965,17 @@ function DRAW_CLASS(){
 					}
 				canvas.fillText(name_tmp, Math.round((WIDTH_APP-button_width)/2)+50, text_y);
 				
+				//id
+				if(DEBUG == true){
+					canvas.fillStyle = "#555555";
+					canvas.font = "Normal 11px Helvetica";
+					var value = TANKS[i].id;
+					canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+110, text_y);
+					}
+				
 				//type
 				canvas.fillStyle = "#000000";
+				canvas.font = "bold 12px Helvetica";
 				canvas.fillText(TYPES[TANKS[i].type].name, Math.round((WIDTH_APP-button_width)/2)+200, text_y);
 				
 				//kills
@@ -1019,7 +1028,7 @@ function DRAW_CLASS(){
 			TANKS = [];
 			pre_draw_functions = [];
 			}
-		}
+		};
 	//message on screen in game
 	this.draw_message = function(this_convas, message){
 		this_convas.save();
@@ -1031,14 +1040,14 @@ function DRAW_CLASS(){
 		this_convas.font = "bold 18px Helvetica";
 		this_convas.fillText(message, Math.round(WIDTH_APP/2)+50, HEIGHT_SCROLL-20);
 		this_convas.restore();
-		}
+		};
 	//show FPS
 	this.update_fps = function(){
 		try{
 			var fps_string = Math.round(FPS*10)/10;
 			parent.document.getElementById("fps").innerHTML = fps_string;	
 			}catch(error){}
-		}
+		};
 	this.draw_mode_selection = function(y, type, params){
 		padding = 15;
 		height = 50;
@@ -1115,7 +1124,7 @@ function DRAW_CLASS(){
 			}
 		
 		return y + height + 5;
-		}
+		};
 	//selecting tank window
 	this.draw_tank_select_screen = function(selected_tank, selected_nation){
 		PLACE = 'select';
@@ -1418,7 +1427,7 @@ function DRAW_CLASS(){
 			text_width = canvas_backround.measureText(text).width;
 			canvas_backround.fillText(text, 15+(width-text_width)/2, y+(height + HELPER.font_pixel_to_height(13))/2);
 			}	
-		}
+		};
 	this.draw_timer_graph = function(){
 		graph_width=WIDTH_APP-30;
 		graph_height=40;
@@ -1442,7 +1451,7 @@ function DRAW_CLASS(){
 			canvas_backround.fillText(text, 25, red_line_y+graph_height-5);
 		else
 			canvas_backround.fillText(text, 25, red_line_y+graph_height-5);
-		}
+		};
 	//shwo preload progress line
 	this.update_preload = function(images_loaded){
 		if(preloaded==true) return false;
@@ -1455,8 +1464,7 @@ function DRAW_CLASS(){
 		
 		if(preload_left==0){
 			preloaded=true;
-			//DRAW.add_first_screen_elements();
-			MAIN.intro();
+			DRAW.intro();
 			return false;
 			}
 		
@@ -1471,7 +1479,7 @@ function DRAW_CLASS(){
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Normal 12px Arial";
 		canvas_backround.fillText(text, 10, HEIGHT_APP-8);
-		}
+		};
 	//shows chat lines
 	this.show_chat = function(){
 		if(PLACE == 'room' || PLACE == 'rooms') return false;
@@ -1514,7 +1522,7 @@ function DRAW_CLASS(){
 			canvas.fillText(text, 10,bottom-i*gap);
 			canvas.restore();
 			}
-		}
+		};
 	//show chat in room - this is textbox with scroll ability
 	this.update_scrolling_chat = function(CHAT){
 		var chat_container = document.getElementById("chat_box");
@@ -1528,7 +1536,7 @@ function DRAW_CLASS(){
 		
 		//scroll
 		chat_container.scrollTop = chat_container.scrollHeight;
-		}
+		};
 	//calculate body and turret rotation
 	this.body_rotation = function(obj, str, speed, rot, time_diff){
 		if(obj.stun != undefined)	return false; //stun
@@ -1549,7 +1557,7 @@ function DRAW_CLASS(){
 			return true
 			}
 		return false;
-		}
+		};
 	this.draw_image = function(canvas, name, x, y, max_w, max_h, offset_x, offset_y, clip_w, clip_h){
 		x = round(x);
 		y = round(y);
@@ -1614,7 +1622,7 @@ function DRAW_CLASS(){
 			return true;
 			}
 		log('Error: can not find image "'+name+'".');
-		}
+		};
 	this.update_counter = function(user_response){
 		START_GAME_COUNT_SINGLE = parseInt(user_response.number);
 		if(START_GAME_COUNT_SINGLE < 1 || isNaN(START_GAME_COUNT_SINGLE)==true)		START_GAME_COUNT_SINGLE = 1;
@@ -1622,27 +1630,60 @@ function DRAW_CLASS(){
 		DRAW.add_settings_buttons(canvas_backround, ["Player name: "+name, "Start game counter: "+START_GAME_COUNT_SINGLE, "Back"]);
 		HELPER.setCookie("start_count", START_GAME_COUNT_SINGLE, 30);
 		DRAW.draw_settings();
-		}
-	this.drawSoftLine = function(ctx, x1, y1, x2, y2, lineWidth, r, g, b, a){
-		var lx = x2 - x1;
-		var ly = y2 - y1;
-		var lineLength = Math.sqrt(lx*lx + ly*ly);
-		var wy = lx / lineLength * lineWidth;
-		var wx = ly / lineLength * lineWidth;
-		var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
-		// The gradient must be defined accross the line, 90° turned compared
-		// to the line direction.
-		gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
-		gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
-		gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
-		gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
-		ctx.save();
-		ctx.beginPath();
-		ctx.lineWidth = lineWidth;
-		ctx.strokeStyle = gradient;
-		ctx.moveTo(x1, y1);
-		ctx.lineTo(x2, y2);
-		ctx.stroke();
-		ctx.restore(); 
-		}
+		};
+	//show intro
+	this.intro = function(force){
+		PLACE = 'intro';
+		var intro_w = 800;
+		var intro_h = 500;
+		DATA = [
+			{image: '1.jpg', text: ["No more oil left on Earth..."],},
+			{image: '2.jpg', text: ["But but researchers found huge amount of non-radioactive isotope",  "helium on the moon..."],},
+			{image: '3.jpg', text: ["Helium-3 gives a chance to build ZPM", "which means unlimited energy..."],},
+			{image: '4.jpg', text: ["Protect your base, push enemies away and save your country.", "Moon needs you!"],},
+			];
+		var text_gap = 20;
+		
+		if(intro_page+1 > DATA.length || (MAIN.intro_enabled == 0 && force == undefined)){
+			PLACE = 'init';
+			DRAW.add_first_screen_elements();
+			return false;
+			}
+		//draw
+		MAIN.IMAGES_INRO.onload = function(){
+			canvas_backround.drawImage(MAIN.IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
+			//draw text
+			var text = DATA[intro_page].text[0];
+			canvas_backround.font = "Bold 21px Arial";
+			canvas_backround.fillStyle = '#ffffff';
+			canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40);
+			//more text
+			if(DATA[intro_page].text[1] != undefined){
+				var text = DATA[intro_page].text[1];
+				canvas_backround.font = "Bold 21px Arial";
+				canvas_backround.strokeStyle = '#ffffff';
+				canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40+text_gap);
+				}
+			//draw skip
+			canvas_backround.font = "Bold 22px Arial";
+			canvas_backround.strokeStyle = '#ffffff';
+			canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
+			}
+		MAIN.IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
+		
+		if(intro_page==0){
+			//register skip button
+			MAIN.register_button(WIDTH_APP-70, HEIGHT_APP-STATUS_HEIGHT-45, 70, 45, PLACE, function(){
+				HELPER.setCookie("nointro", 1, 30);
+				intro_page=0;
+				PLACE = 'init';
+				DRAW.add_first_screen_elements();
+				});
+			//register next slide
+			MAIN.register_button(0, 0, WIDTH_APP, HEIGHT_APP-STATUS_HEIGHT, PLACE, function(){
+				intro_page++;
+				DRAW.intro(force);
+				});
+			}
+		};
 	}

@@ -1,3 +1,8 @@
+var MAPS = new Array();			//maps config
+var ELEMENTS = new Array();		//maps elements
+
+//====== Maps elements =========================================================
+
 ELEMENTS.push({	name: 'fence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'vfence',	alt_color: '#4e4b44',	collission: true,	alpha: 1	});
 ELEMENTS.push({	name: 'hill',				collission: true,	alpha: 1	});
@@ -228,8 +233,9 @@ MAPS.push({
 	team_allies: 1,
 	team_enemies: 10,
 	ground_only: true,
+	mode: 'single_quick',
 	singleplayer_only: true,
-	description: "What the hell happened here? They are everywhere, help, arrr... (signal lost)",
+	description: "What the hell happened here? They are everywhere, heee... (signal lost)",
 	towers: [
 			//team x,	 y, 	name
 			['B',	400,	60,	'Base'],

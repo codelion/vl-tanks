@@ -4,7 +4,11 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	text multiplayer with 2 clients
+	test multiplayer with 2 clients
+		kill sync?
+		occupy
+		bonus works?
+		racial works?
 	game ends on last base death
 	full mode AI
 	special score for mode3: he3 and army graph in time
@@ -23,10 +27,10 @@ function MAIN_CLASS(){
 	this.IMAGES_BULLETS = new Image();
 	this.IMAGES_ELEMENTS = new Image();
 	this.IMAGES_INRO = new Image();
-	var images_src_n = 7;	//images count to load, intro excluded
-	var unique_id = 0;
+	this.intro_enabled = 1;			//if show intro
+	this.player_sync_done = false;
+	var images_src_n = 7;			//images count to load, intro excluded
 	var page_title_copy = 'Moon wars';	//copy of original title
-	var intro_enabled = 1;			//if show intro
 	
 	//init hello screen
 	this.init_game = function(first_time){
@@ -61,8 +65,7 @@ function MAIN_CLASS(){
 			}
 			
 		if(HELPER.getCookie("nointro") == '1')
-			intro_enabled = 0;
-		unique_id = 0;
+			MAIN.intro_enabled = 0;
 		level = 1;
 		//set width and height
 		if(first_time==true)
@@ -98,62 +101,188 @@ function MAIN_CLASS(){
 			}
 		if(preloaded==true)
 			DRAW.add_first_screen_elements();
-		}
-	//show intro
-	this.intro = function(force){
-		PLACE = 'intro';
-		var intro_w = 800;
-		var intro_h = 500;
-		DATA = [
-			{image: '1.jpg', text: ["No more oil left on Earth..."],},
-			{image: '2.jpg', text: ["But but researchers found huge amount of non-radioactive isotope",  "helium on the moon..."],},
-			{image: '3.jpg', text: ["Helium-3 gives a chance to build ZPM", "which means unlimited energy..."],},
-			{image: '4.jpg', text: ["Protect your base, push enemies away and save your country.", "Moon needs you!"],},
-			];
-		var text_gap = 20;
+		};
+	//start game
+	this.init_action = function(map_nr, my_team){
+		if(PLACE == 'game') return false;
+		PLACE = 'game';
+		MAIN.dynamic_title();
+		MP.room_controller();
+		CHAT_LINES = [];
+		level = map_nr;
+		if(my_tank_nr == -1)	my_tank_nr = 0;
 		
-		if(intro_page+1 > DATA.length || (intro_enabled == 0 && force == undefined)){
-			PLACE = 'init';
-			DRAW.add_first_screen_elements();
-			return false;
-			}
-		//draw
-		MAIN.IMAGES_INRO.onload = function(){
-			canvas_backround.drawImage(MAIN.IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
-			//draw text
-			var text = DATA[intro_page].text[0];
-			canvas_backround.font = "Bold 21px Arial";
-			canvas_backround.fillStyle = '#ffffff';
-			canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40);
-			//more text
-			if(DATA[intro_page].text[1] != undefined){
-				var text = DATA[intro_page].text[1];
-				canvas_backround.font = "Bold 21px Arial";
-				canvas_backround.strokeStyle = '#ffffff';
-				canvas_backround.fillText(text, 30, HEIGHT_APP-STATUS_HEIGHT-40+text_gap);
+		//prepare
+		MAIN.player_sync_done = false;
+		MAIN.check_canvas_sizes();
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
+			enemy_nation_tmp = [];
+			for(var n in COUNTRIES){
+				if(n != my_nation) enemy_nation_tmp.push(n);
 				}
-			//draw skip
-			canvas_backround.font = "Bold 22px Arial";
-			canvas_backround.strokeStyle = '#ffffff';
-			canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
+			var enemy_nation = enemy_nation_tmp[HELPER.getRandomInt(0, enemy_nation_tmp.length-1)];
 			}
-		MAIN.IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
+		enemy_team = 'B';
+		if(enemy_team == my_team) enemy_team = 'R';
 		
-		if(intro_page==0){
-			//register skip button
-			MAIN.register_button(WIDTH_APP-70, HEIGHT_APP-STATUS_HEIGHT-45, 70, 45, PLACE, function(){
-				HELPER.setCookie("nointro", 1, 30);
-				intro_page=0;
-				PLACE = 'init';
-				DRAW.add_first_screen_elements();
-				});
-			//register next slide
-			MAIN.register_button(0, 0, WIDTH_APP, HEIGHT_APP-STATUS_HEIGHT, PLACE, function(){
-				intro_page++;
-				MAIN.intro(force);
-				});
+		//me
+		if(game_mode == 'single_quick'){
+			if(MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
+				my_tank_nr = 0; //flying units not allowed in this map
+			
+			MY_TANK = UNITS.add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+			UNITS.add_towers(my_team, my_nation);
+			UNITS.add_towers(enemy_team, enemy_nation);
 			}
-		}
+		else if(game_mode == 'single_craft'){
+			my_tank_nr = UNITS.get_unit_index('Soldier');
+			mechanic_type = UNITS.get_unit_index('Mechanic');
+		
+			MY_TANK = UNITS.add_tank(1, name, name, mechanic_type, my_team, my_nation);
+			MY_TANK.selected = 1;
+			UNITS.add_towers(my_team, my_nation);
+			UNITS.add_towers(enemy_team, enemy_nation);
+			}
+		else if(game_mode == 'multi_quick'){
+			my_nation = UNITS.get_nation_by_team(my_team);
+			var enemy_nation = UNITS.get_nation_by_team(enemy_team);
+			
+			MY_TANK = UNITS.add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+			UNITS.add_towers(my_team, my_nation);
+			UNITS.add_towers(enemy_team, enemy_nation);
+			}
+		else if(game_mode == 'multi_craft'){
+			my_tank_nr = UNITS.get_unit_index('Soldier');
+			mechanic_type = UNITS.get_unit_index('Mechanic');
+			my_nation = UNITS.get_nation_by_team(my_team);
+			var enemy_nation = UNITS.get_nation_by_team(enemy_team);
+			
+			MY_TANK = UNITS.add_tank(1, name, name, mechanic_type, my_team, my_nation);
+			MY_TANK.selected = 1;
+			UNITS.add_towers(my_team, my_nation);
+			}
+		
+		//my allies
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			}
+		//enemies
+		if(game_mode == 'single_craft'){
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			}
+		
+		//add bots if single player
+		if(game_mode == 'single_quick'){
+			//get random type
+			var possible_types = [];
+			var random_type=0;
+			for(var t in TYPES){
+				if(TYPES[t].type != "tank") continue;
+				if(TYPES[t].mode != undefined && TYPES[t].mode == 'craft') continue;
+				possible_types.push(t);
+				}
+				
+			//friends
+			var n = MAPS[level-1].team_allies;
+			for(var i=1; i<n; i++){
+				random_type = possible_types[HELPER.getRandomInt(0, possible_types.length-1)];
+				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
+					continue;
+				if(DEBUG==false){
+					UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
+					}
+				}
+			//enemies
+			for(var i=0; i< MAPS[level-1].team_enemies; ){
+				random_type = possible_types[HELPER.getRandomInt(0, possible_types.length-1)];
+					//random_type = 3; //for testing
+				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
+					continue;
+				UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+				if(DEBUG==true) break;
+				i++;
+				}
+			}
+		
+		MP.sync_multiplayers();
+		MAIN.player_sync_done = true;
+		UNITS.HE3 = UNITS.he3_begin;
+		//reset Research bonus
+		for(var i in COUNTRIES){
+			COUNTRIES[i].bonus.weapon = 0;
+			COUNTRIES[i].bonus.armor = 0;
+			}
+		//handler for mini map
+		MAIN.register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
+			MAP_SCROLL_CONTROLL = true; 
+			INFOBAR.move_to_place(xx, yy);
+			});
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft')
+			MAP_SCROLL_MODE = 2;
+			
+		MAP.draw_map(false);
+		MAP.auto_scoll_map();
+	
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+			//register crystals
+			for(var e in MAPS[level-1].elements){
+				if(MAPS[level-1].elements[e][0] != 'crystals') continue;
+				var element = MAP.get_element_by_name(MAPS[level-1].elements[e][0]);
+				MAP_CRYSTALS.push({
+					id: HELPER.getRandomInt(0, 999999),
+					x: MAPS[level-1].elements[e][1],
+					y: MAPS[level-1].elements[e][2],
+					cx: MAPS[level-1].elements[e][1] + IMAGES_SETTINGS.elements[element.name].w/2,
+					cy: MAPS[level-1].elements[e][2] + IMAGES_SETTINGS.elements[element.name].h/2,
+					w: IMAGES_SETTINGS.elements[element.name].w,
+					h: IMAGES_SETTINGS.elements[element.name].h,
+					power: CRYSTAL_POWER,
+					});
+				}
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				if(TANKS[i].data.name != 'Base') continue;
+				//adding flag
+				if(TANKS[i].team == 'B') //top
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60}
+				else //bottom
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60}
+				}
+			}
+		
+		//detect draw mode support and init it
+		var requestAnimationFrame = window.requestAnimationFrame 
+					|| window.mozRequestAnimationFrame 
+					|| window.webkitRequestAnimationFrame 
+					|| window.msRequestAnimationFrame
+					|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
+		window.requestAnimationFrame = requestAnimationFrame;
+		draw_interval_id = requestAnimationFrame(DRAW.draw_main);
+		
+		//start timed functions
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick')	
+			bots_interval_id = setInterval(UNITS.add_bots, 1000*SOLDIERS_INTERVAl);
+		level_hp_regen_id = setInterval(UNITS.level_hp_regen_handler, 1000);
+		level_interval_id = setInterval(UNITS.tank_level_handler, 1000);
+		timed_functions_id = setInterval(MAIN.timed_functions_handler, 100);
+		
+		//sound
+		if(MUTE_MUSIC==false){
+			audio_main = document.createElement('audio');
+			audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
+			audio_main.setAttribute('loop', 'loop');
+			audio_main.volume = MUSIC_VOLUME;
+			try{
+				audio_main.play();
+				}
+			catch(error){}
+			}
+		};
 	//checks and resizes all canvas layers
 	this.check_canvas_sizes = function(){
 		if(FS==false){
@@ -225,189 +354,7 @@ function MAIN_CLASS(){
 		//chat elements
 		document.getElementById("chat_write").style.top = (HEIGHT_APP-55)+"px";
 		document.getElementById("chat_box").style.top = (HEIGHT_APP-175)+"px";
-		}
-	//start game
-	this.init_action = function(map_nr, my_team){
-		if(PLACE=='game') return false; //already started
-		PLACE = 'game';
-		MAIN.dynamic_title();
-		MP.room_controller();
-		CHAT_LINES = [];
-		level = map_nr;
-		
-		MAIN.check_canvas_sizes();
-		
-		if(my_tank_nr == -1)
-			my_tank_nr=0;
-		var mechanic_type = '0';
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			for(var i in TYPES){
-				if(TYPES[i].name == 'Soldier')
-					my_tank_nr = i;
-				if(TYPES[i].name == 'Mechanic')
-					mechanic_type = i;
-				}
-			}
-		
-		if(my_team=='B')
-			map_offset = [0, 0];
-		else
-			map_offset = [0, -1*(HEIGHT_MAP-HEIGHT_SCROLL)];
-			
-		//sound
-		if(MUTE_MUSIC==false){
-			audio_main = document.createElement('audio');
-			audio_main.setAttribute('src', '../sounds/main'+SOUND_EXT);
-			audio_main.setAttribute('loop', 'loop');
-			audio_main.volume = MUSIC_VOLUME;
-			try{
-				audio_main.play();
-				}
-			catch(error){}
-			}
-		
-		if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
-			my_nation = UNITS.get_nation_by_team(my_team);
-			
-		//find enemy team
-		enemy_team = 'B';
-		if(enemy_team == my_team)
-			enemy_team = 'R';
-			
-		//find enemy nation
-		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
-			enemy_nation_tmp = [];
-			for(var n in COUNTRIES){
-				if(n != my_nation)
-					enemy_nation_tmp.push(n);
-				}
-			var enemy_nation = enemy_nation_tmp[HELPER.getRandomInt(0, enemy_nation_tmp.length-1)];
-			}
-		else
-			var enemy_nation = UNITS.get_nation_by_team(enemy_team);
-		
-		//add towers
-		UNITS.add_towers(my_team, my_nation);	
-		if(my_team == 'R')
-			UNITS.add_towers("B", enemy_nation);	
-		else
-			UNITS.add_towers("R", enemy_nation);	
-		
-		//create ... me
-		if((game_mode == 'single_quick' || game_mode == 'single_craft') && MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
-			my_tank_nr = 0;
-		UNITS.add_tank(1, name, name, my_tank_nr, my_team, my_nation);
-		MY_TANK = TANKS[(TANKS.length-1)];
-		MY_TANK.selected = 1;
-		
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			//add few more me
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, my_team, my_nation);
-			}
-		if(game_mode == 'single_craft'){
-			//enemies
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			}
-		
-		MAP.auto_scoll_map();
-		
-		//add bots if single player
-		if(game_mode == 'single_quick'){
-			//get random type
-			var possible_types = [];
-			var random_type=0;
-			for(var t in TYPES){
-				if(TYPES[t].type != "tank") continue;
-				if(TYPES[t].mode != undefined && TYPES[t].mode == 'craft') continue;
-				possible_types.push(t);
-				}
-				
-			//friends
-			var n = MAPS[level-1].team_allies;
-			for(var i=1; i<n; i++){
-				random_type = possible_types[HELPER.getRandomInt(0, possible_types.length-1)];
-				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
-					continue;
-				if(DEBUG==false){
-					UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
-					}
-				}
-			//enemies
-			for(var i=0; i< MAPS[level-1].team_enemies; ){
-				random_type = possible_types[HELPER.getRandomInt(0, possible_types.length-1)];
-					//random_type = 3;
-				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
-					continue;
-				UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-				if(DEBUG==true) break;
-				i++;
-				}
-			}
-			
-		MP.sync_multiplayers();
-		UNITS.HE3 = UNITS.he3_begin;
-		//reset Research bonus
-		for(var i in COUNTRIES){
-			COUNTRIES[i].bonus.weapon = 0;
-			COUNTRIES[i].bonus.armor = 0;
-			}
-		
-		//handler for mini map
-		MAIN.register_button(MINI_MAP_PLACE[0], HEIGHT_APP-INFO_HEIGHT-STATUS_HEIGHT+MINI_MAP_PLACE[1], MINI_MAP_PLACE[2], MINI_MAP_PLACE[3], 'game', function(xx, yy){ 
-			MAP_SCROLL_CONTROLL=true; 
-			INFOBAR.move_to_place(xx, yy);
-			});
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft')
-			MAP_SCROLL_MODE = 2;
-			
-		MAP.draw_map(false);
-		
-	
-		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			//register crystals
-			for(var e in MAPS[level-1].elements){
-				if(MAPS[level-1].elements[e][0] != 'crystals') continue;
-				var element = MAP.get_element_by_name(MAPS[level-1].elements[e][0]);
-				MAP_CRYSTALS.push({
-					id: HELPER.getRandomInt(0, 999999),
-					x: MAPS[level-1].elements[e][1],
-					y: MAPS[level-1].elements[e][2],
-					cx: MAPS[level-1].elements[e][1] + IMAGES_SETTINGS.elements[element.name].w/2,
-					cy: MAPS[level-1].elements[e][2] + IMAGES_SETTINGS.elements[element.name].h/2,
-					w: IMAGES_SETTINGS.elements[element.name].w,
-					h: IMAGES_SETTINGS.elements[element.name].h,
-					power: CRYSTAL_POWER,
-					});
-				}
-			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
-				if(TANKS[i].data.name != 'Base') continue;
-				//adding flag
-				if(TANKS[i].team == 'B') //top
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60}
-				else //bottom
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60}
-				}
-			}
-		
-		var requestAnimationFrame = window.requestAnimationFrame 
-					|| window.mozRequestAnimationFrame 
-					|| window.webkitRequestAnimationFrame 
-					|| window.msRequestAnimationFrame
-					|| function(callback){ render_mode='setInterval'; setInterval(callback, 1000/25); };
-		window.requestAnimationFrame = requestAnimationFrame;
-		draw_interval_id = requestAnimationFrame(DRAW.draw_main);
-	
-		if(game_mode == 'single_quick' || game_mode == 'multi_quick')	
-			bots_interval_id = setInterval(UNITS.add_bots, 1000*SOLDIERS_INTERVAl);
-		level_hp_regen_id = setInterval(UNITS.level_hp_regen_handler, 1000);
-		level_interval_id = setInterval(UNITS.tank_level_handler, 1000);
-		timed_functions_id = setInterval(MAIN.timed_functions_handler, 100);
-		}
+		};
 	this.preload_all_files = function(){
 		audio_to_preload = [
 			'../sounds/click'+SOUND_EXT,
@@ -433,7 +380,7 @@ function MAIN_CLASS(){
 		for(var i in audio_to_preload){
 			MAIN.preload(audio_to_preload[i], 'audio');
 			}
-		}
+		};
 	//preloading files	
 	this.preload = function(file, type){	
 		if(type=='image' || type==undefined){
@@ -457,16 +404,15 @@ function MAIN_CLASS(){
 			}	
 		else
 			alert('Error, i can not preload ['+file+'], ['+type+'] type is not suported.');
-		}
+		};
 	//get unique id
 	this.get_unique_id = function(){
-		unique_id = unique_id + 1;
-		return unique_id;
-		}
+		return HELPER.getRandomInt(0, 999999);
+		};
 	//tank moving speed conversion
 	this.speed2pixels = function(speed, time_diff){
 		return speed * 1.4 * time_diff/1000;
-		}
+		};
 	//repeat some functions in time
 	this.timed_functions_handler = function(){
 		//check map scrolling	//event.target.id
@@ -484,7 +430,7 @@ function MAIN_CLASS(){
 				MAP.scoll_map(0, -1, power);//down
 			}
 		INFOBAR.draw_ability_reuse();
-		}
+		};
 	//quit button - quits all possible actions
 	this.quit_game = function(init_next_game){
 		if(PLACE=='game' && (game_mode == 'multi_quick' || game_mode == 'multi_craft')){
@@ -568,7 +514,7 @@ function MAIN_CLASS(){
 		
 		if(init_next_game != false)
 			MAIN.init_game(false);
-		}
+		};
 	//register some are for mouse clicks
 	this.register_button = function(x, y, width, height, place, myfunction, extra, type){
 		for(var i in BUTTONS){
@@ -586,14 +532,14 @@ function MAIN_CLASS(){
 			extra: extra,
 			type: type,
 			});
-		}
+		};
 	this.unregister_buttons = function(button_place){
 		for(var i=0; i<BUTTONS.length; i++){
 			if(BUTTONS[i].place == button_place){
 				BUTTONS.splice(i, 1); i--;
 				}
 			}
-		}
+		};
 	//timer in select screen
 	this.starting_game_timer_handler = function(){
 		MAIN.starting_timer--;
@@ -603,9 +549,7 @@ function MAIN_CLASS(){
 		if(MAIN.starting_timer==0){
 			MAIN.starting_timer = -1;
 			clearInterval(start_game_timer_id);
-			if(game_mode == 'single_quick' || game_mode == 'single_craft')
-				MAIN.init_action(level, 'R');
-			else{
+			if(game_mode != 'single_quick' && game_mode != 'single_craft'){
 				room = ROOM.get_room_by_id(opened_room_id);
 				if(room.host == name){
 					room = ROOM.get_room_by_id(opened_room_id);
@@ -613,7 +557,7 @@ function MAIN_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	//save chat data
 	this.chat = function(text, author, team, shift){
 		if(text==undefined){
@@ -654,7 +598,7 @@ function MAIN_CLASS(){
 			CHAT_LINES.splice(0,1);	//remove first
 		if(PLACE == 'room' || PLACE == 'rooms')
 			DRAW.update_scrolling_chat(new_chat);
-		}
+		};
 	//controlls chat lines
 	this.controll_chat = function(){
 		if(CHAT_LINES.length==0) return false;
@@ -675,7 +619,7 @@ function MAIN_CLASS(){
 			canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 			DRAW.show_chat();
 			}
-		}
+		};
 	//dynamic title
 	this.dynamic_title = function(data){
 		try{
@@ -702,5 +646,5 @@ function MAIN_CLASS(){
 		catch(err){
 			console.log("Error: "+err.message);
 			}
-		}
+		};
 	}

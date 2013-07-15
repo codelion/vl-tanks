@@ -45,7 +45,7 @@ function SKILLS_CLASS(){
 			});
 		
 		return reuse;
-		}
+		};
 	this.Frenzy = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 5000;
@@ -76,7 +76,7 @@ function SKILLS_CLASS(){
 			});
 		
 		return reuse;
-		}
+		};
 	this.AA_Bullets = function(TANK, descrition_only, settings_only, ai){
 		var power = 6 + (TANK.abilities_lvl[2]-1);
 		
@@ -87,12 +87,12 @@ function SKILLS_CLASS(){
 		
 		//passive
 		return 0;
-		}
+		};
 	this.AA_Bullets_once = function(TANK, descrition_only, settings_only, ai){
 		var power = 6 + (TANK.abilities_lvl[2]-1);
 		
 		TANK.pierce_armor = power;
-		}
+		};
 	
 	//====== Heavy ===========================================================
 	
@@ -140,7 +140,7 @@ function SKILLS_CLASS(){
 			lifetime: Date.now()+duration,
 			});	
 		return reuse;
-		}
+		};
 	this.Rage = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 7000;
@@ -171,7 +171,7 @@ function SKILLS_CLASS(){
 			});
 		
 		return reuse;
-		}	
+		};	
 	this.Health = function(TANK, descrition_only, settings_only, ai){
 		var power = 1.1 + 0.01 * (TANK.abilities_lvl[2]-1);
 		
@@ -186,7 +186,7 @@ function SKILLS_CLASS(){
 			
 		//passive
 		return 0;
-		}
+		};
 	this.Health_once = function(TANK, descrition_only, settings_only, ai){
 		var power = 1.1 + 0.01 *(TANK.abilities_lvl[2]-1);
 		if(power > 130) power = 130;		power = 1.2;
@@ -197,7 +197,7 @@ function SKILLS_CLASS(){
 			power: power,
 			id: 'health_once',
 			});
-		}
+		};
 	
 	//====== Cruiser =========================================================
 	
@@ -221,7 +221,7 @@ function SKILLS_CLASS(){
 			});
 		
 		return reuse;
-		}
+		};
 	this.Repair = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 5000;
@@ -306,7 +306,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}
+		};
 	this.Boost = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 6000;
@@ -350,7 +350,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}		
+		};		
 	
 	//====== Launcher ========================================================
 	
@@ -389,7 +389,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Mortar = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var power = 50 + 6 * (TANK.abilities_lvl[1]-1);
@@ -427,7 +427,7 @@ function SKILLS_CLASS(){
 			
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.MM_Missile = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 25000;
 		var power = 42 + 8 * (TANK.abilities_lvl[2]-1);
@@ -463,11 +463,11 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Range = function(TANK, descrition_only, settings_only, ai){
 		if(descrition_only != undefined)
 			return 'Tank range is increased. Passive ability.';
-		}
+		};
 	
 	//====== Sniper ==========================================================
 	
@@ -504,7 +504,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Camouflage = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 4000;
 		var duration = 5000;
@@ -576,7 +576,7 @@ function SKILLS_CLASS(){
 			});
 			
 		return reuse;
-		}
+		};
 	this.stop_camouflage = function(TANK){
 		delete TANK.invisibility;
 		
@@ -596,7 +596,7 @@ function SKILLS_CLASS(){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
-		}
+		};
 	
 	//====== Miner ===========================================================
 	
@@ -623,7 +623,7 @@ function SKILLS_CLASS(){
 			});
 			
 		return reuse;
-		}
+		};
 	this.Explode = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 5000;
 		var range = 45 + 0.8 * (TANK.abilities_lvl[1]-1);
@@ -665,7 +665,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}
+		};
 	this.SAM = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 10000;
 		var power = 50 + 6 * (TANK.abilities_lvl[2]-1);
@@ -720,7 +720,7 @@ function SKILLS_CLASS(){
 			}
 	
 		return reuse;
-		}
+		};
 	this.Mine_once = function(TANK){
 		if(TANK.Mine_loaded == 1) return false;
 		if(TANK.abilities_lvl[0]==1)
@@ -728,14 +728,14 @@ function SKILLS_CLASS(){
 		if(TANK.abilities_lvl[0]==1)
 			pre_draw_functions.push(['check_mines', TANK.id]);
 		TANK.Mine_loaded = 1;
-		}
+		};
 	this.draw_mines = function(tank_id){
 		var tank = UNITS.get_tank_by_id(tank_id);
 		for(var i in MINES){
 			if(MINES[i].team != MY_TANK.team) continue;	//enemy dont see it
 			DRAW.draw_image(canvas_main, 'mine', MINES[i].x-7+map_offset[0], MINES[i].y-7+map_offset[1]);
 			}
-		}
+		};
 	this.check_mines = function(tank_id){	
 		var mine_size_half = 8;
 		
@@ -774,7 +774,7 @@ function SKILLS_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	
 	//====== Tech ============================================================
 	
@@ -814,7 +814,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.EMP_Bomb = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 25000;		
 		var power = 0;	
@@ -853,7 +853,7 @@ function SKILLS_CLASS(){
 			
 		//return reuse - later, on use
 		return 0;
-		}	
+		};	
 	this.M7_Shield = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 2000 + 105*(TANK.abilities_lvl[2]-1);
@@ -901,7 +901,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}
+		};
 	
 	//====== Truck ===========================================================
 	
@@ -942,7 +942,7 @@ function SKILLS_CLASS(){
 			
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Soldiers = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 35000 - 500 * (TANK.abilities_lvl[2]-1);
 		var n = 2;
@@ -978,7 +978,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}
+		};
 	this.Medicine = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 20000;
 		var duration = 5000;
@@ -1026,7 +1026,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return reuse;
-		}
+		};
 	
 	//====== TRex ==========================================================
 	
@@ -1069,7 +1069,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Jump = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 10000;
 		var range = 100 + 2.7 * (TANK.abilities_lvl[1]-1);
@@ -1114,7 +1114,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.PL_Shield = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 15000;
 		var duration = 3000 + 105*(TANK.abilities_lvl[2]-1);
@@ -1136,7 +1136,7 @@ function SKILLS_CLASS(){
 			});
 			
 		return reuse;
-		}
+		};
 	this.do_jump = function(tank_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_jump == undefined) return false;
@@ -1220,7 +1220,7 @@ function SKILLS_CLASS(){
 		mouse_click_controll = false;
 		target_range=0;
 		target_mode='';
-		}
+		};
 	
 	//====== Apache ==========================================================
 	
@@ -1260,7 +1260,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.Scout = function(TANK, descrition_only, settings_only, ai){	//multi
 		var ability_nr = 1;
 		if(TYPES[TANK.type].name == 'Stealth') ability_nr = 2;
@@ -1289,7 +1289,7 @@ function SKILLS_CLASS(){
 			}, duration);
 		
 		return reuse;
-		}
+		};
 	
 	//====== Bomber ==========================================================
 	
@@ -1329,7 +1329,7 @@ function SKILLS_CLASS(){
 			
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	this.AA_bomb = function(TANK, descrition_only, settings_only, ai){
 		var reuse = 10000;
 		var power = 50 + 6 * (TANK.abilities_lvl[1]-1);
@@ -1365,7 +1365,7 @@ function SKILLS_CLASS(){
 		
 		//return reuse - later, on use
 		return 0;
-		}
+		};
 	
 	//====== Tower ===========================================================
 	
@@ -1399,7 +1399,7 @@ function SKILLS_CLASS(){
 			});
 			
 		return reuse;
-		}
+		};
 	
 	//====== Base ============================================================
 	
@@ -1463,7 +1463,7 @@ function SKILLS_CLASS(){
 			});
 		
 		return reuse;
-		}
+		};
 
 	//====== Factory =========================================================	
 	
@@ -1474,7 +1474,7 @@ function SKILLS_CLASS(){
 		
 		//passive
 		return 0;
-		}
+		};
 	this.Towers = function(TANK, descrition_only, settings_only, ai){
 		if(descrition_only != undefined)
 			return 'Construct various towers.';
@@ -1482,7 +1482,7 @@ function SKILLS_CLASS(){
 		
 		//passive
 		return 0;
-		}
+		};
 	
 	//====== Research ========================================================
 	
@@ -1535,7 +1535,7 @@ function SKILLS_CLASS(){
 			}, reuse);
 		
 		return reuse;
-		}
+		};
 	this.Armor = function(TANK, descrition_only, settings_only, ai){
 		var power = 5; //static
 		if(PLACE == 'game')
@@ -1585,7 +1585,7 @@ function SKILLS_CLASS(){
 			}, reuse);
 		
 		return reuse;
-		}
+		};
 	
 	//====== Mechanic ======================================================
 	
@@ -1599,9 +1599,9 @@ function SKILLS_CLASS(){
 		
 		//passive
 		return 0;
-		}
+		};
 	this.Occupy = function(TANK, descrition_only, settings_only, ai){
-		var duration = 15*1000;
+		var duration = 15*1000; if(DEBUG == true) duration = 3*1000;
 		
 		if(descrition_only != undefined)
 			return 'Occupy enemy structure. Right click on enemy building to occupy.';
@@ -1609,14 +1609,14 @@ function SKILLS_CLASS(){
 			
 		//passive
 		return 0;
-		}
+		};
 	this.Construct = function(TANK, descrition_only, settings_only, ai){
 		if(descrition_only != undefined)
 			return 'Constructs buildings.';
 			
 		//passive
 		return 0;
-		}
+		};
 	this.construct_prepare = function(TANK, reuse, tank_type, ability_nr){
 		for(var i in TYPES){
 			if(TYPES[i].name == tank_type) var tank_info = TYPES[i];
@@ -1665,7 +1665,7 @@ function SKILLS_CLASS(){
 			tank_type: type,
 			ability_nr: ability_nr,
 			};
-		}
+		};
 	this.construct_hover = function(){
 		if(MY_TANK.try_construct == undefined) return false;
 		var type = MY_TANK.try_construct.tank_type;
@@ -1679,7 +1679,7 @@ function SKILLS_CLASS(){
 		var x = mouse_pos[0] - round(TYPES[type].size[1]/2) - map_offset[0];
 		var y = mouse_pos[1] - round(TYPES[type].size[2]/2) - map_offset[1];
 		UNITS.draw_tank_clone(type, x, y, 0, 0.5, canvas_main);
-		}
+		};
 	this.validate_construction = function(xx, yy, show_errors){
 		var type = MY_TANK.try_construct.tank_type;
 	
@@ -1744,7 +1744,7 @@ function SKILLS_CLASS(){
 			}
 		
 		return true;
-		}
+		};
 	this.register_build = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		BUILDING = UNITS.get_tank_by_id(building_id);
@@ -1781,7 +1781,7 @@ function SKILLS_CLASS(){
 			icon: 'build',
 			source: 'do_construct',
 			});	
-		}
+		};
 	this.cancel_build = function(TANK){
 		delete TANK.do_construct;
 		//remove buffs
@@ -1790,7 +1790,7 @@ function SKILLS_CLASS(){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
-		}
+		};
 	this.register_repair = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		BUILDING = UNITS.get_tank_by_id(building_id);
@@ -1813,6 +1813,7 @@ function SKILLS_CLASS(){
 			TANK.move = 1;
 			TANK.move_to = [BUILDING.cx(), BUILDING.cy()];
 			TANK.reach_tank_and_execute = [10, 'register_repair', tank_id];
+			return false;
 			}
 		
 		//start
@@ -1826,7 +1827,7 @@ function SKILLS_CLASS(){
 			icon: 'build',
 			source: 'do_repair',
 			});	
-		}
+		};
 	this.cancel_repair = function(TANK){
 		delete TANK.do_repair;
 		//remove buffs
@@ -1835,7 +1836,7 @@ function SKILLS_CLASS(){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
-		}
+		};
 	this.register_occupy = function(tank_id, building_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		BUILDING = UNITS.get_tank_by_id(building_id);
@@ -1859,6 +1860,7 @@ function SKILLS_CLASS(){
 			TANK.move = 1;
 			TANK.move_to = [BUILDING.cx(), BUILDING.cy()];
 			TANK.reach_tank_and_execute = [10, 'register_occupy', tank_id];
+			return false;
 			}
 			
 		//start
@@ -1873,7 +1875,7 @@ function SKILLS_CLASS(){
 			icon: 'key',
 			source: 'do_occupy',
 			});
-		}
+		};
 	this.cancel_occupy = function(TANK){
 		delete TANK.do_occupy;
 		delete TANK.occupy_progress;
@@ -1883,7 +1885,7 @@ function SKILLS_CLASS(){
 				TANK.buffs.splice(b, 1); b--;
 				}
 			}
-		}		
+		};		
 		
 	//====== General =========================================================
 	
@@ -2000,7 +2002,7 @@ function SKILLS_CLASS(){
 		mouse_click_controll = false;
 		target_range=0;
 		target_mode='';
-		}
+		};
 	this.do_bomb = function(tank_id, distance_ok, skip_broadcast){	
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_bomb == undefined) return false;
@@ -2097,7 +2099,7 @@ function SKILLS_CLASS(){
 		mouse_click_controll = false;
 		target_range=0;
 		target_mode='';
-		}
+		};
 	this.do_construct = function(tank_id, skip_broadcast, tmp){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_construct == undefined)  return false;
@@ -2115,7 +2117,8 @@ function SKILLS_CLASS(){
 		var tank_size_h = TANK.height()/2;
 		
 		//check
-		if(SKILLS.validate_construction(mouseX, mouseY, true)==false) return false;
+		if(TANK.team == MY_TANK.team)
+			if(SKILLS.validate_construction(mouseX, mouseY, true)==false) return false;
 		
 		TANK.try_construct.cost = UNITS.apply_buff(TANK, 'cost', TANK.try_construct.cost);
 		if(TANK.team == MY_TANK.team){
@@ -2194,5 +2197,5 @@ function SKILLS_CLASS(){
 			delete TANK.try_construct;
 			mouse_click_controll = false;
 			}
-		}
+		};
 	}

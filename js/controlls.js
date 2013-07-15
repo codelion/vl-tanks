@@ -75,6 +75,7 @@ function on_keyboard_action(event){
 							else
 								TANKS[i].sight = TANKS[i].data.scout + round(TANKS[i].width()/2);
 							}
+						TANKS[i].scouted = true;
 						}
 					}	
 				}

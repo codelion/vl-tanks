@@ -109,7 +109,7 @@ function UNITS_CLASS(){
 		
 		//return last tank
 		return TANKS[TANKS.length-1];
-		}
+		};
 	//draw single tank
 	this.draw_tank = function(tank){
 		if(PLACE != 'game' || tank == undefined) return false;
@@ -278,6 +278,8 @@ function UNITS_CLASS(){
 							top = padding + tank_size_h/4*icon_i - icon_h/2; //3+ buffs
 						//draw
 						DRAW.draw_image(tmp_object, tank.buffs[i].icon, left, top);
+						//do not show more then 3 - looks ugly
+						if(icon_i >= 3) break;
 						}
 					}
 				
@@ -334,7 +336,7 @@ function UNITS_CLASS(){
 				}
 			}	
 		INFOBAR.update_radar(tank);
-		}
+		};
 	//draw selected tank on selected place
 	this.draw_tank_clone = function(type, x, y, angle, alpha, canvas){
 		x = x + map_offset[0];
@@ -373,7 +375,7 @@ function UNITS_CLASS(){
 				150, 0, W, H);
 			canvas.restore();
 			}
-		}
+		};
 	//tank hp bar above
 	this.add_hp_bar = function(tank){
 		xx = round(tank.x+map_offset[0]);
@@ -439,8 +441,20 @@ function UNITS_CLASS(){
 						
 					if(game_mode == 'single_craft')
 						UNITS.spawn_trained_unit(type, tank.team, tank.nation, x, y, angle, tank.flag.x, tank.flag.y);
-					else
-						MP.send_packet('train_unit', [type, tank.team, tank.nation, Math.round(x), Math.round(y), angle, tank.flag.x, tank.flag.y]);
+					else{
+						var unit_data = {
+							mode: 'craft',
+							type: type,
+							team: tank.team,
+							nation: tank.nation,
+							x: Math.round(x),
+							y: Math.round(y),
+							angle: tank.angle,
+							flag_x: tank.flag.x,
+							flag_y: tank.flag.y,
+							};
+						MP.send_packet('new_unit', unit_data);
+						}
 					
 					//unregister
 					tank.training.splice(t, 1); t--;
@@ -454,7 +468,7 @@ function UNITS_CLASS(){
 				}
 			}	
 			
-		}
+		};
 	this.spawn_trained_unit = function(type, team, nation, x, y, angle, flag_x, flag_y){
 		//create tank
 		var id = 'unit-'+TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
@@ -466,7 +480,7 @@ function UNITS_CLASS(){
 			flag_x + HELPER.getRandomInt(-gap_rand, gap_rand), 
 			flag_y + HELPER.getRandomInt(-gap_rand, gap_rand)
 			];
-		}
+		};
 	//tank name above
 	this.add_player_name = function(tank){
 		if(TYPES[tank.type].type != 'tank') return false;
@@ -475,7 +489,8 @@ function UNITS_CLASS(){
 		var name_padding = 20;
 		var flag_gap = 0;
 		var show_flag = true;
-		var player_name = tank.name.substring(0, 10);
+		var player_name = tank.name.substring(0, 10);	
+		
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick')
 			player_name = player_name+" "+tank.level;
 		
@@ -515,7 +530,7 @@ function UNITS_CLASS(){
 			//show
 			canvas_main.drawImage(tmp_canvas, xx-name_padding, yy-25);
 			}
-		}
+		};
 	//controlls bullet
 	this.draw_bullets = function(TANK, time_gap){
 		for (b = 0; b < BULLETS.length; b++){
@@ -722,14 +737,14 @@ function UNITS_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	this.prepare_tank_move = function(tank){
 		delete tank.try_missile;
 		delete tank.try_bomb;
 		delete tank.try_jump;
 		delete tank.try_construct;
 		delete tank.target_move_lock;
-		}
+		};
 	//tank move rgistration and graphics
 	this.draw_tank_move = function(mouseX, mouseY){
 		var ns = UNITS.get_selected_count(MY_TANK.team);
@@ -850,7 +865,7 @@ function UNITS_CLASS(){
 				catch(error){}
 				}
 			}
-		}
+		};
 	//returns array of selected war units, only in craft mode
 	this.get_selected_tanks = function(team){
 		var data = [];
@@ -861,7 +876,7 @@ function UNITS_CLASS(){
 			data.push(TANKS[i].id);
 			}
 		return data;
-		}
+		};
 	//check collisions
 	this.check_collisions = function(xx, yy, TANK, full_check){
 		if(full_check == undefined && TYPES[TANK.type].no_collisions != undefined) return false;
@@ -922,7 +937,7 @@ function UNITS_CLASS(){
 			}
 		
 		return false;
-		}
+		};
 	this.calc_new_position = function(team, xx, yy){
 		var bsize = 40;
 		var ns = UNITS.get_selected_count(team);
@@ -956,7 +971,7 @@ function UNITS_CLASS(){
 			if(TANKS[i].do_repair != undefined)	SKILLS.cancel_repair(TANKS[i]);
 			if(TANKS[i].do_occupy != undefined)	SKILLS.cancel_occupy(TANKS[i]);
 			}
-		}
+		};
 	//checks tanks levels
 	this.tank_level_handler = function(){		//once per second
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
@@ -1051,6 +1066,7 @@ function UNITS_CLASS(){
 			
 			return false;
 			}
+		
 		//check level-up
 		for (i in TANKS){
 			if(TYPES[TANKS[i].type].type == 'building') continue;
@@ -1100,7 +1116,7 @@ function UNITS_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	//checks tanks hp regen
 	this.level_hp_regen_handler = function(){		//once per 1 second - 2.2%/s
 		for (i in TANKS){
@@ -1124,7 +1140,7 @@ function UNITS_CLASS(){
 				}
 			}
 		INFOBAR.draw_infobar();
-		}
+		};
 	this.get_ability_to_ugrade = function(TANK){
 		var nr = 0;
 		if(TYPES[TANK.type].abilities.length == 0) return false; //if no abilities
@@ -1143,7 +1159,7 @@ function UNITS_CLASS(){
 			return false;		
 		else
 			return nr;
-		}
+		};
 	//scout enemies buildings
 	this.scout_enemies_buildings = function(TANK){		
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return false;	
@@ -1161,9 +1177,9 @@ function UNITS_CLASS(){
 			//range ok
 			TANKS[i].scouted = true;
 			}
-		if(TANK.data.type == 'building')
+		if(TANK.data.type == 'building' && TANK.constructing == undefined)
 			TANK.skip_scout = 1;
-		}
+		};
 	//actions on enemies
 	this.check_enemies = function(TANK){
 		if(TANK.dead == 1) return false; //dead
@@ -1177,17 +1193,17 @@ function UNITS_CLASS(){
 			var hit_reuse = TANK.data.attack_delay*1000;
 			hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
 			TANK.hit_reuse = hit_reuse + Date.now();
-			}
-		
-		if(TANK.check_enemies_reuse - Date.now() > 0)
-			return false;	//check reuse
-		UNITS.scout_enemies_buildings(TANK);
+			}		
+		if(TANK.check_enemies_reuse == undefined) TANK.check_enemies_reuse = 0;
+		if(TANK.check_enemies_reuse > Date.now())
+			return false;				//enemies check reuse
+		UNITS.scout_enemies_buildings(TANK);	
 		if(TANK.data.damage[0] == 0) return false;	//not war unit, no more check
-			
 		if(TANK.hit_reuse - Date.now() > 0)
-			return false;	//hit reuse
-	
-		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && UNITS.check_if_broadcast(TANK)==false) return false; //not our business
+			return false;				//hit reuse, must wait 1s-2s
+			
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && UNITS.check_if_broadcast(TANK)==false) 
+			return false; //not our business
 			
 		range = TYPES[TANK.type].range;
 		var found = false;
@@ -1247,7 +1263,7 @@ function UNITS_CLASS(){
 				else if(distance < ENEMY_NEAR[0])
 					ENEMY_NEAR = [distance, i];
 				}
-			}		
+			}	
 		
 		//single attack on closest enemy
 		if(found==false && TYPES[TANK.type].aoe == undefined && ENEMY_NEAR != undefined){
@@ -1330,7 +1346,7 @@ function UNITS_CLASS(){
 			
 		//if not found, do short pause till next search for enemies
 		if(found == false){
-			TANK.check_enemies_reuse = 1000/2+Date.now();	//half second pause
+			TANK.check_enemies_reuse = 1000/2 + Date.now();	//half second pause
 			if(game_mode == 'single_quick' || game_mode == 'single_craft')
 				delete TANK.attacking;
 			else if(UNITS.check_if_broadcast(TANK)==true && TANK.attacking != undefined){
@@ -1340,7 +1356,7 @@ function UNITS_CLASS(){
 				MP.send_packet('tank_update', [TANK.id, params]);
 				}
 			}
-		}
+		};
 	//bullet shoot
 	this.do_shoot = function(TANK, TANK_TO, shoot_angle, aoe){
 		if(game_mode == 'single_quick' || game_mode == 'single_craft')
@@ -1394,7 +1410,7 @@ function UNITS_CLASS(){
 		hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
 		TANK.hit_reuse = hit_reuse + Date.now();	
 		TANK.check_enemies_reuse = 0;
-		}
+		};
 	//draw tank shooting fire
 	this.draw_fire = function(TANK, TANK_TO){
 		if(TANK.invisibility==1) return false;
@@ -1414,8 +1430,8 @@ function UNITS_CLASS(){
 		radiance = Math.atan2(dist_y, dist_x);
 		from_x += Math.cos(radiance) * TANK.width()/2;
 		from_y += Math.sin(radiance) * TANK.width()/2;
-		to_x -= Math.cos(radiance) * TANK_TO.width()/2;
-		to_y -= Math.sin(radiance) * TANK_TO.width()/2;
+		to_x -= Math.cos(radiance) * TANK_TO.width()/3;
+		to_y -= Math.sin(radiance) * TANK_TO.width()/3;
 		
 		TANK.animations.push({
 			name: 'shoot',
@@ -1440,7 +1456,7 @@ function UNITS_CLASS(){
 			lifetime: Date.now() + 150,
 			duration: 150,
 			});
-		}
+		};
 	//shooting
 	this.shoot_sound = function(TANK){
 		if(MUTE_FX==true) return false;
@@ -1453,7 +1469,7 @@ function UNITS_CLASS(){
 			audio_fire.play();
 			}
 		catch(error){}
-		}
+		};
 	//damage to other tank function
 	this.do_damage = function(TANK, TANK_TO, BULLET){
 		if(TANK_TO == undefined) return false;
@@ -1603,7 +1619,7 @@ function UNITS_CLASS(){
 				}
 			}
 		return false;
-		}
+		};
 	//find and select other tank
 	this.check_selection = function(TANK_TO){
 		if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TANK_TO.id == MY_TANK.id && TANK_TO.team == MY_TANK.team){
@@ -1626,7 +1642,7 @@ function UNITS_CLASS(){
 				return false;
 				}
 			}
-		}
+		};
 	//check if broadcast other tank shooting, kill
 	this.check_if_broadcast = function(KILLER){
 		var room = ROOM.get_room_by_id(opened_room_id);
@@ -1634,14 +1650,17 @@ function UNITS_CLASS(){
 		//me
 		if(KILLER.name == name) return true;	
 		
+		//my unit
+		if(game_mode == 'multi_craft' && KILLER.team == MY_TANK.team) return true;
+		
 		//only host broadcast tower/autobots actions
-		if(room.host == name && (TYPES[KILLER.type].type == 'building' || KILLER.automove==1) ) return true; 
+		if(room.host == name && (KILLER.data.type == 'building' || KILLER.automove == 1) ) return true; 
 		
 		//my soldier - me broadcast
 		if(KILLER.master != undefined && KILLER.master.id == MY_TANK.id) return true; 
 		
 		return false;
-		}
+		};
 	//tank death
 	this.death = function(tank){
 		tank.hp = 0;
@@ -1672,7 +1691,7 @@ function UNITS_CLASS(){
 			respan_time = 3*1000;
 		respan_time = respan_time + Date.now();
 		tank.respan_time = respan_time;
-		}
+		};
 	//add towers to map
 	this.add_towers = function(team, nation){
 		for (var i in MAPS[level-1].towers){
@@ -1705,9 +1724,9 @@ function UNITS_CLASS(){
 			if(team != 'B')
 				angle = 0;
 			//add
-			UNITS.add_tank(1, 'tow'+team+x+"."+y, '', type, team, nation, x, y, angle);
+			UNITS.add_tank(1, 'tow'+team+x+"."+y, HELPER.generatePassword(6), type, team, nation, x, y, angle);
 			}
-		}
+		};
 	this.get_nation_by_team = function(team){
 		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 			for(var i in TANKS){
@@ -1728,7 +1747,7 @@ function UNITS_CLASS(){
 				return room.nation2;
 			}
 		log('Error: can not find nation.');
-		}
+		};
 	//do ability an all selected tanks
 	this.do_abilities = function(nr, TANK){
 		if(INFOBAR.check_abilities_visibility() == false) return false;		//few different tanks selected
@@ -1759,7 +1778,7 @@ function UNITS_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	//do ability on 1 tank	
 	this.do_ability = function(nr, TANK, grouping){
 		if(TANK.abilities_reuse[nr-1] > Date.now() ) return false;	//not ready yet
@@ -1806,7 +1825,7 @@ function UNITS_CLASS(){
 					}
 				}
 			}
-		}
+		};
 	//check if enemy visible
 	this.check_enemy_visibility = function(tank){		
 		if(TYPES[tank.type].type == 'building')
@@ -1834,21 +1853,26 @@ function UNITS_CLASS(){
 		tank.cache_scouted_reuse = 500+Date.now();
 		tank.cache_scouted = false;
 		return false;
-		}
+		};
 	//returns tank by name
 	this.get_tank_by_name = function(tank_name){
 		for(var i in TANKS){
 			if(TANKS[i].name == tank_name) return TANKS[i];
 			}
 		return false;
-		}
+		};
 	//returns tank by id
 	this.get_tank_by_id = function(tank_id){
 		for(var i in TANKS){
 			if(TANKS[i].id == tank_id)	return TANKS[i];
 			}
 		return false;
-		}
+		};
+	this.get_unit_index = function(name){
+		for(var i in TYPES){
+			if(TYPES[i].name == name) return i;
+			}
+		};
 	this.check_nation_tank = function(tank_name, nation){
 		for(var x in COUNTRIES[nation].tanks_lock){
 			if(COUNTRIES[nation].tanks_lock[x] == tank_name){
@@ -1869,7 +1893,7 @@ function UNITS_CLASS(){
 			}
 			
 		return true;
-		}
+		};
 	//choose tanks on mirror/random
 	this.choose_and_register_tanks = function(room){
 		//get possible types
@@ -1942,7 +1966,7 @@ function UNITS_CLASS(){
 				selected_types.splice(random_type_i, 1);  i--;
 				}
 			}
-		}
+		};
 	//returns bullet by filename
 	this.get_bullet = function(filename){
 		for(var i in BULLETS_TYPES){
@@ -1951,7 +1975,7 @@ function UNITS_CLASS(){
 				}
 			}
 		return false;
-		}
+		};
 	//returns tank by coordinates
 	this.get_tank_by_coords = function(mouseX, mouseY, team, tank_from){
 		for(var i in TANKS){
@@ -1965,7 +1989,7 @@ function UNITS_CLASS(){
 				}
 			}
 		return false;
-		}
+		};
 	//returns distance bewteen 2 tanks
 	this.get_distance_between_tanks = function(id1, id2){	
 		if(typeof id1 == 'object')
@@ -1987,7 +2011,7 @@ function UNITS_CLASS(){
 		distance = round(distance);
 		if(distance<0) distance = 0;
 		return distance;
-		}
+		};
 	//sync movement in network, if distance too far - fix it, else, ignore
 	this.sync_movement = function(TANK, xx, yy, MAX_DIFFERENCE){
 		if(TANK===false) return false;
@@ -2002,13 +2026,13 @@ function UNITS_CLASS(){
 				TANK.y = yy;
 				}
 			}
-		}
+		};
 	this.get_tank_max_hp = function(TANK){
 		var max_hp = TYPES[TANK.type].life[0] + TYPES[TANK.type].life[1] * (TANK.level-1);
 		max_hp = UNITS.apply_buff(TANK, 'health', max_hp);
 		max_hp = round(max_hp);
 		return max_hp;
-		}
+		};
 	//add auto bots to map		['B',	30,	1,	[[5, 15],[20,41],[20,50],[20,59],[5,85], [45,99]]	],
 	this.add_bots = function(random_id){
 		var type_name = 'Soldier';	//unit name
@@ -2063,7 +2087,7 @@ function UNITS_CLASS(){
 				bot_nr++;
 				}
 			}
-		}
+		};
 	//check if invisible tank still invisible
 	this.check_invisibility = function(TANK, force_check){
 		for(var i in TANKS){
@@ -2087,7 +2111,7 @@ function UNITS_CLASS(){
 					SKILLS.stop_camouflage(TANK);
 				}
 			}
-		}
+		};
 	this.apply_buff = function(TANK, buff_name, original_value){
 		for(var b in TANK.buffs){
 			if(TANK.buffs[b].name == undefined) continue;
@@ -2103,7 +2127,7 @@ function UNITS_CLASS(){
 			}
 		if(original_value < 0) original_value = 0;
 		return original_value;
-		}
+		};
 	this.set_spawn_coordinates = function(tank){
 		var space = 35;
 		var xx;
@@ -2142,7 +2166,7 @@ function UNITS_CLASS(){
 		tank.angle = angle;
 		
 		//if multi - only hosts set random coordinates
-		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && MAIN.player_sync_done == true){
 			room = ROOM.get_room_by_id(opened_room_id);
 			if(room.host != name) return false;	//not host
 			var params = [
@@ -2152,7 +2176,7 @@ function UNITS_CLASS(){
 				];
 			MP.send_packet('tank_update', [tank.id, params]);
 			}
-		}
+		};
 	this.get_selected_count = function(team){
 		if(game_mode == 'single_quick' || game_mode == 'multi_quick') return 1;
 		var selected_n = 0;
@@ -2162,5 +2186,5 @@ function UNITS_CLASS(){
 			selected_n++;
 			}
 		return selected_n;
-		}
+		};
 	}

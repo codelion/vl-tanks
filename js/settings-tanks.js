@@ -1,3 +1,6 @@
+var COUNTRIES = new Array();		//countries
+var TYPES = new Array();		//tanks types config
+
 COUNTRIES = {
 	us: {
 		name: 'United States', 
@@ -335,10 +338,10 @@ TYPES.push({
 	scout: 120,
 	armor: [20, 0.5, 45],	
 	speed: 32,
-	attack_delay: 1,
+	attack_delay: 0.99,
 	turn_speed: 3,
 	//bonus: 1,
-	no_collisions: 0.99,
+	no_collisions: 1,
 	flying: true,
 	abilities: [
 		{name: 'Airstrike',	passive: false,		broadcast: 2}, 
@@ -365,10 +368,10 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 37,
-	attack_delay: 1,
+	attack_delay: 1.01,
 	turn_speed: 3,
 	//bonus: 1,
-	no_collisions: 1.01,
+	no_collisions: 1,
 	flying: true,
 	abilities: [
 		{name: 'Bomb',		passive: false,		broadcast: 2}, 
