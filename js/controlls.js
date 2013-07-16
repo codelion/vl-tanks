@@ -175,7 +175,7 @@ function MouseWheelHandler(e){
 		MAP.scoll_map(0, -1);
 	
 	//disable page scroll - dont worry, only on started game area
-	e.preventDefault()
+	e.preventDefault();
 	return false;
 	}
 
@@ -289,7 +289,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
 							}
 						}
 					
@@ -309,7 +309,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
 							}
 						}
 					
@@ -331,7 +331,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
 							}
 						}
 					
@@ -621,7 +621,7 @@ function full_screenchange_handler(event){
 			}
 		else if(PLACE == 'init'){
 			MAIN.check_canvas_sizes();
-			MAIN.init_game(false);
+			MAIN.home(false);
 			}	
 		}
 	}

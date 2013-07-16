@@ -17,7 +17,6 @@ var MINI_MAP_PLACE = [13,13,104,104,3];	//x, y, width, height, border width
 var SCORES_INFO = [10,40,-20,50,100];	//level up, kill, death, per tower, win bonus
 var SOUND_EXT = '.ogg';			//default sound files extension
 var LEVEL_UP_TIME = 30;			//how much seconds must pass till level up
-var TOWER_HP_DAMAGE_IN_1VS1 = [0.7,0.9];//towers modifiers in multiplayer 1vs1
 var SOLDIERS_INTERVAl = 30;		//pause between soldiers spawn, seconds
 var MAX_ABILITY_LEVEL = 20;		//max ability level
 var INVISIBILITY_SPOT_RANGE = 50;	//% of enemy range, if enemy comes close, invisibility wanishes.
@@ -28,6 +27,7 @@ var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
 var CRYSTAL_RANGE = 100;		//crystal/silo orange
 var SILO_POWER = 100;			//how much he3 silo generates per 1s
 var QUALITY = 3;			//1=low, 2=mid, 3=high
+var MAX_BULLET_RANGE = 160;		//for units position sync, if exeeds - sync unit position
 
 //========= global variables ===================================================
 
@@ -121,11 +121,11 @@ document.getElementById("canvas_backround").addEventListener('mousedown', on_mou
 canvas_base.addEventListener('mouseup', on_mouseup, false);
 document.getElementById("canvas_backround").addEventListener('mouseup', on_mouseup_back, false);
 canvas_base.addEventListener('mousedown', on_mousedown, false);
-document.oncontextmenu = function(e) {return on_mouse_right_click(e); }
+document.oncontextmenu = function(e) {return on_mouse_right_click(e); };
 
 //keyboard handlers
-document.onkeydown = function(e) {return on_keyboard_action(e); }
-document.onkeyup = function(e) {return on_keyboardup_action(e); }
+document.onkeydown = function(e) {return on_keyboard_action(e); };
+document.onkeyup = function(e) {return on_keyboardup_action(e); };
 
 //full screen handlers
 document.addEventListener("fullscreenchange", full_screenchange_handler, false);
@@ -202,4 +202,4 @@ var IMAGES_SETTINGS = {
 		bones:	{ x:250,y:150,	w:136,	h:86 },
 		crystals:{ x:0,y:50,	w:52,	h:44 },
 		},
-	}
+	};

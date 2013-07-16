@@ -314,7 +314,7 @@ function MAP_CLASS(){
 			document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
 			document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
 			}
-		}
+		};
 	//scroll map in manual scroll mode
 	this.scoll_map = function(xx, yy, step){
 		if(MAP_SCROLL_MODE==1) return false;

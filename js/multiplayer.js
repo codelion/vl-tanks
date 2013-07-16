@@ -463,7 +463,7 @@ function MP_CLASS(){
 					}
 				//start	
 				clearInterval(start_game_timer_id, my_team);
-				MAIN.init_action(current_level, my_team);
+				MAIN.start_game(current_level, my_team);
 				}
 			}
 		else if(type == 'end_game'){		//game ends
@@ -512,8 +512,16 @@ function MP_CLASS(){
 					ids = [DATA[1]];
 				else
 					ids = DATA[1];
-				//unselect all
-				for(var i in TANKS) delete TANKS[i].selected;
+				//unselect all teams units
+				var tank_tmp = UNITS.get_tank_by_id(ids[0]);
+				if(tank_tmp===false){
+					console.log('Error: tank "'+ids[0]+'" was not found on tank_move.');
+					return false;
+					}
+				for(var i in TANKS){
+					if(TANKS[i].team != tank_tmp.team) continue;
+					delete TANKS[i].selected;
+					}
 				for(var i in ids){
 					TANK = UNITS.get_tank_by_id(ids[i]);
 					if(TANK===false){
@@ -604,12 +612,16 @@ function MP_CLASS(){
 			//adding extra info to tank
 			for(var i in skill_data.tank_params){
 				var key = skill_data.tank_params[i].key;
-				TANK[key] = skill_data.tank_params[i].value
+				TANK[key] = skill_data.tank_params[i].value;
 				}
 			//executing function
 			var function_name = skill_data.function;
-			if(function_name != '')	
-				SKILLS[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+			if(function_name != ''){
+				if(skill_data.ai === true)
+					AI[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+				else
+					SKILLS[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+				}
 			}
 		else if(type == 'tank_update'){		//tank updates 
 			//DATA = [tank_id, params]
@@ -641,8 +653,9 @@ function MP_CLASS(){
 		else if(type == 'tank_kill'){	//tank was killed
 			//DATA = room_id, player, killed_tank_id
 			TANK_TO = UNITS.get_tank_by_id(DATA[2]);
-			if(TANK_TO===false){	
-				console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
+			if(TANK_TO===false){
+				if(DEBUG == true)
+					console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 				return false;
 				}
 			TANK_FROM = UNITS.get_tank_by_id(DATA[1]);
@@ -730,24 +743,36 @@ function MP_CLASS(){
 			//DATA = [room_id, random_id]
 			UNITS.add_bots(DATA[1]);
 			}
+		else if(type == 'do_research'){	//research weapon/armor bonus
+			//DATA = [nation, type, power]
+			COUNTRIES[DATA[0]].bonus[DATA[1]] += DATA[2];
+			}	
 		else if(type == 'new_unit'){	//new unit was added
 			if(DATA.mode == 'sync'){	
 				if(DATA.team != MY_TANK.team)
 					UNITS.add_tank(1, DATA.id, DATA.name, DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle);
 				}
-			else if(DATA.mode == 'craft')
-				UNITS.spawn_trained_unit(DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle, DATA.flag_x, DATA.flag_y, true);
+			else if(DATA.mode == 'craft'){
+				var new_tank = UNITS.add_tank(1, DATA.id, DATA.name, DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle);
+				new_tank.move = 1;
+				//randomize spawn position
+				new_tank.move_to = [
+					DATA.move_x, 
+					DATA.move_y,
+					];
+				}
 			}		
 		else if(type == 'bullet'){	//tank hit
-			//DATA = [target_id, source_id, angle, damage, instant_bullet, pierce_armor]
+			//DATA = [target_id, source_id, angle, damage, instant_bullet, pierce_armor, unit_x, unit_y]
 			TANK_TO = UNITS.get_tank_by_id(DATA[0]);
 			TANK = UNITS.get_tank_by_id(DATA[1]);
 			if(TANK_TO===false){	
 				console.log('Error: tank_to "'+DATA[0]+'" was not found on tank_hit.');
 				return false;
 				}
-			if(TANK===false){	
-				console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
+			if(TANK===false){
+				if(DEBUG == true)
+					console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
 				return false;
 				}
 			MP.update_players_ping(TANK.name);
@@ -775,6 +800,13 @@ function MP_CLASS(){
 				UNITS.draw_fire(TANK, TANK_TO);
 				if(TANK.id == MY_TANK.id)
 					UNITS.shoot_sound(TANK);
+				}
+			//check sync
+			var distance = UNITS.get_distance_between_tanks(TANK, TANK_TO);
+			if(distance > MAX_BULLET_RANGE){
+				//unit shooting from very far location - sync its position
+				TANK.x = DATA[6];
+				TANK.y = DATA[7];				
 				}
 			}	
 		};
@@ -849,7 +881,7 @@ function MP_CLASS(){
 	this.register_new_room = function(room_name, mode, type, max_players, map, nation1, nation2, main_mode){
 		var players = [];
 		players.push({
-			name: name, 
+			name: name,
 			team: 'B',
 			nation: nation1,
 			ping: Date.now(),

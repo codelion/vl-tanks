@@ -104,13 +104,13 @@ function AI_CLASS(){
 		};
 	this.try_skills = function(TANK_AI){
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			var selected_n = UNITS.get_selected_count(TANK_AI.team);
-			if(selected_n == 1 && TANK_AI.id == MY_TANK.id) return false;
+			var n_s = UNITS.get_selected_count(TANK_AI.team);
+			if(n_s == 1 && TANK_AI.id == MY_TANK.id) return false;
 			}
 		for(i in TYPES[TANK_AI.type].abilities){
 			var nr = 1+parseInt(i);
 			var ability_function = TYPES[TANK_AI.type].abilities[i].name.replace(/ /g,'_');
-			if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && (game_mode == 'multi_quick' || game_mode == 'multi_craft')) continue;
+			//if(TYPES[TANK_AI.type].abilities[i].broadcast == 2 && (game_mode == 'multi_quick' || game_mode == 'multi_craft')) continue;
 			if(TYPES[TANK_AI.type].abilities[i].passive == true) continue;
 			if(TANK_AI.abilities_reuse[nr-1] > Date.now() ) continue;
 			var reuse = 0;
@@ -129,7 +129,7 @@ function AI_CLASS(){
 				}
 			}
 		//check if missle or bomb ready
-		if((game_mode == 'single_quick' || game_mode == 'single_craft') && TANK_AI.dead == undefined){	
+		if(TANK_AI.dead == undefined){
 			AI.do_auto_missile(TANK_AI.id);
 			AI.do_auto_bomb(TANK_AI.id);
 			}
@@ -204,30 +204,51 @@ function AI_CLASS(){
 				}
 			}
 		};
-	this.do_auto_missile = function(tank_id){	
+	this.do_auto_missile = function(tank_id, enemy_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_missile == undefined) return false;
 		
-		//find enemy with min hp
-		var ENEMY_NEAR;
-		for (i in TANKS){				
-			if(TANKS[i].team == TANK.team)	continue;	//same team
-			if(TANKS[i].dead == 1)			continue;	//target dead
-			if(TANKS[i].invisibility==1)		continue;	//blur mode
-			if(TYPES[TANKS[i].type].type == "human")	continue;	//dont waste specials on soldiers
-			
-			//check
-			distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
-			if(distance > TANK.try_missile.range) continue;	//target too far
-			
-			//range ok
-			if(ENEMY_NEAR==undefined)
-				ENEMY_NEAR = [TANKS[i].hp, i];
-			else if(TANKS[i].hp < ENEMY_NEAR[0])
-				ENEMY_NEAR = [TANKS[i].hp, i];
+		if(enemy_id == undefined){
+			//find enemy with min hp
+			var ENEMY_NEAR;
+			for (i in TANKS){				
+				if(TANKS[i].team == TANK.team) continue; //same team
+				if(TANKS[i].dead == 1) continue; //target dead
+				if(TANKS[i].invisibility==1) continue; //blur mode
+				if(TYPES[TANKS[i].type].type == "human") continue; //dont waste specials on soldiers
+				
+				//check
+				distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
+				if(distance > TANK.try_missile.range) continue;	//target too far
+				
+				//range ok
+				if(ENEMY_NEAR==undefined)
+					ENEMY_NEAR = [TANKS[i].hp, i];
+				else if(TANKS[i].hp < ENEMY_NEAR[0])
+					ENEMY_NEAR = [TANKS[i].hp, i];
+				}
+			if(ENEMY_NEAR == undefined) return false;
+			var enemy = TANKS[ENEMY_NEAR[1]];
 			}
-		if(ENEMY_NEAR == undefined) return false;
-		var enemy = TANKS[ENEMY_NEAR[1]];
+		else{
+			enemy = UNITS.get_tank_by_id(enemy_id);
+			if(enemy===false) return false;
+			}
+		
+		//broadcast
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
+			DATA = {
+				function: 'do_auto_missile',
+				ai: true,
+				fparam: [tank_id, enemy.id, true],
+				tank_params: [
+					{key: 'try_missile', value: TANK.try_missile},
+					],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, tank_id, DATA);
+			delete TANK.try_missile;
+			return false;
+			}
 		
 		if(TANK.try_missile.angle == true){
 			//find angle
@@ -259,33 +280,56 @@ function AI_CLASS(){
 		
 		delete TANK.try_missile;
 		};
-	this.do_auto_bomb = function(tank_id){	
+	this.do_auto_bomb = function(tank_id, distance_ok, skip_broadcast){	
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_bomb == undefined) return false;
 		
-		//find enemy with min hp
-		var ENEMY_NEAR;
-		var total_range = TANK.try_bomb.range + TANK.try_bomb.aoe*8/10;
-		for (i in TANKS){				
-			if(TANKS[i].team == TANK.team)	continue;	//same team
-			if(TANKS[i].dead == 1)			continue;	//target dead
-			if(TANKS[i].invisibility==1)		continue;	//blur mode
-			if(TYPES[TANKS[i].type].type == "human")	continue;	//dont waste specials on soldiers
-			
-			//check
-			distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
-			if(distance > total_range) continue;	//target too far
-			
-			//range ok
-			if(ENEMY_NEAR==undefined)
-				ENEMY_NEAR = [TANKS[i].hp, i];
-			else if(TANKS[i].hp < ENEMY_NEAR[0])
-				ENEMY_NEAR = [TANKS[i].hp, i];
+		if(distance_ok !== true){
+			//find enemy with min hp
+			var ENEMY_NEAR;
+			var total_range = TANK.try_bomb.range + TANK.try_bomb.aoe*8/10;
+			for (i in TANKS){				
+				if(TANKS[i].team == TANK.team) continue; //same team
+				if(TANKS[i].dead == 1) continue; //target dead
+				if(TANKS[i].invisibility==1) continue; //blur mode
+				if(TYPES[TANKS[i].type].type == "human") continue; //dont waste specials on soldiers
+				
+				//check
+				distance = UNITS.get_distance_between_tanks(TANKS[i], TANK);
+				if(distance > total_range) continue;	//target too far
+				
+				//range ok
+				if(ENEMY_NEAR==undefined)
+					ENEMY_NEAR = [TANKS[i].hp, i];
+				else if(TANKS[i].hp < ENEMY_NEAR[0])
+					ENEMY_NEAR = [TANKS[i].hp, i];
+				}
+			if(ENEMY_NEAR == undefined) return false;
+			var enemy = TANKS[ENEMY_NEAR[1]];
+			var mouseX = enemy.cx();
+			var mouseY = enemy.cy();
 			}
-		if(ENEMY_NEAR == undefined) return false;
-		var enemy = TANKS[ENEMY_NEAR[1]];
-		var mouseX = enemy.cx();
-		var mouseY = enemy.cy();
+		else{
+			mouseX = TANK.bomb_x;
+			mouseY = TANK.bomb_y;
+			}
+		
+		//broadcast
+		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
+			DATA = {
+				function: 'do_auto_bomb',
+				ai: true,
+				fparam: [tank_id, true, true],
+				tank_params: [
+					{key: 'try_bomb', value: TANK.try_bomb},
+					{key: 'bomb_x', value: mouseX},
+					{key: 'bomb_y', value: mouseY},
+					],
+				};
+			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
+			delete TANK.try_bomb;
+			return false;
+			}
 	
 		//control
 		nr = TANK.try_bomb.ability_nr;

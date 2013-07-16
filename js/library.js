@@ -87,7 +87,7 @@ function LIBRARY_CLASS(){
 		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
 		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			DRAW.last_selected = -1;
-			MAIN.init_game(false);
+			MAIN.home(false);
 			});
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Bold 13px Helvetica";
@@ -189,7 +189,7 @@ function LIBRARY_CLASS(){
 			var height_space = 16;
 			var st=0;
 			var xx = info_left+preview_x+40;
-			var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), round(TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay)]
+			var value = [round(TYPES[selected_tank].damage[0]/TYPES[selected_tank].attack_delay), round(TYPES[selected_tank].damage[1]/TYPES[selected_tank].attack_delay)];
 			LIBRARY.lib_show_stats("DPS", value, xx, y+50+st*height_space, 90, false, 9, 30); st++;
 			LIBRARY.lib_show_stats("Life", TYPES[selected_tank].life, xx, y+50+st*height_space, 90, false, 100, 250); st++;
 			LIBRARY.lib_show_stats("Armor", TYPES[selected_tank].armor, xx, y+50+st*height_space, 90, false, 0, 40); st++;

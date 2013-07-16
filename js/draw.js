@@ -220,14 +220,18 @@ function DRAW_CLASS(){
 						}
 					else{
 						//in battle
-						var TANK_TO = TANKS[i].attacking;
-						dist_x = TANK_TO.cx() - (TANKS[i].cx());
-						dist_y = TANK_TO.cy() - (TANKS[i].cy());
-						var radiance = Math.atan2(dist_y, dist_x);
-						var enemy_angle = (radiance*180.0)/Math.PI+90;
-						
-						//rotate
-						DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].data.turn_speed, enemy_angle, time_gap);
+						var TANK_TO = TANKS[i].attacking; 
+						if(typeof TANK_TO == 'object'){
+							dist_x = TANK_TO.cx() - (TANKS[i].cx());
+							dist_y = TANK_TO.cy() - (TANKS[i].cy());
+							var radiance = Math.atan2(dist_y, dist_x);
+							var enemy_angle = (radiance*180.0)/Math.PI+90;
+							
+							//rotate
+							DRAW.body_rotation(TANKS[i], "fire_angle", TANKS[i].data.turn_speed, enemy_angle, time_gap);
+							}
+						else
+							delete TANKS[i].attacking;
 						}
 					}
 				
@@ -323,7 +327,7 @@ function DRAW_CLASS(){
 				continue;
 				}
 			var animation = TANK.animations[a];
-			//jump
+			//jump - with ghosts behind
 			if(animation.name == 'jump'){
 				var gap = 10;
 				dist_x = animation.to_x - (animation.from_x);
@@ -339,7 +343,7 @@ function DRAW_CLASS(){
 					UNITS.draw_tank_clone(TANK.type, x, y, animation.angle, alpha);
 					}
 				}
-			//fire explosion
+			//fire explosion - with slow disapearance
 			else if(animation.name == 'fire'){
 				alpha = (animation.lifetime - Date.now()) / animation.duration;
 				alpha = round(alpha*100)/100;
@@ -355,7 +359,7 @@ function DRAW_CLASS(){
 				DRAW.draw_image(canvas_main, "fire", -(24/2), -(32/2));
 				canvas_main.restore();
 				}
-			//explosion
+			//explosion - with slow disapearance
 			else if(animation.name == 'explosion'){
 				alpha = (animation.lifetime - Date.now()) / animation.duration;
 				alpha = round(alpha*100)/100;
@@ -364,12 +368,31 @@ function DRAW_CLASS(){
 				DRAW.draw_image(canvas_main, 'explosion', animation.x, animation.y);
 				canvas_main.restore();
 				}	
-			//shoot
+			//shoot - with blurred sides and moving animation from source to target
 			else if(animation.name == 'shoot'){
 				alpha = (animation.lifetime - Date.now()) / animation.duration;
 				alpha = round(alpha*100)/100;
-				HELPER.drawSoftLine(canvas_main, animation.from_x+map_offset[0], animation.from_y+map_offset[1], 
-					animation.to_x+map_offset[0], animation.to_y+map_offset[1], 
+				bullet_length = 0.7;	//1 = all length
+				
+				dist_x = animation.to_x - animation.from_x;
+				dist_y = animation.to_y - animation.from_y;
+				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+				radiance = Math.atan2(dist_y, dist_x);
+				distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+				//adjust corners to begin from turrer and end near enemy border
+				var from_x = animation.from_x + Math.cos(radiance) * animation.tank_from_size/2;
+				var from_y = animation.from_y + Math.sin(radiance) * animation.tank_from_size/2;
+				var to_x = animation.to_x - Math.cos(radiance) * animation.tank_to_size/3;
+				var to_y = animation.to_y - Math.sin(radiance) * animation.tank_to_size/3;
+				//moving bullet effect
+				var bullet_start = distance * (1-bullet_length) * (1-alpha);	//0 -> n
+				var bullet_end = distance * (1-bullet_length) * alpha;		//n -> 0
+				from_x += Math.cos(radiance) * bullet_start;
+				from_y += Math.sin(radiance) * bullet_start;
+				to_x -= Math.cos(radiance) * bullet_end;
+				to_y -= Math.sin(radiance) * bullet_end;
+				
+				HELPER.drawSoftLine(canvas_main, from_x+map_offset[0], from_y+map_offset[1], to_x+map_offset[0], to_y+map_offset[1], 
 					animation.size, 255, 255, 255, alpha);
 				}
 			}
@@ -411,7 +434,7 @@ function DRAW_CLASS(){
 		
 		//text
 		if(logo_visible==1){
-			var text = "Moon wars".split("").join(String.fromCharCode(8201))
+			var text = "Moon wars".split("").join(String.fromCharCode(8201));
 			canvas_backround.font = "Bold 70px Arial";
 			canvas_backround.strokeStyle = '#ffffff';
 			canvas_backround.strokeText(text, 160, 340);
@@ -763,7 +786,7 @@ function DRAW_CLASS(){
 		if(change_logo==undefined){
 			if(logo_visible==0){
 				logo_visible=1;
-				var text = "Moon wars".split("").join(String.fromCharCode(8201))
+				var text = "Moon wars".split("").join(String.fromCharCode(8201));
 				canvas_backround.font = "Bold 70px Arial";
 				canvas_backround.strokeStyle = '#ffffff';
 				canvas_backround.strokeText(text, left, top+52);
@@ -925,11 +948,11 @@ function DRAW_CLASS(){
 		
 		//sort
 		if(live==false)
-			TANKS.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score) } );
+			TANKS.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score); } );
 		
 		var j=1;
 		for (var i in TANKS){
-			if(TYPES[TANKS[i].type].type == 'tank' || DEBUG == true){
+			if(TYPES[TANKS[i].type].type == 'tank' || (DEBUG == true && TANKS[i].data.type != 'building_')){
 				//background
 				canvas.strokeStyle = "#000000";
 				if(TANKS[i].team == 'R')
@@ -1419,7 +1442,7 @@ function DRAW_CLASS(){
 			canvas_backround.fillStyle = "#69a126";
 			HELPER.roundRect(canvas_backround, 15, y, width, height, 5, true);
 			MAIN.register_button(15, y, width, height, PLACE, function(xx, yy){
-				MAIN.init_action(level, 'R');
+				MAIN.start_game(level, 'R');
 				});
 			canvas_backround.fillStyle = "#ffffff";
 			canvas_backround.font = "Bold 17px Helvetica";
@@ -1554,7 +1577,7 @@ function DRAW_CLASS(){
 			obj[str] += speed;
 		else{
 			obj[str] = rot;
-			return true
+			return true;
 			}
 		return false;
 		};
@@ -1668,7 +1691,7 @@ function DRAW_CLASS(){
 			canvas_backround.font = "Bold 22px Arial";
 			canvas_backround.strokeStyle = '#ffffff';
 			canvas_backround.fillText("Skip", WIDTH_APP-60, HEIGHT_APP-STATUS_HEIGHT-15);
-			}
+			};
 		MAIN.IMAGES_INRO.src = '../img/intro.jpg?'+VERSION;
 		
 		if(intro_page==0){

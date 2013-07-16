@@ -14,14 +14,7 @@ function UNITS_CLASS(){
 		//angle
 		if(angle==undefined)
 			angle = 0;
-		//modifiers
-		var hp_mod = 1;
-		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && (TYPES[type].name == 'Tower' || TYPES[type].name == 'Base')){
-			room = ROOM.get_room_by_id(opened_room_id);
-			if(room.players.length < 3)
-				hp_mod = TOWER_HP_DAMAGE_IN_1VS1[0];
-			}
-		var hp = hp_mod * (TYPES[type].life[0]+TYPES[type].life[1]*(level-1));
+		var hp = (TYPES[type].life[0]+TYPES[type].life[1]*(level-1));
 		for(var b in COUNTRIES[nation].buffs){
 			var buff = COUNTRIES[nation].buffs[b];
 			if(buff.name == "health"){
@@ -74,10 +67,10 @@ function UNITS_CLASS(){
 			TANK_tmp.master = master_tank;	//if unit slave, like Truck soldiers 
 		if(begin_time != undefined)
 			TANK_tmp.begin_time = begin_time;
-		TANK_tmp.cx = function(){ 	return this.x + round(TYPES[this.type].size[1]/2);	} //center x coordinates
-		TANK_tmp.cy = function(){	return this.y + round(TYPES[this.type].size[2]/2);	} //center y coordinates
-		TANK_tmp.width = function(){	return TYPES[this.type].size[1];		}	//unit width
-		TANK_tmp.height = function(){	return TYPES[this.type].size[2];		}	//unit height
+		TANK_tmp.cx = function(){ 	return this.x + round(TYPES[this.type].size[1]/2);	}; //center x coordinates
+		TANK_tmp.cy = function(){	return this.y + round(TYPES[this.type].size[2]/2);	}; //center y coordinates
+		TANK_tmp.width = function(){	return TYPES[this.type].size[1];		};	//unit width
+		TANK_tmp.height = function(){	return TYPES[this.type].size[2];		};	//unit height
 		if(TANK_tmp.x == undefined || TANK_tmp.y == undefined)
 			UNITS.set_spawn_coordinates(TANK_tmp);
 		
@@ -130,7 +123,7 @@ function UNITS_CLASS(){
 			//dashed line
 			canvas_main.lineWidth = 2;
 			canvas_main.strokeStyle = "#363737";
-			var image_stats = IMAGES_SETTINGS.general.flag
+			var image_stats = IMAGES_SETTINGS.general.flag;
 			HELPER.dashedLine(canvas_main, tank.cx()+map_offset[0], tank.cy()+map_offset[1], tank.flag.x+map_offset[0]+image_stats.w/2, tank.flag.y+map_offset[1]+image_stats.h/2);
 			}
 		
@@ -381,15 +374,6 @@ function UNITS_CLASS(){
 		xx = round(tank.x+map_offset[0]);
 		yy = round(tank.y+map_offset[1]);
 		var max_life = UNITS.get_tank_max_hp(tank);
-		
-		//check hp modifiers
-		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && (TYPES[tank.type].name == 'Tower' || TYPES[tank.type].name == 'Base')){
-			room = ROOM.get_room_by_id(opened_room_id);
-			if(room.players.length < 3){
-				max_life = max_life * TOWER_HP_DAMAGE_IN_1VS1[0];
-				}
-			}
-		
 		life = tank.hp * 100 / max_life;
 		canvas_main.fillStyle = "#c10000";
 		hp_width = round(tank.width()*80/100);	//%80
@@ -415,71 +399,78 @@ function UNITS_CLASS(){
 			canvas_main.fillStyle = "#d9ce00";
 			canvas_main.fillRect(xx+padding_left, yy+padding_top-3-hp_height, length, hp_height);
 			}
-		if(tank.training != undefined){
-			for(var t=0; t < tank.training.length; t++){
-				var type = tank.training[t].type;
-				if(tank.training[t].start == undefined)
-					tank.training[t].start = Date.now();
-				var length = (Date.now() - tank.training[t].start) * hp_width / tank.training[t].duration;
-				length = round(length);
-				if(length >= hp_width){
-					//find tank spawn point and path to flag
-					var dist_x = tank.flag.x - tank.cx();
-					var dist_y = tank.flag.y - tank.cy();
-					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-					var radiance = Math.atan2(dist_y, dist_x);
-					var x = tank.cx() + Math.floor(Math.cos(radiance)*70) - round(TYPES[type].size[1]/2);
-					var y = tank.cy() + Math.floor(Math.sin(radiance)*70) - round(TYPES[type].size[2]/2);
-					if(x < 0) x = 0;
-					if(y < 0) y = 0;
-					if(x > WIDTH_MAP) x = WIDTH_MAP;
-					if(y > HEIGHT_MAP) y = HEIGHT_MAP;
+		UNITS.train_process(tank);
+		};
+	this.train_process = function(tank){
+		if(tank.training == undefined) return false;
+		for(var t=0; t < tank.training.length; t++){
+			var type = tank.training[t].type;
+			if(tank.training[t].start == undefined)
+				tank.training[t].start = Date.now();
+			var length = (Date.now() - tank.training[t].start) * hp_width / tank.training[t].duration;
+			length = round(length);
+			if(length >= hp_width){
+				//find tank spawn point and path to flag
+				var dist_x = tank.flag.x - tank.cx();
+				var dist_y = tank.flag.y - tank.cy();
+				var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+				var radiance = Math.atan2(dist_y, dist_x);
+				var x = tank.cx() + Math.floor(Math.cos(radiance)*70) - round(TYPES[type].size[1]/2);
+				var y = tank.cy() + Math.floor(Math.sin(radiance)*70) - round(TYPES[type].size[2]/2);
+				if(x < 0) x = 0;
+				if(y < 0) y = 0;
+				if(x > WIDTH_MAP) x = WIDTH_MAP;
+				if(y > HEIGHT_MAP) y = HEIGHT_MAP;
+				
+				var angle = 180;
+				if(MY_TANK.team != 'B')
+					angle = 0;
 					
-					var angle = 180;
-					if(MY_TANK.team != 'B')
-						angle = 0;
-						
-					if(game_mode == 'single_craft')
-						UNITS.spawn_trained_unit(type, tank.team, tank.nation, x, y, angle, tank.flag.x, tank.flag.y);
-					else{
-						var unit_data = {
-							mode: 'craft',
-							type: type,
-							team: tank.team,
-							nation: tank.nation,
-							x: Math.round(x),
-							y: Math.round(y),
-							angle: tank.angle,
-							flag_x: tank.flag.x,
-							flag_y: tank.flag.y,
-							};
-						MP.send_packet('new_unit', unit_data);
-						}
-					
-					//unregister
-					tank.training.splice(t, 1); t--;
-					break;
+				var new_id = TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
+				var new_name = HELPER.generatePassword(6);
+				var gap_rand = tank.width()*2;
+				var move_x = tank.flag.x + HELPER.getRandomInt(-gap_rand, gap_rand);
+				var move_y = tank.flag.y + HELPER.getRandomInt(-gap_rand, gap_rand);
+				
+				if(game_mode == 'single_craft'){
+					//create tank
+					var new_tank = UNITS.add_tank(1, new_id, new_name, type, tank.team, tank.nation, x, y, angle);
+					new_tank.move = 1;
+					//randomize spawn position
+					new_tank.move_to = [
+						move_x, 
+						move_y,
+						];
 					}
-				canvas_main.fillStyle = "#d9ce00";
-				hp_height = 3;
-				var gap = 3*(t+1);
-				canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
+				else{
+					var unit_data = {
+						mode: 'craft',
+						type: type,
+						team: tank.team,
+						nation: tank.nation,
+						x: Math.round(x),
+						y: Math.round(y),
+						id: new_id,
+						name: new_name,
+						move_x: move_x,
+						move_y: move_y,
+						angle: tank.angle,
+						flag_x: tank.flag.x,
+						flag_y: tank.flag.y,
+						};
+					MP.send_packet('new_unit', unit_data);
+					}
+				
+				//unregister
+				tank.training.splice(t, 1); t--;
 				break;
 				}
-			}	
-			
-		};
-	this.spawn_trained_unit = function(type, team, nation, x, y, angle, flag_x, flag_y){
-		//create tank
-		var id = 'unit-'+TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
-		var new_tank = UNITS.add_tank(1, id, HELPER.generatePassword(6), type, team, nation, x, y, angle);
-		new_tank.move = 1;
-		//randomize spawn position
-		var gap_rand = new_tank.width()*2;
-		new_tank.move_to = [
-			flag_x + HELPER.getRandomInt(-gap_rand, gap_rand), 
-			flag_y + HELPER.getRandomInt(-gap_rand, gap_rand)
-			];
+			canvas_main.fillStyle = "#d9ce00";
+			hp_height = 3;
+			var gap = 3*(t+1);
+			canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
+			break;
+			}
 		};
 	//tank name above
 	this.add_player_name = function(tank){
@@ -502,7 +493,7 @@ function UNITS_CLASS(){
 		else{	
 			//create tmp
 			var tmp_canvas = document.createElement('canvas');
-			tmp_canvas.width = 100
+			tmp_canvas.width = 100;
 			tmp_canvas.height = 100;
 			var tmp_object = tmp_canvas.getContext("2d");
 			var name_pos_x = round(TYPES[tank.type].size[1]/2) + name_padding;
@@ -639,7 +630,7 @@ function UNITS_CLASS(){
 						else if(UNITS.check_if_broadcast(TANK)==true){	//angle, damage, instant_bullet, pierce_armor]
 							var bpierce = BULLETS[b].pierce_armor;
 							if(bpierce == undefined) bpierce = false;
-							MP.send_packet('bullet', [TANKS[ii].id, TANK.id, 0, BULLETS[b].damage, true, bpierce]);
+							MP.send_packet('bullet', [TANKS[ii].id, TANK.id, 0, BULLETS[b].damage, true, bpierce, TANK.x, TANK.y]);
 							}
 						}
 					
@@ -771,7 +762,7 @@ function UNITS_CLASS(){
 				if(Math.abs(TANKS[i].cx() - mouseX) < tank_size_w/2 && Math.abs(TANKS[i].cy() - mouseY) < tank_size_h/2){
 					//if clicked on enemy
 					if(TANKS[i].team != MY_TANK.team){
-						TANKS[i].clicked_on = 10;	// will draw circle on enemy
+						TANKS[i].clicked_on = 10;	//will draw circle on enemy
 						
 						//check occupy
 						if(ns == 1 && MY_TANK.data.name == 'Mechanic' && TANKS[i].data.type == 'building' && TANKS[i].data.name != 'Base'){
@@ -784,12 +775,14 @@ function UNITS_CLASS(){
 							MY_TANK.target_shoot_lock = TANKS[i].id;
 							}
 						else{
-							for(var s in TANKS){
-								if(TANKS[s].team != MY_TANK.team) continue;
-								if(TANKS[s].dead == 1) continue;
-								if(TANKS[s].selected == 1){
-									TANKS[s].target_move_lock = TANKS[i].id;
-									TANKS[s].target_shoot_lock = TANKS[i].id;
+							if(game_mode == 'single_craft'){
+								for(var s in TANKS){
+									if(TANKS[s].team != MY_TANK.team) continue;
+									if(TANKS[s].dead == 1) continue;
+									if(TANKS[s].selected == 1){
+										TANKS[s].target_move_lock = TANKS[i].id;
+										TANKS[s].target_shoot_lock = TANKS[i].id;
+										}
 									}
 								}
 							}
@@ -827,7 +820,7 @@ function UNITS_CLASS(){
 		
 		//register
 		if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
-			if(found_something==true){
+			if(found_something==true && game_mode != 'multi_craft'){
 				var params = [
 					{key: 'target_move_lock', value: target_lock_id	},
 					{key: 'target_shoot_lock', value: target_lock_id },
@@ -839,8 +832,12 @@ function UNITS_CLASS(){
 					MP.register_tank_action('move', opened_room_id, MY_TANK.id, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]);
 				else{
 					var selected_tanks = UNITS.get_selected_tanks(MY_TANK.team);
-					if(selected_tanks.length > 0)
-						MP.send_packet('tank_move', [opened_room_id, selected_tanks, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]]);
+					if(selected_tanks.length > 0){
+						if(found_something==true)
+							MP.send_packet('tank_move', [opened_room_id, selected_tanks, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY), target_lock_id]]);
+						else
+							MP.send_packet('tank_move', [opened_room_id, selected_tanks, [round(MY_TANK.x), round(MY_TANK.y), round(mouseX), round(mouseY)]]);
+						}
 					}
 				}
 			return false;
@@ -1404,7 +1401,7 @@ function UNITS_CLASS(){
 				}
 			}
 		else
-			MP.send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle)]);
+			MP.send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle), false, false, false, TANK.x, TANK.y]);
 		
 		var hit_reuse = TANK.data.attack_delay*1000;
 		hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
@@ -1419,26 +1416,15 @@ function UNITS_CLASS(){
 		var size = 5;
 		if(TYPES[TANK.type].type == 'human')
 			size = 3;
-		var from_x = TANK.cx();
-		var from_y = TANK.cy();
-		var to_x = TANK_TO.cx();
-		var to_y = TANK_TO.cy();
-		
-		dist_x = to_x - from_x;
-		dist_y = to_y - from_y;
-		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		radiance = Math.atan2(dist_y, dist_x);
-		from_x += Math.cos(radiance) * TANK.width()/2;
-		from_y += Math.sin(radiance) * TANK.width()/2;
-		to_x -= Math.cos(radiance) * TANK_TO.width()/3;
-		to_y -= Math.sin(radiance) * TANK_TO.width()/3;
-		
+		//bullet animation
 		TANK.animations.push({
 			name: 'shoot',
-			from_x: from_x,
-			from_y: from_y,
-			to_x: to_x,
-			to_y: to_y,
+			from_x: TANK.cx(),
+			from_y: TANK.cy(),
+			to_x: TANK_TO.cx(),
+			to_y: TANK_TO.cy(),
+			tank_from_size: TANK.width(),
+			tank_to_size: TANK_TO.width(),
 			lifetime: Date.now() + 200,
 			duration: 200,
 			size: size,
@@ -1724,7 +1710,7 @@ function UNITS_CLASS(){
 			if(team != 'B')
 				angle = 0;
 			//add
-			UNITS.add_tank(1, 'tow'+team+x+"."+y, HELPER.generatePassword(6), type, team, nation, x, y, angle);
+			UNITS.add_tank(1, TYPES[type].name+'-'+team+"."+x+"."+y, HELPER.generatePassword(6), type, team, nation, x, y, angle);
 			}
 		};
 	this.get_nation_by_team = function(team){
@@ -2068,11 +2054,11 @@ function UNITS_CLASS(){
 				angle = 180;
 			//group
 			for(var g = -1; g < n; g=g+2){
-				id = 'bot'+random_id+"-"+bot_nr;
+				id = TYPES[type].name+'-'+random_id+"-"+bot_nr;
 				xx = Math.floor(MAPS[level-1].bots[i][1]*width_tmp/100) + g*gap;
 				yy = Math.floor(MAPS[level-1].bots[i][2]*height_tmp/100);
 				//add
-				UNITS.add_tank(1, id, '', type, team, nation, xx, yy, angle);
+				UNITS.add_tank(1, id, TYPES[type].name, type, team, nation, xx, yy, angle);
 				//change
 				TANK_added = UNITS.get_tank_by_id(id);
 				TANK_added.automove = 1;	//will stop near enemies, and continue to move
@@ -2100,7 +2086,7 @@ function UNITS_CLASS(){
 			//ranges
 			if(TANKS[i].data.flying != undefined || TANKS[i].data.name == "Tower" 
 				|| TANKS[i].data.name == "SAM_Tower" || TANKS[i].data.name == "Scout_Tower" || TANKS[i].data.name == "Base")
-				min_range = min_range;	//has radar
+				{}	//has radar
 			else
 				min_range = INVISIBILITY_SPOT_RANGE * min_range / 100; //no radar - less range
 			

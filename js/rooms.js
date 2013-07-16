@@ -77,7 +77,7 @@ function ROOM_CLASS(){
 		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
 		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			document.getElementById("chat_box").style.display = 'none';
-			MAIN.init_game(false);
+			MAIN.home(false);
 			});
 		//text
 		text = "Menu";
@@ -470,7 +470,6 @@ function ROOM_CLASS(){
 			}
 		offset_top = offset_top + 40;
 		
-		
 		//create button
 		button_width = 130;
 		button_height = 40;
@@ -833,16 +832,10 @@ function ROOM_CLASS(){
 				}
 			for(var i in TYPES){
 				if(TYPES[i].name == 'Tower'){
-					if(room.players.length > 2)
-						towers_total_hp = towers_n * TYPES[i].life[0];
-					else
-						towers_total_hp = towers_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+					towers_total_hp = towers_n * TYPES[i].life[0];
 					}
 				else if(TYPES[i].name == 'Base'){
-					if(room.players.length > 2)
-						base_total_hp = bases_n * TYPES[i].life[0];
-					else
-						base_total_hp = bases_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+					base_total_hp = bases_n * TYPES[i].life[0];
 					}
 				}
 			for(var i in TANKS){

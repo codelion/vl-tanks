@@ -4,18 +4,14 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	test multiplayer with 2 clients
-		kill sync?
-		occupy
-		bonus works?
-		racial works?
 	game ends on last base death
 	full mode AI
+	sounds in craft mode
 	special score for mode3: he3 and army graph in time
 */
 
 var MAIN = new MAIN_CLASS();
-MAIN.init_game(true);
+MAIN.home(true);
 
 function MAIN_CLASS(){
 	this.starting_timer=-1;
@@ -33,7 +29,7 @@ function MAIN_CLASS(){
 	var page_title_copy = 'Moon wars';	//copy of original title
 	
 	//init hello screen
-	this.init_game = function(first_time){
+	this.home = function(first_time){
 		PLACE = 'init';
 		MAIN.dynamic_title();
 		CHAT_LINES = [];
@@ -103,7 +99,7 @@ function MAIN_CLASS(){
 			DRAW.add_first_screen_elements();
 		};
 	//start game
-	this.init_action = function(map_nr, my_team){
+	this.start_game = function(map_nr, my_team){
 		if(PLACE == 'game') return false;
 		PLACE = 'game';
 		MAIN.dynamic_title();
@@ -129,16 +125,18 @@ function MAIN_CLASS(){
 		if(game_mode == 'single_quick'){
 			if(MAPS[level-1].ground_only != undefined && TYPES[my_tank_nr].no_collisions==1)
 				my_tank_nr = 0; //flying units not allowed in this map
+			var my_id = TYPES[my_tank_nr].name+'-'+HELPER.getRandomInt(0, 999999);
 			
-			MY_TANK = UNITS.add_tank(1, name, name, my_tank_nr, my_team, my_nation);
+			MY_TANK = UNITS.add_tank(1, my_id, name, my_tank_nr, my_team, my_nation);
 			UNITS.add_towers(my_team, my_nation);
 			UNITS.add_towers(enemy_team, enemy_nation);
 			}
 		else if(game_mode == 'single_craft'){
 			my_tank_nr = UNITS.get_unit_index('Soldier');
 			mechanic_type = UNITS.get_unit_index('Mechanic');
-		
-			MY_TANK = UNITS.add_tank(1, name, name, mechanic_type, my_team, my_nation);
+			var my_id = TYPES[mechanic_type].name+'-'+HELPER.getRandomInt(0, 999999);
+			
+			MY_TANK = UNITS.add_tank(1, my_id, name, mechanic_type, my_team, my_nation);
 			MY_TANK.selected = 1;
 			UNITS.add_towers(my_team, my_nation);
 			UNITS.add_towers(enemy_team, enemy_nation);
@@ -146,6 +144,7 @@ function MAIN_CLASS(){
 		else if(game_mode == 'multi_quick'){
 			my_nation = UNITS.get_nation_by_team(my_team);
 			var enemy_nation = UNITS.get_nation_by_team(enemy_team);
+			var my_id = TYPES[my_tank_nr].name+'-'+HELPER.getRandomInt(0, 999999);
 			
 			MY_TANK = UNITS.add_tank(1, name, name, my_tank_nr, my_team, my_nation);
 			UNITS.add_towers(my_team, my_nation);
@@ -156,24 +155,25 @@ function MAIN_CLASS(){
 			mechanic_type = UNITS.get_unit_index('Mechanic');
 			my_nation = UNITS.get_nation_by_team(my_team);
 			var enemy_nation = UNITS.get_nation_by_team(enemy_team);
+			var my_id = TYPES[mechanic_type].name+'-'+HELPER.getRandomInt(0, 999999);
 			
-			MY_TANK = UNITS.add_tank(1, name, name, mechanic_type, my_team, my_nation);
+			MY_TANK = UNITS.add_tank(1, my_id, name, mechanic_type, my_team, my_nation);
 			MY_TANK.selected = 1;
 			UNITS.add_towers(my_team, my_nation);
 			}
 		
 		//my allies
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, my_team, my_nation);
 			}
 		//enemies
 		if(game_mode == 'single_craft'){
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
-			UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, TYPES[mechanic_type].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), mechanic_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+			UNITS.add_tank(1, TYPES[my_tank_nr].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), my_tank_nr, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 			}
 		
 		//add bots if single player
@@ -194,7 +194,7 @@ function MAIN_CLASS(){
 				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 					continue;
 				if(DEBUG==false){
-					UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
+					UNITS.add_tank(1, TYPES[random_type].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, my_team, my_nation, undefined, undefined, undefined, true);
 					}
 				}
 			//enemies
@@ -203,7 +203,7 @@ function MAIN_CLASS(){
 					//random_type = 3; //for testing
 				if(MAPS[level-1].ground_only != undefined && TYPES[random_type].no_collisions==1)
 					continue;
-				UNITS.add_tank(1, MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
+				UNITS.add_tank(1, TYPES[random_type].name+'-'+MAIN.get_unique_id(), HELPER.generatePassword(6), random_type, enemy_team, enemy_nation, undefined, undefined, undefined, true);
 				if(DEBUG==true) break;
 				i++;
 				}
@@ -249,9 +249,9 @@ function MAIN_CLASS(){
 				if(TANKS[i].data.name != 'Base') continue;
 				//adding flag
 				if(TANKS[i].team == 'B') //top
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60}
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60};
 				else //bottom
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60}
+					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60};
 				}
 			}
 		
@@ -387,7 +387,7 @@ function MAIN_CLASS(){
 			var imageObj = new Image();
 			imageObj.onload = function(){
 				DRAW.update_preload(10);	
-				}
+				};
 			imageObj.src=file;
 			}
 		else if(type=="audio"){	
@@ -513,7 +513,7 @@ function MAIN_CLASS(){
 		MAP_CRYSTALS = [];
 		
 		if(init_next_game != false)
-			MAIN.init_game(false);
+			MAIN.home(false);
 		};
 	//register some are for mouse clicks
 	this.register_button = function(x, y, width, height, place, myfunction, extra, type){

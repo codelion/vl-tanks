@@ -9,7 +9,7 @@ COUNTRIES = {
 		pros: 'High damage units per second will allow you to shine at offensive strategy.',
 		cons: 'Enemy mines',
 		buffs: [
-			{ name: 'damage',		power: 1.1, },
+			{ name: 'damage',	power: 1.1, },
 			],
 		tanks_lock: ['Heavy', 'Miner', 'TRex'],
 		tank_unique: 'Bomber',
@@ -22,7 +22,7 @@ COUNTRIES = {
 		pros: 'Units will excel at defence.',
 		cons: 'Issues in offensive strategy',
 		buffs: [
-			{ name: 'health',		power: 1.15,	},
+			{ name: 'health',	power: 1.15,	},
 			],
 		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
 		tank_unique: 'Heavy',
@@ -36,15 +36,15 @@ COUNTRIES = {
 		cons: 'Units have less health.',
 		buffs: [
 			{ name: 'respawn',	power: 0.5, },
-			{ name: 'speed',		power: 1.15,},
-			{ name: 'health',		power: 0.9,	},
+			{ name: 'speed',	power: 1.15,},
+			{ name: 'health',	power: 0.9,	},
 			{ name: 'cost',		power: 0.9,	},
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		tank_unique: 'TRex',
 		bonus: {weapon: 0, armor: 0},
 		},
-	}
+	};
 
 //====== TANKS =================================================================
 
