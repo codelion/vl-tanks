@@ -3,6 +3,8 @@ var AI = new AI_CLASS();
 function AI_CLASS(){
 	this.check_path_AI = function(TANK){
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && TANK.master.id != MY_TANK.id) return false;
+		if(game_mode == 'single_craft')
+			return AI.advanced_ai_actions(TANK);
 		if(TANK.id == MY_TANK.id) return false;
 		if(TANK.ai_reuse - Date.now() > 0) return false;	//wait for reuse
 		if(game_mode == 'multi_quick' || game_mode == 'multi_craft')
@@ -354,5 +356,78 @@ function AI_CLASS(){
 		BULLETS.push(tmp);
 
 		delete TANK.try_bomb;
+		};
+	//more advanced combat system
+	this.advanced_ai_actions = function(TANK){
+		//settings
+		var silo_n = 5;	//max silos around crystal
+		var combat_unit = 'Apache';	//flying - no need to check collisions...
+		
+		//find base
+		var base;
+		for(var i in TANKS){
+			if(TANKS[i].team != TANK.team) continue;
+			if(TANKS[i].data.name != 'Base') continue;
+			
+			base = TANKS[i];
+			break;
+			}
+				
+		//find nearest crystal
+		var crystal;
+		var min_range = 999999;
+		for(var c in MAP_CRYSTALS){
+			var dist_x = MAP_CRYSTALS[c].cx - base.cx();
+			var dist_y = MAP_CRYSTALS[c].cy - base.cy();
+			var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			if(distance < min_range && MAP_CRYSTALS[c].power > 0){
+				crystal = MAP_CRYSTALS[c];
+				min_range = distance;
+				}
+			}
+					
+		
+		//add silo
+		if(TANK.data.name == 'Mechanic'){
+			var silo_size;
+			var silo_i;
+			for(var i in TYPES){
+				if(TYPES[i].name != 'Silo') continue;
+				silo_size = TYPES[i].size[1];
+				silo_i = i;
+				break;
+				}
+			var nr = 0;
+			for(var i=TYPES[silo_i].size[1]; i < WIDTH_MAP-silo_size; i=i+silo_size){
+				for(var j=TYPES[silo_i].size[1]; j < HEIGHT_MAP-silo_size; j=j+silo_size){
+					var dist_x = crystal.cx - (i + TYPES[silo_i].size[1]/2);
+					var dist_y = crystal.cy - (j + TYPES[silo_i].size[2]/2);
+					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+					if(distance > CRYSTAL_RANGE) continue;	
+					
+					if(UNITS.check_collisions(i, j, {type:silo_i}, true)==true) continue;
+					if(UNITS.check_collisions(i + TYPES[silo_i].size[1], j, {type:silo_i}, true)==true) continue;
+					if(UNITS.check_collisions(i + TYPES[silo_i].size[1], j + TYPES[silo_i].size[2], {type:silo_i}, true)==true) continue;
+					if(UNITS.check_collisions(i, j + TYPES[silo_i].size[2], {type:silo_i}, true)==true) continue;
+					if(UNITS.check_collisions(i + TYPES[silo_i].size[1], j + TYPES[silo_i].size[2], {type:silo_i}, true)==true) continue;
+					
+					TANK.try_construct = {
+						cost: 0,
+						reuse: 0,
+						tank_type: silo_i,
+						ability_nr: 2,
+						auto_x: i+TYPES[silo_i].size[1]/2/2,
+						auto_y: j+TYPES[silo_i].size[1]/2/2,
+						};
+					
+					SKILLS.do_construct(TANK.id); 
+					nr++;
+					if(nr >= silo_n) break;
+					}
+				if(nr >= silo_n) break;
+				}
+			}
+		
+		delete TANK.use_AI;
 		};
 	}

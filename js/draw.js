@@ -21,7 +21,9 @@ function DRAW_CLASS(){
 		time_gap = Date.now() - frame_last_time;
 		
 		//clear main
-		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+		if(PLACE == 'game')
+			canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+			
 		INFOBAR.redraw_mini_map();	// mini map actions
 		
 		//external drawings functions
@@ -31,9 +33,8 @@ function DRAW_CLASS(){
 	
 		//tanks actions
 		for(var i=0; i < TANKS.length; i++){
-			if(PLACE != 'game') return false;
 			var angle = undefined;
-			try{
+			//try{
 				//speed multiplier
 				var speed_multiplier = 1;
 				speed_multiplier = UNITS.apply_buff(TANKS[i], 'speed', speed_multiplier);
@@ -252,14 +253,14 @@ function DRAW_CLASS(){
 				UNITS.draw_bullets(TANKS[i], time_gap);
 				
 				//draw tank
-				if(TANKS[i] != undefined){
+				if(PLACE == 'game' && TANKS[i] != undefined){
 					UNITS.check_enemies(TANKS[i]);
 					UNITS.draw_tank(TANKS[i]);
 					}
-				}
+				/*}
 			catch(err){
 				console.log("Error: "+err.message);
-				}
+				}*/
 			}
 		
 		//target	
@@ -401,7 +402,7 @@ function DRAW_CLASS(){
 		if(PLACE != 'game') return false;
 		var left = WIDTH_APP-100;
 		var top = 8;
-		var value = round(UNITS.HE3);
+		var value = round(UNITS.player_data[my_nation].he3);
 		
 		value = HELPER.format("#,##0.####", value);
 		
@@ -620,11 +621,12 @@ function DRAW_CLASS(){
 			LIBRARY.lib_show_stats("live scores", "TAB", padding+20+90, padding+20+st*height_space, -90); st++;
 			LIBRARY.lib_show_stats("chat", "Enter", padding+20+90, padding+20+st*height_space, -90); st++;
 			LIBRARY.lib_show_stats("global chat or team chat in game", "Shift+Enter", padding+20+90, padding+20+st*height_space, -90); st++;
-			LIBRARY.lib_show_stats("change scroll mode", "s", padding+20+90, padding+20+st*height_space, -90); st++;
-			LIBRARY.lib_show_stats("scroll map in manual scroll mode", "arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
-			LIBRARY.lib_show_stats("scroll map up/down", "mouse wheel", padding+20+90, padding+20+st*height_space, -90); st++;
+			LIBRARY.lib_show_stats("Destroy unit", "Delete", padding+20+90, padding+20+st*height_space, -90); st++;
+			LIBRARY.lib_show_stats("change scroll mode", "S", padding+20+90, padding+20+st*height_space, -90); st++;
+			LIBRARY.lib_show_stats("scroll map in manual Sroll mode", "Arrow keys", padding+20+90, padding+20+st*height_space, -90); st++;
+			LIBRARY.lib_show_stats("scroll map up/down", "Mouse scroll", padding+20+90, padding+20+st*height_space, -90); st++;
 			LIBRARY.lib_show_stats("stop and move map to your tank", "Esc", padding+20+90, padding+20+st*height_space, -90); st++;
-			LIBRARY.lib_show_stats("change abilities upgrade mode", "u", padding+20+90, padding+20+st*height_space, -90); st++;
+			LIBRARY.lib_show_stats("change abilities upgrade mode", "U", padding+20+90, padding+20+st*height_space, -90); st++;
 			
 			//back button
 			offset_top = padding+20+st*height_space+20;
@@ -813,8 +815,7 @@ function DRAW_CLASS(){
 			}
 		};
 	//final scores after game ended
-	this.draw_final_score = function(live, lost_team){
-		if(DEBUG == false && live==true && (game_mode == 'single_craft' || game_mode == 'multi_craft')) return false;
+	this.draw_final_score = function(live, win_team){
 		var button_width = WIDTH_SCROLL-40;
 		var button_height = 15;
 		var buttons_gap = 5;
@@ -824,12 +825,7 @@ function DRAW_CLASS(){
 		var flag_space = (button_height - UNITS.flag_height)/2;
 		
 		if(live==false) tab_scores=false;
-		
-		//find canvas
-		if(live==true)
-			canvas = canvas_main;
-		else
-			canvas = canvas_backround;
+		canvas = canvas_main;
 			
 		//find tanks count
 		var tanks_n = 0;
@@ -845,45 +841,49 @@ function DRAW_CLASS(){
 			button_height = 10;
 			buttons_gap = 3;
 			}
+		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+			button_height = 26;
+			buttons_gap = 7;
+			flag_space = (button_height - UNITS.flag_height)/2;
+			}
 		if(live==false){				//final scores
 			//add some score to winning team
-			if(lost_team != false){
+			if(win_team != false){
 				for (var i in TANKS){
-					if(TANKS[i].team == lost_team)
-						continue;
-					TANKS[i].score = TANKS[i].score + SCORES_INFO[4];
+					if(TANKS[i].team == win_team)
+						TANKS[i].score = TANKS[i].score + SCORES_INFO[4];
 					}
 				}
 		
 			PLACE = 'score';
-			map_offset = [0, 0];
 			clearInterval(draw_interval_id);
 			clearInterval(level_interval_id);
 			clearInterval(level_hp_regen_id);
 			clearInterval(timed_functions_id);
+			//chat_interval_id
 			
 			if(audio_main != undefined)
 				audio_main.pause();
-			canvas_fog.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	
-			canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
-			canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
-			canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
-			
+				
 			//background
-			canvas_backround.drawImage(MAIN.IMAGE_BACK, 0, 0, 700, 500, 0, 0, WIDTH_APP, HEIGHT_APP-27);
+			canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+			canvas.strokeStyle = "#000000";
+			canvas.fillStyle = "rgba(255, 255, 255, 0.7)";
+			HELPER.roundRect(canvas, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
 			
-			canvas_backround.fillStyle = "#000000";
-			canvas_backround.fillStyle = "#d5d5d5";
-			HELPER.roundRect(canvas_backround, 10, 10, WIDTH_SCROLL-20, HEIGHT_APP-20*2-10, 0, true);
-			
-			canvas_backround.strokeStyle = "#000000";
-			canvas_backround.fillStyle = "#382da3";
-			HELPER.roundRect(canvas_backround, Math.round((WIDTH_APP-button_width)/2), 25, 70, 30, 3, true);
+			//quit button
+			canvas.strokeStyle = "#000000";
+			canvas.fillStyle = "#69A126";
+			HELPER.roundRect(canvas, Math.round((WIDTH_APP-button_width)/2), 25, 70, 30, 2, true);
 			MAIN.register_button(Math.round((WIDTH_APP-button_width)/2), 25, 70, 30, PLACE, function(){
 				if(FS==true)
 					fullscreen('canvas_area');
 				MAIN.quit_game();
 				});
+				
+			canvas.fillStyle = "#ffffff";
+			canvas.font = "Bold 13px Helvetica";
+			canvas.fillText("Quit", Math.round((WIDTH_APP-button_width)/2)+20, 45);
 			
 			//save button position
 			score_button_pos['x'] = Math.round((WIDTH_APP-button_width)/2);
@@ -892,77 +892,193 @@ function DRAW_CLASS(){
 			score_button_pos['height'] = 30;
 			
 			//title
-			if(lost_team=='R'){
-				canvas_backround.fillStyle = "#3c81ff";
-				var tex = "United States won the game";
-				}
-			else if(lost_team=='B'){
-				canvas_backround.fillStyle = "#9c0309";
-				var tex = "Russia won the game";
-				}
-			else if(lost_team === false){
-				canvas_backround.fillStyle = "#9c0309";
-				var tex = "Tie - both commanders left the battle...";
-				}
-			canvas_backround.font = "bold 20px Helvetica";
-			canvas_backround.fillText(tex, 110, 45);
+			nation_winner = UNITS.get_nation_by_team(win_team);
 			
-			canvas_backround.fillStyle = "#ffffff";
-			canvas_backround.font = "bold 16px Helvetica";
-			canvas_backround.fillText("Quit", Math.round((WIDTH_APP-button_width)/2)+20, 45);
+			if(win_team === false){
+				canvas.fillStyle = "#0669ff";
+				var text = "Tie - both commanders left the battle...";
+				}
+			else if(win_team == MY_TANK.team){
+				canvas.fillStyle = "#056705";
+				var text = "You won the game !!!";
+				}
+			else if(win_team != MY_TANK.team){
+				canvas.fillStyle = "#b12525";
+				var text = COUNTRIES[nation_winner].name + " won the game, you lost";
+				}
+			canvas.font = "bold 20px Helvetica";
+			canvas.fillText(text, 110, 45);
 			}
 		else{							//scores in game
 			//background in live stats
-			canvas_main.strokeStyle = "#000000";
-			canvas_main.fillStyle = "rgba(255, 255, 255, 0.7)";
-			HELPER.roundRect(canvas_main, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
+			canvas.strokeStyle = "#000000";
+			canvas.fillStyle = "rgba(255, 255, 255, 0.7)";
+			HELPER.roundRect(canvas, 10, 10, WIDTH_SCROLL-20, HEIGHT_SCROLL-20, 0, true);
 			}
 		
 		canvas.font = "bold 12px Helvetica";
 		
-		canvas.fillStyle = "#0669ff";
-		canvas.fillText("Type", Math.round((WIDTH_APP-button_width)/2)+200, text_y);
-		
-		canvas.fillStyle = "#0669ff";
-		canvas.fillText("Kills", Math.round((WIDTH_APP-button_width)/2)+300, text_y);
-		
-		canvas.fillStyle = "#9c0309";
-		canvas.fillText("Deaths", Math.round((WIDTH_APP-button_width)/2)+350, text_y);
-		
-		canvas.fillStyle = "#056705";
-		canvas.fillText("Towers", Math.round((WIDTH_APP-button_width)/2)+400, text_y);
-		
-		canvas.fillStyle = "#056705";
-		canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+450, text_y-15);
-		canvas.fillText("done", Math.round((WIDTH_APP-button_width)/2)+450, text_y);
-		
-		canvas.fillStyle = "#b12525";
-		canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+500, text_y-15);
-		canvas.fillText("received", Math.round((WIDTH_APP-button_width)/2)+500, text_y);
-		
-		canvas.fillStyle = "#d06a07";
-		canvas.fillText("Level", Math.round((WIDTH_APP-button_width)/2)+600, text_y);
-		
-		canvas.fillStyle = "#ff3405";
-		canvas.fillText("Score", Math.round((WIDTH_APP-button_width)/2)+650, text_y);
+		//show headers
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Type", Math.round((WIDTH_APP-button_width)/2)+200, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Kills", Math.round((WIDTH_APP-button_width)/2)+300, text_y);
+			
+			canvas.fillStyle = "#9c0309";
+			canvas.fillText("Deaths", Math.round((WIDTH_APP-button_width)/2)+350, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Towers", Math.round((WIDTH_APP-button_width)/2)+400, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+450, text_y-15);
+			canvas.fillText("done", Math.round((WIDTH_APP-button_width)/2)+450, text_y);
+			
+			canvas.fillStyle = "#b12525";
+			canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+500, text_y-15);
+			canvas.fillText("received", Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+			
+			canvas.fillStyle = "#d06a07";
+			canvas.fillText("Level", Math.round((WIDTH_APP-button_width)/2)+600, text_y);
+			
+			canvas.fillStyle = "#ff3405";
+			canvas.fillText("Score", Math.round((WIDTH_APP-button_width)/2)+650, text_y);
+			}
+		else{
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Nation", Math.round((WIDTH_APP-button_width)/2)+150, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("HE-3", Math.round((WIDTH_APP-button_width)/2)+300, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Kills", Math.round((WIDTH_APP-button_width)/2)+400, text_y);
+			
+			canvas.fillStyle = "#056705";
+			canvas.fillText("Damage", Math.round((WIDTH_APP-button_width)/2)+500, text_y-15);
+			canvas.fillText("done", Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+			}
 		
 		//sort
 		if(live==false)
 			TANKS.sort(function(a,b) { return parseFloat(b.score) - parseFloat(a.score); } );
 		
-		var j=1;
-		for (var i in TANKS){
-			if(TYPES[TANKS[i].type].type == 'tank' || (DEBUG == true && TANKS[i].data.type != 'building_')){
+		//show values
+		if(game_mode == 'single_quick' || game_mode == 'multi_quick'){
+			var j=1;
+			for (var i in TANKS){
+				if(TYPES[TANKS[i].type].type == 'tank' || (DEBUG == true && TANKS[i].data.type != 'building')){
+					//background
+					canvas.strokeStyle = "#000000";
+					if(TANKS[i].team == 'R')
+						canvas.fillStyle = "#ffaaaa";
+					else
+						canvas.fillStyle = "#b9b9ff";
+					HELPER.roundRect(canvas, Math.round((WIDTH_SCROLL-button_width)/2), top_margin+(button_height+buttons_gap)*j, button_width, button_height, 0, true);
+					
+					var text_y = top_margin + (button_height+buttons_gap)*j + Math.round((button_height+letter_height)/2);
+					if(TANKS[i].name == name)
+						canvas.font = "bold 12px Helvetica";
+					else
+						canvas.font = "normal 12px Helvetica";
+					
+					//#
+					canvas.fillStyle = "#6b6b6e";
+					canvas.fillText(j, Math.round((WIDTH_APP-button_width)/2)+10, text_y);
+					
+					//flag
+					DRAW.draw_image(canvas, COUNTRIES[TANKS[i].nation].file, 
+						Math.round((WIDTH_SCROLL-button_width)/2)+30, 
+						top_margin+(button_height+buttons_gap)*j+flag_space);
+			
+					//name
+					canvas.fillStyle = "#000000";
+					var name_tmp = TANKS[i].name;
+					if(name_tmp != undefined && name_tmp.length>33)
+						name_tmp = name_tmp.substr(0,33)
+					if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
+						room = ROOM.get_room_by_id(opened_room_id);
+						if(room.host == TANKS[i].name)
+							name_tmp = name_tmp+"*";
+						}
+					canvas.fillText(name_tmp, Math.round((WIDTH_APP-button_width)/2)+50, text_y);
+					
+					//id
+					if(DEBUG == true){
+						canvas.fillStyle = "#555555";
+						canvas.font = "Normal 11px Helvetica";
+						var value = TANKS[i].id;
+						canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+110, text_y);
+						}
+					
+					//type
+					canvas.fillStyle = "#000000";
+					canvas.font = "bold 12px Helvetica";
+					canvas.fillText(TYPES[TANKS[i].type].name, Math.round((WIDTH_APP-button_width)/2)+200, text_y);
+					
+					//kills
+					canvas.font = "bold 12px Helvetica";
+					canvas.fillStyle = "#056705";
+					var kills = TANKS[i].kills;
+					canvas.fillText(kills, Math.round((WIDTH_APP-button_width)/2)+300, text_y);
+					
+					//deaths
+					canvas.fillStyle = "#9c0309";
+					var deaths = TANKS[i].deaths;
+					canvas.fillText(deaths, Math.round((WIDTH_APP-button_width)/2)+350, text_y);
+					
+					//towers
+					canvas.fillStyle = "#056705";
+					var towers = 0;
+					if(TANKS[i].towers != undefined)
+						towers = TANKS[i].towers;
+					else
+						towers = 0;
+					towers = Math.round(towers*10)/10;
+					canvas.fillText(towers, Math.round((WIDTH_APP-button_width)/2)+400, text_y);
+					
+					//damage done
+					canvas.fillStyle = "#056705";
+					var value = TANKS[i].damage_done;
+					if(value>1000) value = Math.floor(value/100)/10+"k";
+					canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+450, text_y);	
+					
+					//damage received
+					canvas.fillStyle = "#b12525";
+					var value = TANKS[i].damage_received;
+					if(value>1000) value = Math.floor(value/100)/10+"k";
+					canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+500, text_y);
+					
+					//level
+					canvas.fillStyle = "#d06a07";
+					canvas.fillText(TANKS[i].level, Math.round((WIDTH_APP-button_width)/2)+600, text_y);
+					
+					//score
+					canvas.fillStyle = "#ff3405";
+					var score = TANKS[i].score;
+					canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+650, text_y);
+					
+					j++;
+					}
+				}
+			}
+		else{
+			var j = 1;
+			top_margin = 50;
+			flag_space = 10;
+			if(game_mode == 'multi_craft')
+				var room = ROOM.get_room_by_id(opened_room_id);
+			for (var i in COUNTRIES){
+				var nation = COUNTRIES[i].file;
+				
 				//background
 				canvas.strokeStyle = "#000000";
-				if(TANKS[i].team == 'R')
-					canvas.fillStyle = "#ffaaaa";
-				else
-					canvas.fillStyle = "#b9b9ff";
+				canvas.fillStyle = "#8FC74C";
 				HELPER.roundRect(canvas, Math.round((WIDTH_SCROLL-button_width)/2), top_margin+(button_height+buttons_gap)*j, button_width, button_height, 0, true);
-				
-				var text_y = top_margin+(button_height+buttons_gap)*j+Math.round((button_height+letter_height)/2);
-				if(TANKS[i].name == name)
+				var text_y = top_margin + (button_height+buttons_gap)*j + Math.round((button_height+letter_height)/2);
+				if(MY_TANK.nation == COUNTRIES[i].file)
 					canvas.font = "bold 12px Helvetica";
 				else
 					canvas.font = "normal 12px Helvetica";
@@ -972,85 +1088,51 @@ function DRAW_CLASS(){
 				canvas.fillText(j, Math.round((WIDTH_APP-button_width)/2)+10, text_y);
 				
 				//flag
-				DRAW.draw_image(canvas, COUNTRIES[TANKS[i].nation].file, 
+				DRAW.draw_image(canvas, COUNTRIES[i].file, 
 					Math.round((WIDTH_SCROLL-button_width)/2)+30, 
 					top_margin+(button_height+buttons_gap)*j+flag_space);
-		
+				
 				//name
 				canvas.fillStyle = "#000000";
-				var name_tmp = TANKS[i].name;
-				if(name_tmp != undefined && name_tmp.length>33)
-					name_tmp = name_tmp.substr(0,33)
-				if(game_mode == 'multi_quick' || game_mode == 'multi_craft'){
-					room = ROOM.get_room_by_id(opened_room_id);
-					if(room.host == TANKS[i].name)
-						name_tmp = name_tmp+"*";
-					}
-				canvas.fillText(name_tmp, Math.round((WIDTH_APP-button_width)/2)+50, text_y);
-				
-				//id
-				if(DEBUG == true){
-					canvas.fillStyle = "#555555";
-					canvas.font = "Normal 11px Helvetica";
-					var value = TANKS[i].id;
-					canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+110, text_y);
+				var value = '-';
+				if(nation == MY_TANK.nation)
+					value = name;
+				else if(game_mode == 'multi_craft'){
+					for(var p in room.players){
+						if(room.players[p].nation == nation){	//if not me
+							value = room.players[p].name;
+							break;
+							}
+						}
 					}
 				
-				//type
+				canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+50, text_y);
+				
+				//nation
+				canvas.fillStyle = "#000000";
+				canvas.font = "normal 12px Helvetica";
+				canvas.fillText(COUNTRIES[i].name, Math.round((WIDTH_APP-button_width)/2)+150, text_y);
+				
+				//he-3
 				canvas.fillStyle = "#000000";
 				canvas.font = "bold 12px Helvetica";
-				canvas.fillText(TYPES[TANKS[i].type].name, Math.round((WIDTH_APP-button_width)/2)+200, text_y);
+				canvas.fillText(UNITS.player_data[nation].total_he3, Math.round((WIDTH_APP-button_width)/2)+300, text_y);
 				
 				//kills
-				canvas.font = "bold 12px Helvetica";
-				canvas.fillStyle = "#0669ff";
-				var kills = TANKS[i].kills;
-				canvas.fillText(kills, Math.round((WIDTH_APP-button_width)/2)+300, text_y);
-				
-				//deaths
-				canvas.fillStyle = "#9c0309";
-				var deaths = TANKS[i].deaths;
-				canvas.fillText(deaths, Math.round((WIDTH_APP-button_width)/2)+350, text_y);
-				
-				//towers
-				canvas.fillStyle = "#056705";
-				var towers = 0;
-				if(TANKS[i].towers != undefined)
-					towers = TANKS[i].towers;
-				else
-					towers = 0;
-				towers = Math.round(towers*10)/10;
-				canvas.fillText(towers, Math.round((WIDTH_APP-button_width)/2)+400, text_y);
+				canvas.fillStyle = "#000000";
+				canvas.fillText(UNITS.player_data[nation].kills, Math.round((WIDTH_APP-button_width)/2)+400, text_y);
 				
 				//damage done
-				canvas.fillStyle = "#056705";
-				var value = TANKS[i].damage_done;
-				if(value>1000) value = Math.floor(value/100)/10+"k";
-				canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+450, text_y);	
-				
-				//damage received
-				canvas.fillStyle = "#b12525";
-				var value = TANKS[i].damage_received;
+				canvas.fillStyle = "#000000";
+				var value = UNITS.player_data[nation].total_damage;
 				if(value>1000) value = Math.floor(value/100)/10+"k";
 				canvas.fillText(value, Math.round((WIDTH_APP-button_width)/2)+500, text_y);
-				
-				//level
-				canvas.fillStyle = "#d06a07";
-				canvas.fillText(TANKS[i].level, Math.round((WIDTH_APP-button_width)/2)+600, text_y);
-				
-				//score
-				canvas.fillStyle = "#ff3405";
-				var score = TANKS[i].score;
-				canvas.fillText(Math.round(score), Math.round((WIDTH_APP-button_width)/2)+650, text_y);
-				
 				j++;
 				}
 			}
 		
-		if(live==false){
-			TANKS = [];
+		if(live==false)
 			pre_draw_functions = [];
-			}
 		};
 	//message on screen in game
 	this.draw_message = function(this_convas, message){

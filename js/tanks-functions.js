@@ -1383,8 +1383,8 @@ function SKILLS_CLASS(){
 		
 		if(TANK.constructing != undefined) return false;
 		if(TANK.team == MY_TANK.team){
-			if(UNITS.HE3 < cost) return false;
-			UNITS.HE3 = UNITS.HE3 - cost;
+			if(UNITS.player_data[TANK.nation].he3 < cost) return false;
+			UNITS.player_data[TANK.nation].he3 -= cost;
 			}
 		
 		TANK.abilities_reuse[0] = Date.now() + reuse;	
@@ -1420,7 +1420,7 @@ function SKILLS_CLASS(){
 		
 		cost = UNITS.apply_buff(TANK, 'cost', cost);
 		//check he3
-		if(UNITS.HE3 < cost){
+		if(UNITS.player_data[TANK.nation].he3 < cost){
 			screen_message.text = "Not enough HE-3.";
 			screen_message.time = Date.now() + 1000;
 			return false;
@@ -1443,7 +1443,7 @@ function SKILLS_CLASS(){
 			return false;
 			}
 		if(TANK.team == MY_TANK.team)
-			UNITS.HE3 = UNITS.HE3 - cost;
+			UNITS.player_data[TANK.nation].he3 -= cost;
 		
 		//check respawn buff
 		for(var b in COUNTRIES[TANK.nation].buffs){
@@ -1521,12 +1521,12 @@ function SKILLS_CLASS(){
 		if(TANK.constructing != undefined) return false;
 		if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) return false;
 		if(TANK.team == MY_TANK.team){
-			if(UNITS.HE3 < cost){ 
+			if(UNITS.player_data[TANK.nation].he3 < cost){ 
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
 				return false;
 				}
-			UNITS.HE3 = UNITS.HE3 - cost;
+			UNITS.player_data[TANK.nation].he3 -= cost;
 			}
 		
 		//register effect
@@ -1574,12 +1574,12 @@ function SKILLS_CLASS(){
 		if(TANK.constructing != undefined) return false;
 		if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) return false;
 		if(TANK.team == MY_TANK.team){
-			if(UNITS.HE3 < cost){ 
+			if(UNITS.player_data[TANK.nation].he3 < cost){ 
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
 				return false;
 				}
-			UNITS.HE3 = UNITS.HE3 - cost;
+			UNITS.player_data[TANK.nation].he3 -= cost;
 			}
 		
 		//register effect
@@ -1637,7 +1637,7 @@ function SKILLS_CLASS(){
 			return 0;
 			}
 		
-		if(TANK.team == MY_TANK.team && UNITS.HE3 < cost){
+		if(TANK.team == MY_TANK.team && UNITS.player_data[TANK.nation].he3 < cost){
 			//message
 			screen_message.text = "Not enough HE-3.";
 			screen_message.time = Date.now() + 1000;
@@ -1676,7 +1676,7 @@ function SKILLS_CLASS(){
 		if(MY_TANK.try_construct == undefined) return false;
 		var type = MY_TANK.try_construct.tank_type;
 		
-		if(SKILLS.validate_construction(mouse_pos[0]-map_offset[0], mouse_pos[1]-map_offset[1])==true)
+		if(SKILLS.validate_construction(MY_TANK, mouse_pos[0]-map_offset[0], mouse_pos[1]-map_offset[1])==true)
 			canvas_main.fillStyle = "#576b35";
 		else
 			canvas_main.fillStyle = "#b12525";
@@ -1686,8 +1686,8 @@ function SKILLS_CLASS(){
 		var y = mouse_pos[1] - round(TYPES[type].size[2]/2) - map_offset[1];
 		UNITS.draw_tank_clone(type, x, y, 0, 0.5, canvas_main);
 		};
-	this.validate_construction = function(xx, yy, show_errors){
-		var type = MY_TANK.try_construct.tank_type;
+	this.validate_construction = function(TANK, xx, yy, show_errors){
+		var type = TANK.try_construct.tank_type;
 	
 		if(TYPES[type].name == 'Silo'){
 			//find nearest resourse
@@ -2109,7 +2109,11 @@ function SKILLS_CLASS(){
 	this.do_construct = function(tank_id, skip_broadcast, tmp){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_construct == undefined) return false;
-		if(skip_broadcast == undefined){
+		if(TANK.try_construct.auto_x != undefined && TANK.try_construct.auto_y != undefined){
+			mouseX = TANK.try_construct.auto_x;
+			mouseY = TANK.try_construct.auto_y;
+			}
+		else if(skip_broadcast == undefined){
 			mouseX = mouse_click_pos[0];
 			mouseY = mouse_click_pos[1];
 			}
@@ -2124,7 +2128,7 @@ function SKILLS_CLASS(){
 		
 		//check only if me and if not validated yet
 		if(TANK.team == MY_TANK.team && skip_broadcast == undefined){
-			if(SKILLS.validate_construction(mouseX, mouseY, true)==false)
+			if(SKILLS.validate_construction(MY_TANK, mouseX, mouseY, true)==false)
 				return false;
 			}
 		
@@ -2135,8 +2139,8 @@ function SKILLS_CLASS(){
 		
 		TANK.try_construct.cost = UNITS.apply_buff(TANK, 'cost', TANK.try_construct.cost);
 		if(TANK.team == MY_TANK.team && skip_broadcast == undefined){
-			if(UNITS.HE3 < TANK.try_construct.cost)	return false;
-			UNITS.HE3 = UNITS.HE3 - TANK.try_construct.cost;
+			if(UNITS.player_data[TANK.nation].he3 < TANK.try_construct.cost)	return false;
+			UNITS.player_data[TANK.nation].he3 -= TANK.try_construct.cost;
 			}
 		
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_construct.reuse;

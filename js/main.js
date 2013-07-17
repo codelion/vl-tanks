@@ -4,10 +4,7 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
-	game ends on last base death
 	full mode AI
-	sounds in craft mode
-	special score for mode3: he3 and army graph in time
 */
 
 var MAIN = new MAIN_CLASS();
@@ -211,7 +208,8 @@ function MAIN_CLASS(){
 		
 		MP.sync_multiplayers();
 		MAIN.player_sync_done = true;
-		UNITS.HE3 = UNITS.he3_begin;
+		UNITS.init_stats();
+		
 		//reset Research bonus
 		for(var i in COUNTRIES){
 			COUNTRIES[i].bonus.weapon = 0;
@@ -448,6 +446,11 @@ function MAIN_CLASS(){
 		clearInterval(chat_interval_id);	
 		chat_interval_id = setInterval(MAIN.controll_chat, 500);
 		
+		canvas_fog.clearRect(0, 0, WIDTH_MAP, HEIGHT_MAP);	
+		canvas_map_sight.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+		canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+		canvas_map.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
+		
 		room_id_to_join = -1;
 		MAIN.starting_timer = -1;
 		MINES = [];
@@ -455,8 +458,6 @@ function MAIN_CLASS(){
 		
 		if(PLACE=='game'){
 			pre_draw_functions = [];
-			
-			canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 					
 			if(audio_main != undefined)
 				audio_main.pause();
@@ -481,7 +482,6 @@ function MAIN_CLASS(){
 			parent.document.getElementById("packets").innerHTML = "0/0";
 			parent.document.getElementById("fps").innerHTML = "";	
 			}catch(error){}
-		canvas_main.clearRect(0, 0, WIDTH_APP, HEIGHT_APP);
 		
 		//reset other variables
 		ROOMS = [];
@@ -615,7 +615,7 @@ function MAIN_CLASS(){
 				}
 			}
 		//show?
-		if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select' || PLACE == 'score'){
+		if(PLACE == 'rooms' || PLACE == 'room' || PLACE == 'select'){
 			canvas_main.clearRect(0, 0, WIDTH_SCROLL, HEIGHT_SCROLL);
 			DRAW.show_chat();
 			}

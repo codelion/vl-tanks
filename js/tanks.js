@@ -4,7 +4,7 @@ function UNITS_CLASS(){
 	this.flag_width = 15;
 	this.flag_height = 9;
 	this.he3_begin = 260;
-	this.HE3 = this.he3_begin;		//my team hellium-3 resources
+	this.player_data = {};	//player data in full mode
 	
 	//adds new tank
 	this.add_tank = function(level, id, name, type, team, nation, x, y, angle, AI, master_tank, begin_time){ 
@@ -105,7 +105,7 @@ function UNITS_CLASS(){
 		};
 	//draw single tank
 	this.draw_tank = function(tank){
-		if(PLACE != 'game' || tank == undefined) return false;
+		if(tank == undefined) return false;
 		if(tank.invisibility != undefined && tank.team != MY_TANK.team) return false; //enemy in hide mode
 		var tank_size_w =  tank.width();
 		var tank_size_h =  tank.height();
@@ -910,7 +910,7 @@ function UNITS_CLASS(){
 		//other tanks
 		if(TYPES[TANK.type].types != 'building'){
 			for (i in TANKS){
-				if((game_mode == 'single_craft' || game_mode == 'multi_craft') && full_check == undefined && TYPES[TANKS[i].type].type != 'building') continue;
+				if((game_mode == 'single_craft' || game_mode == 'multi_craft') && full_check == undefined && TYPES[TANKS[i].type].type != 'building __disabled__') continue;
 				if(full_check == undefined && TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'building') continue;
 				if(TANKS[i].id == TANK.id) continue;			//same tank
 				if(full_check == undefined && TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
@@ -975,16 +975,15 @@ function UNITS_CLASS(){
 			//update silo
 			var valid = false;
 			for(var i=0; i < TANKS.length; i++){
+				var nation = UNITS.get_nation_by_team(TANKS[i].team);
 				if(TYPES[TANKS[i].type].name != 'Silo') continue;
 				if(TANKS[i].constructing != undefined) continue;
 				if(TANKS[i].crystal == undefined) continue;
 				//if not empty
 				if(TANKS[i].crystal.power > 0){
 					TANKS[i].crystal.power = TANKS[i].crystal.power - SILO_POWER;
-					if(TANKS[i].team == MY_TANK.team){
-						UNITS.HE3 = UNITS.HE3 + SILO_POWER;
-						valid = true;
-						}
+					UNITS.player_data[nation].he3 += SILO_POWER;
+					UNITS.player_data[nation].total_he3 += SILO_POWER;
 					}
 				else{
 					//relink
@@ -1005,9 +1004,6 @@ function UNITS_CLASS(){
 					MAP.draw_map(true);
 					}
 				}
-			//passive He3 regen
-			if(valid == false)
-				UNITS.HE3 = UNITS.HE3 + 0.5; //poor team dont have silo :), lets give them a bit
 			//constructions
 			for(var i in TANKS){
 				if(TANKS[i].data.name != 'Mechanic') continue;
@@ -1032,14 +1028,15 @@ function UNITS_CLASS(){
 				var skill_stats = SKILLS.Rebuild(undefined, undefined, true);
 				
 				//check he3
-				if(TANKS[i].team == MY_TANK.team && UNITS.HE3 < skill_stats.cost){
+				var nation = UNITS.get_nation_by_team(TANKS[i].team);
+				if(TANKS[i].team == MY_TANK.team && UNITS.player_data[nation].he3 < skill_stats.cost){
 					SKILLS.cancel_repair(TANKS[i]);
 					return false;
 					}
 				
 				TANK_to.hp = TANK_to.hp + skill_stats.power;
 				if(TANKS[i].team == MY_TANK.team)
-					UNITS.HE3 = UNITS.HE3 - skill_stats.cost;
+					UNITS.player_data[nation].he3 -= skill_stats.cost;
 	
 				if(TANK_to.hp >= max_hp){
 					TANK_to.hp = max_hp;
@@ -1524,6 +1521,7 @@ function UNITS_CLASS(){
 			TANK.score = TANK.score + SCORES_INFO[3] * (damage / TYPES[TANK_TO.type].life[0]);
 			}
 		TANK.damage_done = TANK.damage_done + damage;
+		UNITS.player_data[TANK.nation].total_damage += damage;
 		TANK_TO.damage_received = TANK_TO.damage_received + damage;
 		
 		life_total = TANK_TO.hp;
@@ -1540,22 +1538,16 @@ function UNITS_CLASS(){
 				TANK_TO.deaths = TANK_TO.deaths + 1;
 				TANK_TO.score = TANK_TO.score + SCORES_INFO[2];
 				}
+			UNITS.check_game_end(TANK, TANK_TO);
 			
 			//find killer
 			var killer = TANK;
 			if(TANK.master != undefined){
 				killer = TANK.master;
 				}
+			UNITS.player_data[TANK.nation].kills += 1;
 			if(TYPES[TANK_TO.type].no_repawn != undefined  || game_mode == 'single_craft' || game_mode == 'multi_craft'){	//tanks without repawn
-				//base dead
-				if(TYPES[TANK_TO.type].name == "Base"){
-					if(game_mode == 'single_quick' || game_mode == 'single_craft'){
-						DRAW.draw_final_score(false, TANK_TO.team);
-						}
-					else
-						MP.register_tank_action('end_game', opened_room_id, false, TANK_TO.team);
-					}
-				else if(TYPES[TANK_TO.type].name == "Tower" && (game_mode == 'single_quick' || game_mode == 'single_craft')){
+				if(TYPES[TANK_TO.type].name == "Tower" && (game_mode == 'single_quick' || game_mode == 'single_craft')){
 					//tower dead - decreasing base armor
 					for(var b in TANKS){
 						if(TYPES[TANKS[b].type].name == "Base" && TANKS[b].team == TANK_TO.team){
@@ -1605,6 +1597,26 @@ function UNITS_CLASS(){
 				}
 			}
 		return false;
+		};
+	this.check_game_end = function(TANK, TANK_TO){
+		if(TYPES[TANK_TO.type].name != "Base") return false; //not base was killed
+		
+		//some team lost base at this point - check if we have another base
+		for(var i in TANKS){
+			if(TANKS[i].team != TANK_TO.team) continue; //other team
+			if(TANKS[i].data.name != 'Base') continue; //not base
+			//if(TANKS[i].constructing != undefined) continue; //base still constructing
+			if(TANKS[i].id == TANK_TO.id) continue;	//this unit is already registered as dead ...
+			
+			return false;	//we found another base - no need to finish game
+			}
+		
+		//sorry - game ends here
+		if(game_mode == 'single_quick' || game_mode == 'single_craft'){
+			DRAW.draw_final_score(false, TANK.team);
+			}
+		else
+			MP.register_tank_action('end_game', opened_room_id, false, TANK.team);
 		};
 	//find and select other tank
 	this.check_selection = function(TANK_TO){
@@ -2021,6 +2033,7 @@ function UNITS_CLASS(){
 		};
 	//add auto bots to map		['B',	30,	1,	[[5, 15],[20,41],[20,50],[20,59],[5,85], [45,99]]	],
 	this.add_bots = function(random_id){
+		if(PLACE != 'game') return false;
 		var type_name = 'Soldier';	//unit name
 		var n = 2;	//group size
 		var gap = 15;	//gap beween units in group
@@ -2172,5 +2185,17 @@ function UNITS_CLASS(){
 			selected_n++;
 			}
 		return selected_n;
+		};
+	this.init_stats = function(){
+		UNITS.player_data = {};
+		for(var i in COUNTRIES){
+			var nation = COUNTRIES[i].file;
+			UNITS.player_data[nation] = {
+				he3: UNITS.he3_begin,
+				total_he3: 0,
+				kills: 0,
+				total_damage: 0,
+				};
+			}
 		};
 	}

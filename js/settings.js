@@ -24,10 +24,10 @@ var ABILITIES_MODE = 0;			//0=all, 1=first, 2=second, 3 = third
 var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
 var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
 var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
-var CRYSTAL_RANGE = 100;		//crystal/silo orange
+var CRYSTAL_RANGE = 100;		//crystal/silo range
 var SILO_POWER = 100;			//how much he3 silo generates per 1s
 var QUALITY = 3;			//1=low, 2=mid, 3=high
-var MAX_BULLET_RANGE = 160;		//for units position sync, if exeeds - sync unit position
+var MAX_BULLET_RANGE = 160;		//for units position sync, if exeeds - unit position is synced
 
 //========= global variables ===================================================
 

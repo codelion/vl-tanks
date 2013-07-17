@@ -789,7 +789,7 @@ function INFOBAR_CLASS(){
 					if(TANKS[x].selected == undefined) continue;
 					if(TANKS[x].data.name != 'Factory') continue;
 					for(var i in TANKS[x].training){
-						UNITS.HE3 = UNITS.HE3 + TANKS[x].training[i].cost;
+						UNITS.player_data[my_nation].he3 += TANKS[x].training[i].cost;
 						}
 					TANKS[x].training = [];
 					}
@@ -971,7 +971,7 @@ function INFOBAR_CLASS(){
 					var unit_cost = TYPES[index].cost;
 					unit_cost = UNITS.apply_buff(MY_TANK, 'cost', unit_cost);
 					//check he3
-					if(UNITS.HE3 < unit_cost){
+					if(UNITS.player_data[my_nation].he3 < unit_cost){
 						screen_message.text = "Not enough HE-3.";
 						screen_message.time = Date.now() + 1000;
 						return false;
@@ -993,7 +993,7 @@ function INFOBAR_CLASS(){
 						screen_message.time = Date.now() + 1000;
 						return false;
 						}
-					UNITS.HE3 = UNITS.HE3 - unit_cost;
+					UNITS.player_data[my_nation].he3 -= unit_cost;
 					//register
 					var duration = 30*1000;
 					if(TYPES[index].type == 'human')
@@ -1034,7 +1034,7 @@ function INFOBAR_CLASS(){
 				index = i;
 				
 				var unit_cost = TYPES[index].cost; 
-				if(UNITS.HE3 < unit_cost){
+				if(UNITS.player_data[my_nation].he3 < unit_cost){
 					screen_message.text = "Not enough HE-3.";
 					screen_message.time = Date.now() + 1000;
 					return false;

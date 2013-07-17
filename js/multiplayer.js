@@ -467,7 +467,7 @@ function MP_CLASS(){
 				}
 			}
 		else if(type == 'end_game'){		//game ends
-			//DATA = [game_id, lost_team]
+			//DATA = [game_id, win_team]
 			//if me host, broadcast game end
 			room = ROOM.get_room_by_id(opened_room_id);
 			if(room.host == name){
@@ -691,10 +691,11 @@ function MP_CLASS(){
 					}
 				}
 			//adding kill stats
+			UNITS.player_data[TANK_TO.nation].kills += 1;
 			if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){
 				//player
 				if(TANK_TO.dead != 1)
-					TANK_FROM.kills = TANK_FROM.kills + 1;	
+					TANK_FROM.kills = TANK_FROM.kills + 1;
 				//score
 				TANK_FROM.score = TANK_FROM.score + SCORES_INFO[1];
 				UNITS.death(TANK_TO);
