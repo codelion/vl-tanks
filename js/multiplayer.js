@@ -755,6 +755,7 @@ function MP_CLASS(){
 				}
 			else if(DATA.mode == 'craft'){
 				var new_tank = UNITS.add_tank(1, DATA.id, DATA.name, DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle);
+				UNITS.player_data[new_tank.nation].units++;
 				new_tank.move = 1;
 				//randomize spawn position
 				new_tank.move_to = [

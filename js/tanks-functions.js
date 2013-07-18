@@ -1421,8 +1421,10 @@ function SKILLS_CLASS(){
 		cost = UNITS.apply_buff(TANK, 'cost', cost);
 		//check he3
 		if(UNITS.player_data[TANK.nation].he3 < cost){
-			screen_message.text = "Not enough HE-3.";
-			screen_message.time = Date.now() + 1000;
+			if(TANK.team == MY_TANK.team){
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				}
 			return false;
 			}
 		//check unit limit
@@ -1520,14 +1522,14 @@ function SKILLS_CLASS(){
 		
 		if(TANK.constructing != undefined) return false;
 		if(COUNTRIES[TANK.nation].bonus.weapon >= power * levels) return false;
-		if(TANK.team == MY_TANK.team){
-			if(UNITS.player_data[TANK.nation].he3 < cost){ 
+		if(UNITS.player_data[TANK.nation].he3 < cost){ 
+			if(TANK.team == MY_TANK.team){
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
-				return false;
 				}
-			UNITS.player_data[TANK.nation].he3 -= cost;
+			return false;
 			}
+		UNITS.player_data[TANK.nation].he3 -= cost;
 		
 		//register effect
 		setTimeout(function(){
@@ -1573,14 +1575,14 @@ function SKILLS_CLASS(){
 		
 		if(TANK.constructing != undefined) return false;
 		if(COUNTRIES[TANK.nation].bonus.armor >= power * levels) return false;
-		if(TANK.team == MY_TANK.team){
-			if(UNITS.player_data[TANK.nation].he3 < cost){ 
+		if(UNITS.player_data[TANK.nation].he3 < cost){
+			if(TANK.team == MY_TANK.team){
 				screen_message.text = "Not enough HE-3.";
 				screen_message.time = Date.now() + 1000;
-				return false;
 				}
-			UNITS.player_data[TANK.nation].he3 -= cost;
+			return false;
 			}
+		UNITS.player_data[TANK.nation].he3 -= cost;
 		
 		//register effect
 		setTimeout(function(){
@@ -1637,10 +1639,12 @@ function SKILLS_CLASS(){
 			return 0;
 			}
 		
-		if(TANK.team == MY_TANK.team && UNITS.player_data[TANK.nation].he3 < cost){
+		if(UNITS.player_data[TANK.nation].he3 < cost){
 			//message
-			screen_message.text = "Not enough HE-3.";
-			screen_message.time = Date.now() + 1000;
+			if(TANK.team == MY_TANK.team){
+				screen_message.text = "Not enough HE-3.";
+				screen_message.time = Date.now() + 1000;
+				}
 			return false;
 			}
 		
@@ -1895,6 +1899,15 @@ function SKILLS_CLASS(){
 		
 	//====== General =========================================================
 	
+	this.get_ability_index = function(type_name, ability_name){
+		for(var i in TYPES){
+			if(TYPES[i].name != type_name) continue;
+			for(var j in TYPES[i].abilities){
+				if(TYPES[i].abilitie[j].name == ability_name)
+					return j;
+				}
+			}
+		};
 	this.do_missile = function(tank_id, enemy_id, skip_broadcast){
 		TANK = UNITS.get_tank_by_id(tank_id);
 		if(TANK.try_missile == undefined) return false;

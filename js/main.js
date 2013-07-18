@@ -5,6 +5,8 @@ Email: www.viliusl@gmail.com
 
 TODO:
 	full mode AI
+		check he3, nothing for free
+	enable try{}
 */
 
 var MAIN = new MAIN_CLASS();
@@ -243,13 +245,19 @@ function MAIN_CLASS(){
 					});
 				}
 			for(var i in TANKS){
-				if(TANKS[i].team != MY_TANK.team) continue;
 				if(TANKS[i].data.name != 'Base') continue;
 				//adding flag
 				if(TANKS[i].team == 'B') //top
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y+60};
+					TANKS[i].flag = { x: TANKS[i].cx(), y: TANKS[i].cy() + 100};
 				else //bottom
-					TANKS[i].flag = { x: TANKS[i].x, y: TANKS[i].y-60};
+					TANKS[i].flag = { x: TANKS[i].cx(), y: TANKS[i].cy() - 100};
+				if(TANKS[i].flag.x < 100)
+					TANKS[i].flag.x = 100;
+				if(TANKS[i].flag.x > WIDTH_MAP-100)
+					TANKS[i].flag.x = WIDTH_MAP-100;
+				
+				if(TANKS[i].team != MY_TANK.team && game_mode == 'single_craft')
+					TANKS[i].use_AI = true;
 				}
 			}
 		

@@ -395,7 +395,7 @@ function UNITS_CLASS(){
 			var length = hp_width * tank.constructing.time / tank.constructing.duration;
 			length = round(length);
 			if(length >= hp_width)
-				delete tank.constructing;
+				length = hp_width;
 			canvas_main.fillStyle = "#d9ce00";
 			canvas_main.fillRect(xx+padding_left, yy+padding_top-3-hp_height, length, hp_height);
 			}
@@ -428,14 +428,17 @@ function UNITS_CLASS(){
 					
 				var new_id = TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
 				var new_name = HELPER.generatePassword(6);
-				var gap_rand = tank.width()*2;
+				var gap_rand = tank.width();
 				var move_x = tank.flag.x + HELPER.getRandomInt(-gap_rand, gap_rand);
 				var move_y = tank.flag.y + HELPER.getRandomInt(-gap_rand, gap_rand);
 				
 				if(game_mode == 'single_craft'){
 					//create tank
 					var new_tank = UNITS.add_tank(1, new_id, new_name, type, tank.team, tank.nation, x, y, angle);
+					UNITS.player_data[new_tank.nation].units++;
 					new_tank.move = 1;
+					if(tank.use_AI == true)
+						new_tank.use_AI = true;
 					//randomize spawn position
 					new_tank.move_to = [
 						move_x, 
@@ -875,7 +878,7 @@ function UNITS_CLASS(){
 		return data;
 		};
 	//check collisions
-	this.check_collisions = function(xx, yy, TANK, full_check){
+	this.check_collisions = function(xx, yy, TANK, full_check, debug){
 		if(full_check == undefined && TYPES[TANK.type].no_collisions != undefined) return false;
 		if(TANK.automove != undefined) return false;
 		xx = Math.round(xx);
@@ -887,6 +890,9 @@ function UNITS_CLASS(){
 		
 		//elements
 		for(var e in MAPS[level-1].elements){
+			if(game_mode == 'single_craft' && TANK.use_AI != undefined && TANK.data.name == 'Mechanic') continue; //ai mechanic can go through everything
+			if(game_mode == 'single_craft' && TANK.use_AI != undefined && TANK.data.name == 'Soldier') continue; //ai soldiers can go through walls
+			
 			var element = MAP.get_element_by_name(MAPS[level-1].elements[e][0]);
 			if(element.collission == false) continue;	
 			var elem_width = IMAGES_SETTINGS.elements[element.name].w;
@@ -910,15 +916,17 @@ function UNITS_CLASS(){
 		//other tanks
 		if(TYPES[TANK.type].types != 'building'){
 			for (i in TANKS){
+				if(TANKS[i].id == TANK.id) continue;			//same tank
 				if((game_mode == 'single_craft' || game_mode == 'multi_craft') && full_check == undefined && TYPES[TANKS[i].type].type != 'building __disabled__') continue;
 				if(full_check == undefined && TANK.use_AI == true && TANK.team == TANKS[i].team && TYPES[TANKS[i].type].type != 'building') continue;
-				if(TANKS[i].id == TANK.id) continue;			//same tank
 				if(full_check == undefined && TYPES[TANKS[i].type].no_collisions != undefined) continue;	//flying units
 				if(TYPES[TANK.type].type == 'tank' && TYPES[TANKS[i].type].type == 'human') continue;	//tanks can go over soldiers
 				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'tank') continue;	//soldiers can go over tanks, why? see above
 				if(TYPES[TANK.type].type == 'human' && TYPES[TANKS[i].type].type == 'human') continue;	//soldier can go over soldiers ...
+				if(TYPES[TANK.type].name == 'Silo' && TYPES[TANKS[i].type].type != 'building') continue;	//Mechanic can craft over others
 				if(TANK.use_AI != undefined && TANKS[i].data.name == 'Tower') continue; //ai can go through towers
 				if(TANKS[i].dead == 1) continue;		//tank dead
+				
 				var size2_w = TANKS[i].width();
 				var size2_h = TANKS[i].height();
 				if(TYPES[TANKS[i].type].type == 'human'){	//soldiers small	
@@ -1010,9 +1018,7 @@ function UNITS_CLASS(){
 				if(TANKS[i].do_construct == undefined) continue;
 				TANK_to = UNITS.get_tank_by_id(TANKS[i].do_construct);
 				if(TANK_to.constructing == undefined) continue;	
-				
 				TANK_to.constructing.time += 1000;	//like 1s
-				
 				if(TANK_to.constructing.time >= TANK_to.constructing.duration)
 					SKILLS.cancel_build(TANKS[i]);
 				}
@@ -2192,10 +2198,17 @@ function UNITS_CLASS(){
 			var nation = COUNTRIES[i].file;
 			UNITS.player_data[nation] = {
 				he3: UNITS.he3_begin,
-				total_he3: 0,
+				total_he3: UNITS.he3_begin,
 				kills: 0,
+				units: 4,
 				total_damage: 0,
 				};
+			}
+		};
+	this.get_type_index = function(type_name){
+		for(var i in TYPES){
+			if(TYPES[i].name == type_name)
+				return i;
 			}
 		};
 	}
