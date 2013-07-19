@@ -983,8 +983,8 @@ function INFOBAR_CLASS(){
 						if(TANKS[ii].data.type == 'building'){
 							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 								team_units = team_units + TANKS[ii].training.length;
-							continue;
 							}
+						if(TANKS[ii].damage == 0) continue;
 						team_units++;
 						}
 					if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;

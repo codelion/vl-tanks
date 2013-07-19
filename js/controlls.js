@@ -337,7 +337,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
+							INFOBAR.ability_hover_text = name+" - "+round(cost)+" HE-3";
 							}
 						}
 					
@@ -422,7 +422,7 @@ function on_mousedown(event){
 		mouseY = mouseY-map_offset[1];
 		mouse_click_pos = [mouseX, mouseY];
 	
-		if(mouse_click_controll==true){			
+		if(mouse_click_controll==true){
 			SKILLS.do_missile(MY_TANK.id);
 			SKILLS.do_bomb(MY_TANK.id);
 			SKILLS.do_jump(MY_TANK.id);

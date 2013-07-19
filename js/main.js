@@ -4,6 +4,11 @@ Author: Vilius
 Email: www.viliusl@gmail.com
 
 TODO:
+	ai
+		after second wave , build towers first
+		attack
+			build few to scare
+			then wait ???
 	easy/normal/hard/immposible
 		in local only
 		50% 100% 200% 300% hp

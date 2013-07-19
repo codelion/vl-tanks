@@ -57,7 +57,7 @@ TYPES.push({
 	damage: [30, 1.5],	//30 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80, 					//tank shooting range
 	scout: 110,					//tank scout range
-	armor: [25, 0.5, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [15, 0.5, 40],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 28,					//moving speed
 	attack_delay: 1.05,				//pause between shoots in seconds
 	turn_speed: 2.5,				//turn speed, higher - faster
@@ -277,7 +277,7 @@ TYPES.push({
 	name: 'Mechanic',
 	type: 'tank',
 	description: ["Constructs, rebuilds and occupies enemy building", "Essential unit in Full mode"],
-	life: [150, 10],
+	life: [120, 10],
 	damage: [10, 1],	//10 dps
 	range: 80,
 	scout: 110,
@@ -297,7 +297,7 @@ TYPES.push({
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	mode: 'craft',
-	cost: 40,
+	cost: 30,
 	});	
 
 //TRex
@@ -443,7 +443,7 @@ TYPES.push({
 	name: 'SAM_Tower',
 	type: 'building',
 	description: ["Tower for air defence"],
-	life: [1000,0],
+	life: [800,0],
 	damage: [50, 0],	//40 dps
 	range: 110,
 	scout: 130,
@@ -460,7 +460,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'air',
-	cost: 90,
+	cost: 60,
 	});
 
 //Scout Tower
@@ -562,7 +562,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 185,
+	cost: 145,
 	});
 
 //Silo

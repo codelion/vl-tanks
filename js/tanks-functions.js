@@ -366,7 +366,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('369');
 				target_range=0;
 				target_mode='';
 				}
@@ -403,7 +403,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_bomb != undefined){
 			delete TANK.try_bomb;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-		 		mouse_click_controll = false;
+		 		mouse_click_controll = false;		log('406');
 		 		target_range=0;
 				target_mode='';
 		 		}
@@ -440,7 +440,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('443');
 				target_range=0;
 				target_mode='';
 				}
@@ -483,7 +483,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('486');
 				target_range=0;
 				target_mode='';
 				}
@@ -792,7 +792,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('795');
 				target_range=0;
 				target_mode='';
 				}
@@ -829,7 +829,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_bomb != undefined){
 			delete TANK.try_bomb;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-		 		mouse_click_controll = false;
+		 		mouse_click_controll = false;		log('832');
 		 		target_range=0;
 				target_mode='';
 		 		}
@@ -918,7 +918,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_bomb != undefined){
 			delete TANK.try_bomb;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-		 		mouse_click_controll = false;
+		 		mouse_click_controll = false;		log('921');
 		 		target_range=0;
 				target_mode='';
 		 		}
@@ -1044,7 +1044,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1047');
 				target_range=0;
 				target_mode='';
 				}
@@ -1084,7 +1084,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_jump != undefined){
 			delete TANK.try_jump;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1087');
 				target_range=0;
 				target_mode='';
 				}
@@ -1185,7 +1185,7 @@ function SKILLS_CLASS(){
 				};
 			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_jump;
-			mouse_click_controll = false;
+			mouse_click_controll = false;		log('1188');
 			target_range=0;
 			target_mode='';
 			return false;
@@ -1217,7 +1217,7 @@ function SKILLS_CLASS(){
 		MAP.auto_scoll_map();
 			
 		delete TANK.try_jump;
-		mouse_click_controll = false;
+		mouse_click_controll = false;		log('1220');
 		target_range=0;
 		target_mode='';
 		};
@@ -1236,7 +1236,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1239');
 				target_range=0;
 				target_mode='';
 				}
@@ -1306,7 +1306,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_bomb != undefined){
 			delete TANK.try_bomb;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1309');
 				target_range=0;
 				target_mode='';
 				}
@@ -1342,7 +1342,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_missile != undefined){
 			delete TANK.try_missile;
 			if(TANK.id == MY_TANK.id && ai == undefined){
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1345');
 				target_range=0;
 				target_mode='';
 				}
@@ -1432,8 +1432,8 @@ function SKILLS_CLASS(){
 			if(TANKS[ii].data.type == 'building'){
 				if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 					team_units = team_units + TANKS[ii].training.length;
-				continue;
 				}
+			if(TANKS[ii].damage == 0) continue;
 			team_units++;
 			}
 		if(TANK.training != undefined && TANK.training.length >= 5) return false;
@@ -1631,7 +1631,7 @@ function SKILLS_CLASS(){
 		if(TANK.try_construct != undefined){
 			delete TANK.try_construct;
 			if(TANK.id == MY_TANK.id){
-		 		mouse_click_controll = false;
+		 		mouse_click_controll = false;		log('1634');
 		 		}
 			return 0;
 			}
@@ -1931,7 +1931,7 @@ function SKILLS_CLASS(){
 			
 			if(enemy.tmp_range > TANK.try_missile.range){
 				//too far - move to target
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('1934');
 				target_range=0;
 				target_mode='';
 				if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
@@ -1989,7 +1989,7 @@ function SKILLS_CLASS(){
 				};
 			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_missile;
-			mouse_click_controll = false;
+			mouse_click_controll = false;		log('1992');
 			target_range=0;
 			target_mode='';
 			return false;
@@ -2015,7 +2015,7 @@ function SKILLS_CLASS(){
 		BULLETS.push(tmp);
 		
 		delete TANK.try_missile;
-		mouse_click_controll = false;
+		mouse_click_controll = false;		log('2018');
 		target_range=0;
 		target_mode='';
 		};
@@ -2041,7 +2041,7 @@ function SKILLS_CLASS(){
 			distance = distance - tank_size_w;
 			if(distance > TANK.try_bomb.range){
 				//too far - move to target
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('2044');
 				target_range=0;
 				target_mode='';
 				if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && skip_broadcast !== true){
@@ -2083,7 +2083,7 @@ function SKILLS_CLASS(){
 				};
 			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			delete TANK.try_bomb;
-			mouse_click_controll = false;
+			mouse_click_controll = false;		log('2086');
 			target_range=0;
 			target_mode='';
 			return false;
@@ -2112,7 +2112,7 @@ function SKILLS_CLASS(){
 		BULLETS.push(tmp);
 
 		delete TANK.try_bomb;
-		mouse_click_controll = false;
+		mouse_click_controll = false;		log('2115');
 		target_range=0;
 		target_mode='';
 		};
@@ -2177,7 +2177,7 @@ function SKILLS_CLASS(){
 			MP.register_tank_action('skill_advanced', opened_room_id, TANK.id, DATA);
 			if(shift_pressed == false){
 				delete TANK.try_construct;
-				mouse_click_controll = false;
+				mouse_click_controll = false;		log('2180');
 				}
 			return false;
 			}
@@ -2221,8 +2221,9 @@ function SKILLS_CLASS(){
 			}
 		if(shift_pressed == false){
 			delete TANK.try_construct;
-			if(TANK.id == MY_TANK.id);
-				mouse_click_controll = false;
+			if(TANK.id == MY_TANK.id){
+				mouse_click_controll = false;		log('2025');
+				}
 			}
 		};
 	}

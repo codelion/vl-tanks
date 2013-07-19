@@ -10,11 +10,15 @@ function AI_CLASS(){
 	var silos_around = 0;	//silos count around active crystal
 	var min_attack_group = 4;
 	var total_silo = 0;	//total silos was created in game
-	var total_towers = 0;
+	var total_towers = 0;	//total towers created
+	var total_factors = 0;	//total factors created
+	var total_war_units = 0;	//total war units created
 	
 	this.init = function(){
 		total_silo = 0;
 		total_towers = 0;
+		total_factors = 0;
+		total_war_units = 0;
 		};
 	this.check_path_AI = function(TANK){
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && TANK.master.id != MY_TANK.id) return false;
@@ -499,7 +503,7 @@ function AI_CLASS(){
 		var cost = TYPES[UNITS.get_type_index('Factory')].cost;
 		if(cost > UNITS.player_data[TANK.nation].he3) return true;
 		if(total_silo < 4) return true;
-		if(total_towers == 0) return false;
+		if(total_towers == 0) return true;
 		
 		//count factories
 		var factory_n = 0;
@@ -509,7 +513,7 @@ function AI_CLASS(){
 			factory_n++;
 			}
 		//create
-		if(factory_n == 0 || factory_n == 1 && silos_around >= 4 || factory_n == 2 || factory_n == 3){
+		if(factory_n < 2 || (factory_n == 2 && UNITS.player_data[TANK.nation].he3 > 200) || (factory_n == 3 && UNITS.player_data[TANK.nation].he3 > 300 )){
 			var fac_i = UNITS.get_type_index('Factory');
 			yy = base.cy();
 			xx = base.cx() + 100;
@@ -540,14 +544,14 @@ function AI_CLASS(){
 				auto_y: yy + TYPES[fac_i].size[2]/2,
 				};
 			SKILLS.do_construct(TANK.id);
+			total_factors++;
 			return false;
 			}
 		};
 	this.create_towers = function(TANK){
-		var cost = TYPES[UNITS.get_type_index('Tower')].cost;
-		if(cost > UNITS.player_data[TANK.nation].he3) return true;
-		if(total_silo < 3) return true;
-	
+		if(total_silo < 3 && total_towers > 0) return true;
+		if(total_factors == 0 && total_silo >=5) return false;
+		
 		//create towers near our base
 		var towers_n = 0;
 		for(var i in TANKS){
@@ -557,10 +561,13 @@ function AI_CLASS(){
 			if(distance > 200) continue;	//target too far
 			towers_n++;
 			}
-		if(towers_n == 0 || (towers_n < 3 && silos_around >= 4)){
+		if(towers_n < 4 && total_silo >= 5 && total_towers > 2){
 			var tower_i = UNITS.get_type_index('Tower');
 			if(towers_n == 1)
-				var tower_i = UNITS.get_type_index('SAM_Tower');	
+				var tower_i = UNITS.get_type_index('SAM_Tower');
+			var cost = TYPES[tower_i].cost;
+			if(cost > UNITS.player_data[TANK.nation].he3) return true;
+					
 			xx = base.cx();
 			yy = base.cy();
 			//move a little to enemy base
@@ -597,31 +604,36 @@ function AI_CLASS(){
 				if(distance > 150) continue;	//target too far
 				towers_n++;
 				}
-		if(towers_n < 2 && silos_around >= 3){
-			var tower_i = UNITS.get_type_index('Tower');
-			if(towers_n == 1)
-				var tower_i = UNITS.get_type_index('SAM_Tower');	
-			xx = crystal.cx-30;
-			yy = crystal.cy+100;
-			if(towers_n == 1)
-				xx += 30;
-			TANK.try_construct = {
-				cost: TYPES[tower_i].cost,
-				reuse: 0,
-				tank_type: tower_i,
-				ability_nr: 0,
-				auto_x: xx + TYPES[tower_i].size[1]/2,
-				auto_y: yy + TYPES[tower_i].size[1]/2,
-				};
-			SKILLS.do_construct(TANK.id);
-			return false;
-			}
+			if(towers_n == 0 || (towers_n == 1 && silos_around >= 3)){
+				var tower_i = UNITS.get_type_index('Tower');
+				if(towers_n == 1)
+					var tower_i = UNITS.get_type_index('SAM_Tower');
+				var cost = TYPES[tower_i].cost;
+				if(cost > UNITS.player_data[TANK.nation].he3) return true;
+				
+				xx = crystal.cx-30;
+				yy = crystal.cy+100;
+				if(towers_n == 1)
+					xx += 30;
+				TANK.try_construct = {
+					cost: TYPES[tower_i].cost,
+					reuse: 0,
+					tank_type: tower_i,
+					ability_nr: 0,
+					auto_x: xx + TYPES[tower_i].size[1]/2,
+					auto_y: yy + TYPES[tower_i].size[1]/2,
+					};
+				SKILLS.do_construct(TANK.id);
+				total_towers++;
+				return false;
+				}
 			}
 		};
 	this.create_silos = function(TANK){
 		var cost = TYPES[UNITS.get_type_index('Silo')].cost;
 		if(cost > UNITS.player_data[TANK.nation].he3) return true;
-		if(total_towers == 0 && total_silo >=3) return false;
+		if(total_towers == 0) return true;
+		if(total_towers == 1 && total_silo > 2) return false;
 		
 		if(silos_around < silo_n && crystal != undefined){
 			var silo_i = UNITS.get_type_index('Silo');
@@ -698,7 +710,7 @@ function AI_CLASS(){
 			var unit_cost = TYPES[type_i].cost;
 			unit_cost = UNITS.apply_buff(TANK, 'cost', unit_cost);
 			if(UNITS.player_data[TANK.nation].he3 < unit_cost)
-				return false;
+				return true;
 			
 			//check units
 			var team_units = 0;
@@ -707,12 +719,12 @@ function AI_CLASS(){
 				if(TANKS[ii].data.type == 'building'){
 					if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 						team_units = team_units + TANKS[ii].training.length;
-					continue;
 					}
+				if(TANKS[ii].damage == 0) continue;
 				team_units++;
 				}
-			if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
-			if(team_units >= MAX_TEAM_TANKS) return false;
+			if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return true;
+			if(team_units >= MAX_TEAM_TANKS) return true;
 			UNITS.player_data[TANK.nation].he3 -= unit_cost;
 			
 			//check respawn buff
@@ -732,6 +744,7 @@ function AI_CLASS(){
 				type: type_i,
 				cost: unit_cost,
 				});
+			total_war_units++;
 			}
 		};
 	this.attack_target = function(TANK, target_tank){
