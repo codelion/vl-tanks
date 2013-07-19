@@ -3,11 +3,12 @@
 HTML5 based tank game. Requires Firefox, Chrome, Internet explorer 10 or Opera. Old IE and Safari does not support all HTML5 features.
 
 ## Features:
-* 9 tanks and 2 air units
+* 15 combat units
 * 3 unique countries
-* 5 maps
+* 6 maps
 * single player
-* multiplayer with 4 modes
+* multiplayer
+* many game variations
 * full screen support
 * HTML5 only, no flash
 
@@ -16,12 +17,9 @@ HTML5 based tank game. Requires Firefox, Chrome, Internet explorer 10 or Opera. 
 * or download and open index.html in modern browser to play dev version
 
 ## Latest News
+* major update with more strategy support
 * countries with unique abilities
 * animations
-* more skills, skills upgrade system
-* even better AI
-* added intro
-* added IE10 support
 
 ## Contacts
 Email me www.viliusl@gmail.com
