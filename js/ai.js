@@ -29,7 +29,7 @@ function AI_CLASS(){
 			y_direction = max_height;
 		
 		//if in battle - stop
-		if(TANK.last_bullet_time + 1000 - Date.now() > 0){
+		if(TANK.last_bullet_time + 1200 - Date.now() > 0){
 			if(game_mode == 'single_quick' || game_mode == 'single_craft'){
 				TANK.move = 0;
 				AI.try_skills(TANK);
@@ -495,12 +495,14 @@ function AI_CLASS(){
 			}
 		};
 	this.create_towers = function(TANK){
-		//create defence towers
+		//create towers near our base
 		var towers_n = 0;
 		for(var i in TANKS){
 			if(TANKS[i].team != TANK.team) continue;
-			if(TANKS[i].data.name == 'Tower' || TANKS[i].data.name == 'SAM_Tower')
-				towers_n++;
+			if(TANKS[i].data.name != 'Tower' && TANKS[i].data.name != 'SAM_Tower') continue;
+			distance = UNITS.get_distance_between_tanks(TANKS[i], base);
+			if(distance > 200) continue;	//target too far
+			towers_n++;
 			}
 		if(towers_n == 0 || (towers_n < 3 && silos_around >= 4)){
 			var tower_i = UNITS.get_type_index('Tower');
@@ -530,6 +532,36 @@ function AI_CLASS(){
 				};
 			SKILLS.do_construct(TANK.id);
 			return false;
+			}
+		//create towers near active crystal for defence
+		if(crystal != undefined){
+			var towers_n = 0;
+			for(var i in TANKS){
+				if(TANKS[i].team != TANK.team) continue;
+				if(TANKS[i].data.name != 'Tower' && TANKS[i].data.name != 'SAM_Tower') continue;
+				distance = UNITS.get_distance_between_tanks(TANKS[i], false, crystal.cx, crystal.cy);
+				if(distance > 150) continue;	//target too far
+				towers_n++;
+				}
+		if(towers_n < 2 && silos_around >= 3){
+			var tower_i = UNITS.get_type_index('Tower');
+			if(towers_n == 1)
+				var tower_i = UNITS.get_type_index('SAM_Tower');	
+			xx = crystal.cx-30;
+			yy = crystal.cy+100;
+			if(towers_n == 1)
+				xx += 30;
+			TANK.try_construct = {
+				cost: TYPES[tower_i].cost,
+				reuse: 0,
+				tank_type: tower_i,
+				ability_nr: 0,
+				auto_x: xx + TYPES[tower_i].size[1]/2,
+				auto_y: yy + TYPES[tower_i].size[1]/2,
+				};
+			SKILLS.do_construct(TANK.id);
+			return false;
+			}
 			}
 		};
 	this.create_silos = function(TANK){
@@ -583,7 +615,7 @@ function AI_CLASS(){
 		if(repair_total > 0) return true;	//other on this
 		//try repair base
 		base_max_hp = UNITS.get_tank_max_hp(base);
-		if(base.hp < base_max_hp){
+		if(base.hp < base_max_hp * 0.7){
 			SKILLS.register_repair(TANK.id, base.id);
 			}
 		};
@@ -610,6 +642,7 @@ function AI_CLASS(){
 			var team_units = 0;
 			for(var ii in TANKS){
 				if(TANKS[ii].team != TANK.team) continue;
+				if(TANKS[ii].data.name != 'tank') continue;
 				if(TANKS[ii].data.type == 'building'){
 					if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 						team_units = team_units + TANKS[ii].training.length;
@@ -646,19 +679,28 @@ function AI_CLASS(){
 			if(TANKS[i].team != TANK.team) continue;
 			if(TANKS[i].data.type != 'tank') continue;
 			if(TANKS[i].data.name == 'Mechanic') continue;
+			if(TANKS[i].move == 1) continue;
+			if(TANKS[i].last_bullet_time + 1200 - Date.now() > 0) continue;
+			
 			units++;
 			}
-		if(units < min_attack_group) return true;
-		
-		//attack
-		for(var i in TANKS){
-			if(TANKS[i].team != TANK.team) continue;
-			if(TANKS[i].data.type != 'tank') continue;
-			if(TANKS[i].data.name == 'Mechanic') continue;
-			
-			TANKS[i].target_move_lock = enemy_base.id;
-			TANKS[i].target_shoot_lock = enemy_base.id;
+		//attack on base
+		if(units >= min_attack_group){
+			for(var i in TANKS){
+				if(TANKS[i].team != TANK.team) continue;
+				if(TANKS[i].data.type != 'tank') continue;
+				if(TANKS[i].data.name == 'Mechanic') continue;
+				if(TANKS[i].move == 1) continue;
+				if(TANKS[i].last_bullet_time + 1200 - Date.now() > 0) continue;
+				
+				TANKS[i].target_move_lock = enemy_base.id;
+				//TANKS[i].target_shoot_lock = enemy_base.id;
+				}
 			}
+		//attack on enemy crystals
+		
+		//attack on enemy Factory
+		
 		};
 	this.defend = function(TANK){
 		

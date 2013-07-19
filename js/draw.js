@@ -250,7 +250,7 @@ function DRAW_CLASS(){
 					}
 				
 				//autoskills
-				if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TANKS[i].last_bullet_time + 1000 - Date.now() > 0){
+				if((game_mode == 'single_craft' || game_mode == 'multi_craft') && TANKS[i].last_bullet_time + 1200 - Date.now() > 0){
 					if(TANKS[i].ai_reuse - Date.now() < 0 || TANKS[i].ai_reuse == undefined){
 						TANKS[i].ai_reuse = 1000/2+Date.now();	//half second pause
 						AI.try_skills(TANKS[i]);

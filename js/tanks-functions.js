@@ -2220,6 +2220,8 @@ function SKILLS_CLASS(){
 				new_tank.flag = { x: new_tank.x, y: new_tank.y+60};
 			else //bottom
 				new_tank.flag = { x: new_tank.x, y: new_tank.y-60};
+			if(new_tank.flag.x < 100)		new_tank.flag.x = 100;
+			if(new_tank.flag.x > WIDTH_MAP-100)	new_tank.flag.x = WIDTH_MAP-100;
 			}
 		if(shift_pressed == false){
 			delete TANK.try_construct;

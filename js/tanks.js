@@ -1406,7 +1406,7 @@ function UNITS_CLASS(){
 		else
 			MP.send_packet('bullet', [TANK_TO.id, TANK.id, round(shoot_angle), false, false, false, TANK.x, TANK.y]);
 		
-		var hit_reuse = TANK.data.attack_delay*1000;
+		var hit_reuse = TANK.data.attack_delay * 1000;
 		hit_reuse = UNITS.apply_buff(TANK, 'hit_reuse', hit_reuse);
 		TANK.hit_reuse = hit_reuse + Date.now();	
 		TANK.check_enemies_reuse = 0;
@@ -1994,8 +1994,9 @@ function UNITS_CLASS(){
 			}
 		return false;
 		};
-	//returns distance bewteen 2 tanks
-	this.get_distance_between_tanks = function(id1, id2){	
+	//returns distance bewteen 2 tanks - provide 2 tanks objects or ids
+	//second object can be false, but then cx2, cy2 must be provided
+	this.get_distance_between_tanks = function(id1, id2, cx2, cy2){	
 		if(typeof id1 == 'object')
 			tank1 = id1;
 		else
@@ -2004,14 +2005,23 @@ function UNITS_CLASS(){
 			tank2 = id2;
 		else
 			tank2 = UNITS.get_tank_by_id(id2);
-		if(tank1===false || tank2===false) return 100000;
-		if(tank1.id==tank2.id) return 0;
+		if(tank1===false) return 100000;
+		if(tank2===false && id2 !== false && cx2 == undefined && cy2 == undefined) return 100000;
+		if(id2 !== false && tank1.id == tank2.id) return 0;
 		
-		dist_x = tank1.cx() - (tank2.cx());
-		dist_y = tank1.cy() - (tank2.cy());
+		if(id2 === false){
+			dist_x = tank1.cx() - cx2;
+			dist_y = tank1.cy() - cy2;
+			}
+		else{
+			dist_x = tank1.cx() - (tank2.cx());
+			dist_y = tank1.cy() - (tank2.cy());
+			}
 		
-		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
-		distance = distance - tank1.width()/2 - tank2.width()/2;
+		distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y)); 		
+		distance = distance - tank1.width()/2;
+		if(id2 !== false)
+			distance = distance - tank2.width()/2;
 		distance = round(distance);
 		if(distance<0) distance = 0;
 		return distance;

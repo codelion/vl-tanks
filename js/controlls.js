@@ -66,6 +66,7 @@ function on_keyboard_action(event){
 					//
 					if(mouse_click_controll == true){
 						UNITS.prepare_tank_move(MY_TANK);
+						delete MY_TANK.try_construct;
 						mouse_click_controll = false;
 						}
 					}	

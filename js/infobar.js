@@ -980,6 +980,7 @@ function INFOBAR_CLASS(){
 					var team_units = 0;
 					for(var ii in TANKS){
 						if(TANKS[ii].team != MY_TANK.team) continue;
+						if(TANKS[ii].data.name != 'tank') continue;
 						if(TANKS[ii].data.type == 'building'){
 							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 								team_units = team_units + TANKS[ii].training.length;

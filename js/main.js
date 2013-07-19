@@ -5,6 +5,9 @@ Email: www.viliusl@gmail.com
 
 TODO:
 	full mode AI
+		on attack stop if towers
+		attack enemy resoures and factories
+		defence
 		check he3, nothing for free
 	enable try{}
 */
@@ -244,17 +247,15 @@ function MAIN_CLASS(){
 					power: CRYSTAL_POWER,
 					});
 				}
+			//add flags
 			for(var i in TANKS){
 				if(TANKS[i].data.name != 'Base') continue;
-				//adding flag
 				if(TANKS[i].team == 'B') //top
 					TANKS[i].flag = { x: TANKS[i].cx(), y: TANKS[i].cy() + 100};
 				else //bottom
 					TANKS[i].flag = { x: TANKS[i].cx(), y: TANKS[i].cy() - 100};
-				if(TANKS[i].flag.x < 100)
-					TANKS[i].flag.x = 100;
-				if(TANKS[i].flag.x > WIDTH_MAP-100)
-					TANKS[i].flag.x = WIDTH_MAP-100;
+				if(TANKS[i].flag.x < 100)		TANKS[i].flag.x = 100;
+				if(TANKS[i].flag.x > WIDTH_MAP-100)	TANKS[i].flag.x = WIDTH_MAP-100;
 				
 				if(TANKS[i].team != MY_TANK.team && game_mode == 'single_craft')
 					TANKS[i].use_AI = true;
