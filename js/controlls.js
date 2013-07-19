@@ -67,7 +67,7 @@ function on_keyboard_action(event){
 					if(mouse_click_controll == true){
 						UNITS.prepare_tank_move(MY_TANK);
 						delete MY_TANK.try_construct;
-						mouse_click_controll = false;
+						mouse_click_controll = false;	log('70.');
 						}
 					}	
 				}
@@ -372,7 +372,9 @@ function on_mouse_right_click(event){
 		mouseY = event.layerY-map_offset[1];
 		}
 	if(PLACE == 'game'){
-		mouse_click_controll = false;
+		if(mouse_click_controll == true){
+			mouse_click_controll = false;		log('375.');
+			}
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue;
@@ -419,7 +421,8 @@ function on_mousedown(event){
 		mouseX = mouseX-map_offset[0];
 		mouseY = mouseY-map_offset[1];
 		mouse_click_pos = [mouseX, mouseY];
-		if(mouse_click_controll==true){
+	
+		if(mouse_click_controll==true){			
 			SKILLS.do_missile(MY_TANK.id);
 			SKILLS.do_bomb(MY_TANK.id);
 			SKILLS.do_jump(MY_TANK.id);

@@ -34,7 +34,7 @@ function DRAW_CLASS(){
 		//tanks actions
 		for(var i=0; i < TANKS.length; i++){
 			var angle = undefined;
-			//try{
+			try{
 				//speed multiplier
 				var speed_multiplier = 1;
 				speed_multiplier = UNITS.apply_buff(TANKS[i], 'speed', speed_multiplier);
@@ -269,11 +269,12 @@ function DRAW_CLASS(){
 				if(PLACE == 'game' && TANKS[i] != undefined){
 					UNITS.check_enemies(TANKS[i]);
 					UNITS.draw_tank(TANKS[i]);
+					UNITS.train_process(TANKS[i]);
 					}
-				/*}
+				}
 			catch(err){
 				console.log("Error: "+err.message);
-				}*/
+				}
 			}
 		
 		//target	
@@ -418,6 +419,8 @@ function DRAW_CLASS(){
 		var value = round(UNITS.player_data[my_nation].he3);
 		
 		value = HELPER.format("#,##0.####", value);
+		if(DEBUG == true)
+			value = value+" / "+round(UNITS.player_data[MAIN.enemy_nation].he3);
 		
 		DRAW.draw_image(canvas_main, 'he3', left, top);
 		canvas_main.fillStyle = "#ffffff";
@@ -448,7 +451,7 @@ function DRAW_CLASS(){
 		
 		//text
 		if(logo_visible==1){
-			var text = "Moon wars".split("").join(String.fromCharCode(8201));
+			var text = "Moon wars".split("").join(" ");
 			canvas_backround.font = "Bold 70px Arial";
 			canvas_backround.strokeStyle = '#ffffff';
 			canvas_backround.strokeText(text, 160, 340);
@@ -801,7 +804,7 @@ function DRAW_CLASS(){
 		if(change_logo==undefined){
 			if(logo_visible==0){
 				logo_visible=1;
-				var text = "Moon wars".split("").join(String.fromCharCode(8201));
+				var text = "Moon wars".split("").join(" ");
 				canvas_backround.font = "Bold 70px Arial";
 				canvas_backround.strokeStyle = '#ffffff';
 				canvas_backround.strokeText(text, left, top+52);
@@ -1591,7 +1594,7 @@ function DRAW_CLASS(){
 		else
 			canvas_backround.fillText(text, 25, red_line_y+graph_height-5);
 		};
-	//shwo preload progress line
+	//show preload progress line
 	this.update_preload = function(images_loaded){
 		if(preloaded==true) return false;
 		preload_left = preload_left - images_loaded;
@@ -1788,7 +1791,9 @@ function DRAW_CLASS(){
 			DRAW.add_first_screen_elements();
 			return false;
 			}
+		
 		//draw
+		MAIN.IMAGES_INRO = new Image();	//chrome requires new image for using onload...
 		MAIN.IMAGES_INRO.onload = function(){
 			canvas_backround.drawImage(MAIN.IMAGES_INRO, 0, intro_h*intro_page, intro_w, intro_h, 0, 0, intro_w, intro_h);
 			//draw text

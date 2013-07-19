@@ -78,7 +78,7 @@ TYPES.push({
 	bullet: 'bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	//mode: 'quick',				//if set, unit available only in quick/craft mode
-	cost: 80,					//unit cost in full mode
+	cost: 100,					//unit cost in full mode
 	});
 
 //Heavy
@@ -132,7 +132,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	cost: 50,
+	cost: 80,
 	});
 
 //Launcher
@@ -282,7 +282,7 @@ TYPES.push({
 	range: 80,
 	scout: 110,
 	armor: [10, 0, 10],
-	speed: 25,		speed: 100,	range: 150,	damage: [30, 1], scout: 11000,
+	speed: 25,				speed: 100,	scout: 11000,
 	attack_delay: 1.04,
 	turn_speed: 3,
 	abilities: [
@@ -435,7 +435,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'ground',
-	cost: 150,
+	cost: 80,
 	});
 	
 //SAM Tower
@@ -460,7 +460,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'air',
-	cost: 120,
+	cost: 90,
 	});
 
 //Scout Tower
@@ -536,7 +536,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 150,
+	cost: 110,
 	});
 
 //Research
@@ -585,5 +585,5 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 60,
+	cost: 50,
 	});

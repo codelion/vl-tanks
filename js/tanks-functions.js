@@ -1382,10 +1382,8 @@ function SKILLS_CLASS(){
 		if(settings_only != undefined) return {reuse: reuse};
 		
 		if(TANK.constructing != undefined) return false;
-		if(TANK.team == MY_TANK.team){
-			if(UNITS.player_data[TANK.nation].he3 < cost) return false;
-			UNITS.player_data[TANK.nation].he3 -= cost;
-			}
+		if(TANK.team == MY_TANK.team && UNITS.player_data[TANK.nation].he3 < cost) return false;
+		UNITS.player_data[TANK.nation].he3 -= cost;
 		
 		TANK.abilities_reuse[0] = Date.now() + reuse;	
 		TANK.abilities_reuse_max[0] = reuse;
@@ -1444,8 +1442,7 @@ function SKILLS_CLASS(){
 			screen_message.time = Date.now() + 1000;
 			return false;
 			}
-		if(TANK.team == MY_TANK.team)
-			UNITS.player_data[TANK.nation].he3 -= cost;
+		UNITS.player_data[TANK.nation].he3 -= cost;
 		
 		//check respawn buff
 		for(var b in COUNTRIES[TANK.nation].buffs){
@@ -2151,10 +2148,9 @@ function SKILLS_CLASS(){
 		if(TANK.abilities_reuse[nr] > Date.now() ) return false; //last check
 		
 		TANK.try_construct.cost = UNITS.apply_buff(TANK, 'cost', TANK.try_construct.cost);
-		if(TANK.team == MY_TANK.team && skip_broadcast == undefined){
-			if(UNITS.player_data[TANK.nation].he3 < TANK.try_construct.cost)	return false;
-			UNITS.player_data[TANK.nation].he3 -= TANK.try_construct.cost;
-			}
+		if(TANK.team == MY_TANK.team && skip_broadcast == undefined)
+			if(UNITS.player_data[TANK.nation].he3 < TANK.try_construct.cost) return false;
+		UNITS.player_data[TANK.nation].he3 -= TANK.try_construct.cost;
 		
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_construct.reuse;
 		TANK.abilities_reuse_max[nr] = TANK.try_construct.reuse;
@@ -2225,7 +2221,8 @@ function SKILLS_CLASS(){
 			}
 		if(shift_pressed == false){
 			delete TANK.try_construct;
-			mouse_click_controll = false;
+			if(TANK.id == MY_TANK.id);
+				mouse_click_controll = false;
 			}
 		};
 	}

@@ -3,7 +3,6 @@ var UNITS = new UNITS_CLASS();
 function UNITS_CLASS(){
 	this.flag_width = 15;
 	this.flag_height = 9;
-	this.he3_begin = 260;
 	this.player_data = {};	//player data in full mode
 	
 	//adds new tank
@@ -399,9 +398,13 @@ function UNITS_CLASS(){
 			canvas_main.fillStyle = "#d9ce00";
 			canvas_main.fillRect(xx+padding_left, yy+padding_top-3-hp_height, length, hp_height);
 			}
-		UNITS.train_process(tank);
 		};
 	this.train_process = function(tank){
+		xx = round(tank.x+map_offset[0]);
+		yy = round(tank.y+map_offset[1]);
+		padding_left = round((tank.width() - hp_width)/2);
+		padding_top = round(tank.height()*7/100);
+		
 		if(tank.training == undefined) return false;
 		for(var t=0; t < tank.training.length; t++){
 			var type = tank.training[t].type;
@@ -423,7 +426,7 @@ function UNITS_CLASS(){
 				if(y > HEIGHT_MAP) y = HEIGHT_MAP;
 				
 				var angle = 180;
-				if(MY_TANK.team != 'B')
+				if(tank.team != 'B')
 					angle = 0;
 					
 				var new_id = TYPES[type].name+'-'+HELPER.getRandomInt(0, 999999);
@@ -468,10 +471,13 @@ function UNITS_CLASS(){
 				tank.training.splice(t, 1); t--;
 				break;
 				}
-			canvas_main.fillStyle = "#d9ce00";
-			hp_height = 3;
-			var gap = 3*(t+1);
-			canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
+			//draw
+			if(tank.team == MY_TANK.team){
+				canvas_main.fillStyle = "#d9ce00";
+				hp_height = 3;
+				var gap = 3*(t+1);
+				canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
+				}
 			break;
 			}
 		};
@@ -880,7 +886,7 @@ function UNITS_CLASS(){
 	//check collisions
 	this.check_collisions = function(xx, yy, TANK, full_check, debug){
 		if(full_check == undefined && TYPES[TANK.type].no_collisions != undefined) return false;
-		if(TANK.automove != undefined) return false;
+		if(TANK.automove != undefined && TANK.data.name == 'Soldier') return false;
 		xx = Math.round(xx);
 		yy = Math.round(yy);
 	
@@ -1676,7 +1682,7 @@ function UNITS_CLASS(){
 		tank.abilities_reuse_max = [0, 0, 0];
 		delete tank.target_move_lock;
 		delete tank.target_shoot_lock;
-		mouse_click_controll = false;
+		mouse_click_controll = false;			log('1685...death');
 		target_range=0;	
 		//removing short buffs
 		for(var i=0; i < tank.buffs.length; i++){
@@ -2207,8 +2213,8 @@ function UNITS_CLASS(){
 		for(var i in COUNTRIES){
 			var nation = COUNTRIES[i].file;
 			UNITS.player_data[nation] = {
-				he3: UNITS.he3_begin,
-				total_he3: UNITS.he3_begin,
+				he3: HE3_BEGIN,
+				total_he3: HE3_BEGIN,
 				kills: 0,
 				units: 4,
 				total_damage: 0,

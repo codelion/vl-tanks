@@ -25,7 +25,8 @@ var MAX_TEAM_TANKS = 20;		//max tanks for 1 team in commander mode
 var CRYSTAL_POWER = 3000;		//how much he3 1 crystal has
 var CRYSTAL_THREADS = 10;		//max silos for 1 crystal
 var CRYSTAL_RANGE = 100;		//crystal/silo range
-var SILO_POWER = 100;			//how much he3 silo generates per 1s
+var HE3_BEGIN = 260;			//he-3 at begin, recommended 260
+var SILO_POWER = 1;			//how much he3 silo generates per 1s
 var QUALITY = 3;			//1=low, 2=mid, 3=high
 var MAX_BULLET_RANGE = 160;		//for units position sync, if exeeds - unit position is synced
 
@@ -96,13 +97,13 @@ var bots_interval_id;			//controller for adding new bots function, rate: once pe
 
 //========= canvas layers ======================================================
 
-var canvas_map = document.getElementById("canvas_map").getContext("2d");			//map
-var canvas_fog = document.getElementById("canvas_fog").getContext("2d");			//fog
+var canvas_map = document.getElementById("canvas_map").getContext("2d");		//map
+var canvas_fog = document.getElementById("canvas_fog").getContext("2d");		//fog
 var canvas_map_sight = document.getElementById("canvas_map_sight").getContext("2d");	//sight
 var canvas_backround = document.getElementById("canvas_backround").getContext("2d");	//backgrounds
 var canvas_base = document.getElementById("canvas_main");
-var canvas_main = canvas_base.getContext("2d");								//objects
-var MINI_FOG;													//fog inside mini map
+var canvas_main = canvas_base.getContext("2d");						//objects
+var MINI_FOG;										//fog inside mini map
 
 //========= events handlers ====================================================
 

@@ -2,14 +2,20 @@ var AI = new AI_CLASS();
 
 function AI_CLASS(){
 	var silo_n = 5;	//max silos around crystal
-	var mechanic_m = 3;	//mechanic count
+	var mechanic_m = 2;	//mechanic count
 	var combat_unit = 'Apache';	//main comabar unit
 	var crystal;	//active nearest crystal
 	var enemy_base;	//nearest
 	var base;	//our base
 	var silos_around = 0;	//silos count around active crystal
 	var min_attack_group = 4;
+	var total_silo = 0;	//total silos was created in game
+	var total_towers = 0;
 	
+	this.init = function(){
+		total_silo = 0;
+		total_towers = 0;
+		};
 	this.check_path_AI = function(TANK){
 		if((game_mode == 'multi_quick' || game_mode == 'multi_craft') && TANK.master.id != MY_TANK.id) return false;
 		if(TANK.id == MY_TANK.id) return false;
@@ -374,7 +380,6 @@ function AI_CLASS(){
 		};
 	//more advanced combat system
 	this.advanced_ai_actions = function(TANK){
-		
 		//find bases
 		for(var i in TANKS){
 			if(TANKS[i].data.name != 'Base') continue;
@@ -399,6 +404,21 @@ function AI_CLASS(){
 			var dist_x = MAP_CRYSTALS[c].cx - base.cx();
 			var dist_y = MAP_CRYSTALS[c].cy - base.cy();
 			var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			
+			//calc silos around
+			var n = 0;
+			for(var i in TANKS){
+				if(TANKS[i].team != TANK.team) continue;
+				if(TANKS[i].data.name != 'Silo') continue;
+				var dist_x = MAP_CRYSTALS[c].cx - TANKS[i].cx();
+				var dist_y = MAP_CRYSTALS[c].cy - TANKS[i].cy();
+				var distance_silo = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+				if(distance_silo >= 100) continue;
+				n++;
+				}
+			if(n >= silo_n)
+				continue;	//this crystal already has silos
+			
 			if(distance < min_range && MAP_CRYSTALS[c].power > 0){
 				crystal = MAP_CRYSTALS[c];
 				min_range = distance;
@@ -406,7 +426,7 @@ function AI_CLASS(){
 			}
 		if(crystal != undefined && HEIGHT_MAP - crystal.cy < 200)
 			crystal = undefined;	//to close to enemy line
-			
+		
 		//make sure we have mechanics
 		var Mechanic_n = 0;
 		for(var i in TANKS){
@@ -416,12 +436,18 @@ function AI_CLASS(){
 			}
 		if(base.training != undefined)
 			Mechanic_n += base.training.length;
-		if(Mechanic_n < mechanic_m)
-			SKILLS.Mechanic(base);
+		if(Mechanic_n < mechanic_m){
+			var cost = TYPES[UNITS.get_type_index('Mechanic')].cost;
+			create = true;
+			if(cost > UNITS.player_data[TANK.nation].he3) create = false;
+			if(total_silo < 5 && Mechanic_n > 1) create = false;
+			
+			if(create == true)
+				SKILLS.Mechanic(base);
+			}
 			
 		AI.create_attack_units(TANK);
 		AI.attack(TANK);
-		AI.defend(TANK);
 		AI.kill_empty_silos(TANK);
 
 		if(TANK.data.name == 'Base') return false;	//base is for basic AI check
@@ -443,10 +469,17 @@ function AI_CLASS(){
 			if(TANKS[i].team != TANK.team) continue;
 			if(TANKS[i].data.name != 'Silo') continue;
 			if(TANKS[i].crystal == undefined) continue;
+			if(crystal == undefined) continue;
+			
+			var dist_x = crystal.cx - TANKS[i].cx();
+			var dist_y = crystal.cy - TANKS[i].cy();
+			var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+			if(distance >= 100) continue;
+			
 			silos_around++;
 			}
 		
-		//add silo to nearest crystal
+		//give some tasks to Mechanics
 		if(TANK.data.name == 'Mechanic'){
 			//validate mechanic
 			if(TANK.do_construct != undefined){
@@ -455,7 +488,7 @@ function AI_CLASS(){
 					delete TANK.do_construct;
 				}
 			if(TANK.do_construct != undefined || TANK.move == 1) return false; //mechanich in use
-
+			
 			if(AI.create_factories(TANK) === false) return false;
 			if(AI.create_towers(TANK) === false) return false;
 			if(AI.repair(TANK) === false) return false;
@@ -463,6 +496,11 @@ function AI_CLASS(){
 			}
 		};
 	this.create_factories = function(TANK){
+		var cost = TYPES[UNITS.get_type_index('Factory')].cost;
+		if(cost > UNITS.player_data[TANK.nation].he3) return true;
+		if(total_silo < 4) return true;
+		if(total_towers == 0) return false;
+		
 		//count factories
 		var factory_n = 0;
 		for(var i in TANKS){
@@ -471,15 +509,26 @@ function AI_CLASS(){
 			factory_n++;
 			}
 		//create
-		if(factory_n == 0 || factory_n == 1 && silos_around >= 4 || factory_n == 2){
+		if(factory_n == 0 || factory_n == 1 && silos_around >= 4 || factory_n == 2 || factory_n == 3){
 			var fac_i = UNITS.get_type_index('Factory');
 			yy = base.cy();
 			xx = base.cx() + 100;
 			var dx = -500;
 			for(i=0; i < 10; i++){
-				xx = base.cx() - 500 + i*100;
-				if(UNITS.check_collisions(xx+TYPES[fac_i].size[1]/2, yy+TYPES[fac_i].size[1]/2, {type:fac_i}, true)==false)
-					break;
+				xx = base.cx() - 500 + i*100;	
+				if(UNITS.check_collisions(xx+TYPES[fac_i].size[1]/2, yy+TYPES[fac_i].size[1]/2, {type:fac_i}, true)==true)
+					continue;
+				//make sure there is no crystal near - we need space for silos
+				var valid = true;
+				for(var c in MAP_CRYSTALS){
+					var dist_x = MAP_CRYSTALS[c].cx - (xx + TYPES[fac_i].size[2]/1);
+					var dist_y = MAP_CRYSTALS[c].cy - (yy + TYPES[fac_i].size[2]/2);
+					var distance = Math.sqrt((dist_x*dist_x)+(dist_y*dist_y));
+					if(distance < 100)
+						valid = false;
+					}
+				if(valid == false) continue;
+				break;
 				}
 			
 			TANK.try_construct = {
@@ -495,6 +544,10 @@ function AI_CLASS(){
 			}
 		};
 	this.create_towers = function(TANK){
+		var cost = TYPES[UNITS.get_type_index('Tower')].cost;
+		if(cost > UNITS.player_data[TANK.nation].he3) return true;
+		if(total_silo < 3) return true;
+	
 		//create towers near our base
 		var towers_n = 0;
 		for(var i in TANKS){
@@ -531,6 +584,7 @@ function AI_CLASS(){
 				auto_y: yy + TYPES[tower_i].size[1]/2,
 				};
 			SKILLS.do_construct(TANK.id);
+			total_towers++;
 			return false;
 			}
 		//create towers near active crystal for defence
@@ -565,6 +619,10 @@ function AI_CLASS(){
 			}
 		};
 	this.create_silos = function(TANK){
+		var cost = TYPES[UNITS.get_type_index('Silo')].cost;
+		if(cost > UNITS.player_data[TANK.nation].he3) return true;
+		if(total_towers == 0 && total_silo >=3) return false;
+		
 		if(silos_around < silo_n && crystal != undefined){
 			var silo_i = UNITS.get_type_index('Silo');
 			var silo_size = TYPES[silo_i].size[1];
@@ -590,6 +648,7 @@ function AI_CLASS(){
 						auto_y: j + TYPES[silo_i].size[1]/2,
 						};
 					SKILLS.do_construct(TANK.id);
+					total_silo++;
 					return false;
 					}
 				}
@@ -620,6 +679,9 @@ function AI_CLASS(){
 			}
 		};
 	this.create_attack_units = function(TANK){
+		if(UNITS.player_data[TANK.nation].he3 < 100) return true;
+		if(total_silo < 5 && UNITS.player_data[TANK.nation].he3 < 150) return true;
+		
 		var type_i = UNITS.get_type_index(combat_unit);
 		var duration = 30*1000;
 		if(TYPES[type_i].type == 'human')
@@ -642,7 +704,6 @@ function AI_CLASS(){
 			var team_units = 0;
 			for(var ii in TANKS){
 				if(TANKS[ii].team != TANK.team) continue;
-				if(TANKS[ii].data.name != 'tank') continue;
 				if(TANKS[ii].data.type == 'building'){
 					if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 						team_units = team_units + TANKS[ii].training.length;
@@ -673,8 +734,7 @@ function AI_CLASS(){
 				});
 			}
 		};
-	this.attack = function(TANK){
-		var units = 0;
+	this.attack_target = function(TANK, target_tank){
 		for(var i in TANKS){
 			if(TANKS[i].team != TANK.team) continue;
 			if(TANKS[i].data.type != 'tank') continue;
@@ -682,27 +742,80 @@ function AI_CLASS(){
 			if(TANKS[i].move == 1) continue;
 			if(TANKS[i].last_bullet_time + 1200 - Date.now() > 0) continue;
 			
+			xx = target_tank.cx();
+			yy = target_tank.cy();
+			
+			TANKS[i].automove = 1;	//will stop near enemies, and continue to move
+			TANKS[i].move = 1;
+			TANKS[i].move_to = [xx, yy];
+			}
+		};
+	this.attack = function(TANK){
+		var units = 0;		//total war units
+		var total_units = 0;	//total war units ready for combat
+		var random = HELPER.getRandomInt(1, 100);
+		for(var i in TANKS){
+			if(TANKS[i].team != TANK.team) continue;
+			if(TANKS[i].data.type != 'tank') continue;
+			if(TANKS[i].data.name == 'Mechanic') continue;
+			total_units++;
+			if(TANKS[i].move == 1) continue;
+			if(TANKS[i].last_bullet_time + 1200 - Date.now() > 0) continue;
 			units++;
 			}
 		//attack on base
-		if(units >= min_attack_group){
+		if(units >= min_attack_group && random < 30)
+			AI.attack_target(TANK, enemy_base);
+		//attack nearest enemy - this is defence also
+		else if(units >= 2 && random < 50){
+			var target;
+			var range_min = 999999;
 			for(var i in TANKS){
-				if(TANKS[i].team != TANK.team) continue;
 				if(TANKS[i].data.type != 'tank') continue;
-				if(TANKS[i].data.name == 'Mechanic') continue;
-				if(TANKS[i].move == 1) continue;
-				if(TANKS[i].last_bullet_time + 1200 - Date.now() > 0) continue;
-				
-				TANKS[i].target_move_lock = enemy_base.id;
-				//TANKS[i].target_shoot_lock = enemy_base.id;
+				if(TANKS[i].team == TANK.team) continue;
+				range = UNITS.get_distance_between_tanks(TANKS[i], base);
+				if(range < range_min){
+					target = TANKS[i];
+					range_min = range;
+					}
+				}
+			if(target != undefined){
+				AI.attack_target(TANK, target);
 				}
 			}
-		//attack on enemy crystals
-		
+		//attack on enemy silos
+		else if(units >= 2 && random < 80 || total_units <= 2){
+			var target;
+			var range_min = 999999;
+			for(var i in TANKS){
+				if(TANKS[i].data.name != 'Silo') continue;
+				if(TANKS[i].team == TANK.team) continue;
+				range = UNITS.get_distance_between_tanks(TANKS[i], base);
+				if(range < range_min){
+					target = TANKS[i];
+					range_min = range;
+					}
+				}
+			if(target != undefined){
+				AI.attack_target(TANK, target);
+				}
+			}
 		//attack on enemy Factory
-		
-		};
-	this.defend = function(TANK){
-		
+		else if(units >= 2){
+			var target;
+			var range_min = 999999;
+			for(var i in TANKS){
+				if(TANKS[i].data.name != 'Factory') continue;
+				if(TANKS[i].team == TANK.team) continue;
+				range = UNITS.get_distance_between_tanks(TANKS[i], base);
+				if(range < range_min){
+					target = TANKS[i];
+					range_min = range;
+					}
+				}
+			if(target != undefined){
+				AI.attack_target(TANK, target);
+				}
+			}
 		};
 	}
