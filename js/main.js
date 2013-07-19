@@ -26,7 +26,7 @@ function MAIN_CLASS(){
 	this.IMAGES_ELEMENTS = new Image();
 	this.IMAGES_INRO = new Image();
 	this.intro_enabled = 1;			//if show intro
-	this.player_sync_done = false;c
+	this.player_sync_done = false;
 	var images_src_n = 7;			//images count to load, intro excluded
 	var page_title_copy = 'Moon wars';	//copy of original title
 	
