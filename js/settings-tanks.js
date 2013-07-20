@@ -132,7 +132,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	cost: 80,
+	cost: 70,
 	});
 
 //Launcher
@@ -282,7 +282,7 @@ TYPES.push({
 	range: 80,
 	scout: 110,
 	armor: [10, 0, 10],
-	speed: 25,				speed: 100,	scout: 11000,
+	speed: 25,
 	attack_delay: 1.04,
 	turn_speed: 3,
 	abilities: [
