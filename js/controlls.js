@@ -41,8 +41,13 @@ function on_keyboard_action(event){
 			else if(k == 37)
 				MAP.scoll_map(1, 0); 	//right
 			else if(k == 46){ 		//del
-				if(MY_TANK.data.name != "Base")
+				if(MY_TANK.data.name != "Base"){
+					if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
+						if(MY_TANK.data.name != 'human')
+							UNITS.player_data[MY_TANK.nation].he3 += round(MY_TANK.data.cost/2);
+						}
 					UNITS.do_damage(MY_TANK, MY_TANK, {damage: UNITS.get_tank_max_hp(MY_TANK), pierce_armor: 100});
+					}
 				}
 			else if(k == 27){		//esc
 				if(PLACE == 'game'){
@@ -61,7 +66,22 @@ function on_keyboard_action(event){
 					//
 					if(mouse_click_controll == true){
 						UNITS.prepare_tank_move(MY_TANK);
-						mouse_click_controll = false;
+						delete MY_TANK.try_construct;
+						mouse_click_controll = false;	log('70.');
+						}
+					}	
+				}
+			else if(k == 77){	//m
+				if(DEBUG == true){
+					//reveal map - base gets 9999 sight
+					for(var i in TANKS){
+						if(TANKS[i].data.name == 'Base'){
+							if(TANKS[i].sight != 9999)
+								TANKS[i].sight = 9999;
+							else
+								TANKS[i].sight = TANKS[i].data.scout + round(TANKS[i].width()/2);
+							}
+						TANKS[i].scouted = true;
 						}
 					}	
 				}
@@ -91,7 +111,7 @@ function on_keyboard_action(event){
 		}
 	if(k==13){
 		//enter
-		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select' || PLACE=='score'){
+		if(PLACE=='rooms' || PLACE=='room' || PLACE=='game' || PLACE=='select'){
 			if(chat_mode==0){
 				//begin write
 				chat_mode=1;
@@ -161,7 +181,7 @@ function MouseWheelHandler(e){
 		MAP.scoll_map(0, -1);
 	
 	//disable page scroll - dont worry, only on started game area
-	e.preventDefault()
+	e.preventDefault();
 	return false;
 	}
 
@@ -275,7 +295,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
 							}
 						}
 					
@@ -295,7 +315,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3";
 							}
 						}
 					
@@ -317,7 +337,7 @@ function on_mousemove_background(event){
 							var name = TYPES[i].name.replace("_"," ");
 							var cost = TYPES[i].cost;
 							cost = UNITS.apply_buff(MY_TANK, 'cost', cost);
-							INFOBAR.ability_hover_text = name+" - "+cost+" HE-3"
+							INFOBAR.ability_hover_text = name+" - "+round(cost)+" HE-3";
 							}
 						}
 					
@@ -352,7 +372,9 @@ function on_mouse_right_click(event){
 		mouseY = event.layerY-map_offset[1];
 		}
 	if(PLACE == 'game'){
-		mouse_click_controll = false;
+		if(mouse_click_controll == true){
+			mouse_click_controll = false;		log('375.');
+			}
 		if(game_mode == 'single_craft' || game_mode == 'multi_craft'){
 			for(var i in TANKS){
 				if(TANKS[i].team != MY_TANK.team) continue;
@@ -399,6 +421,7 @@ function on_mousedown(event){
 		mouseX = mouseX-map_offset[0];
 		mouseY = mouseY-map_offset[1];
 		mouse_click_pos = [mouseX, mouseY];
+	
 		if(mouse_click_controll==true){
 			SKILLS.do_missile(MY_TANK.id);
 			SKILLS.do_bomb(MY_TANK.id);
@@ -607,7 +630,7 @@ function full_screenchange_handler(event){
 			}
 		else if(PLACE == 'init'){
 			MAIN.check_canvas_sizes();
-			MAIN.init_game(false);
+			MAIN.home(false);
 			}	
 		}
 	}

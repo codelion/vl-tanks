@@ -1,3 +1,6 @@
+var COUNTRIES = new Array();		//countries
+var TYPES = new Array();		//tanks types config
+
 COUNTRIES = {
 	us: {
 		name: 'United States', 
@@ -6,7 +9,7 @@ COUNTRIES = {
 		pros: 'High damage units per second will allow you to shine at offensive strategy.',
 		cons: 'Enemy mines',
 		buffs: [
-			{ name: 'damage',		power: 1.1, },
+			{ name: 'damage',	power: 1.1, },
 			],
 		tanks_lock: ['Heavy', 'Miner', 'TRex'],
 		tank_unique: 'Bomber',
@@ -19,7 +22,7 @@ COUNTRIES = {
 		pros: 'Units will excel at defence.',
 		cons: 'Issues in offensive strategy',
 		buffs: [
-			{ name: 'health',		power: 1.15,	},
+			{ name: 'health',	power: 1.15,	},
 			],
 		tanks_lock: ['Cruiser', 'TRex', 'Bomber'],
 		tank_unique: 'Heavy',
@@ -33,15 +36,15 @@ COUNTRIES = {
 		cons: 'Units have less health.',
 		buffs: [
 			{ name: 'respawn',	power: 0.5, },
-			{ name: 'speed',		power: 1.15,},
-			{ name: 'health',		power: 0.9,	},
+			{ name: 'speed',	power: 1.15,},
+			{ name: 'health',	power: 0.9,	},
 			{ name: 'cost',		power: 0.9,	},
 			],
 		tanks_lock: ['Heavy', 'Stealth', 'Bomber'],
 		tank_unique: 'TRex',
 		bonus: {weapon: 0, armor: 0},
 		},
-	}
+	};
 
 //====== TANKS =================================================================
 
@@ -54,9 +57,9 @@ TYPES.push({
 	damage: [30, 1.5],	//30 dps		//[tank damage in level 0, damage increase in each level]
 	range: 80, 					//tank shooting range
 	scout: 110,					//tank scout range
-	armor: [25, 0.5, 50],				//[tank armor in level 0, armor increase in each level, max armor]
+	armor: [15, 0.5, 40],				//[tank armor in level 0, armor increase in each level, max armor]
 	speed: 28,					//moving speed
-	attack_delay: 1,				//pause between shoots in seconds
+	attack_delay: 1.05,				//pause between shoots in seconds
 	turn_speed: 2.5,				//turn speed, higher - faster
 	//no_repawn: 1,					//if tank dies - he will not respawn
 	//no_collisions: 1,				//tank can go other walls and other tanks
@@ -75,7 +78,7 @@ TYPES.push({
 	bullet: 'bullet',				//bullet_image
 	fire_sound: 'shoot',				//shooting sound
 	//mode: 'quick',				//if set, unit available only in quick/craft mode
-	cost: 70,					//unit cost in full mode
+	cost: 100,					//unit cost in full mode
 	});
 
 //Heavy
@@ -89,7 +92,7 @@ TYPES.push({
 	scout: 110,
 	armor: [40, 0.5, 65],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.09,
 	turn_speed: 2.5,
 	abilities: [
 		{name: 'Rest',		passive: false,		broadcast: 1}, 
@@ -113,10 +116,10 @@ TYPES.push({
 	life: [180, 11],
 	damage: [18, 1.3],	//18 dps
 	range: 80,
-	scout: 110,
+	scout: 110,			
 	armor: [20, 0.5, 45],
 	speed: 30,
-	attack_delay: 1,
+	attack_delay: 0.95,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Turbo',		passive: false,		broadcast: 1}, 
@@ -129,7 +132,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
-	cost: 50,
+	cost: 80,
 	});
 
 //Launcher
@@ -143,7 +146,7 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.02,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Missile',	passive: false,		broadcast: 2}, 
@@ -170,7 +173,7 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 28,
-	attack_delay: 2,
+	attack_delay: 1.92,
 	turn_speed: 2,
 	abilities: [
 		{name: 'Strike',	passive: false,		broadcast: 2}, 
@@ -184,7 +187,7 @@ TYPES.push({
 	icon_base: true,
 	bullet: 'bullet',
 	fire_sound: 'shoot',
-	cost: 50,
+	cost: 70,
 	});
 
 //Miner
@@ -198,7 +201,7 @@ TYPES.push({
 	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 1.07,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Mine',		passive: false,		broadcast: 1}, 
@@ -225,7 +228,7 @@ TYPES.push({
 	scout: 110,
 	armor: [20, 0.5, 45],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 1.08,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Virus',		passive: false,		broadcast: 2}, 
@@ -252,7 +255,7 @@ TYPES.push({
 	scout: 110,
 	armor: [10, 0, 10],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.03,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Fire bomb',	passive: false,		broadcast: 2}, 
@@ -274,18 +277,18 @@ TYPES.push({
 	name: 'Mechanic',
 	type: 'tank',
 	description: ["Constructs, rebuilds and occupies enemy building", "Essential unit in Full mode"],
-	life: [150, 10],
+	life: [120, 10],
 	damage: [10, 1],	//10 dps
 	range: 80,
 	scout: 110,
 	armor: [10, 0, 10],
-	speed: 25,
-	attack_delay: 1,
+	speed: 25,				speed: 100,	scout: 11000,
+	attack_delay: 1.04,
 	turn_speed: 3,
 	abilities: [
+		{name: 'Construct',	passive: true,		broadcast: 0}, 
 		{name: 'Rebuild',	passive: true,		broadcast: 0}, 
 		{name: 'Occupy',	passive: true,		broadcast: 0}, 
-		{name: 'Construct',	passive: true,		broadcast: 0}, 
 		],
 	size: ['M', 50, 50],
 	preview: true,
@@ -294,7 +297,7 @@ TYPES.push({
 	bullet: 'small_bullet',
 	fire_sound: 'shoot',
 	mode: 'craft',
-	cost: 40,
+	cost: 30,
 	});	
 
 //TRex
@@ -308,7 +311,7 @@ TYPES.push({
 	scout: 100,
 	armor: [30, 0.5, 55],
 	speed: 28,
-	attack_delay: 1,
+	attack_delay: 0.98,
 	turn_speed: 3,
 	abilities: [
 		{name: 'Plasma',	passive: false,		broadcast: 2}, 
@@ -335,7 +338,7 @@ TYPES.push({
 	scout: 120,
 	armor: [20, 0.5, 45],	
 	speed: 32,
-	attack_delay: 1,
+	attack_delay: 0.99,
 	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
@@ -365,7 +368,7 @@ TYPES.push({
 	scout: 120,
 	armor: [10, 0.2, 20],
 	speed: 37,
-	attack_delay: 1,
+	attack_delay: 1.01,
 	turn_speed: 3,
 	//bonus: 1,
 	no_collisions: 1,
@@ -395,7 +398,7 @@ TYPES.push({
 	scout: 100,
 	armor: [0, 0, 0],
 	speed: 25,
-	attack_delay: 1,
+	attack_delay: 1.06,
 	turn_speed: 4,
 	no_repawn: 1,
 	abilities: [],
@@ -419,7 +422,7 @@ TYPES.push({
 	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.13,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
@@ -432,7 +435,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'ground',
-	cost: 150,
+	cost: 80,
 	});
 	
 //SAM Tower
@@ -440,13 +443,13 @@ TYPES.push({
 	name: 'SAM_Tower',
 	type: 'building',
 	description: ["Tower for air defence"],
-	life: [1000,0],
+	life: [800,0],
 	damage: [50, 0],	//40 dps
 	range: 110,
 	scout: 130,
 	armor: [20, 0, 20],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.15,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [],
@@ -457,7 +460,7 @@ TYPES.push({
 	bullet: 'bullet',
 	fire_sound: 'shoot',
 	attack_type: 'air',
-	cost: 120,
+	cost: 60,
 	});
 
 //Scout Tower
@@ -494,14 +497,11 @@ TYPES.push({
 	scout: 130,
 	armor: [50, 0, 50],
 	speed: 0,
-	attack_delay: 1.1,
+	attack_delay: 1.12,
 	turn_speed: 2.5,
 	no_repawn: 1,
 	abilities: [
 		{name: 'Mechanic',		passive: false,		broadcast: 2}, 
-		/*{name: 'Factory',		passive: false,		broadcast: 2}, 
-		{name: 'Research',		passive: false,		broadcast: 2}, 
-		{name: 'Silo',			passive: false,		broadcast: 2}, */
 		],
 	size: ['L', 90, 90],
 	preview: false,
@@ -536,7 +536,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 150,
+	cost: 110,
 	});
 
 //Research
@@ -562,7 +562,7 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 185,
+	cost: 145,
 	});
 
 //Silo
@@ -585,5 +585,5 @@ TYPES.push({
 	icon_top: false,
 	icon_base: true,
 	no_base_rotate: true,
-	cost: 60,
+	cost: 50,
 	});

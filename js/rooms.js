@@ -77,7 +77,7 @@ function ROOM_CLASS(){
 		HELPER.roundRect(canvas_backround, x, y, width, height, 5, true);
 		MAIN.register_button(x, y, width, height, PLACE, function(xx, yy){
 			document.getElementById("chat_box").style.display = 'none';
-			MAIN.init_game(false);
+			MAIN.home(false);
 			});
 		//text
 		text = "Menu";
@@ -195,7 +195,7 @@ function ROOM_CLASS(){
 				}
 			y = y + height+gap;
 			}
-		}
+		};
 	//create new room window
 	this.draw_create_room = function(game_players, mode, game_type, game_map, nation1, nation2){
 		PLACE = 'create_room';
@@ -470,7 +470,6 @@ function ROOM_CLASS(){
 			}
 		offset_top = offset_top + 40;
 		
-		
 		//create button
 		button_width = 130;
 		button_height = 40;
@@ -516,7 +515,7 @@ function ROOM_CLASS(){
 		canvas_backround.font = "Normal 12px Arial";
 		text = "Notice: If you are hosting game, please do not switch this tab or minimize browser while game is active.";
 		canvas_backround.fillText(text, 10+offset_left, 30+offset_top);
-		}
+		};
 	//room waiting for players
 	this.draw_room = function(room_id){
 		PLACE = 'room';
@@ -770,7 +769,7 @@ function ROOM_CLASS(){
 			
 			y = y + height+gap;
 			}
-		}
+		};
 	//kick button was pressed - find player
 	this.on_kick_player = function(side, index, room_id){
 		left_n = 0;
@@ -788,7 +787,7 @@ function ROOM_CLASS(){
 				right_n++;
 				}
 			}
-		}
+		};
 	//returns room by id
 	this.get_room_by_id = function(room_id){
 		for(var i in ROOMS){
@@ -797,7 +796,7 @@ function ROOM_CLASS(){
 				}
 			}
 		return false;
-		}
+		};
 	this.get_active_room_progress = function(){
 		room = ROOM.get_room_by_id(opened_room_id);
 		var progress = 0;
@@ -833,16 +832,10 @@ function ROOM_CLASS(){
 				}
 			for(var i in TYPES){
 				if(TYPES[i].name == 'Tower'){
-					if(room.players.length > 2)
-						towers_total_hp = towers_n * TYPES[i].life[0];
-					else
-						towers_total_hp = towers_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+					towers_total_hp = towers_n * TYPES[i].life[0];
 					}
 				else if(TYPES[i].name == 'Base'){
-					if(room.players.length > 2)
-						base_total_hp = bases_n * TYPES[i].life[0];
-					else
-						base_total_hp = bases_n * TYPES[i].life[0] * TOWER_HP_DAMAGE_IN_1VS1[0];
+					base_total_hp = bases_n * TYPES[i].life[0];
 					}
 				}
 			for(var i in TANKS){
@@ -866,5 +859,5 @@ function ROOM_CLASS(){
 				progress = progress_tmp;
 			}
 		return round(progress);
-		}
+		};
 	}

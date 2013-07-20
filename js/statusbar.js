@@ -29,7 +29,7 @@ function STATUS_CLASS(){
 		this.draw_quit_button();
 		this.draw_fs_button();
 		this.draw_version();
-		}
+		};
 	//show mute music button in statusbar
 	this.draw_mute_music_button = function(){
 		PADDING = 55;
@@ -62,7 +62,7 @@ function STATUS_CLASS(){
 			canvas_backround.stroke();
 			}
 		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_music, WIDTH_APP-PADDING, 'nofix');
-		}
+		};
 	//draw mute effects button in statusbar
 	this.draw_mute_fx_button = function(){
 		PADDING = 108;
@@ -95,7 +95,7 @@ function STATUS_CLASS(){
 			}
 		
 		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', STATUS.mute_unmute_fx, WIDTH_APP-PADDING, 'nofix');
-		}
+		};
 	//show quality button in statusbar
 	this.draw_quality_button = function(first_run){
 		PADDING = 161;
@@ -129,7 +129,7 @@ function STATUS_CLASS(){
 			MAP.change_quality();
 			STATUS.draw_quality_button(false);
 			}, false, 'nofix');
-		}
+		};
 	//quit button in statusbar
 	this.draw_quit_button = function(){
 		PADDING = 214;
@@ -146,7 +146,7 @@ function STATUS_CLASS(){
 		canvas_backround.fillText(q_text, WIDTH_APP-PADDING+tmp, HEIGHT_APP-18-5+14);
 		
 		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, '', MAIN.quit_game, false, 'nofix');
-		}
+		};
 	//show fullscreen button in statusbar
 	this.draw_fs_button = function(){
 		if(PLACE != 'game' ) return false;
@@ -166,14 +166,14 @@ function STATUS_CLASS(){
 		MAIN.register_button(WIDTH_APP-PADDING, HEIGHT_APP-23, 48, 20, PLACE, function(){
 			fullscreen('canvas_area');
 			}, false, 'nofix');
-		}
+		};
 	//show version instatus bar
 	this.draw_version = function(){
 		PADDING = 10;
 		canvas_backround.fillStyle = "#ffffff";
 		canvas_backround.font = "Normal 11px Helvetica";
 		canvas_backround.fillText("v"+VERSION, PADDING, HEIGHT_APP-18-5+14);
-		}
+		};
 	//do mute or unmute music
 	this.mute_unmute_music = function(mouse_x, mouse_y, left_margin){
 		mode = 1;
@@ -219,7 +219,7 @@ function STATUS_CLASS(){
 		if(MUTE_MUSIC==true)	HELPER.setCookie("mute_music", "0", 30);
 		else			HELPER.setCookie("mute_music", MUSIC_VOLUME, 30);
 		STATUS.draw_mute_music_button();
-		}
+		};
 	//do mute or unmute effects
 	this.mute_unmute_fx = function(mouse_x, mouse_y, left_margin){
 		mode = 1;
@@ -242,5 +242,5 @@ function STATUS_CLASS(){
 		if(MUTE_FX==true)	HELPER.setCookie("mute_fx", "0", 30);
 		else			HELPER.setCookie("mute_fx", FX_VOLUME, 30);
 		STATUS.draw_mute_fx_button();
-		}
+		};
 	}

@@ -22,7 +22,7 @@ function MP_CLASS(){
 		orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.READY, MP.readyListener, this);
 		orbiter.addEventListener(net.user1.orbiter.OrbiterEvent.CLOSE, MP.disconnect_server, this);
 		orbiter.connect(SOCKET[0], SOCKET[1]);
-		}
+		};
 	//on connection ready
 	this.readyListener = function(e){
 		SOCKET_ROOMS = SOCKET_ROOM_PREFIX+"rooms";
@@ -35,7 +35,7 @@ function MP_CLASS(){
 		//status
 		MP.socket_live = true;
 		try{parent.document.getElementById("connected").innerHTML = 'single';}catch(error){}
-		}
+		};
 	//controlls which rooms to join and leave
 	this.room_controller = function(new_room){
 		if(MP.socket_live == false) return false;
@@ -103,7 +103,7 @@ function MP_CLASS(){
 				parent.document.getElementById("connected").innerHTML = 'none';
 			}
 		catch(error){}
-		}
+		};
 	//we joined the room
 	this.joinRoomsListener = function(e){
 		//redraw list
@@ -113,14 +113,14 @@ function MP_CLASS(){
 			ROOM.draw_rooms_list();
 		else if(PLACE=='room')
 			ROOM.draw_room(opened_room_id);
-		}
+		};
 	this.joinRoomListener_id = function(e){
 		if(room_id_to_join != -1){
 			MP.register_tank_action('join_room', room_id_to_join, name);
 			ROOM.draw_room(room_id_to_join);
 			room_id_to_join = -1;
 			}	
-		}
+		};
 	//client joins room
 	this.addOccupantListener = function(e) {
 		if(Rooms_obj.getSyncState() != net.user1.orbiter.SynchronizationState.SYNCHRONIZING) { 
@@ -130,8 +130,8 @@ function MP_CLASS(){
 			else if(PLACE=='room')
 				ROOM.draw_room(opened_room_id);
 			}
-		}
-	this.addOccupantListener_id = function(e) {}
+		};
+	this.addOccupantListener_id = function(e) {};
 	//client leaves room
 	this.removeOccupantListener = function(e){
 		waiting_users = Rooms_obj.getNumOccupants();
@@ -139,8 +139,8 @@ function MP_CLASS(){
 			ROOM.draw_rooms_list();
 		else if(PLACE=='room')
 			ROOM.draw_room(opened_room_id);
-		}
-	this.removeOccupantListener_id = function(e) {}
+		};
+	this.removeOccupantListener_id = function(e) {};
 	//do clean disconnect from server
 	this.disconnect_server = function(e){
 		//disconnect
@@ -154,13 +154,13 @@ function MP_CLASS(){
 		//update status
 		MP.socket_live = false;
 		try{parent.document.getElementById("connected").innerHTML = 'none';}catch(error){}
-		}
+		};
 	this.get_packet_inner = function(fromClient, message){
 		MP.get_packet(fromClient, message);
-		}
+		};
 	this.get_packet_inner_id = function(fromClient, message){
 		MP.get_packet(fromClient, message);
-		}
+		};
 	
 	//===== COMMUNICATION ====================================================
 	
@@ -215,7 +215,7 @@ function MP_CLASS(){
 			Rooms_obj.sendMessage("CHAT_MESSAGE", "true", null, message);		//use all rooms
 		else
 			console.log('Error: we are not joined any room, place: '+PLACE);	//error
-		}
+		};
 	//get packets from server
 	this.get_packet = function(fromClient, message){
 		packets_all++;	
@@ -259,7 +259,7 @@ function MP_CLASS(){
 		else if(type == 'ask_rooms'){	//somebody is asking rooms list
 			if(PLACE == 'room'){
 				room = ROOM.get_room_by_id(opened_room_id);
-				if(room.host==name)
+				if(room.host == name)
 					MP.send_packet('new_room', room);	//broadcast it
 				}
 			else if(PLACE == 'select'){ //i am host and i can broadcast started game status...
@@ -300,7 +300,7 @@ function MP_CLASS(){
 				for(var j=0; j < room.players.length; j++){
 					if(room.players[j].name == DATA[1]){
 						room.players.splice(j, 1);  j--;
-						if(DATA[1]==name){
+						if(DATA[1] == name){
 							if(PLACE=='room'){
 								//i was kicked ... go back
 								ROOM.draw_rooms_list();
@@ -449,25 +449,25 @@ function MP_CLASS(){
 						}
 					}
 				
-				//find level
+				//check map
 				current_level = 1;
 				for(var m in MAPS){
 					if(MAPS[m].name == room.settings[2])
 						current_level = parseInt(m)+1;
 					}
-				//find my team
+				//check my team - make sure all players see same teams
 				var my_team='B';
 				for(var p in room.players){
-					if(room.players[p].name==name)
+					if(room.players[p].name == name)
 						my_team = room.players[p].team;
 					}
 				//start	
 				clearInterval(start_game_timer_id, my_team);
-				MAIN.init_action(current_level, my_team);
+				MAIN.start_game(current_level, my_team);
 				}
 			}
 		else if(type == 'end_game'){		//game ends
-			//DATA = [game_id, lost_team]
+			//DATA = [game_id, win_team]
 			//if me host, broadcast game end
 			room = ROOM.get_room_by_id(opened_room_id);
 			if(room.host == name){
@@ -495,46 +495,86 @@ function MP_CLASS(){
 			}
 		else if(type == 'tank_move'){		//tank move
 			//DATA = room_id, tank_id, [from_x, from_y, to_x, to_y, lock, direction] 
-			if(DATA[1] == name && MUTE_FX==false){
-				try{
-					audio_finish = document.createElement('audio');
-					audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
-					audio_finish.volume = FX_VOLUME;
-					audio_finish.play();
-					}
-				catch(error){}
-				}
 			if(PLACE=="game" && opened_room_id==DATA[0]){
-				TANK = UNITS.get_tank_by_id(DATA[1]);
-				if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on tank_move.');
-				MP.update_players_ping(TANK.name);
-				UNITS.sync_movement(TANK, DATA[2][0], DATA[2][1]);
-				TANK.move = 1;
-				TANK.move_to = [DATA[2][2], DATA[2][3]];
-				delete TANK.target_move_lock;
-				if(DATA[2][4] != undefined){
-					//target lock
-					TANK.target_move_lock = DATA[2][4];
-					TANK.target_shoot_lock = DATA[2][4];
+				//sound
+				if(DATA[1] == name && MUTE_FX==false){
+					try{
+						audio_finish = document.createElement('audio');
+						audio_finish.setAttribute('src', '../sounds/click'+SOUND_EXT);
+						audio_finish.volume = FX_VOLUME;
+						audio_finish.play();
+						}
+					catch(error){}
 					}
-				if(DATA[2][5] != undefined)
-					TANK.move_direction = DATA[2][5];
+				//move tank
+				var ids = [];
+				if(typeof DATA[1] != 'object')
+					ids = [DATA[1]];
+				else
+					ids = DATA[1];
+				//unselect all teams units
+				var tank_tmp = UNITS.get_tank_by_id(ids[0]);
+				if(tank_tmp===false){
+					console.log('Error: tank "'+ids[0]+'" was not found on tank_move.');
+					return false;
+					}
+				for(var i in TANKS){
+					if(TANKS[i].team != tank_tmp.team) continue;
+					delete TANKS[i].selected;
+					}
+				for(var i in ids){
+					TANK = UNITS.get_tank_by_id(ids[i]);
+					if(TANK===false){
+						console.log('Error: tank "'+ids[i]+'" was not found on tank_move.');
+						return false;
+						}
+					MP.update_players_ping(TANK.name);
+					if(ids.length == 1)
+						UNITS.sync_movement(TANK, DATA[2][0], DATA[2][1], 100);
+					if(game_mode == 'multi_quick'){
+						TANK.move = 1;
+						TANK.move_to = [DATA[2][2], DATA[2][3]];
+						}
+					else{
+						TANK.selected = 1;
+						if(DATA[2][4] == undefined)
+							UNITS.calc_new_position(TANK.team, DATA[2][2], DATA[2][3]);
+						}
+					delete TANK.target_move_lock;
+					if(DATA[2][4] != undefined){
+						//target lock
+						TANK.target_move_lock = DATA[2][4];
+						TANK.target_shoot_lock = DATA[2][4];
+						}
+					if(DATA[2][5] != undefined)
+						TANK.move_direction = DATA[2][5];
+					}
 				}
 			}
 		else if(type == 'skill_do'){	//tank skill start
-			//DATA = room_id, player_name, nr=[1,2,3], random
+			//DATA = room_id, tank_id, nr=[1,2,3], random
 			if(PLACE != "game" || opened_room_id!=DATA[0]) return false;
-			TANK_FROM = UNITS.get_tank_by_name(DATA[1]);
-			if(TANK_FROM===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_do.');
-			var nr = DATA[2];	
-			var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
-			//execute
-			TANK_FROM.rand = DATA[3];
-			var ability_reuse = SKILLS[ability_function](TANK_FROM);
-			//reuse	
-			if(ability_reuse != undefined && ability_reuse != 0){	
-				TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
-				TANK_FROM.abilities_reuse_max[nr-1] = ability_reuse;
+			var ids = [];
+			if(typeof DATA[1] != 'object')
+				ids = [DATA[1]];
+			else
+				ids = DATA[1];
+			for(var i in ids){
+				TANK_FROM = UNITS.get_tank_by_id(ids[i]);
+				if(TANK_FROM===false){
+					console.log('Error: tank "'+ids[i]+'" was not found on skill_do.');
+					return false;
+					}
+				var nr = DATA[2];	
+				var ability_function = TYPES[TANK_FROM.type].abilities[nr-1].name.replace(/ /g,'_');
+				//execute
+				TANK_FROM.rand = DATA[3];
+				var ability_reuse = SKILLS[ability_function](TANK_FROM);
+				//reuse	
+				if(ability_reuse != undefined && ability_reuse != 0){	
+					TANK_FROM.abilities_reuse[nr-1] = Date.now() + ability_reuse;
+					TANK_FROM.abilities_reuse_max[nr-1] = ability_reuse;
+					}
 				}
 			}
 		else if(type == 'chat'){		//chat
@@ -556,31 +596,41 @@ function MP_CLASS(){
 			MP.update_players_ping(DATA[2]);
 			}
 		else if(type == 'skill_advanced'){	//advanced skill, with delayed execution
-			/*DATA = room_id, player, {
+			/*DATA = room_id, unit_id, {
 					function: 'function_name',
 					fparam: [param1, param2, param3],
 					tank_params: [	{key: 'xxxx', value: 'xxxx'},	]
 					}*/
 			if(PLACE != "game" || opened_room_id != DATA[0]) return false;
-			TANK = UNITS.get_tank_by_name(DATA[1]);
-			if(TANK===false) console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
+			TANK = UNITS.get_tank_by_id(DATA[1]);
+			if(TANK===false){
+				console.log('Error: tank "'+DATA[1]+'" was not found on skill_advanced.');
+				return false;
+				}
 			var skill_data = DATA[2];
 			delete TANK.target_move_lock;
 			//adding extra info to tank
 			for(var i in skill_data.tank_params){
 				var key = skill_data.tank_params[i].key;
-				TANK[key] = skill_data.tank_params[i].value
+				TANK[key] = skill_data.tank_params[i].value;
 				}
 			//executing function
 			var function_name = skill_data.function;
-			if(function_name != '')	
-				SKILLS[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+			if(function_name != ''){
+				if(skill_data.ai === true)
+					AI[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+				else
+					SKILLS[function_name](skill_data.fparam[0], skill_data.fparam[1], skill_data.fparam[2]);
+				}
 			}
 		else if(type == 'tank_update'){		//tank updates 
 			//DATA = [tank_id, params]
 			if(PLACE != "game") return false;
 			TANK = UNITS.get_tank_by_id(DATA[0]);
-			if(TANK===false) console.log('Error: tank "'+DATA[0]+'" was not found on tank_update.');
+			if(TANK===false){
+				console.log('Error: tank "'+DATA[0]+'" was not found on tank_update.');
+				return false;
+				}
 			//adding extra info to tank
 			for(var i in DATA[1]){
 				var key = DATA[1][i].key;
@@ -603,8 +653,9 @@ function MP_CLASS(){
 		else if(type == 'tank_kill'){	//tank was killed
 			//DATA = room_id, player, killed_tank_id
 			TANK_TO = UNITS.get_tank_by_id(DATA[2]);
-			if(TANK_TO===false){	
-				console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
+			if(TANK_TO===false){
+				if(DEBUG == true)
+					console.log('Error: tank_to "'+DATA[2]+'" was not found on tank_kill.');
 				return false;
 				}
 			TANK_FROM = UNITS.get_tank_by_id(DATA[1]);
@@ -629,7 +680,7 @@ function MP_CLASS(){
 						}
 					}
 				}
-			if(TYPES[TANK_TO.type].no_repawn != undefined){	
+			if(TYPES[TANK_TO.type].no_repawn != undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){	
 				UNITS.check_selection(TANK_TO);
 				//removing
 				for(var b=0; b < TANKS.length; b++){
@@ -640,10 +691,11 @@ function MP_CLASS(){
 					}
 				}
 			//adding kill stats
+			UNITS.player_data[TANK_TO.nation].kills += 1;
 			if(TYPES[TANK_TO.type].no_repawn == undefined || game_mode == 'single_craft' || game_mode == 'multi_craft'){
 				//player
 				if(TANK_TO.dead != 1)
-					TANK_FROM.kills = TANK_FROM.kills + 1;	
+					TANK_FROM.kills = TANK_FROM.kills + 1;
 				//score
 				TANK_FROM.score = TANK_FROM.score + SCORES_INFO[1];
 				UNITS.death(TANK_TO);
@@ -691,17 +743,38 @@ function MP_CLASS(){
 		else if(type == 'summon_bots'){	//send bots
 			//DATA = [room_id, random_id]
 			UNITS.add_bots(DATA[1]);
+			}
+		else if(type == 'do_research'){	//research weapon/armor bonus
+			//DATA = [nation, type, power]
+			COUNTRIES[DATA[0]].bonus[DATA[1]] += DATA[2];
 			}	
+		else if(type == 'new_unit'){	//new unit was added
+			if(DATA.mode == 'sync'){	
+				if(DATA.team != MY_TANK.team)
+					UNITS.add_tank(1, DATA.id, DATA.name, DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle);
+				}
+			else if(DATA.mode == 'craft'){
+				var new_tank = UNITS.add_tank(1, DATA.id, DATA.name, DATA.type, DATA.team, DATA.nation, DATA.x, DATA.y, DATA.angle);
+				UNITS.player_data[new_tank.nation].units++;
+				new_tank.move = 1;
+				//randomize spawn position
+				new_tank.move_to = [
+					DATA.move_x, 
+					DATA.move_y,
+					];
+				}
+			}		
 		else if(type == 'bullet'){	//tank hit
-			//DATA = [target_id, source_id, angle, damage, instant_bullet, pierce_armor]
+			//DATA = [target_id, source_id, angle, damage, instant_bullet, pierce_armor, unit_x, unit_y]
 			TANK_TO = UNITS.get_tank_by_id(DATA[0]);
 			TANK = UNITS.get_tank_by_id(DATA[1]);
 			if(TANK_TO===false){	
 				console.log('Error: tank_to "'+DATA[0]+'" was not found on tank_hit.');
 				return false;
 				}
-			if(TANK===false){	
-				console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
+			if(TANK===false){
+				if(DEBUG == true)
+					console.log('Error: tank "'+DATA[1]+'" was not found on tank_hit.');
 				return false;
 				}
 			MP.update_players_ping(TANK.name);
@@ -730,8 +803,15 @@ function MP_CLASS(){
 				if(TANK.id == MY_TANK.id)
 					UNITS.shoot_sound(TANK);
 				}
+			//check sync
+			var distance = UNITS.get_distance_between_tanks(TANK, TANK_TO);
+			if(distance > MAX_BULLET_RANGE){
+				//unit shooting from very far location - sync its position
+				TANK.x = DATA[6];
+				TANK.y = DATA[7];				
+				}
 			}	
-		}
+		};
 	//sending action to other players
 	this.register_tank_action = function(action, room_id, player, data, data2, data3){	//lots of broadcasting
 		if(action=='move')
@@ -798,12 +878,12 @@ function MP_CLASS(){
 		//error
 		else
 			alert('Error, unknown action ['+action+'] in MP.register_tank_action();');	
-		}
+		};
 	//new room was created
 	this.register_new_room = function(room_name, mode, type, max_players, map, nation1, nation2, main_mode){
 		var players = [];
 		players.push({
-			name: name, 
+			name: name,
 			team: 'B',
 			nation: nation1,
 			ping: Date.now(),
@@ -823,20 +903,39 @@ function MP_CLASS(){
 		ROOMS.push(room);
 		MP.send_packet('new_room', room);						//broadcast it
 		return room.id;
-		}
+		};
 	//sync multiplayer data to local room data
 	this.sync_multiplayers = function(){
-		var room = ROOM.get_room_by_id(opened_room_id);
-		for(var i in room.players){
-			if(room.players[i].name != name){	//if not me
-				var nation = UNITS.get_nation_by_team(room.players[i].team);
-				UNITS.add_tank(1, room.players[i].name, room.players[i].name, room.players[i].tank, room.players[i].team, nation);
+		if(game_mode == 'multi_quick'){
+			var room = ROOM.get_room_by_id(opened_room_id);
+			for(var i in room.players){
+				if(room.players[i].team != MY_TANK.team){	//if not me
+					var nation = UNITS.get_nation_by_team(room.players[i].team);
+					UNITS.add_tank(1, room.players[i].name, room.players[i].name, room.players[i].tank, room.players[i].team, nation);
+					}
 				}
 			}
-		}
+		else if(game_mode == 'multi_craft'){
+			for(var i in TANKS){
+				if(TANKS[i].team != MY_TANK.team) continue;
+				var unit_data = {
+					mode: 'sync',
+					id: TANKS[i].id,
+					name: TANKS[i].name,
+					type: TANKS[i].type,
+					team: TANKS[i].team,
+					nation: TANKS[i].nation,
+					x: TANKS[i].x,
+					y: TANKS[i].y,
+					angle: TANKS[i].angle,
+					};
+				MP.send_packet('new_unit', unit_data);
+				}
+			}
+		};
 	this.get_waiting_players_count = function(){
 		return waiting_users;
-		}
+		};
 	this.update_players_ping = function(name){
 		if(PLACE != 'game') return false;
 		room = ROOM.get_room_by_id(opened_room_id);
@@ -844,7 +943,7 @@ function MP_CLASS(){
 			if(room.players[p].name == name)
 				room.players[p].ping = Date.now();
 			}
-		}
+		};
 	this.disconnect_game = function(e){
 		if(PLACE=='room' && (game_mode == 'multi_quick' || game_mode == 'multi_craft') ){
 			if(confirm("Do you really want to leave this room?")==false){
@@ -858,5 +957,5 @@ function MP_CLASS(){
 				}
 			MP.register_tank_action('leave_game', opened_room_id, name);
 			}
-		}
+		};
 	}
