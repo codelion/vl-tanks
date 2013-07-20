@@ -3,7 +3,7 @@ var HELPER = new HELPER_CLASS();
 function HELPER_CLASS(){
 	this.replaceAt = function(index, char){
 		return this.substr(0, index) + char + this.substr(index+char.length);
-		}
+		};
 	//get url param
 	this.get_url_param = function(name){
 		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
@@ -14,7 +14,7 @@ function HELPER_CLASS(){
 			return "";  
 		else    
 			return results[1];
-		}
+		};
 	this.getCookie = function(NameOfCookie){
 		if (document.cookie.length > 0){
 			begin = document.cookie.indexOf(NameOfCookie+"=");
@@ -26,17 +26,17 @@ function HELPER_CLASS(){
 				}
 			}
 		return '';
-		}
+		};
 	this.setCookie = function(NameOfCookie, value, expiredays){ 
 		var ExpireDate = new Date ();
 		ExpireDate.setTime(ExpireDate.getTime() + (expiredays * 24 * 3600 * 1000));
 		document.cookie = NameOfCookie + "=" + escape(value) +
 		((expiredays == null) ? "" : "; expires=" + ExpireDate.toGMTString());
-		}
+		};
 	this.delCookie = function(NameOfCookie){
 		if(HELPER.getCookie(NameOfCookie))
 			document.cookie = NameOfCookie + "="+"; expires=Thu, 01-Jan-70 00:00:01 GMT";
-		}
+		};
 	//ctx.strokeStyle = "#2d6";
 	//ctx.fillStyle = "#abc";
 	//roundRect(ctx, 100, 200, 200, 100, 50, true);
@@ -59,17 +59,17 @@ function HELPER_CLASS(){
 		ctx.lineWidth = 1;
 		if (stroke)		ctx.stroke();	//borders
 		if (fill)		ctx.fill();	//background
-		}
+		};
 	//this.to get random number from 1 to n
 	this.getRandomInt = function(min, max){
 		return Math.floor(Math.random() * (max - min + 1)) + min;
-		}
+		};
 	this.font_pixel_to_height = function(px){
 		return Math.round(px*0.75);
-		}
+		};
 	this.ucfirst = function(string){
 		return string.charAt(0).toUpperCase() + string.slice(1);
-		}
+		};
 	this.get_dimensions = function(){
 		var theWidth, theHeight;
 		if (window.innerWidth)
@@ -85,7 +85,7 @@ function HELPER_CLASS(){
 		else if (document.body)
 			theHeight=document.body.clientHeight;
 		return [theWidth, theHeight];
-		}
+		};
 	this.drawImage_rotated = function(canvas, file, x, y, width, height, angle){
 		var TO_RADIANS = Math.PI/180;
 		var img = new Image();	
@@ -95,16 +95,16 @@ function HELPER_CLASS(){
 		canvas.rotate(angle * TO_RADIANS);
 		canvas.drawImage(img, -(width/2), -(height/2));
 		canvas.restore();
-		}
+		};
 	this.convertToSlug = function(Text){
 		return Text.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-');
-		}
+		};
 	this.isIE = function() {
 		return !!navigator.userAgent.match(/MSIE 10/);
-		}
+		};
 	this.generatePassword = function(limit){
 		array1 = "zsdcrfvtgbhnjmkp";
-		array2 = "aeou"; //yes, no i
+		array2 = "aeoui";
 		n1 = array1.length;
 		n2 = array2.length;
 		string = "";
@@ -113,7 +113,7 @@ function HELPER_CLASS(){
 			string = string + array2[HELPER.getRandomInt(0, n2-1)];
 			}
 		return string;
-		}
+		};
 	//IntegraXor Web SCADA - JavaScript Number Formatter, author: KPL, KHL
 	this.format = function(b,a){
 		if(!b||isNaN(+a))return a;
@@ -127,14 +127,14 @@ function HELPER_CLASS(){
 		else		+c[0]==0&&(c[0]="");
 		a=a.split(".");a[0]=c[0];
 		if(c=d[1]&&d[d.length-1].length)
-			{for(var d=a[0],f="",k=d.length%c,g=0,i=d.length;g<i;g++)f+=d.charAt(g),!((g-k+1)%c)&&g<i-c&&(f+=e);a[0]=f}
+			{for(var d=a[0],f="",k=d.length%c,g=0,i=d.length;g<i;g++)f+=d.charAt(g),!((g-k+1)%c)&&g<i-c&&(f+=e);a[0]=f;}
 		a[1]=b[1]&&a[1]?h+a[1]:"";
 		return(j?"-":"")+a[0]+a[1];
 		};
 	this.strpos = function(haystack, needle, offset) {
 		var i = (haystack+'').indexOf(needle, (offset || 0));
 		return i === -1 ? false : i;
-		}
+		};
 	//dashed objects
 	this.dashedRect = function(canvas, x1, y1, x2, y2, dashLen, color) {
 		HELPER.dashedLine(canvas, x1, y1, x2, y1, dashLen, color);
@@ -172,7 +172,29 @@ function HELPER_CLASS(){
 			if (obj.hasOwnProperty(key)) size++;
 			}
 		return size;
-		}
+		};
+	this.drawSoftLine = function(ctx, x1, y1, x2, y2, lineWidth, r, g, b, a){
+		var lx = x2 - x1;
+		var ly = y2 - y1;
+		var lineLength = Math.sqrt(lx*lx + ly*ly);
+		var wy = lx / lineLength * lineWidth;
+		var wx = ly / lineLength * lineWidth;
+		var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
+		// The gradient must be defined accross the line, 90° turned compared
+		// to the line direction.
+		gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
+		gradient.addColorStop(0.43, "rgba("+r+","+g+","+b+","+a+")");
+		gradient.addColorStop(0.57, "rgba("+r+","+g+","+b+","+a+")");
+		gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
+		ctx.save();
+		ctx.beginPath();
+		ctx.lineWidth = lineWidth;
+		ctx.strokeStyle = gradient;
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		ctx.restore(); 
+		};
 	}	
 	
 function log(object){

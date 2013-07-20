@@ -101,7 +101,7 @@ function MAP_CLASS(){
 		if(map_only==false){
 			INFOBAR.draw_infobar(true);
 			}
-		}
+		};
 	this.add_road_line = function(ctx, width, x1, y1, x2, y2){
 		//light border
 		ctx.lineWidth = width+5;
@@ -145,7 +145,7 @@ function MAP_CLASS(){
 			ctx.lineTo(x2, y2);
 			ctx.stroke();
 			}
-		}
+		};
 	this.add_road_turn = function(ctx, width, x1, y1, x2, y2, x3, y3){
 		//light border
 		ctx.lineWidth = width+5;
@@ -189,7 +189,7 @@ function MAP_CLASS(){
 			ctx.quadraticCurveTo(x2,y2,x3,y3);
 			ctx.stroke();
 			}
-		}
+		};
 	this.add_road_curve = function(ctx, width, x1, y1, x2, y2, x3, y3, x4, y4){
 		//light border
 		ctx.lineWidth = width+5;
@@ -233,7 +233,7 @@ function MAP_CLASS(){
 			ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
 			ctx.stroke();
 			}
-		}
+		};
 	/*
 	1x speed if QUALITY = 1	- scout off, fog off
 	2x slow  if QUALITY = 2 - scout on, fog off
@@ -287,12 +287,12 @@ function MAP_CLASS(){
 			}
 		canvas_map_sight.restore();
 		SCOUT_FOG_REUSE = Date.now() + 40; //next repaint in 40 ms - 25fps
-		}
+		};
 	//cancel manual map move controlls
 	this.move_to_place_reset = function(){
 		MAP_SCROLL_CONTROLL=false;
 		MAP.auto_scoll_map();
-		}
+		};
 	//move map by tank position
 	this.auto_scoll_map = function(){
 		//calc
@@ -314,7 +314,7 @@ function MAP_CLASS(){
 			document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
 			document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
 			}
-		}
+		};
 	//scroll map in manual scroll mode
 	this.scoll_map = function(xx, yy, step){
 		if(MAP_SCROLL_MODE==1) return false;
@@ -341,7 +341,7 @@ function MAP_CLASS(){
 			document.getElementById("canvas_fog").style.marginTop =  map_offset[1]+"px";
 			document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
 			}
-		}
+		};
 	//redraw actions in selecting tank/map window
 	this.show_maps_selection = function(canvas_this, top_height, can_select_map){
 		if(game_mode == 'multi_quick' || game_mode == 'multi_craft') return false;
@@ -353,7 +353,10 @@ function MAP_CLASS(){
 		//clear name area
 		canvas_backround.drawImage(MAIN.IMAGE_BACK, 0, top_height-5, WIDTH_APP, 110, 0, top_height-5, WIDTH_APP, 110);
 		
+		var j=0;
 		for (i in MAPS){
+			if(MAPS[i].mode != undefined && MAPS[i].mode != game_mode) continue;
+			
 			var padding_left = 15;
 			if(PLACE == 'library')
 				padding_left = 10;	
@@ -363,12 +366,12 @@ function MAP_CLASS(){
 			else
 				canvas_this.fillStyle = "#cccccc";
 			canvas_this.strokeStyle = "#196119";
-			HELPER.roundRect(canvas_this, padding_left+i*(button_width+gap), top_height, button_width, button_height, 5, true);
+			HELPER.roundRect(canvas_this, padding_left+j*(button_width+gap), top_height, button_width, button_height, 5, true);
 			
 			//calcuate mini-size
 			mini_w = (button_width-2)/MAPS[i].width;
 			mini_h = (button_height-2)/MAPS[i].height;
-			var pos1 = padding_left+i*(button_width+gap);
+			var pos1 = padding_left+j*(button_width+gap);
 			var pos2 = top_height;
 			
 			//paint towers
@@ -434,12 +437,12 @@ function MAP_CLASS(){
 			var letters_width = canvas_this.measureText(MAPS[i].name).width;
 			var text_padding_left = Math.round((button_width-letters_width)/2);
 			if(text_padding_left<0) text_padding_left=0;
-			canvas_this.fillText(MAPS[i].name, padding_left+i*(button_width+gap)+text_padding_left, top_height+1+button_height+gap+10);
+			canvas_this.fillText(MAPS[i].name, padding_left+j*(button_width+gap)+text_padding_left, top_height+1+button_height+gap+10);
 			
 			if(can_select_map==true){
 				//save position
 				var tmp = new Array();
-				tmp['x'] = padding_left+i*(button_width+gap)+1;
+				tmp['x'] = padding_left+j*(button_width+gap)+1;
 				tmp['y'] = top_height+1;
 				tmp['width'] = button_width;
 				tmp['height'] = button_height;
@@ -448,23 +451,16 @@ function MAP_CLASS(){
 				tmp['top_height'] = top_height-18*2;
 				MAP.maps_positions.push(tmp);
 				
-				MAIN.register_button(tmp['x'], tmp['y'], tmp['width'], tmp['height'], PLACE, function(mouseX, mouseY){	
-					for (i in MAP.maps_positions){
-						if(mouseX > MAP.maps_positions[i].x && mouseX < MAP.maps_positions[i].x + MAP.maps_positions[i].width){
-							if(mouseY > MAP.maps_positions[i].y && mouseY < MAP.maps_positions[i].y + MAP.maps_positions[i].height){
-								//we have click on map
-								level = 1+parseInt(MAP.maps_positions[i].index); 
-								MAP.show_maps_selection(canvas_backround, top_height, true);
-								if(PLACE == 'library')
-									LIBRARY.draw_library_maps();
-								}
-						
-							}
-						}
-					});
+				MAIN.register_button(tmp['x'], tmp['y'], tmp['width'], tmp['height'], PLACE, function(mouseX, mouseY, index){	
+					level = 1 + parseInt(index);
+					MAP.show_maps_selection(canvas_backround, top_height, true);
+					if(PLACE == 'library')
+						LIBRARY.draw_library_maps();
+					}, i);
 				}
+			j++;
 			}
-		}
+		};
 	//return map element info by name
 	this.get_element_by_name = function(name){
 		for(var i in ELEMENTS){
@@ -473,7 +469,7 @@ function MAP_CLASS(){
 				}
 			}
 		return false;
-		}
+		};
 	this.change_quality = function(){
 		QUALITY++;
 		if(QUALITY==4)
@@ -495,5 +491,5 @@ function MAP_CLASS(){
 				document.getElementById("canvas_fog").style.marginLeft = map_offset[0]+"px";
 				}
 			}
-		}
+		};
 	}
