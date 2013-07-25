@@ -1429,17 +1429,20 @@ function SKILLS_CLASS(){
 		var team_units = 0;
 		for(var ii in TANKS){
 			if(TANKS[ii].team != TANK.team) continue;
+			if(TANKS[ii].data.name == 'Base') continue;
 			if(TANKS[ii].data.type == 'building'){
 				if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
 					team_units = team_units + TANKS[ii].training.length;
 				}
-			if(TANKS[ii].damage == 0) continue;
+			if(TANKS[ii].data.damage[0] == 0) continue;
 			team_units++;
 			}
 		if(TANK.training != undefined && TANK.training.length >= 5) return false;
 		if(team_units >= MAX_TEAM_TANKS){
-			screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
-			screen_message.time = Date.now() + 1000;
+			if(TANK.team == MY_TANK.team){
+				screen_message.text = "Unit limit reached: "+MAX_TEAM_TANKS;
+				screen_message.time = Date.now() + 1000;
+				}
 			return false;
 			}
 		UNITS.player_data[TANK.nation].he3 -= cost;
@@ -2150,7 +2153,6 @@ function SKILLS_CLASS(){
 		TANK.try_construct.cost = UNITS.apply_buff(TANK, 'cost', TANK.try_construct.cost);
 		if(TANK.team == MY_TANK.team && skip_broadcast == undefined)
 			if(UNITS.player_data[TANK.nation].he3 < TANK.try_construct.cost) return false;
-		UNITS.player_data[TANK.nation].he3 -= TANK.try_construct.cost;
 		
 		TANK.abilities_reuse[nr] = Date.now() + TANK.try_construct.reuse;
 		TANK.abilities_reuse_max[nr] = TANK.try_construct.reuse;
@@ -2182,6 +2184,7 @@ function SKILLS_CLASS(){
 			return false;
 			}
 		
+		UNITS.player_data[TANK.nation].he3 -= TANK.try_construct.cost;
 		//create unit
 		var new_tank = UNITS.add_tank(1, unit_id, TYPES[type].name, type, TANK.team, nation, x, y, angle);
 		

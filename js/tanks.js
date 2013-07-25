@@ -472,12 +472,12 @@ function UNITS_CLASS(){
 				break;
 				}
 			//draw
-			if(tank.team == MY_TANK.team){
+			//if(tank.team == MY_TANK.team){
 				canvas_main.fillStyle = "#d9ce00";
 				hp_height = 3;
 				var gap = 3*(t+1);
 				canvas_main.fillRect(xx+padding_left, yy+padding_top-gap-hp_height, length, hp_height);
-				}
+			//	}
 			break;
 			}
 		};
@@ -1523,18 +1523,23 @@ function UNITS_CLASS(){
 	
 		//stats
 		if(TYPES[TANK_TO.type].name=="Tower" || TYPES[TANK_TO.type].name=="Base"){
+			var max_hp_to = UNITS.get_tank_max_hp(TANK_TO);
 			if(TANK.towers == undefined)
 				TANK.towers = 0;
-			var damage_at_tower = damage / TYPES[TANK_TO.type].life[0];
+			var damage_at_tower = damage / max_hp_to;
 			if(TANK_TO.hp < damage)
-				damage_at_tower = TANK_TO.hp / TYPES[TANK_TO.type].life[0];
+				damage_at_tower = TANK_TO.hp / max_hp_to;
 			
 			TANK.towers = TANK.towers + damage_at_tower;	
-			TANK.score = TANK.score + SCORES_INFO[3] * (damage / TYPES[TANK_TO.type].life[0]);
+			TANK.score = TANK.score + SCORES_INFO[3] * (damage / max_hp_to);
 			}
 		TANK.damage_done = TANK.damage_done + damage;
 		UNITS.player_data[TANK.nation].total_damage += damage;
 		TANK_TO.damage_received = TANK_TO.damage_received + damage;
+		TANK_TO.hit_stats = {
+			id: TANK.id, 
+			time: Date.now(),
+			}
 		
 		life_total = TANK_TO.hp;
 		if(life_total-damage>0){

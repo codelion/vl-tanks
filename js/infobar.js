@@ -980,11 +980,13 @@ function INFOBAR_CLASS(){
 					var team_units = 0;
 					for(var ii in TANKS){
 						if(TANKS[ii].team != MY_TANK.team) continue;
+						if(TANKS[ii].data.name == 'Base') continue;
 						if(TANKS[ii].data.type == 'building'){
-							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined)
+							if(TANKS[ii].data.name == "Factory" && TANKS[ii].training != undefined){
 								team_units = team_units + TANKS[ii].training.length;
+								}
 							}
-						if(TANKS[ii].damage == 0) continue;
+						if(TANKS[ii].data.damage[0] == 0) continue;
 						team_units++;
 						}
 					if(TANKS[i].training != undefined && TANKS[i].training.length >= 5) return false;
@@ -1043,7 +1045,7 @@ function INFOBAR_CLASS(){
 				return true;
 				}
 			}	
-		//multliple selection
+		//multiple selection
 		if(ns > 1){
 			var k = 0;
 			for(var i in TANKS){
