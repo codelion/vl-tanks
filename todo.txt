@@ -1,8 +1,0 @@
-countries: usa, russia, chinna
-IDEAS
-	number of opponents on single
-	fog on/off	
-	Helium3
-		base, mines generates, spawn takes, on 0 - team dies.
-		H3 mines give your base more energy and your towers more attacking power. 
-		H3 should be deposited randomly across the map
