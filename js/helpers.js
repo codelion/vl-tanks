@@ -60,7 +60,6 @@ function HELPER_CLASS(){
 		if (stroke)		ctx.stroke();	//borders
 		if (fill)		ctx.fill();	//background
 		};
-	//this.to get random number from 1 to n
 	this.getRandomInt = function(min, max){
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 		};
