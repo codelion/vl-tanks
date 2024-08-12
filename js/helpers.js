@@ -8,7 +8,7 @@ function HELPER_CLASS(){
 	this.get_url_param = function(name){
 		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
 		var regexS = "[\\?&]"+name+"=([^&#]*)";  
-		var regex = new RegExp( regexS );  
+		var regex = new RegExp(/your_hardcoded_regex_here/);
 		var results = regex.exec( window.location.href ); 
 		if( results == null )    
 			return "";  
